@@ -74,7 +74,7 @@ final class BarRepository: ObservableObject {
         _ bar: Bar,
         createdBy user: User
     ) async {
-        guard bar.createdBy == user.id else { return }
+        guard user.isAdmin || bar.createdBy == user.id else { return }
 
         self.bars.removeAll { $0.id == bar.id }
         self.prices.removeAll { $0.barID == bar.id }
@@ -124,13 +124,48 @@ final class BarRepository: ObservableObject {
         _ price: Price,
         reportedBy user: User
     ) async {
-        guard price.reportedBy == user.id else { return }
+        guard user.isAdmin || price.reportedBy == user.id else { return }
         self.prices.removeAll { $0.id == price.id }
 
         do {
             try await SupabaseClient.shared.deletePrice(price)
         } catch {
             print("Failed to delete price from Supabase: \(error)")
+        }
+    }
+
+    func deletePriceGroup(
+        for bar: Bar,
+        drink: Drink,
+        size: DrinkSize,
+        brand: String?,
+        deletedBy user: User
+    ) async {
+        let groupPrices = prices.filter {
+            $0.barID == bar.id &&
+                $0.drink == drink &&
+                $0.size == size &&
+                $0.brand == brand
+        }
+
+        guard !groupPrices.isEmpty else { return }
+
+        guard user.isAdmin || groupPrices.allSatisfy({ price in
+            price.reportedBy == user.id
+        }) else {
+            return
+        }
+
+        self.prices.removeAll { price in
+            groupPrices.contains { $0.id == price.id }
+        }
+
+        do {
+            for price in groupPrices {
+                try await SupabaseClient.shared.deletePrice(price)
+            }
+        } catch {
+            print("Failed to delete price group from Supabase: \(error)")
         }
     }
 

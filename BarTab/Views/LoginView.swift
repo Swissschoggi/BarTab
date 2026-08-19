@@ -24,7 +24,7 @@ struct LoginView: View {
     @Environment(\.presentationMode) private var presentationMode
 
     @State private var mode: Mode = .signIn
-    @State private var username = ""
+    @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var currentNonce: String?
@@ -74,12 +74,12 @@ struct LoginView: View {
                         ]
 
                         let rawNonce =
-                            AppleIDTokenValidator
+                            SupabaseAuthService
                             .randomNonceString()
 
                         currentNonce = rawNonce
                         request.nonce =
-                            AppleIDTokenValidator
+                            SupabaseAuthService
                             .sha256(rawNonce)
 
                     } onCompletion: { result in
@@ -103,7 +103,7 @@ struct LoginView: View {
 
                         VStack { Divider() }
 
-                        Text("or use a username")
+                        Text("or use an email")
                             .font(.caption)
                             .foregroundColor(.secondary)
 
@@ -129,13 +129,14 @@ struct LoginView: View {
                             spacing: 6
                         ) {
 
-                            Text("Username")
+                            Text("Email")
                                 .font(.headline)
 
                             TextField(
-                                "Your username",
-                                text: $username
+                                "Your email",
+                                text: $email
                             )
+                            .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .padding()
@@ -233,7 +234,7 @@ struct LoginView: View {
 
 
                     Text(
-                        "Accounts are stored securely "
+                        "Your account lives on BarTab's server. "
                     )
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -268,7 +269,7 @@ struct LoginView: View {
 
     private var canSubmit: Bool {
 
-        let trimmed = username.trimmingCharacters(
+        let trimmed = email.trimmingCharacters(
             in: .whitespacesAndNewlines
         )
 
@@ -287,12 +288,12 @@ struct LoginView: View {
 
     private func submit() {
 
-        let trimmed = username.trimmingCharacters(
+        let trimmed = email.trimmingCharacters(
             in: .whitespacesAndNewlines
         )
 
         guard !trimmed.isEmpty else {
-            errorMessage = "Enter a username."
+            errorMessage = "Enter your email."
             return
         }
 
@@ -319,26 +320,29 @@ struct LoginView: View {
 
         isSubmitting = true
 
-        do {
+        Task {
 
-            if mode == .createAccount {
-                try userSession.signUp(
-                    username: trimmed,
-                    password: password
-                )
-            } else {
-                try userSession.signIn(
-                    username: trimmed,
-                    password: password
-                )
+            do {
+
+                if mode == .createAccount {
+                    try await userSession.signUp(
+                        email: trimmed,
+                        password: password
+                    )
+                } else {
+                    try await userSession.signIn(
+                        email: trimmed,
+                        password: password
+                    )
+                }
+
+                presentationMode.wrappedValue.dismiss()
+
+            } catch {
+
+                isSubmitting = false
+                errorMessage = error.localizedDescription
             }
-
-            presentationMode.wrappedValue.dismiss()
-
-        } catch {
-
-            isSubmitting = false
-            errorMessage = error.localizedDescription
         }
     }
 
@@ -365,23 +369,21 @@ struct LoginView: View {
 
         isSubmitting = true
 
-        userSession.signInWithApple(
-            credential: credential,
-            rawNonce: rawNonce
-        ) { result in
+        Task {
 
-            DispatchQueue.main.async { [self] in
+            do {
+
+                try await userSession.signInWithApple(
+                    credential: credential,
+                    rawNonce: rawNonce
+                )
+
+                presentationMode.wrappedValue.dismiss()
+
+            } catch {
 
                 isSubmitting = false
-
-                switch result {
-
-                case .success:
-                    presentationMode.wrappedValue.dismiss()
-
-                case .failure(let error):
-                    errorMessage = error.localizedDescription
-                }
+                errorMessage = error.localizedDescription
             }
         }
     }

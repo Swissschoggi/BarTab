@@ -23,6 +23,12 @@ struct BarView: View {
     @State private var showingAlreadyReported = false
     @State private var alreadyReportedText = ""
 
+    @State private var showingDeleteBarConfirmation = false
+    @State private var pendingDeletePrice: Price?
+    @State private var showingDeletePriceConfirmation = false
+    @State private var pendingDeleteGroup: PriceGroup?
+    @State private var showingDeleteGroupConfirmation = false
+
     init(bar: Bar, allowsDismissal: Bool = false) {
         self.bar = bar
         self.allowsDismissal = allowsDismissal
@@ -245,6 +251,20 @@ struct BarView: View {
                     .foregroundColor(.barTabPrimary)
                 }
             }
+
+            if canDeleteBar {
+
+                ToolbarItem(
+                    placement: .navigationBarTrailing
+                ) {
+                    Button {
+                        showingDeleteBarConfirmation = true
+                    } label: {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                }
+            }
         }
         .onAppear {
             locationService.requestPermission()
@@ -308,6 +328,60 @@ struct BarView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(alreadyReportedText)
+        }
+        .confirmationDialog(
+            "Delete this bar?",
+            isPresented: $showingDeleteBarConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                deleteBar()
+            }
+
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(
+                "This removes the bar and all of its prices. This can't be undone."
+            )
+        }
+        .confirmationDialog(
+            "Delete this price?",
+            isPresented: $showingDeletePriceConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                guard let price = pendingDeletePrice else {
+                    return
+                }
+                deletePrice(price)
+            }
+
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(
+                "This removes this price report. This can't be undone."
+            )
+        }
+        .confirmationDialog(
+            "Delete this drink?",
+            isPresented: Binding(
+                get: { pendingDeleteGroup != nil },
+                set: { if !$0 { pendingDeleteGroup = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                guard let group = pendingDeleteGroup else {
+                    return
+                }
+                deleteGroup(group)
+            }
+
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(
+                "This removes all prices for this drink at this bar. This can't be undone."
+            )
         }
     }
 
@@ -528,11 +602,38 @@ struct BarView: View {
                             )
                             .font(.caption)
                             .foregroundColor(.secondary)
+
+                            if canDeletePrice(price) {
+
+                                Button {
+                                    pendingDeletePrice = price
+                                    showingDeletePriceConfirmation = true
+                                } label: {
+                                    Image(systemName: "trash")
+                                        .font(.caption)
+                                        .foregroundColor(.red)
+                                }
+                            }
                         }
                     }
 
-                    Divider()
-                        .padding(.vertical, 4)
+                    if canDeleteGroup(group) {
+
+                        Divider()
+                            .padding(.vertical, 4)
+
+                        Button {
+                            pendingDeleteGroup = group
+                        } label: {
+                            Label(
+                                "Delete this drink",
+                                systemImage: "trash"
+                            )
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.red)
+                        }
+                    }
 
                     Button {
                         pendingReportGroup = group
@@ -688,6 +789,86 @@ struct BarView: View {
             "We'll review this price and correct it "
             + "if it looks wrong."
         showingReportConfirmation = true
+    }
+
+    private var canDeleteBar: Bool {
+        guard let user = userSession.currentUser else {
+            return false
+        }
+
+        return user.isAdmin || bar.createdBy == user.id
+    }
+
+    private func canDeletePrice(
+        _ price: Price
+    ) -> Bool {
+        guard let user = userSession.currentUser else {
+            return false
+        }
+
+        return user.isAdmin || price.reportedBy == user.id
+    }
+
+    private func canDeleteGroup(
+        _ group: PriceGroup
+    ) -> Bool {
+        guard let user = userSession.currentUser else {
+            return false
+        }
+
+        return user.isAdmin || group.prices.allSatisfy { price in
+            price.reportedBy == user.id
+        }
+    }
+
+    private func deleteBar() {
+
+        guard let user = userSession.currentUser else {
+            return
+        }
+
+        Task {
+            await barRepository.deleteBar(
+                bar,
+                createdBy: user
+            )
+            presentationMode.wrappedValue.dismiss()
+        }
+    }
+
+    private func deletePrice(
+        _ price: Price
+    ) {
+
+        guard let user = userSession.currentUser else {
+            return
+        }
+
+        Task {
+            await barRepository.deletePrice(
+                price,
+                reportedBy: user
+            )
+        }
+    }
+
+    private func deleteGroup(
+        _ group: PriceGroup
+    ) {
+
+        guard let user = userSession.currentUser else {
+            return
+        }
+
+        Task {
+            await barRepository.deletePriceGroup(
+                for: bar,
+                drink: group.drink,
+                size: group.size,
+                brand: group.brand,
+                deletedBy: user
+            )
+        }
     }
 
     private func openDirections() {

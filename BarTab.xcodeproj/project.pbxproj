@@ -52,8 +52,7 @@
 		AEF036663035E20000BDA1CC /* AdminReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036653035E20000BDA1CC /* AdminReportsView.swift */; };
 		AEF036683035E20000BDA1CC /* ReportNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036673035E20000BDA1CC /* ReportNotificationService.swift */; };
 		AEF0366A3035E30000BDA1CC /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036693035E30000BDA1CC /* KeychainService.swift */; };
-		AEF0366C3035E30000BDA1CC /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0366B3035E30000BDA1CC /* AccountStore.swift */; };
-		AEF0366E3035E30000BDA1CC /* AppleIDTokenValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0366D3035E30000BDA1CC /* AppleIDTokenValidator.swift */; };
+		AEF036723035E40000BDA1CC /* SupabaseAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036713035E40000BDA1CC /* SupabaseAuthService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,8 +122,7 @@
 		AEF036653035E20000BDA1CC /* AdminReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminReportsView.swift; sourceTree = "<group>"; };
 		AEF036673035E20000BDA1CC /* ReportNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportNotificationService.swift; sourceTree = "<group>"; };
 		AEF036693035E30000BDA1CC /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
-		AEF0366B3035E30000BDA1CC /* AccountStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountStore.swift; sourceTree = "<group>"; };
-		AEF0366D3035E30000BDA1CC /* AppleIDTokenValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIDTokenValidator.swift; sourceTree = "<group>"; };
+		AEF036713035E40000BDA1CC /* SupabaseAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseAuthService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -264,8 +262,7 @@
 				AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */,
 				AEF036673035E20000BDA1CC /* ReportNotificationService.swift */,
 				AEF036693035E30000BDA1CC /* KeychainService.swift */,
-				AEF0366B3035E30000BDA1CC /* AccountStore.swift */,
-				AEF0366D3035E30000BDA1CC /* AppleIDTokenValidator.swift */,
+				AEF036713035E40000BDA1CC /* SupabaseAuthService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -445,8 +442,7 @@
 				AEF036663035E20000BDA1CC /* AdminReportsView.swift in Sources */,
 				AEF036683035E20000BDA1CC /* ReportNotificationService.swift in Sources */,
 				AEF0366A3035E30000BDA1CC /* KeychainService.swift in Sources */,
-				AEF0366C3035E30000BDA1CC /* AccountStore.swift in Sources */,
-				AEF0366E3035E30000BDA1CC /* AppleIDTokenValidator.swift in Sources */,
+				AEF036723035E40000BDA1CC /* SupabaseAuthService.swift in Sources */,
 				AEF0362F30350E1200BDA1CC /* BarTabColors.swift in Sources */,
 				AEF0361A3034F92700BDA1CC /* MapView.swift in Sources */,
 				AEA1BD703035ECF800DE059C /* SupabaseDTOs.swift in Sources */,

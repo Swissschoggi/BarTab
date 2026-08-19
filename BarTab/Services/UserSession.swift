@@ -2,20 +2,23 @@ import Foundation
 import Combine
 import AuthenticationServices
 
+@MainActor
 final class UserSession: ObservableObject {
 
     @Published private(set) var currentUser: User?
 
-    private let keychain = KeychainService(
-        service: "com.bartab.session"
-    )
-    private let accountStore = AccountStore()
+    private let authService = SupabaseAuthService()
     private let guestUser = User.mockUser
 
-    private var appleUsers: [String: User] = [:]
-
     init() {
-        restoreSession()
+
+        if let session = authService.restoreSession() {
+            currentUser = makeUser(from: session)
+
+            Task {
+                await refreshAdminStatus(from: session)
+            }
+        }
 
         if currentUser == nil {
             currentUser = guestUser
@@ -27,137 +30,137 @@ final class UserSession: ObservableObject {
     }
 
     func signIn(
-        username: String,
+        email: String,
         password: String
-    ) throws {
+    ) async throws {
 
-        let user = try accountStore.signIn(
-            username: username,
+        let session = try await authService.signIn(
+            email: email,
             password: password
         )
 
+        let user = await makeUserWithAdminCheck(
+            from: session
+        )
+
         currentUser = user
-        persistSession()
+        authService.saveSession(session)
     }
 
     func signUp(
-        username: String,
+        email: String,
         password: String
-    ) throws {
+    ) async throws {
 
-        let user = try accountStore.signUp(
-            username: username,
+        let session = try await authService.signUp(
+            email: email,
             password: password
         )
 
+        let user = await makeUserWithAdminCheck(
+            from: session
+        )
+
         currentUser = user
-        persistSession()
+        authService.saveSession(session)
     }
 
     func signInWithApple(
         credential: ASAuthorizationAppleIDCredential,
-        rawNonce: String,
-        completion: @escaping (Result<User, Error>) -> Void
-    ) {
+        rawNonce: String
+    ) async throws {
 
-        guard let token = credential.identityToken else {
-            completion(
-                .failure(
-                    AppleIDTokenValidator
-                        .ValidationError
-                        .invalidToken
-                )
-            )
-            return
+        guard let tokenData = credential.identityToken,
+              let token = String(
+                  data: tokenData,
+                  encoding: .utf8
+              ) else {
+            throw SupabaseAuthService.AuthError.invalidAppleToken
         }
 
-        AppleIDTokenValidator.validate(
-            token,
-            nonce: rawNonce
-        ) { [weak self] result in
+        let session = try await authService.signInWithApple(
+            idToken: token,
+            rawNonce: rawNonce
+        )
 
-            DispatchQueue.main.async {
+        let user = await makeUserWithAdminCheck(
+            from: session
+        )
 
-                guard let self = self else {
-                    return
-                }
+        currentUser = user
+        authService.saveSession(session)
+    }
 
-                switch result {
+    func logout() {
 
-                case .failure(let error):
-                    completion(.failure(error))
+        let accessToken = authService
+            .restoreSession()?
+            .tokens
+            .accessToken
 
-                case .success:
+        authService.clearSession()
+        currentUser = nil
 
-                    let name = [
-                        credential.fullName?.givenName,
-                        credential.fullName?.familyName
-                    ]
-                    .compactMap { $0 }
-                    .joined(separator: " ")
-
-                    let user: User
-
-                    if let existing =
-                        self.appleUsers[credential.user] {
-                        user = existing
-                    } else {
-                        user = User(
-                            id: UUID(),
-                            username: name.isEmpty
-                                ? "Apple User"
-                                : name,
-                            createdAt: Date()
-                        )
-                        self.appleUsers[credential.user] = user
-                    }
-
-                    self.currentUser = user
-                    self.persistSession()
-                    completion(.success(user))
-                }
+        if let accessToken = accessToken {
+            Task {
+                try? await authService.logout(
+                    accessToken: accessToken
+                )
             }
         }
     }
 
-    func logout() {
-        currentUser = nil
-        keychain.delete(account: "current")
+    // MARK: - Helpers
+
+    private func makeUser(
+        from session: SupabaseAuthService.AuthSession
+    ) -> User {
+
+        User(
+            id: session.user.id,
+            username: session.user.username,
+            createdAt: session.user.createdAt,
+            isAdmin: false
+        )
     }
 
-    private struct SessionState: Codable {
-        var currentUser: User?
-        var appleUsers: [String: User]
-    }
+    private func refreshAdminStatus(
+        from session: SupabaseAuthService.AuthSession
+    ) async {
 
-    private func restoreSession() {
-
-        guard let data = keychain.read(account: "current"),
-              let state = try? JSONDecoder().decode(
-                  SessionState.self,
-                  from: data
-              ) else {
-            return
-        }
-
-        appleUsers = state.appleUsers
-        currentUser = state.currentUser
-    }
-
-    private func persistSession() {
-
-        let state = SessionState(
-            currentUser:
-                currentUser?.id == guestUser.id
-                ? nil
-                : currentUser,
-            appleUsers: appleUsers
+        let isAdmin = await authService.fetchIsAdmin(
+            userID: session.user.id,
+            accessToken: session.tokens.accessToken
         )
 
-        guard let data = try? JSONEncoder().encode(state) else {
+        guard let user = currentUser,
+              user.id == session.user.id,
+              user.isAdmin != isAdmin else {
             return
         }
 
-        keychain.write(data, account: "current")
+        currentUser = User(
+            id: user.id,
+            username: user.username,
+            createdAt: user.createdAt,
+            isAdmin: isAdmin
+        )
+    }
+
+    private func makeUserWithAdminCheck(
+        from session: SupabaseAuthService.AuthSession
+    ) async -> User {
+
+        let isAdmin = await authService.fetchIsAdmin(
+            userID: session.user.id,
+            accessToken: session.tokens.accessToken
+        )
+
+        return User(
+            id: session.user.id,
+            username: session.user.username,
+            createdAt: session.user.createdAt,
+            isAdmin: isAdmin
+        )
     }
 }

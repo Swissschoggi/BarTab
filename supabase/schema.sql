@@ -81,20 +81,68 @@ values
     ('cccccccc-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'cocktail', null, 'glass', 14.00, 'CHF', '00000000-0000-0000-0000-000000000001')
 on conflict (id) do nothing;
 
--- MARK: - When you wire in Supabase Auth
+-- MARK: - Profiles (Supabase Auth)
 --
--- 1. Delete the permissive delete/update policies above.
--- 2. Add a `public.profiles` table keyed to auth.users with a
---    display_name and is_admin flag.
--- 3. Replace the delete policies, e.g.:
+-- Every auth user gets a profile row (created by the trigger below)
+-- so the app can check the `is_admin` flag after sign-in.
+
+create table if not exists public.profiles (
+    id uuid primary key references auth.users (id) on delete cascade,
+    display_name text,
+    is_admin boolean not null default false,
+    created_at timestamptz not null default now()
+);
+
+alter table public.profiles enable row level security;
+
+create policy "profiles are readable by everyone"
+    on public.profiles for select using (true);
+
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+    insert into public.profiles (id, display_name)
+    values (
+        new.id,
+        coalesce(
+            new.raw_user_meta_data ->> 'username',
+            split_part(coalesce(new.email, ''), '@', 1)
+        )
+    )
+    on conflict (id) do nothing;
+    return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+    after insert on auth.users
+    for each row execute function public.handle_new_user();
+
+-- Mark a user as admin (run once with your auth user id):
+--   update public.profiles set is_admin = true where id = '<your-user-uuid>';
+
+-- MARK: - Security notes
 --
---    create policy "own bars only"
---        on public.bars for delete
---        using (created_by = auth.uid());
+-- The bars/prices policies above are intentionally permissive so the
+-- demo guest account (00000000-0000-0000-0000-000000000001) can still
+-- add and delete content. The app now sends the real auth user id in
+-- created_by / reported_by, so tightening is a one-step change:
 --
---    create policy "own prices only"
---        on public.prices for delete
---        using (reported_by = auth.uid());
+--   drop policy "anyone can insert bars" on public.bars;
+--   create policy "authenticated users can insert bars"
+--       on public.bars for insert
+--       with check (auth.uid() = created_by);
 --
--- 4. Send the real auth.uid() from the client instead of trusting
---    the id that the app sends in the body.
+--   drop policy "bars can be deleted" on public.bars;
+--   create policy "owners or admins can delete bars"
+--       on public.bars for delete
+--       using (created_by = auth.uid() or
+--              exists (select 1 from public.profiles
+--                      where id = auth.uid() and is_admin));
+--
+-- Apply the same idea to prices (reported_by / is_admin) and update
+-- the individual price policies the same way.

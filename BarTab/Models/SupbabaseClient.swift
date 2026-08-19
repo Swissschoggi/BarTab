@@ -1,5 +1,18 @@
 import Foundation
 
+/// Shared Supabase project credentials.
+/// Replace with your project details from
+/// Supabase Dashboard -> Settings -> API.
+enum SupabaseConfig {
+
+    static let projectURL = URL(
+        string: "https://xdyewakhzjnmpzhzhehl.supabase.co"
+    )!
+
+    static let anonKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkeWV3YWtoempubXB6aHpoZWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwODc2MjksImV4cCI6MjEwMjY2MzYyOX0.nAZASYlhS3OBFc-mBSUVenGUTuzfMZgcbt9eBhc4Dm4"
+}
+
 /// Thin Supabase REST (PostgREST + Auth) client.
 ///
 /// The URL and anon key come from Supabase Dashboard -> Settings -> API.
@@ -33,7 +46,7 @@ final class SupabaseClient {
     ) -> URLRequest {
 
         let url = URL(
-            string: "\(baseURL)/\(endpoint)"
+            string: "\(baseURL)/rest/v1/\(endpoint)"
         )!
 
         var request = URLRequest(url: url)
