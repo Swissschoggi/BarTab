@@ -13,6 +13,15 @@ struct BarView: View {
     @StateObject private var locationService = LocationService()
 
     @State private var showingAddPrice = false
+    @State private var expandedGroupID: String?
+
+    @State private var showingBarReport = false
+    @State private var showingPriceReport = false
+    @State private var pendingReportGroup: PriceGroup?
+    @State private var showingReportConfirmation = false
+    @State private var reportConfirmationText = ""
+    @State private var showingAlreadyReported = false
+    @State private var alreadyReportedText = ""
 
     init(bar: Bar, allowsDismissal: Bool = false) {
         self.bar = bar
@@ -210,6 +219,32 @@ struct BarView: View {
                     .foregroundColor(.barTabPrimary)
                 }
             }
+
+            ToolbarItem(
+                placement: .navigationBarTrailing
+            ) {
+                ShareLink(
+                    item: shareText
+                ) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundColor(.barTabPrimary)
+                }
+            }
+
+            ToolbarItem(
+                placement: .navigationBarTrailing
+            ) {
+                Button {
+                    handleBarReportTap()
+                } label: {
+                    Image(
+                        systemName: currentUserReportedBar
+                        ? "flag.fill"
+                        : "flag"
+                    )
+                    .foregroundColor(.barTabPrimary)
+                }
+            }
         }
         .onAppear {
             locationService.requestPermission()
@@ -221,6 +256,59 @@ struct BarView: View {
                 .environmentObject(barRepository)
                 .environmentObject(userSession)
         }
+        .confirmationDialog(
+            "Report this bar?",
+            isPresented: $showingBarReport,
+            titleVisibility: .visible
+        ) {
+            ForEach(ReportReason.allCases) { reason in
+                Button(reason.title) {
+                    reportBar(reason: reason)
+                }
+            }
+
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(
+                "Tell us why this bar looks wrong."
+            )
+        }
+        .confirmationDialog(
+            "Report this price?",
+            isPresented: $showingPriceReport,
+            titleVisibility: .visible
+        ) {
+            ForEach(ReportReason.allCases) { reason in
+                Button(reason.title) {
+                    guard let group = pendingReportGroup else {
+                        return
+                    }
+                    reportPriceGroup(group, reason: reason)
+                }
+            }
+
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(
+                "Tell us why this price looks wrong."
+            )
+        }
+        .alert(
+            "Thanks for your report",
+            isPresented: $showingReportConfirmation
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(reportConfirmationText)
+        }
+        .alert(
+            "Already reported",
+            isPresented: $showingAlreadyReported
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(alreadyReportedText)
+        }
     }
 
     private func priceGroupRow(
@@ -229,117 +317,377 @@ struct BarView: View {
 
         let confidence = confidenceForGroup(group)
         let average = averageAmount(for: group)
+        let change = group.prices.priceChange
+        let isExpanded = expandedGroupID == group.id
+        let isFlagged = barRepository.isPriceGroupFlagged(
+            drink: group.drink,
+            size: group.size,
+            brand: group.brand
+        )
 
         return VStack(
             alignment: .leading,
-            spacing: 12
+            spacing: 0
         ) {
 
-            HStack {
+            Button {
+
+                withAnimation(
+                    .easeInOut(duration: 0.2)
+                ) {
+                    expandedGroupID =
+                        isExpanded ? nil : group.id
+                }
+
+            } label: {
 
                 VStack(
                     alignment: .leading,
-                    spacing: 4
+                    spacing: 12
                 ) {
 
-                    HStack(spacing: 6) {
-                        Text(group.drink.displayName)
-                            .font(.headline)
+                    HStack {
 
-                        if let brand = group.brand {
-                            Text("·")
-                                .foregroundColor(.secondary)
+                        VStack(
+                            alignment: .leading,
+                            spacing: 4
+                        ) {
 
-                            Text(brand)
+                            HStack(spacing: 6) {
+                                Text(group.drink.displayName)
+                                    .font(.headline)
+
+                                if isFlagged {
+                                    Image(
+                                        systemName: "flag.fill"
+                                    )
+                                    .font(.caption2)
+                                    .foregroundColor(.orange)
+                                }
+
+                                if let brand = group.brand {
+                                    Text("·")
+                                        .foregroundColor(.secondary)
+
+                                    Text(brand)
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+
+                            Text(group.size.displayName)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
+
+                        Spacer()
+
+                        VStack(
+                            alignment: .trailing,
+                            spacing: 2
+                        ) {
+                            Text(
+                                "\(average.formattedAmount) CHF"
+                            )
+                            .font(
+                                .system(
+                                    size: 19,
+                                    weight: .bold
+                                )
+                            )
+                            .foregroundColor(
+                                .barTabPrimary
+                            )
+
+                            Text(
+                                group.prices.count == 1
+                                ? "1 report"
+                                : "\(group.prices.count) reports"
+                            )
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        }
                     }
 
-                    Text(group.size.displayName)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
+                    HStack {
 
-                Spacer()
+                        if let change = change {
+                            trendBadge(change)
+                        }
+
+                        Spacer()
+
+                        Label(
+                            isExpanded
+                            ? "Hide history"
+                            : "Show history",
+                            systemImage: isExpanded
+                                ? "chevron.up"
+                                : "chevron.down"
+                        )
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    }
+
+                    VStack(
+                        alignment: .leading,
+                        spacing: 6
+                    ) {
+
+                        HStack {
+                            Text("Price confidence")
+                                .font(.caption)
+                                .fontWeight(.medium)
+
+                            Spacer()
+
+                            Text("\(confidence)%")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                        }
+
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+
+                                Capsule()
+                                    .fill(
+                                        Color.barTabPrimary
+                                            .opacity(0.12)
+                                    )
+
+                                Capsule()
+                                    .fill(
+                                        Color.barTabPrimary
+                                    )
+                                    .frame(
+                                        width:
+                                            geometry.size.width
+                                            * CGFloat(confidence)
+                                            / 100
+                                    )
+                            }
+                        }
+                        .frame(height: 7)
+
+                        Text(
+                            confidenceDescription(
+                                confidence
+                            )
+                        )
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(PlainButtonStyle())
+
+            if isExpanded {
+
+                Divider()
+                    .padding(.vertical, 12)
 
                 VStack(
-                    alignment: .trailing,
-                    spacing: 2
+                    alignment: .leading,
+                    spacing: 10
                 ) {
-                    Text(
-                        "\(average.formattedAmount) CHF"
+
+                    Text("Price history")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+
+                    PriceTrendChart(
+                        prices: group.prices
                     )
-                    .font(
-                        .system(
-                            size: 19,
-                            weight: .bold
+
+                    ForEach(
+                        group.prices.sorted {
+                            $0.reportedAt > $1.reportedAt
+                        },
+                        id: \.id
+                    ) { price in
+
+                        HStack {
+
+                            Text(
+                                "\(price.formattedAmount) \(price.currency)"
+                            )
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(
+                                .barTabPrimary
+                            )
+
+                            Spacer()
+
+                            Text(
+                                relativeDate(
+                                    price.reportedAt
+                                )
+                            )
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        }
+                    }
+
+                    Divider()
+                        .padding(.vertical, 4)
+
+                    Button {
+                        pendingReportGroup = group
+                        showingPriceReport = true
+                    } label: {
+
+                        let alreadyReported =
+                            userSession.currentUser
+                            .map {
+                                barRepository.hasReported(
+                                    group.id,
+                                    by: $0
+                                )
+                            } ?? false
+
+                        Label(
+                            alreadyReported
+                            ? "Reported — thanks"
+                            : "Report this price",
+                            systemImage: alreadyReported
+                                ? "checkmark.circle"
+                                : "flag"
                         )
-                    )
-                    .foregroundColor(
-                        .barTabPrimary
-                    )
-
-                    Text(
-                        group.prices.count == 1
-                        ? "1 report"
-                        : "\(group.prices.count) reports"
-                    )
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                }
-            }
-
-            VStack(
-                alignment: .leading,
-                spacing: 6
-            ) {
-
-                HStack {
-                    Text("Price confidence")
                         .font(.caption)
                         .fontWeight(.medium)
-
-                    Spacer()
-
-                    Text("\(confidence)%")
-                        .font(.caption)
-                        .fontWeight(.bold)
-                }
-
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-
-                        Capsule()
-                            .fill(
-                                Color.barTabPrimary
-                                    .opacity(0.12)
-                            )
-
-                        Capsule()
-                            .fill(
-                                Color.barTabPrimary
-                            )
-                            .frame(
-                                width:
-                                    geometry.size.width
-                                    * CGFloat(confidence)
-                                    / 100
-                            )
+                        .foregroundColor(
+                            alreadyReported
+                            ? .secondary
+                            : .barTabPrimary
+                        )
                     }
                 }
-                .frame(height: 7)
-
-                Text(
-                    confidenceDescription(
-                        confidence
-                    )
-                )
-                .font(.caption2)
-                .foregroundColor(.secondary)
             }
         }
         .barTabCard()
+    }
+
+    private func trendBadge(
+        _ change: Double
+    ) -> some View {
+
+        let up = change >= 0
+        let color: Color = up ? .green : .red
+
+        return Label(
+            "\(up ? "▲" : "▼") \(String(format: "%.1f%%", abs(change * 100)))",
+            systemImage: up
+                ? "arrow.up.right"
+                : "arrow.down.right"
+        )
+        .font(.caption2)
+        .fontWeight(.semibold)
+        .foregroundColor(color)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(color.opacity(0.12))
+        .clipShape(Capsule())
+    }
+
+    private func relativeDate(
+        _ date: Date
+    ) -> String {
+
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+
+        return formatter.localizedString(
+            for: date,
+            relativeTo: Date()
+        )
+    }
+
+    private var shareText: String {
+
+        var text = "\(bar.name)\n\(bar.address)"
+
+        let lines = groupedPrices.prefix(3).map { group in
+
+            "• \(group.drink.displayName) " +
+            "(\(group.size.displayName)) — " +
+            "\(averageAmount(for: group).formattedAmount) CHF"
+        }
+
+        if !lines.isEmpty {
+            text += "\n\nPrices:\n" + lines.joined(
+                separator: "\n"
+            )
+        }
+
+        return text
+    }
+
+    private var currentUserReportedBar: Bool {
+
+        guard let user = userSession.currentUser else {
+            return false
+        }
+
+        return barRepository.hasReported(
+            bar.id.uuidString,
+            by: user
+        )
+    }
+
+    private func handleBarReportTap() {
+
+        if currentUserReportedBar {
+            alreadyReportedText =
+                "You've already reported this bar."
+            showingAlreadyReported = true
+            return
+        }
+
+        showingBarReport = true
+    }
+
+    private func reportBar(reason: ReportReason) {
+
+        guard let user = userSession.currentUser else {
+            return
+        }
+
+        barRepository.reportBar(
+            bar,
+            reason: reason,
+            reportedBy: user
+        )
+
+        reportConfirmationText =
+            "We'll review this bar and remove it "
+            + "if it doesn't belong."
+        showingReportConfirmation = true
+    }
+
+    private func reportPriceGroup(
+        _ group: PriceGroup,
+        reason: ReportReason
+    ) {
+
+        guard let user = userSession.currentUser else {
+            return
+        }
+
+        barRepository.reportPriceGroup(
+            drink: group.drink,
+            size: group.size,
+            brand: group.brand,
+            reason: reason,
+            reportedBy: user
+        )
+
+        reportConfirmationText =
+            "We'll review this price and correct it "
+            + "if it looks wrong."
+        showingReportConfirmation = true
     }
 
     private func openDirections() {

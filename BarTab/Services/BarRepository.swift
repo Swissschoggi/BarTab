@@ -7,6 +7,7 @@ final class BarRepository: ObservableObject {
     @Published private(set) var bars: [Bar] = []
     @Published private(set) var prices: [Price] = []
     @Published private(set) var favoriteBarIDs: Set<UUID> = []
+    @Published private(set) var reports: [ContentReport] = []
 
     init() {
         loadMockData()
@@ -155,6 +156,107 @@ final class BarRepository: ObservableObject {
         }
 
         favoriteBarIDs.remove(bar.id)
+    }
+
+    func reportBar(
+        _ bar: Bar,
+        reason: ReportReason,
+        reportedBy user: User
+    ) {
+        addReport(
+            targetID: bar.id.uuidString,
+            targetType: .bar,
+            reason: reason,
+            user: user
+        )
+    }
+
+    func reportPriceGroup(
+        drink: Drink,
+        size: DrinkSize,
+        brand: String?,
+        reason: ReportReason,
+        reportedBy user: User
+    ) {
+        addReport(
+            targetID: priceGroupKey(
+                drink: drink,
+                size: size,
+                brand: brand
+            ),
+            targetType: .price,
+            reason: reason,
+            user: user
+        )
+    }
+
+    func hasReported(
+        _ targetID: String,
+        by user: User
+    ) -> Bool {
+        reports.contains {
+            $0.targetID == targetID
+                && $0.reportedBy == user.id
+        }
+    }
+
+    func isBarFlagged(_ bar: Bar) -> Bool {
+        reportCount(for: bar.id.uuidString) > 0
+    }
+
+    func isPriceGroupFlagged(
+        drink: Drink,
+        size: DrinkSize,
+        brand: String?
+    ) -> Bool {
+        reportCount(
+            for: priceGroupKey(
+                drink: drink,
+                size: size,
+                brand: brand
+            )
+        ) > 0
+    }
+
+    func reportCount(for targetID: String) -> Int {
+        reports.filter {
+            $0.targetID == targetID
+        }.count
+    }
+
+    func priceGroupKey(
+        drink: Drink,
+        size: DrinkSize,
+        brand: String?
+    ) -> String {
+        "\(drink)-\(size)-\(brand ?? "")"
+    }
+
+    private func addReport(
+        targetID: String,
+        targetType: ReportTargetType,
+        reason: ReportReason,
+        user: User
+    ) {
+
+        guard !reports.contains(where: {
+            $0.targetID == targetID
+                && $0.targetType == targetType
+                && $0.reportedBy == user.id
+        }) else {
+            return
+        }
+
+        reports.append(
+            ContentReport(
+                id: UUID(),
+                targetID: targetID,
+                targetType: targetType,
+                reason: reason,
+                reportedBy: user.id,
+                reportedAt: Date()
+            )
+        )
     }
 
     func updatePrice(

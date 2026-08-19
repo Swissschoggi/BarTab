@@ -19,6 +19,34 @@ struct PriceSearchView: View {
 
     @State private var sortOption: SortOption = .cheapest
 
+    @State private var searchText = ""
+
+    private var trimmedSearchText: String {
+        searchText.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+    }
+
+    private var displayedResults: [(bar: Bar, price: Price)] {
+
+        guard !trimmedSearchText.isEmpty else {
+            return matchingPrices
+        }
+
+        return matchingPrices.filter {
+            $0.bar.name.localizedCaseInsensitiveContains(
+                trimmedSearchText
+            )
+        }
+    }
+
+    private var bestDealPriceID: UUID? {
+
+        displayedResults.min {
+            $0.price.amount < $1.price.amount
+        }?.price.id
+    }
+
 
     private var availableSizes: [DrinkSize] {
 
@@ -160,6 +188,44 @@ struct PriceSearchView: View {
                             subtitle: "See what bars around you charge."
                         )
                     }
+
+
+                    HStack(spacing: 10) {
+
+                        Image(
+                            systemName: "magnifyingglass"
+                        )
+                        .foregroundColor(.secondary)
+
+                        TextField(
+                            "Search by bar name",
+                            text: $searchText
+                        )
+                        .textFieldStyle(.plain)
+                        .autocorrectionDisabled()
+
+                        if !searchText.isEmpty {
+
+                            Button {
+                                searchText = ""
+                            } label: {
+                                Image(
+                                    systemName: "xmark.circle.fill"
+                                )
+                                .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    .padding(12)
+                    .background(
+                        Color.barTabPrimary.opacity(0.08)
+                    )
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 12,
+                            style: .continuous
+                        )
+                    )
 
 
                     VStack(
@@ -348,12 +414,12 @@ struct PriceSearchView: View {
                             Spacer()
 
                             Text(
-                                "\(matchingPrices.count)"
+                                "\(displayedResults.count)"
                             )
                             .foregroundColor(.secondary)
                         }
 
-                        if matchingPrices.isEmpty {
+                        if displayedResults.isEmpty {
 
                             VStack(spacing: 10) {
 
@@ -374,12 +440,15 @@ struct PriceSearchView: View {
                                     .font(.headline)
 
                                 Text(
-                                    "Be the first to add this price."
+                                    !trimmedSearchText.isEmpty
+                                    ? "No bars match \"\(trimmedSearchText)\"."
+                                    : "Be the first to add this price."
                                 )
                                 .font(.subheadline)
                                 .foregroundColor(
                                     .secondary
                                 )
+                                .multilineTextAlignment(.center)
                             }
                             .frame(
                                 maxWidth: .infinity
@@ -392,7 +461,7 @@ struct PriceSearchView: View {
                         } else {
 
                             ForEach(
-                                matchingPrices,
+                                displayedResults,
                                 id: \.price.id
                             ) { result in
 
@@ -408,7 +477,10 @@ struct PriceSearchView: View {
                                 ) {
                                     resultRow(
                                         bar: result.bar,
-                                        price: result.price
+                                        price: result.price,
+                                        isBestDeal:
+                                            result.price.id
+                                            == bestDealPriceID
                                     )
                                 }
                                 .buttonStyle(
@@ -461,7 +533,8 @@ struct PriceSearchView: View {
 
     private func resultRow(
         bar: Bar,
-        price: Price
+        price: Price,
+        isBestDeal: Bool = false
     ) -> some View {
         VStack(
             alignment: .leading,
@@ -472,8 +545,30 @@ struct PriceSearchView: View {
                     alignment: .leading,
                     spacing: 5
                 ) {
-                    Text(bar.name)
-                        .font(.headline)
+                    HStack(spacing: 8) {
+
+                        Text(bar.name)
+                            .font(.headline)
+
+                        if barRepository.isBarFlagged(bar) {
+
+                            Image(systemName: "flag.fill")
+                                .font(.caption2)
+                                .foregroundColor(.orange)
+                        }
+
+                        if isBestDeal {
+
+                            Text("Best deal")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(Color.barTabAccent)
+                                .clipShape(Capsule())
+                        }
+                    }
 
                     Text(
                         "\(price.drink.displayName) · " +
