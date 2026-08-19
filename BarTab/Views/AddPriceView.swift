@@ -315,14 +315,16 @@ struct AddPriceView: View {
         user: User
     ) {
 
-        barRepository.addPrice(
-            to: bar,
-            drink: selectedDrink,
-            brand: selectedBrand,
-            size: selectedSize,
-            amount: amount,
-            reportedBy: user
-        )
+        Task {
+            await barRepository.addPrice(
+                to: bar,
+                drink: selectedDrink,
+                brand: selectedBrand,
+                size: selectedSize,
+                amount: amount,
+                reportedBy: user
+            )
+        }
 
         presentationMode
             .wrappedValue

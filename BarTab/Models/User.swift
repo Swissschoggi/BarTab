@@ -19,7 +19,7 @@ struct User: Identifiable, Codable {
     }
 
     static let mockUser = User(
-        id: UUID(),
+        id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
         username: "Test User",
         createdAt: Date(),
         isAdmin: true

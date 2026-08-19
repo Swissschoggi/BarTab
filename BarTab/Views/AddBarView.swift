@@ -440,12 +440,14 @@ struct AddBarView: View {
             return
         }
 
-        barRepository.addBar(
-            name: trimmedName,
-            address: trimmedAddress,
-            coordinate: coordinate,
-            createdBy: user
-        )
+        Task {
+            await barRepository.addBar(
+                name: trimmedName,
+                address: trimmedAddress,
+                coordinate: coordinate,
+                createdBy: user
+            )
+        }
 
         presentationMode.wrappedValue.dismiss()
     }

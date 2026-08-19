@@ -21,8 +21,10 @@ final class BarRepository: ObservableObject {
     func fetchAllData() async {
         do {
             async let fetchedBars = SupabaseClient.shared.fetchBars()
-            // If you added fetchPrices to SupabaseClient, fetch all or query per bar
+            async let fetchedPrices = SupabaseClient.shared.fetchAllPrices()
+
             self.bars = try await fetchedBars
+            self.prices = try await fetchedPrices
         } catch {
             print("Failed to fetch initial data: \(error)")
         }
@@ -74,12 +76,15 @@ final class BarRepository: ObservableObject {
     ) async {
         guard bar.createdBy == user.id else { return }
 
-        // Remove locally first or after server confirmation
         self.bars.removeAll { $0.id == bar.id }
         self.prices.removeAll { $0.barID == bar.id }
         self.favoriteBarIDs.remove(bar.id)
-        
-        // Add a DELETE endpoint method in SupabaseClient if needed
+
+        do {
+            try await SupabaseClient.shared.deleteBar(bar)
+        } catch {
+            print("Failed to delete bar from Supabase: \(error)")
+        }
     }
 
     // MARK: - Price Actions
@@ -119,6 +124,12 @@ final class BarRepository: ObservableObject {
     ) async {
         guard price.reportedBy == user.id else { return }
         self.prices.removeAll { $0.id == price.id }
+
+        do {
+            try await SupabaseClient.shared.deletePrice(price)
+        } catch {
+            print("Failed to delete price from Supabase: \(error)")
+        }
     }
 
     func updatePrice(
@@ -145,6 +156,12 @@ final class BarRepository: ObservableObject {
         )
 
         self.prices[index] = updatedPrice
+
+        do {
+            try await SupabaseClient.shared.updatePrice(updatedPrice)
+        } catch {
+            print("Failed to update price on Supabase: \(error)")
+        }
     }
 
     // MARK: - Synchronous Read & Helper Methods
