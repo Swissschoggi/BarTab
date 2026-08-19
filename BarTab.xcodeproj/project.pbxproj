@@ -14,10 +14,35 @@
 		AE7839783034F16B00F1555E /* BarTabTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7839773034F16B00F1555E /* BarTabTests.swift */; };
 		AE7839823034F16B00F1555E /* BarTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7839813034F16B00F1555E /* BarTabUITests.swift */; };
 		AE7839843034F16B00F1555E /* BarTabUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7839833034F16B00F1555E /* BarTabUITestsLaunchTests.swift */; };
-		AE7839933034F3B800F1555E /* Models in Resources */ = {isa = PBXBuildFile; fileRef = AE7839903034F3B800F1555E /* Models */; };
-		AE7839943034F3B800F1555E /* Services in Resources */ = {isa = PBXBuildFile; fileRef = AE7839913034F3B800F1555E /* Services */; };
-		AE7839953034F3B800F1555E /* views in Resources */ = {isa = PBXBuildFile; fileRef = AE7839923034F3B800F1555E /* views */; };
 		AE7839973034F4E700F1555E /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = AE7839963034F4E700F1555E /* README.md */; };
+		AEF0361A3034F92700BDA1CC /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036193034F92700BDA1CC /* MapView.swift */; };
+		AEF036223034FC6100BDA1CC /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036213034FC6100BDA1CC /* LocationService.swift */; };
+		AEF03628303509AB00BDA1CC /* Bar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF03627303509AB00BDA1CC /* Bar.swift */; };
+		AEF0362A303509E500BDA1CC /* MockBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF03629303509E500BDA1CC /* MockBar.swift */; };
+		AEF0362C30350C5100BDA1CC /* BarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0362B30350C5100BDA1CC /* BarView.swift */; };
+		AEF0362F30350E1200BDA1CC /* BarTabColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0362E30350E1200BDA1CC /* BarTabColors.swift */; };
+		AEF0363130350EA400BDA1CC /* Price.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0363030350EA400BDA1CC /* Price.swift */; };
+		AEF0363330350F0000BDA1CC /* Drink.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0363230350F0000BDA1CC /* Drink.swift */; };
+		AEF0363530350F4500BDA1CC /* DrinkSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0363430350F4500BDA1CC /* DrinkSize.swift */; };
+		AEF0363730350F6800BDA1CC /* MockPrices.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0363630350F6800BDA1CC /* MockPrices.swift */; };
+		AEF03639303510D700BDA1CC /* AddPriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF03638303510D700BDA1CC /* AddPriceView.swift */; };
+		AEF0363B3035140B00BDA1CC /* BarRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0363A3035140B00BDA1CC /* BarRepository.swift */; };
+		AEF0363D303515C100BDA1CC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0363C303515C100BDA1CC /* User.swift */; };
+		AEF0363F303515D400BDA1CC /* UserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0363E303515D400BDA1CC /* UserSession.swift */; };
+		AEF036413035160F00BDA1CC /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036403035160F00BDA1CC /* ProfileView.swift */; };
+		AEF03643303518F900BDA1CC /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF03642303518F900BDA1CC /* MainTabView.swift */; };
+		AEF036453035193E00BDA1CC /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036443035193E00BDA1CC /* SearchView.swift */; };
+		AEF0364730351C9700BDA1CC /* MyContributionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364630351C9700BDA1CC /* MyContributionsView.swift */; };
+		AEF03649303523E200BDA1CC /* PriceSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF03648303523E200BDA1CC /* PriceSearchView.swift */; };
+		AEF0364B3035260A00BDA1CC /* DistanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364A3035260A00BDA1CC /* DistanceService.swift */; };
+		AEF0364D3035B7AC00BDA1CC /* AddBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364C3035B7AC00BDA1CC /* AddBarView.swift */; };
+		AEF0364F3035B7DB00BDA1CC /* LocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364E3035B7DB00BDA1CC /* LocationPickerView.swift */; };
+		AEF036513035B9EE00BDA1CC /* PlaceSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036503035B9EE00BDA1CC /* PlaceSearchService.swift */; };
+		AEF036533035BB2A00BDA1CC /* DrinkBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */; };
+		AEF036553035BB3F00BDA1CC /* DrinkBrands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */; };
+		AEF036573035BF5100BDA1CC /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036563035BF5100BDA1CC /* LoginView.swift */; };
+		AEF036593035C62000BDA1CC /* PriceConfidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036583035C62000BDA1CC /* PriceConfidence.swift */; };
+		AEF0365B3035C7FA00BDA1CC /* PriceSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,10 +73,35 @@
 		AE78397D3034F16B00F1555E /* BarTabUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarTabUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE7839813034F16B00F1555E /* BarTabUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabUITests.swift; sourceTree = "<group>"; };
 		AE7839833034F16B00F1555E /* BarTabUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		AE7839903034F3B800F1555E /* Models */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Models; sourceTree = "<group>"; };
-		AE7839913034F3B800F1555E /* Services */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Services; sourceTree = "<group>"; };
-		AE7839923034F3B800F1555E /* views */ = {isa = PBXFileReference; lastKnownFileType = folder; path = views; sourceTree = "<group>"; };
 		AE7839963034F4E700F1555E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		AEF036193034F92700BDA1CC /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		AEF036213034FC6100BDA1CC /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		AEF03627303509AB00BDA1CC /* Bar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bar.swift; sourceTree = "<group>"; };
+		AEF03629303509E500BDA1CC /* MockBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBar.swift; sourceTree = "<group>"; };
+		AEF0362B30350C5100BDA1CC /* BarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarView.swift; sourceTree = "<group>"; };
+		AEF0362E30350E1200BDA1CC /* BarTabColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabColors.swift; sourceTree = "<group>"; };
+		AEF0363030350EA400BDA1CC /* Price.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Price.swift; sourceTree = "<group>"; };
+		AEF0363230350F0000BDA1CC /* Drink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Drink.swift; sourceTree = "<group>"; };
+		AEF0363430350F4500BDA1CC /* DrinkSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkSize.swift; sourceTree = "<group>"; };
+		AEF0363630350F6800BDA1CC /* MockPrices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPrices.swift; sourceTree = "<group>"; };
+		AEF03638303510D700BDA1CC /* AddPriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPriceView.swift; sourceTree = "<group>"; };
+		AEF0363A3035140B00BDA1CC /* BarRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarRepository.swift; sourceTree = "<group>"; };
+		AEF0363C303515C100BDA1CC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		AEF0363E303515D400BDA1CC /* UserSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSession.swift; sourceTree = "<group>"; };
+		AEF036403035160F00BDA1CC /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		AEF03642303518F900BDA1CC /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		AEF036443035193E00BDA1CC /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		AEF0364630351C9700BDA1CC /* MyContributionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyContributionsView.swift; sourceTree = "<group>"; };
+		AEF03648303523E200BDA1CC /* PriceSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceSearchView.swift; sourceTree = "<group>"; };
+		AEF0364A3035260A00BDA1CC /* DistanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceService.swift; sourceTree = "<group>"; };
+		AEF0364C3035B7AC00BDA1CC /* AddBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBarView.swift; sourceTree = "<group>"; };
+		AEF0364E3035B7DB00BDA1CC /* LocationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerView.swift; sourceTree = "<group>"; };
+		AEF036503035B9EE00BDA1CC /* PlaceSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSearchService.swift; sourceTree = "<group>"; };
+		AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkBrand.swift; sourceTree = "<group>"; };
+		AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkBrands.swift; sourceTree = "<group>"; };
+		AEF036563035BF5100BDA1CC /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		AEF036583035C62000BDA1CC /* PriceConfidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceConfidence.swift; sourceTree = "<group>"; };
+		AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceSummary.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,9 +153,10 @@
 		AE7839653034F16A00F1555E /* BarTab */ = {
 			isa = PBXGroup;
 			children = (
-				AE7839903034F3B800F1555E /* Models */,
-				AE7839913034F3B800F1555E /* Services */,
-				AE7839923034F3B800F1555E /* views */,
+				AEF0362D30350DFE00BDA1CC /* Theme */,
+				AEF036243035094800BDA1CC /* Models */,
+				AEF036203034FC4E00BDA1CC /* Services */,
+				AEF036183034F91400BDA1CC /* Views */,
 				AE7839663034F16A00F1555E /* BarTabApp.swift */,
 				AE7839683034F16A00F1555E /* ContentView.swift */,
 				AE78396A3034F16B00F1555E /* Assets.xcassets */,
@@ -137,6 +188,62 @@
 				AE7839833034F16B00F1555E /* BarTabUITestsLaunchTests.swift */,
 			);
 			path = BarTabUITests;
+			sourceTree = "<group>";
+		};
+		AEF036183034F91400BDA1CC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AEF036193034F92700BDA1CC /* MapView.swift */,
+				AEF0362B30350C5100BDA1CC /* BarView.swift */,
+				AEF03638303510D700BDA1CC /* AddPriceView.swift */,
+				AEF036403035160F00BDA1CC /* ProfileView.swift */,
+				AEF03642303518F900BDA1CC /* MainTabView.swift */,
+				AEF036443035193E00BDA1CC /* SearchView.swift */,
+				AEF0364630351C9700BDA1CC /* MyContributionsView.swift */,
+				AEF03648303523E200BDA1CC /* PriceSearchView.swift */,
+				AEF0364C3035B7AC00BDA1CC /* AddBarView.swift */,
+				AEF0364E3035B7DB00BDA1CC /* LocationPickerView.swift */,
+				AEF036563035BF5100BDA1CC /* LoginView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AEF036203034FC4E00BDA1CC /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AEF036213034FC6100BDA1CC /* LocationService.swift */,
+				AEF0363A3035140B00BDA1CC /* BarRepository.swift */,
+				AEF0363E303515D400BDA1CC /* UserSession.swift */,
+				AEF0364A3035260A00BDA1CC /* DistanceService.swift */,
+				AEF036503035B9EE00BDA1CC /* PlaceSearchService.swift */,
+				AEF036583035C62000BDA1CC /* PriceConfidence.swift */,
+				AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AEF036243035094800BDA1CC /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AEF03627303509AB00BDA1CC /* Bar.swift */,
+				AEF03629303509E500BDA1CC /* MockBar.swift */,
+				AEF0363030350EA400BDA1CC /* Price.swift */,
+				AEF0363230350F0000BDA1CC /* Drink.swift */,
+				AEF0363430350F4500BDA1CC /* DrinkSize.swift */,
+				AEF0363630350F6800BDA1CC /* MockPrices.swift */,
+				AEF0363C303515C100BDA1CC /* User.swift */,
+				AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */,
+				AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AEF0362D30350DFE00BDA1CC /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				AEF0362E30350E1200BDA1CC /* BarTabColors.swift */,
+			);
+			path = Theme;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -244,9 +351,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AE7839973034F4E700F1555E /* README.md in Resources */,
-				AE7839953034F3B800F1555E /* views in Resources */,
-				AE7839943034F3B800F1555E /* Services in Resources */,
-				AE7839933034F3B800F1555E /* Models in Resources */,
 				AE78396E3034F16B00F1555E /* Preview Assets.xcassets in Resources */,
 				AE78396B3034F16B00F1555E /* Assets.xcassets in Resources */,
 			);
@@ -273,8 +377,36 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AEF0362C30350C5100BDA1CC /* BarView.swift in Sources */,
+				AEF036453035193E00BDA1CC /* SearchView.swift in Sources */,
+				AEF03628303509AB00BDA1CC /* Bar.swift in Sources */,
+				AEF036593035C62000BDA1CC /* PriceConfidence.swift in Sources */,
+				AEF03639303510D700BDA1CC /* AddPriceView.swift in Sources */,
+				AEF036553035BB3F00BDA1CC /* DrinkBrands.swift in Sources */,
+				AEF0365B3035C7FA00BDA1CC /* PriceSummary.swift in Sources */,
 				AE7839693034F16A00F1555E /* ContentView.swift in Sources */,
+				AEF036513035B9EE00BDA1CC /* PlaceSearchService.swift in Sources */,
+				AEF03649303523E200BDA1CC /* PriceSearchView.swift in Sources */,
+				AEF0363730350F6800BDA1CC /* MockPrices.swift in Sources */,
+				AEF0362F30350E1200BDA1CC /* BarTabColors.swift in Sources */,
+				AEF0361A3034F92700BDA1CC /* MapView.swift in Sources */,
+				AEF0363130350EA400BDA1CC /* Price.swift in Sources */,
+				AEF0363D303515C100BDA1CC /* User.swift in Sources */,
+				AEF036413035160F00BDA1CC /* ProfileView.swift in Sources */,
+				AEF0363530350F4500BDA1CC /* DrinkSize.swift in Sources */,
+				AEF0364F3035B7DB00BDA1CC /* LocationPickerView.swift in Sources */,
+				AEF0364730351C9700BDA1CC /* MyContributionsView.swift in Sources */,
+				AEF036533035BB2A00BDA1CC /* DrinkBrand.swift in Sources */,
+				AEF0364B3035260A00BDA1CC /* DistanceService.swift in Sources */,
+				AEF03643303518F900BDA1CC /* MainTabView.swift in Sources */,
+				AEF036223034FC6100BDA1CC /* LocationService.swift in Sources */,
 				AE7839673034F16A00F1555E /* BarTabApp.swift in Sources */,
+				AEF036573035BF5100BDA1CC /* LoginView.swift in Sources */,
+				AEF0363330350F0000BDA1CC /* Drink.swift in Sources */,
+				AEF0362A303509E500BDA1CC /* MockBar.swift in Sources */,
+				AEF0363B3035140B00BDA1CC /* BarRepository.swift in Sources */,
+				AEF0363F303515D400BDA1CC /* UserSession.swift in Sources */,
+				AEF0364D3035B7AC00BDA1CC /* AddBarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +567,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"BarTab/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarTab uses your Location to show nearby bars and their drink prices.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -463,6 +596,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"BarTab/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarTab uses your Location to show nearby bars and their drink prices.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

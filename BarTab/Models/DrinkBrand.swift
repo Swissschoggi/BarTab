@@ -1,8 +1,8 @@
-//
-//  DrinkBrand.swift
-//  BarTab
-//
-//  Created by marcel blanc on 19.08.26.
-//
-
 import Foundation
+
+struct DrinkBrand: Identifiable, Hashable {
+
+    let id: String
+    let name: String
+    let drink: Drink
+}
