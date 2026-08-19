@@ -27,24 +27,24 @@ struct PriceSearchView: View {
         )
     }
 
-    private var displayedResults: [(bar: Bar, price: Price)] {
+    private var displayedResults: [(bar: Bar, summary: PriceSummary)] {
 
         guard !trimmedSearchText.isEmpty else {
-            return matchingPrices
+            return matchingSummaries
         }
 
-        return matchingPrices.filter {
+        return matchingSummaries.filter {
             $0.bar.name.localizedCaseInsensitiveContains(
                 trimmedSearchText
             )
         }
     }
 
-    private var bestDealPriceID: UUID? {
+    private var bestDealSummaryID: UUID? {
 
         displayedResults.min {
-            $0.price.amount < $1.price.amount
-        }?.price.id
+            $0.summary.amount < $1.summary.amount
+        }?.summary.id
     }
 
 
@@ -108,28 +108,33 @@ struct PriceSearchView: View {
     }
 
 
-    private var matchingPrices: [(bar: Bar, price: Price)] {
+    private var matchingSummaries: [(bar: Bar, summary: PriceSummary)] {
 
-        var results: [(bar: Bar, price: Price)] = []
+        var results: [(bar: Bar, summary: PriceSummary)] = []
 
         for bar in barRepository.getBars() {
 
-            let prices = barRepository.getPrices(for: bar)
+            let summaries =
+                barRepository.getPriceSummaries(for: bar)
 
-            for price in prices {
+            for summary in summaries {
 
-                guard selectedDrinks.contains(price.drink) else {
+                guard selectedDrinks.contains(
+                    summary.drink
+                ) else {
                     continue
                 }
 
-                guard selectedSizes.contains(price.size) else {
+                guard selectedSizes.contains(
+                    summary.size
+                ) else {
                     continue
                 }
 
                 results.append(
                     (
                         bar: bar,
-                        price: price
+                        summary: summary
                     )
                 )
             }
@@ -139,7 +144,7 @@ struct PriceSearchView: View {
         guard let userLocation = locationService.location else {
 
             return results.sorted {
-                $0.price.amount < $1.price.amount
+                $0.summary.amount < $1.summary.amount
             }
         }
 
@@ -148,7 +153,7 @@ struct PriceSearchView: View {
         case .cheapest:
 
             return results.sorted {
-                $0.price.amount < $1.price.amount
+                $0.summary.amount < $1.summary.amount
             }
 
         case .closest:
@@ -462,7 +467,7 @@ struct PriceSearchView: View {
 
                             ForEach(
                                 displayedResults,
-                                id: \.price.id
+                                id: \.summary.id
                             ) { result in
 
                                 NavigationLink(
@@ -477,10 +482,10 @@ struct PriceSearchView: View {
                                 ) {
                                     resultRow(
                                         bar: result.bar,
-                                        price: result.price,
+                                        summary: result.summary,
                                         isBestDeal:
-                                            result.price.id
-                                            == bestDealPriceID
+                                            result.summary.id
+                                            == bestDealSummaryID
                                     )
                                 }
                                 .buttonStyle(
@@ -533,7 +538,7 @@ struct PriceSearchView: View {
 
     private func resultRow(
         bar: Bar,
-        price: Price,
+        summary: PriceSummary,
         isBestDeal: Bool = false
     ) -> some View {
         VStack(
@@ -571,11 +576,18 @@ struct PriceSearchView: View {
                     }
 
                     Text(
-                        "\(price.drink.displayName) · " +
-                        "\(price.size.displayName)"
+                        "\(summary.drink.displayName) · " +
+                        "\(summary.size.displayName)"
                     )
                     .font(.subheadline)
                     .foregroundColor(.secondary)
+
+                    if let brand = summary.brand {
+
+                        Text(brand)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
 
                     if let location =
                         locationService.location {
@@ -598,23 +610,24 @@ struct PriceSearchView: View {
                     spacing: 2
                 ) {
                     Text(
-                        price.formattedAmount
+                        "\(summary.formattedAmount) \(summary.currency)"
                     )
                     .font(.headline)
                     .foregroundColor(
                         .barTabPrimary
                     )
 
-                    Text(price.currency)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Text(
+                        summary.reportCount == 1
+                        ? "1 report"
+                        : "\(summary.reportCount) reports"
+                    )
+                    .font(.caption)
+                    .foregroundColor(.secondary)
                 }
             }
 
-            confidenceView(
-                price: price,
-                bar: bar
-            )
+            confidenceView(summary: summary)
         }
         .barTabCard()
     }
@@ -674,40 +687,30 @@ struct PriceSearchView: View {
 
 
     private func confidenceView(
-        price: Price,
-        bar: Bar
+        summary: PriceSummary
     ) -> some View {
-        let confidence =
-            barRepository.confidenceForPrice(
-                price,
-                at: bar
-            )
 
-        let label: String
-
-        switch confidence {
-        case 80...:
-            label = "Very reliable"
-        case 60..<80:
-            label = "Reliable"
-        case 40..<60:
-            label = "Somewhat reliable"
-        default:
-            label = "Low confidence"
-        }
+        let confidence = summary.confidence
 
         return VStack(
             alignment: .leading,
             spacing: 5
         ) {
             HStack {
+
                 Text("Price confidence")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
+                Text(
+                    "· \(summary.reportCount) \(summary.reportCount == 1 ? "report" : "reports")"
+                )
+                .font(.caption)
+                .foregroundColor(.secondary)
+
                 Spacer()
 
-                Text(label)
+                Text(summary.confidenceLabel)
                     .font(.caption)
                     .fontWeight(.semibold)
                     .foregroundColor(.barTabPrimary)
