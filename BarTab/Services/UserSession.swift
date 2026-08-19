@@ -8,20 +8,17 @@ final class UserSession: ObservableObject {
     @Published private(set) var currentUser: User?
 
     private let authService = SupabaseAuthService()
-    private let guestUser = User.mockUser
 
     init() {
 
-        if let session = authService.restoreSession() {
-            currentUser = makeUser(from: session)
-
-            Task {
-                await refreshAdminStatus(from: session)
-            }
+        guard let session = authService.restoreSession() else {
+            return
         }
 
-        if currentUser == nil {
-            currentUser = guestUser
+        currentUser = makeUser(from: session)
+
+        Task {
+            await refreshAdminStatus(from: session)
         }
     }
 

@@ -31,7 +31,7 @@ extension View {
 
     func barTabCard(
         cornerRadius: CGFloat = 18,
-        fill: Color = Color.white.opacity(0.72),
+        fill: Color = Color.barTabCardFill,
         padding: CGFloat = 16
     ) -> some View {
         self
