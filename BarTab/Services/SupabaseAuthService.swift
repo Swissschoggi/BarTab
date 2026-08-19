@@ -324,7 +324,8 @@ final class SupabaseAuthService {
             let createdAt: Date
 
             if let createdString = user.created_at,
-               let date = Self.parseISODate(createdString) {
+               let date = SupabaseAuthService
+                   .parseISODate(createdString) {
                 createdAt = date
             } else {
                 createdAt = Date()
