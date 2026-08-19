@@ -3,6 +3,7 @@ import SwiftUI
 struct PriceSearchView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
+    @EnvironmentObject private var userSession: UserSession
 
     @StateObject private var locationService = LocationService()
 
@@ -154,18 +155,10 @@ struct PriceSearchView: View {
 
                     VStack(alignment: .leading, spacing: 6) {
 
-                        Text("Find a price")
-                            .font(
-                                .system(
-                                    size: 30,
-                                    weight: .bold
-                                )
-                            )
-
-                        Text(
-                            "See what bars around you charge."
+                        BarTabScreenHeader(
+                            title: "Find a price",
+                            subtitle: "See what bars around you charge."
                         )
-                        .foregroundColor(.secondary)
                     }
 
 
@@ -209,7 +202,7 @@ struct PriceSearchView: View {
 
                                             Image(
                                                 systemName:
-                                                    icon(for: drink)
+                                                    drink.icon
                                             )
 
                                             Text(
@@ -235,7 +228,12 @@ struct PriceSearchView: View {
                                             : Color.barTabPrimary
                                                 .opacity(0.12)
                                         )
-                                        .cornerRadius(20)
+                                        .clipShape(
+                                            RoundedRectangle(
+                                                cornerRadius: 20,
+                                                style: .continuous
+                                            )
+                                        )
                                     }
                                 }
                             }
@@ -300,7 +298,12 @@ struct PriceSearchView: View {
                                             : Color.barTabPrimary
                                                 .opacity(0.12)
                                         )
-                                        .cornerRadius(20)
+                                        .clipShape(
+                                            RoundedRectangle(
+                                                cornerRadius: 20,
+                                                style: .continuous
+                                            )
+                                        )
                                     }
                                 }
                             }
@@ -400,7 +403,7 @@ struct PriceSearchView: View {
                                                 barRepository
                                             )
                                             .environmentObject(
-                                                UserSession()
+                                                userSession
                                             )
                                 ) {
                                     resultRow(
@@ -422,11 +425,9 @@ struct PriceSearchView: View {
             }
             .background(
                 Color.barTabBackground
+                    .ignoresSafeArea()
             )
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(
-                .inline
-            )
+            .navigationBarHidden(true)
 
 
             .onChange(of: selectedDrinks) { _ in
@@ -502,7 +503,7 @@ struct PriceSearchView: View {
                     spacing: 2
                 ) {
                     Text(
-                        price.amount.description
+                        price.formattedAmount
                     )
                     .font(.headline)
                     .foregroundColor(
@@ -520,11 +521,7 @@ struct PriceSearchView: View {
                 bar: bar
             )
         }
-        .padding()
-        .background(
-            Color.white.opacity(0.7)
-        )
-        .cornerRadius(14)
+        .barTabCard()
     }
 
 
@@ -571,39 +568,16 @@ struct PriceSearchView: View {
                 : Color.barTabPrimary
                     .opacity(0.12)
             )
-            .cornerRadius(18)
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: 18,
+                    style: .continuous
+                )
+            )
         }
     }
 
 
-    private func icon(
-        for drink: Drink
-    ) -> String {
-
-        switch drink {
-
-        case .beer:
-            return "mug.fill"
-
-        case .wine:
-            return "wineglass.fill"
-
-        case .cocktail:
-            return "wineglass"
-
-        case .shot:
-            return "flask.fill"
-
-        case .softDrink:
-            return "cup.and.saucer.fill"
-
-        case .coffee:
-            return "cup.and.saucer.fill"
-
-        case .other:
-            return "fork.knife"
-        }
-    }
     private func confidenceView(
         price: Price,
         bar: Bar

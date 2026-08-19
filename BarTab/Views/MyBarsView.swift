@@ -1,28 +1,28 @@
 import SwiftUI
 
-struct MyContributionsView: View {
+struct MyBarsView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
 
-    private var myPrices: [Price] {
+    @StateObject private var locationService = LocationService()
 
+    private var myBars: [Bar] {
         guard let user = userSession.currentUser else {
             return []
         }
 
-        return barRepository.getPrices(
-            reportedBy: user
-        )
+        return barRepository.getBars().filter {
+            $0.createdBy == user.id
+        }
     }
 
     var body: some View {
-
         ScrollView {
 
             VStack(alignment: .leading, spacing: 20) {
 
-                if myPrices.isEmpty {
+                if myBars.isEmpty {
 
                     emptyState
 
@@ -31,7 +31,7 @@ struct MyContributionsView: View {
                     HStack {
 
                         Text(
-                            "\(myPrices.count) \(myPrices.count == 1 ? "contribution" : "contributions")"
+                            "\(myBars.count) \(myBars.count == 1 ? "bar" : "bars")"
                         )
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -41,14 +41,14 @@ struct MyContributionsView: View {
 
                     VStack(spacing: 12) {
 
-                        ForEach(
-                            myPrices,
-                            id: \.id
-                        ) { price in
+                        ForEach(myBars) { bar in
 
-                            contributionCard(
-                                price: price
-                            )
+                            NavigationLink {
+                                BarView(bar: bar)
+                            } label: {
+                                barCard(bar)
+                            }
+                            .buttonStyle(PlainButtonStyle())
                             .swipeActions(
                                 edge: .trailing,
                                 allowsFullSwipe: true
@@ -59,9 +59,9 @@ struct MyContributionsView: View {
 
                                     Button(role: .destructive) {
                                         withAnimation {
-                                            barRepository.deletePrice(
-                                                price,
-                                                reportedBy: user
+                                            barRepository.deleteBar(
+                                                bar,
+                                                createdBy: user
                                             )
                                         }
                                     } label: {
@@ -84,8 +84,11 @@ struct MyContributionsView: View {
             Color.barTabBackground
                 .ignoresSafeArea()
         )
-        .navigationTitle("My Contributions")
+        .navigationTitle("My Bars")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            locationService.requestPermission()
+        }
     }
 
     private var emptyState: some View {
@@ -104,7 +107,7 @@ struct MyContributionsView: View {
                     )
 
                 Image(
-                    systemName: "square.and.pencil"
+                    systemName: "building.2.fill"
                 )
                 .font(.system(size: 28))
                 .foregroundColor(
@@ -112,12 +115,12 @@ struct MyContributionsView: View {
                 )
             }
 
-            Text("No contributions yet")
+            Text("No bars yet")
                 .font(.title3)
                 .fontWeight(.semibold)
 
             Text(
-                "Prices you add to bars will appear here."
+                "Bars you add will appear here."
             )
             .font(.subheadline)
             .foregroundColor(.secondary)
@@ -128,19 +131,24 @@ struct MyContributionsView: View {
         .padding(.vertical, 80)
     }
 
-    private func contributionCard(
-        price: Price
+    private func barCard(
+        _ bar: Bar
     ) -> some View {
 
-        VStack(
+        let summaries =
+            barRepository.getPriceSummaries(
+                for: bar
+            )
+
+        let visibleSummaries =
+            Array(summaries.prefix(3))
+
+        return VStack(
             alignment: .leading,
-            spacing: 14
+            spacing: 12
         ) {
 
-            HStack(
-                alignment: .top,
-                spacing: 12
-            ) {
+            HStack(spacing: 12) {
 
                 ZStack {
 
@@ -153,7 +161,7 @@ struct MyContributionsView: View {
                     )
 
                     Image(
-                        systemName: price.drink.icon
+                        systemName: "wineglass.fill"
                     )
                     .font(.title3)
                     .foregroundColor(
@@ -170,104 +178,99 @@ struct MyContributionsView: View {
                     spacing: 4
                 ) {
 
-                    Text(
-                        price.brand
-                            ?? price.drink.displayName
-                    )
-                    .font(.headline)
+                    Text(bar.name)
+                        .font(.headline)
+                        .foregroundColor(.primary)
 
-                    Text(
-                        "\(price.drink.displayName) · \(price.size.displayName)"
-                    )
-                    .font(.subheadline)
+                    Text(bar.address)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+
+                    HStack(spacing: 10) {
+
+                        if let location =
+                            locationService.location {
+
+                            Label(
+                                DistanceService.formattedDistance(
+                                    from: location,
+                                    to: bar
+                                ),
+                                systemImage: "location.fill"
+                            )
+                        }
+
+                        Label(
+                            "\(summaries.count) \(summaries.count == 1 ? "price" : "prices")",
+                            systemImage: "tag.fill"
+                        )
+                    }
+                    .font(.caption)
                     .foregroundColor(.secondary)
                 }
 
                 Spacer()
 
-                VStack(
-                    alignment: .trailing,
-                    spacing: 1
-                ) {
-
-                    Text(
-                        price.formattedAmount
-                    )
-                    .font(
-                        .system(
-                            size: 20,
-                            weight: .bold
-                        )
-                    )
-                    .foregroundColor(
-                        .barTabPrimary
-                    )
-
-                    Text(price.currency)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Image(
+                    systemName: "chevron.right"
+                )
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
 
-            Divider()
+            if !visibleSummaries.isEmpty {
 
-            if let bar = barRepository.getBar(
-                id: price.barID
-            ) {
+                Divider()
 
-                HStack(spacing: 8) {
+                VStack(
+                    alignment: .leading,
+                    spacing: 8
+                ) {
 
-                    Image(
-                        systemName: "mappin.circle.fill"
-                    )
-                    .foregroundColor(
-                        .barTabPrimary
-                    )
+                    ForEach(visibleSummaries) { summary in
 
-                    VStack(
-                        alignment: .leading,
-                        spacing: 2
-                    ) {
+                        HStack {
 
-                        Text(bar.name)
+                            Text(
+                                "\(summary.drink.displayName) · \(summary.size.displayName)"
+                            )
                             .font(.subheadline)
-                            .fontWeight(.medium)
-
-                        Text(bar.address)
-                            .font(.caption)
                             .foregroundColor(.secondary)
-                            .lineLimit(1)
+
+                            Spacer()
+
+                            Text(
+                                "\(summary.formattedAmount) \(summary.currency)"
+                            )
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.barTabPrimary)
+                        }
                     }
 
-                    Spacer()
-                }
+                    if summaries.count > visibleSummaries.count {
 
-            } else {
-
-                HStack(spacing: 8) {
-
-                    Image(
-                        systemName: "mappin.slash"
-                    )
-
-                    Text("Bar no longer available")
+                        Text(
+                            "And \(summaries.count - visibleSummaries.count) more…"
+                        )
                         .font(.caption)
+                        .foregroundColor(.secondary)
+                    }
                 }
-                .foregroundColor(.secondary)
             }
         }
         .barTabCard()
     }
-
 }
 
-struct MyContributionsView_Previews: PreviewProvider {
+struct MyBarsView_Previews: PreviewProvider {
 
     static var previews: some View {
 
         NavigationView {
 
-            MyContributionsView()
+            MyBarsView()
                 .environmentObject(
                     BarRepository()
                 )

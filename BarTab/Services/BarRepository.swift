@@ -6,6 +6,7 @@ final class BarRepository: ObservableObject {
 
     @Published private(set) var bars: [Bar] = []
     @Published private(set) var prices: [Price] = []
+    @Published private(set) var favoriteBarIDs: Set<UUID> = []
 
     init() {
         loadMockData()
@@ -73,6 +74,24 @@ final class BarRepository: ObservableObject {
         }
     }
 
+    var favoriteBars: [Bar] {
+        bars.filter { bar in
+            favoriteBarIDs.contains(bar.id)
+        }
+    }
+
+    func isFavorite(_ bar: Bar) -> Bool {
+        favoriteBarIDs.contains(bar.id)
+    }
+
+    func toggleFavorite(_ bar: Bar) {
+        if favoriteBarIDs.contains(bar.id) {
+            favoriteBarIDs.remove(bar.id)
+        } else {
+            favoriteBarIDs.insert(bar.id)
+        }
+    }
+
     func getPrices(reportedBy user: User) -> [Price] {
 
         prices.filter { price in
@@ -116,6 +135,26 @@ final class BarRepository: ObservableObject {
         prices.removeAll {
             $0.id == price.id
         }
+    }
+
+    func deleteBar(
+        _ bar: Bar,
+        createdBy user: User
+    ) {
+
+        guard bar.createdBy == user.id else {
+            return
+        }
+
+        bars.removeAll {
+            $0.id == bar.id
+        }
+
+        prices.removeAll {
+            $0.barID == bar.id
+        }
+
+        favoriteBarIDs.remove(bar.id)
     }
 
     func updatePrice(

@@ -88,7 +88,12 @@ struct LocationPickerView: View {
                         .background(
                             Color.barTabPrimary
                         )
-                        .cornerRadius(16)
+                        .clipShape(
+                            RoundedRectangle(
+                                cornerRadius: 16,
+                                style: .continuous
+                            )
+                        )
                     }
                     .padding()
                 }

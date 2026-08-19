@@ -97,7 +97,7 @@ struct MainTabView: View {
 
         } label: {
 
-            HStack(spacing: 5) {
+            HStack(spacing: 6) {
 
                 Image(systemName: icon)
                     .font(
@@ -111,6 +111,7 @@ struct MainTabView: View {
                     .font(.caption)
                     .fontWeight(.semibold)
             }
+            .frame(maxWidth: .infinity)
             .foregroundColor(
                 selectedTab == tab
                     ? .white

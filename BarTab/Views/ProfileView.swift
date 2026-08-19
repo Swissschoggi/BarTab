@@ -54,20 +54,12 @@ struct ProfileView: View {
 
                     VStack(alignment: .leading, spacing: 6) {
 
-                        Text("Me")
-                            .font(
-                                .system(
-                                    size: 30,
-                                    weight: .bold
-                                )
-                            )
-
-                        Text(
-                            currentUser == nil
+                        BarTabScreenHeader(
+                            title: "Me",
+                            subtitle: currentUser == nil
                                 ? "Sign in to manage your contributions."
                                 : "Your BarTab profile."
                         )
-                        .foregroundColor(.secondary)
                     }
 
                     if let user = currentUser {
@@ -117,20 +109,7 @@ struct ProfileView: View {
                                 Spacer()
                             }
                         }
-                        .padding()
-                        .frame(
-                            maxWidth: .infinity,
-                            alignment: .leading
-                        )
-                        .background(
-                            Color.white.opacity(0.7)
-                        )
-                        .clipShape(
-                            RoundedRectangle(
-                                cornerRadius: 18,
-                                style: .continuous
-                            )
-                        )
+                        .barTabCard()
 
 
                         VStack(
@@ -179,7 +158,39 @@ struct ProfileView: View {
                                 subtitle: "\(myBars.count) bars added",
                                 icon: "building.2.fill"
                             ) {
-                                MyContributionsView()
+                                MyBarsView()
+                            }
+                        }
+
+
+                        if !barRepository.favoriteBars.isEmpty {
+
+                            VStack(
+                                alignment: .leading,
+                                spacing: 10
+                            ) {
+
+                                Text("Favorites")
+                                    .font(.headline)
+
+                                ForEach(
+                                    barRepository.favoriteBars
+                                ) { bar in
+
+                                    navigationRow(
+                                        title: bar.name,
+                                        subtitle: bar.address,
+                                        icon: "heart.fill"
+                                    ) {
+                                        BarView(bar: bar)
+                                            .environmentObject(
+                                                barRepository
+                                            )
+                                            .environmentObject(
+                                                userSession
+                                            )
+                                    }
+                                }
                             }
                         }
 
@@ -208,16 +219,7 @@ struct ProfileView: View {
 
                                     Spacer()
                                 }
-                                .padding()
-                                .background(
-                                    Color.white.opacity(0.7)
-                                )
-                                .clipShape(
-                                    RoundedRectangle(
-                                        cornerRadius: 14,
-                                        style: .continuous
-                                    )
-                                )
+                                .barTabCard()
                             }
                         }
 
@@ -251,20 +253,11 @@ struct ProfileView: View {
                             } label: {
                                 Text("Sign In")
                                     .font(.headline)
-                                    .foregroundColor(.white)
                                     .frame(
                                         maxWidth: .infinity
                                     )
                                     .padding()
-                                    .background(
-                                        Color.barTabPrimary
-                                    )
-                                    .clipShape(
-                                        RoundedRectangle(
-                                            cornerRadius: 14,
-                                            style: .continuous
-                                        )
-                                    )
+                                    .barTabPrimaryButton()
                             }
                         }
                         .padding(.vertical, 40)
@@ -312,20 +305,7 @@ struct ProfileView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
-        .frame(
-            maxWidth: .infinity,
-            alignment: .leading
-        )
-        .padding()
-        .background(
-            Color.white.opacity(0.7)
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 16,
-                style: .continuous
-            )
-        )
+        .barTabCard()
     }
 
 
@@ -371,16 +351,7 @@ struct ProfileView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
             }
-            .padding()
-            .background(
-                Color.white.opacity(0.7)
-            )
-            .clipShape(
-                RoundedRectangle(
-                    cornerRadius: 14,
-                    style: .continuous
-                )
-            )
+            .barTabCard()
         }
     }
 }

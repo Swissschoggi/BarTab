@@ -1,14 +1,23 @@
 import SwiftUI
-import CoreLocation
+import MapKit
 
 struct BarView: View {
 
     let bar: Bar
+    let allowsDismissal: Bool
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @Environment(\.presentationMode) private var presentationMode
+
+    @StateObject private var locationService = LocationService()
 
     @State private var showingAddPrice = false
+
+    init(bar: Bar, allowsDismissal: Bool = false) {
+        self.bar = bar
+        self.allowsDismissal = allowsDismissal
+    }
 
     private var prices: [Price] {
         barRepository.getPrices(for: bar)
@@ -53,95 +62,157 @@ struct BarView: View {
     }
 
     var body: some View {
-        NavigationView {
-            ScrollView {
+        ScrollView {
+            VStack(
+                alignment: .leading,
+                spacing: 24
+            ) {
+
                 VStack(
                     alignment: .leading,
-                    spacing: 24
+                    spacing: 8
                 ) {
 
-                    VStack(
-                        alignment: .leading,
-                        spacing: 8
-                    ) {
-                        Text(bar.name)
-                            .font(
-                                .system(
-                                    size: 30,
-                                    weight: .bold
-                                )
-                            )
+                    Text(bar.address)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
 
-                        Text(bar.address)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                    if let location =
+                        locationService.location {
 
-                        if let location = CLLocationManager().location {
-                            Text(
-                                DistanceService.formattedDistance(
-                                    from: location,
-                                    to: bar
-                                )
-                            )
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        }
-                    }
-
-                    VStack(
-                        alignment: .leading,
-                        spacing: 12
-                    ) {
-                        HStack {
-                            Text("Prices")
-                                .font(.title2)
-                                .fontWeight(.bold)
-
-                            Spacer()
-
-                            Text("\(groupedPrices.count)")
-                                .foregroundColor(.secondary)
-                        }
-
-                        if groupedPrices.isEmpty {
-                            emptyPricesView
-                        } else {
-                            ForEach(groupedPrices) { group in
-                                priceGroupRow(group)
-                            }
-                        }
-                    }
-
-                    Button {
-                        showingAddPrice = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "plus")
-
-                            Text("Add a price")
-                                .fontWeight(.semibold)
-
-                            Spacer()
-
-                            Image(
-                                systemName: "chevron.right"
-                            )
-                        }
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(
-                            Color.barTabPrimary
+                        Label(
+                            DistanceService.formattedDistance(
+                                from: location,
+                                to: bar
+                            ),
+                            systemImage: "location.fill"
                         )
-                        .cornerRadius(16)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     }
                 }
-                .padding()
+
+                VStack(
+                    alignment: .leading,
+                    spacing: 12
+                ) {
+                    HStack {
+                        Text("Prices")
+                            .font(.title2)
+                            .fontWeight(.bold)
+
+                        Spacer()
+
+                        Text("\(groupedPrices.count)")
+                            .foregroundColor(.secondary)
+                    }
+
+                    if groupedPrices.isEmpty {
+                        emptyPricesView
+                    } else {
+                        ForEach(groupedPrices) { group in
+                            priceGroupRow(group)
+                        }
+                    }
+                }
+
+                Button {
+                    openDirections()
+                } label: {
+                    HStack {
+                        Image(
+                            systemName: "arrow.triangle.turn.up.right.diamond.fill"
+                        )
+
+                        Text("Get Directions")
+                            .fontWeight(.semibold)
+
+                        Spacer()
+
+                        Image(
+                            systemName: "arrow.up.right"
+                        )
+                    }
+                    .foregroundColor(.barTabPrimary)
+                    .padding()
+                    .frame(
+                        maxWidth: .infinity
+                    )
+                    .background(
+                        Color.barTabPrimary.opacity(0.12)
+                    )
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 16,
+                            style: .continuous
+                        )
+                    )
+                }
+
+                Button {
+                    showingAddPrice = true
+                } label: {
+                    HStack {
+                        Image(systemName: "plus")
+
+                        Text("Add a price")
+                            .fontWeight(.semibold)
+
+                        Spacer()
+
+                        Image(
+                            systemName: "chevron.right"
+                        )
+                    }
+                    .padding()
+                    .barTabPrimaryButton()
+                }
             }
-            .background(
-                Color.barTabBackground
-            )
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
+            .padding()
+        }
+        .background(
+            Color.barTabBackground
+                .ignoresSafeArea()
+        )
+        .navigationTitle(bar.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+
+            if allowsDismissal {
+
+                ToolbarItem(
+                    placement: .navigationBarLeading
+                ) {
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+            }
+
+            ToolbarItem(
+                placement: .navigationBarTrailing
+            ) {
+                Button {
+                    withAnimation(
+                        .easeInOut(duration: 0.2)
+                    ) {
+                        barRepository.toggleFavorite(bar)
+                    }
+                } label: {
+                    Image(
+                        systemName:
+                            barRepository.isFavorite(bar)
+                            ? "heart.fill"
+                            : "heart"
+                    )
+                    .foregroundColor(.barTabPrimary)
+                }
+            }
+        }
+        .onAppear {
+            locationService.requestPermission()
         }
         .sheet(
             isPresented: $showingAddPrice
@@ -197,7 +268,7 @@ struct BarView: View {
                     spacing: 2
                 ) {
                     Text(
-                        "\(formatAmount(average)) CHF"
+                        "\(average.formattedAmount) CHF"
                     )
                     .font(
                         .system(
@@ -268,13 +339,27 @@ struct BarView: View {
                 .foregroundColor(.secondary)
             }
         }
-        .padding()
-        .background(
-            Color.white.opacity(0.75)
-        )
-        .cornerRadius(14)
+        .barTabCard()
     }
 
+    private func openDirections() {
+
+        let placemark = MKPlacemark(
+            coordinate: bar.coordinate
+        )
+
+        let mapItem = MKMapItem(
+            placemark: placemark
+        )
+        mapItem.name = bar.name
+
+        mapItem.openInMaps(
+            launchOptions: [
+                MKLaunchOptionsDirectionsModeKey:
+                    MKLaunchOptionsDirectionsModeWalking
+            ]
+        )
+    }
 
     private func confidenceForGroup(
         _ group: PriceGroup
@@ -376,7 +461,6 @@ struct BarView: View {
         }
     }
 
-
     private func averageAmount(
         for group: PriceGroup
     ) -> Decimal {
@@ -391,21 +475,6 @@ struct BarView: View {
             group.prices.count
         )
     }
-
-    private func formatAmount(
-        _ amount: Decimal
-    ) -> String {
-
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 2
-        formatter.maximumFractionDigits = 2
-
-        return formatter.string(
-            from: amount as NSDecimalNumber
-        ) ?? amount.description
-    }
-
 
     private var emptyPricesView: some View {
         VStack(spacing: 10) {

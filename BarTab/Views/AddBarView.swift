@@ -56,7 +56,12 @@ struct AddBarView: View {
                 }
                 .padding(14)
                 .background(Color.barTabBackground)
-                .cornerRadius(14)
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: 14,
+                        style: .continuous
+                    )
+                )
                 .padding(.horizontal)
                 .padding(.top)
 
@@ -169,11 +174,7 @@ struct AddBarView: View {
                                     )
                                 }
                                 .foregroundColor(.barTabPrimary)
-                                .padding()
-                                .background(
-                                    Color.white.opacity(0.7)
-                                )
-                                .cornerRadius(14)
+                                .barTabCard(cornerRadius: 14)
                             }
 
                             Button {
@@ -182,15 +183,20 @@ struct AddBarView: View {
 
                                 Text("Add Bar")
                                     .font(.headline)
-                                    .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                                     .padding()
+                                    .foregroundColor(.white)
                                     .background(
                                         canCreateBar
                                         ? Color.barTabPrimary
                                         : Color.gray
                                     )
-                                    .cornerRadius(16)
+                                    .clipShape(
+                                        RoundedRectangle(
+                                            cornerRadius: 16,
+                                            style: .continuous
+                                        )
+                                    )
                             }
                             .disabled(!canCreateBar)
                         }
@@ -285,15 +291,7 @@ struct AddBarView: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
-        .padding()
-        .frame(
-            maxWidth: .infinity,
-            alignment: .leading
-        )
-        .background(
-            Color.white.opacity(0.7)
-        )
-        .cornerRadius(16)
+        .barTabCard()
     }
 
 

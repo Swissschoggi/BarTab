@@ -216,6 +216,11 @@ struct AddPriceView: View {
             }
             .navigationTitle("Add Price")
             .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .background(
+                Color.barTabBackground
+                    .ignoresSafeArea()
+            )
 
             .onChange(of: selectedDrink) { _ in
 
@@ -258,7 +263,7 @@ struct AddPriceView: View {
                 if let duplicatePrice {
 
                     Text(
-                        "\(duplicatePrice.brand ?? duplicatePrice.drink.displayName) · \(duplicatePrice.size.displayName) already has a price of \(duplicatePrice.amount.description) \(duplicatePrice.currency) at this bar."
+                        "\(duplicatePrice.brand ?? duplicatePrice.drink.displayName) · \(duplicatePrice.size.displayName) already has a price of \(duplicatePrice.formattedAmount) \(duplicatePrice.currency) at this bar."
                     )
 
                 } else {

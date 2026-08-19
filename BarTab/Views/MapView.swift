@@ -5,8 +5,9 @@ struct MapView: View {
     @StateObject private var locationService = LocationService()
 
     @State private var showingAddBar = false
-    
+
     @EnvironmentObject private var barRepository: BarRepository
+    @EnvironmentObject private var userSession: UserSession
 
     @State private var selectedBar: Bar?
 
@@ -95,14 +96,17 @@ struct MapView: View {
             }
         }
         .sheet(item: $selectedBar) { bar in
-            BarView(bar: bar)
-                .environmentObject(barRepository)
-                .presentationDetents([.medium, .large])
+            NavigationView {
+                BarView(bar: bar, allowsDismissal: true)
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+            }
+            .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showingAddBar) {
             AddBarView()
                 .environmentObject(barRepository)
-                .environmentObject(UserSession())
+                .environmentObject(userSession)
         }
     }
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import AuthenticationServices
 
 struct LoginView: View {
 
@@ -40,6 +41,43 @@ struct LoginView: View {
                 }
 
 
+                SignInWithAppleButton(
+                    .signIn
+                ) { request in
+
+                    request.requestedScopes = [
+                        .fullName,
+                        .email
+                    ]
+
+                } onCompletion: { result in
+
+                    handleAppleSignIn(result)
+                }
+                .frame(height: 50)
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: 14,
+                        style: .continuous
+                    )
+                )
+                .signInWithAppleButtonStyle(
+                    .whiteOutline
+                )
+
+
+                HStack(spacing: 12) {
+
+                    VStack { Divider() }
+
+                    Text("or use a username")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    VStack { Divider() }
+                }
+
+
                 VStack(alignment: .leading, spacing: 8) {
 
                     Text("Username")
@@ -55,7 +93,12 @@ struct LoginView: View {
                     .background(
                         Color.barTabPrimary.opacity(0.08)
                     )
-                    .cornerRadius(12)
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 12,
+                            style: .continuous
+                        )
+                    )
                 }
 
 
@@ -90,7 +133,12 @@ struct LoginView: View {
                             ? Color.gray
                             : Color.barTabPrimary
                         )
-                        .cornerRadius(14)
+                        .clipShape(
+                            RoundedRectangle(
+                                cornerRadius: 14,
+                                style: .continuous
+                            )
+                        )
                 }
                 .disabled(
                     username.trimmingCharacters(
@@ -112,6 +160,36 @@ struct LoginView: View {
             .navigationTitle("Sign In")
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+
+    private func handleAppleSignIn(
+        _ result: Result<ASAuthorization, Error>
+    ) {
+
+        guard
+            case .success(let authorization) = result,
+            let credential =
+                authorization.credential
+                    as? ASAuthorizationAppleIDCredential
+        else {
+            return
+        }
+
+        let name = [
+            credential.fullName?.givenName,
+            credential.fullName?.familyName
+        ]
+        .compactMap { $0 }
+        .joined(separator: " ")
+
+        userSession.login(
+            appleUserID: credential.user,
+            username: name.isEmpty
+                ? "Apple User"
+                : name
+        )
+
+        presentationMode.wrappedValue.dismiss()
     }
 }
 

@@ -43,6 +43,8 @@
 		AEF036573035BF5100BDA1CC /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036563035BF5100BDA1CC /* LoginView.swift */; };
 		AEF036593035C62000BDA1CC /* PriceConfidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036583035C62000BDA1CC /* PriceConfidence.swift */; };
 		AEF0365B3035C7FA00BDA1CC /* PriceSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */; };
+		AEF0365D3035C80000BDA1CC /* BarTabTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */; };
+		AEF0365F3035C80000BDA1CC /* MyBarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365E3035C80000BDA1CC /* MyBarsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +104,9 @@
 		AEF036563035BF5100BDA1CC /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		AEF036583035C62000BDA1CC /* PriceConfidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceConfidence.swift; sourceTree = "<group>"; };
 		AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceSummary.swift; sourceTree = "<group>"; };
+		AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabTheme.swift; sourceTree = "<group>"; };
+		AEF0365E3035C80000BDA1CC /* MyBarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyBarsView.swift; sourceTree = "<group>"; };
+		AEF036603035D00000BDA1CC /* BarTab.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BarTab.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +165,7 @@
 				AE7839663034F16A00F1555E /* BarTabApp.swift */,
 				AE7839683034F16A00F1555E /* ContentView.swift */,
 				AE78396A3034F16B00F1555E /* Assets.xcassets */,
+				AEF036603035D00000BDA1CC /* BarTab.entitlements */,
 				AE78396C3034F16B00F1555E /* Preview Content */,
 			);
 			path = BarTab;
@@ -200,6 +206,7 @@
 				AEF03642303518F900BDA1CC /* MainTabView.swift */,
 				AEF036443035193E00BDA1CC /* SearchView.swift */,
 				AEF0364630351C9700BDA1CC /* MyContributionsView.swift */,
+				AEF0365E3035C80000BDA1CC /* MyBarsView.swift */,
 				AEF03648303523E200BDA1CC /* PriceSearchView.swift */,
 				AEF0364C3035B7AC00BDA1CC /* AddBarView.swift */,
 				AEF0364E3035B7DB00BDA1CC /* LocationPickerView.swift */,
@@ -242,6 +249,7 @@
 			isa = PBXGroup;
 			children = (
 				AEF0362E30350E1200BDA1CC /* BarTabColors.swift */,
+				AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */,
 			);
 			path = Theme;
 			sourceTree = "<group>";
@@ -407,6 +415,8 @@
 				AEF0363B3035140B00BDA1CC /* BarRepository.swift in Sources */,
 				AEF0363F303515D400BDA1CC /* UserSession.swift in Sources */,
 				AEF0364D3035B7AC00BDA1CC /* AddBarView.swift in Sources */,
+				AEF0365D3035C80000BDA1CC /* BarTabTheme.swift in Sources */,
+				AEF0365F3035C80000BDA1CC /* MyBarsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -562,6 +572,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = BarTab/BarTab.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BarTab/Preview Content\"";
@@ -591,6 +602,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = BarTab/BarTab.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BarTab/Preview Content\"";
