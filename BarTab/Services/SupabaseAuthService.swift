@@ -321,8 +321,14 @@ final class SupabaseAuthService {
                 return nil
             }
 
-            let createdAt = user.created_at
-                ?? Date(timeIntervalSince1970: 0)
+            let createdAt: Date
+
+            if let createdString = user.created_at,
+               let date = Self.parseISODate(createdString) {
+                createdAt = date
+            } else {
+                createdAt = Date()
+            }
 
             let email = user.email ?? ""
 
@@ -418,5 +424,25 @@ final class SupabaseAuthService {
         return digest.map {
             String(format: "%02x", $0)
         }.joined()
+    }
+
+    /// Parses GoTrue timestamps, which may or may not include
+    /// fractional seconds.
+    private static func parseISODate(
+        _ string: String
+    ) -> Date? {
+
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [
+            .withInternetDateTime,
+            .withFractionalSeconds
+        ]
+
+        if let date = fractional.date(from: string) {
+            return date
+        }
+
+        let standard = ISO8601DateFormatter()
+        return standard.date(from: string)
     }
 }
