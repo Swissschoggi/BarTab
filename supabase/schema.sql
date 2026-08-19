@@ -122,15 +122,23 @@ create trigger on_auth_user_created
     after insert on auth.users
     for each row execute function public.handle_new_user();
 
--- Mark a user as admin (run once with your auth user id):
---   update public.profiles set is_admin = true where id = '<your-user-uuid>';
+-- MARK: - Make an account an admin
+--
+-- 1. Find your auth user id:
+--      select id, email from auth.users;
+-- 2. Then flag yourself admin (run once):
+--      update public.profiles set is_admin = true where id = '<your-user-uuid>';
+--
+-- The app re-fetches is_admin at every sign-in, so sign out and back
+-- in (or relaunch) after making this change.
 
 -- MARK: - Security notes
 --
--- The bars/prices policies above are intentionally permissive so the
--- demo guest account (00000000-0000-0000-0000-000000000001) can still
--- add and delete content. The app now sends the real auth user id in
--- created_by / reported_by, so tightening is a one-step change:
+-- The bars/prices policies above are intentionally permissive so
+-- everyone can read and add content, and admins can delete anything
+-- (the app only shows delete UI to owners/admins). The app now sends
+-- the real auth user id in created_by / reported_by, so tightening
+-- is a one-step change:
 --
 --   drop policy "anyone can insert bars" on public.bars;
 --   create policy "authenticated users can insert bars"

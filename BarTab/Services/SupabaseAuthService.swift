@@ -279,7 +279,7 @@ final class SupabaseAuthService {
 
     private func decodeSessionResponse(
         _ data: Data
-    ) throws -> SessionResponse {
+    ) throws -> (user: GoTrueUser, session: AuthSession?) {
 
         let decoder = JSONDecoder()
 
@@ -304,10 +304,23 @@ final class SupabaseAuthService {
             )
         }
 
-        return try decoder.decode(
+        // Session shape: { access_token, refresh_token, expires_in, user }
+        if let response = try? decoder.decode(
             SessionResponse.self,
             from: data
-        )
+        ) {
+            return (user: response.user, session: response.session)
+        }
+
+        // Confirmation-required shape: the raw user object, no session.
+        if let user = try? decoder.decode(
+            GoTrueUser.self,
+            from: data
+        ) {
+            return (user: user, session: nil)
+        }
+
+        throw AuthError.invalidResponse
     }
 
     private struct SessionResponse: Decodable {
@@ -335,10 +348,7 @@ final class SupabaseAuthService {
 
             let username: String
 
-            if let fromMetadata = user.user_metadata?["username"],
-               !fromMetadata.isEmpty {
-                username = fromMetadata
-            } else if !email.isEmpty {
+            if !email.isEmpty {
                 username = email.components(
                     separatedBy: "@"
                 ).first ?? email
@@ -375,7 +385,6 @@ final class SupabaseAuthService {
     private struct GoTrueUser: Decodable {
         let id: UUID
         let email: String?
-        let user_metadata: [String: String]?
         let created_at: String?
     }
 
