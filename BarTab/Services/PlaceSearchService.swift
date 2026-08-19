@@ -1,5 +1,5 @@
 //
-//  Drink.swift
+//  PlaceSearchService.swift
 //  BarTab
 //
 //  Created by marcel blanc on 19.08.26.

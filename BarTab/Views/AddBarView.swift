@@ -1,5 +1,5 @@
 //
-//  Drink.swift
+//  AddBarView.swift
 //  BarTab
 //
 //  Created by marcel blanc on 19.08.26.

@@ -1,5 +1,5 @@
 //
-//  LocationService.swift
+//  BarView.swift
 //  BarTab
 //
 //  Created by marcel blanc on 18.08.26.
