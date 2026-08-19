@@ -11,6 +11,10 @@ struct ProfileView: View {
         userSession.currentUser
     }
 
+    private var unreviewedReportCount: Int {
+        barRepository.unreviewedReportCount
+    }
+
     private var myBars: [Bar] {
         guard let user = currentUser else {
             return []
@@ -159,6 +163,31 @@ struct ProfileView: View {
                                 icon: "building.2.fill"
                             ) {
                                 MyBarsView()
+                            }
+                        }
+
+
+                        if let user = currentUser,
+                            user.isAdmin {
+
+                            VStack(
+                                alignment: .leading,
+                                spacing: 10
+                            ) {
+
+                                Text("Admin")
+                                    .font(.headline)
+
+                                navigationRow(
+                                    title: "Reported content",
+                                    subtitle: unreviewedReportCount == 0
+                                        ? "Nothing to review"
+                                        : "\(unreviewedReportCount) "
+                                        + "\(unreviewedReportCount == 1 ? "report" : "reports") to review",
+                                    icon: "flag.fill"
+                                ) {
+                                    AdminReportsView()
+                                }
                             }
                         }
 

@@ -46,7 +46,11 @@ struct ContentReport: Identifiable {
     let id: UUID
     let targetID: String
     let targetType: ReportTargetType
+    let targetLabel: String
     let reason: ReportReason
     let reportedBy: UUID
+    let reportedByName: String
     let reportedAt: Date
+    var isReviewed: Bool
+    var reviewedAt: Date?
 }

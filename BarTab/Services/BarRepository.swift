@@ -166,6 +166,7 @@ final class BarRepository: ObservableObject {
         addReport(
             targetID: bar.id.uuidString,
             targetType: .bar,
+            targetLabel: bar.name,
             reason: reason,
             user: user
         )
@@ -178,6 +179,13 @@ final class BarRepository: ObservableObject {
         reason: ReportReason,
         reportedBy user: User
     ) {
+
+        var label = "\(drink.displayName) · \(size.displayName)"
+
+        if let brand = brand {
+            label += " (\(brand))"
+        }
+
         addReport(
             targetID: priceGroupKey(
                 drink: drink,
@@ -185,9 +193,26 @@ final class BarRepository: ObservableObject {
                 brand: brand
             ),
             targetType: .price,
+            targetLabel: label,
             reason: reason,
             user: user
         )
+    }
+
+    func markReportReviewed(_ report: ContentReport) {
+
+        guard let index = reports.firstIndex(
+            where: { $0.id == report.id }
+        ) else {
+            return
+        }
+
+        reports[index].isReviewed = true
+        reports[index].reviewedAt = Date()
+    }
+
+    var unreviewedReportCount: Int {
+        reports.filter { !$0.isReviewed }.count
     }
 
     func hasReported(
@@ -235,6 +260,7 @@ final class BarRepository: ObservableObject {
     private func addReport(
         targetID: String,
         targetType: ReportTargetType,
+        targetLabel: String,
         reason: ReportReason,
         user: User
     ) {
@@ -247,16 +273,21 @@ final class BarRepository: ObservableObject {
             return
         }
 
-        reports.append(
-            ContentReport(
-                id: UUID(),
-                targetID: targetID,
-                targetType: targetType,
-                reason: reason,
-                reportedBy: user.id,
-                reportedAt: Date()
-            )
+        let report = ContentReport(
+            id: UUID(),
+            targetID: targetID,
+            targetType: targetType,
+            targetLabel: targetLabel,
+            reason: reason,
+            reportedBy: user.id,
+            reportedByName: user.username,
+            reportedAt: Date(),
+            isReviewed: false,
+            reviewedAt: nil
         )
+
+        reports.append(report)
+        ReportNotificationService.schedule(for: report)
     }
 
     func updatePrice(

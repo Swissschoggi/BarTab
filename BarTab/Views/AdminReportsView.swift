@@ -1,0 +1,174 @@
+import SwiftUI
+
+struct AdminReportsView: View {
+
+    @EnvironmentObject private var barRepository: BarRepository
+    @EnvironmentObject private var userSession: UserSession
+
+    private var reports: [ContentReport] {
+        barRepository.reports.sorted {
+            $0.reportedAt > $1.reportedAt
+        }
+    }
+
+    var body: some View {
+        ScrollView {
+
+            VStack(alignment: .leading, spacing: 20) {
+
+                if reports.isEmpty {
+
+                    VStack(spacing: 12) {
+                        Image(systemName: "checkmark.shield")
+                            .font(.system(size: 44))
+                            .foregroundColor(.barTabPrimary)
+
+                        Text("No reports yet")
+                            .font(.headline)
+
+                        Text(
+                            "Flagged bars and prices "
+                            + "will show up here."
+                        )
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
+                    .barTabCard()
+
+                } else {
+
+                    HStack {
+
+                        Text(
+                            "\(barRepository.unreviewedReportCount) "
+                            + "\(barRepository.unreviewedReportCount == 1 ? "needs" : "need") review"
+                        )
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+
+                        Spacer()
+                    }
+
+                    VStack(spacing: 12) {
+
+                        ForEach(reports) { report in
+                            reportCard(report)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 20)
+        }
+        .background(Color.barTabBackground.ignoresSafeArea())
+        .navigationTitle("Reported content")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            ReportNotificationService.requestPermission()
+        }
+    }
+
+    private func reportCard(
+        _ report: ContentReport
+    ) -> some View {
+
+        VStack(
+            alignment: .leading,
+            spacing: 10
+        ) {
+
+            HStack(spacing: 8) {
+
+                Image(
+                    systemName: report.targetType == .bar
+                        ? "mappin.and.ellipse"
+                        : "dollarsign.circle"
+                )
+                .font(.subheadline)
+                .foregroundColor(.orange)
+
+                Text(report.targetLabel)
+                    .font(.headline)
+                    .lineLimit(1)
+
+                Spacer()
+
+                if !report.isReviewed {
+                    Text("New")
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.barTabAccent)
+                        .clipShape(Capsule())
+                }
+            }
+
+            Text(report.reason.title)
+                .font(.subheadline)
+                .foregroundColor(.primary)
+
+            HStack(spacing: 6) {
+
+                Text("by \(report.reportedByName)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Text("·")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Text(relativeDate(report.reportedAt))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Spacer()
+
+                if report.isReviewed {
+                    Label(
+                        "Reviewed",
+                        systemImage: "checkmark.circle.fill"
+                    )
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.green)
+                } else {
+                    Button {
+                        withAnimation(
+                            .easeInOut(duration: 0.2)
+                        ) {
+                            barRepository.markReportReviewed(
+                                report
+                            )
+                        }
+                    } label: {
+                        Text("Mark reviewed")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(
+                                .barTabPrimary
+                            )
+                    }
+                }
+            }
+        }
+        .barTabCard()
+    }
+
+    private func relativeDate(
+        _ date: Date
+    ) -> String {
+
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+
+        return formatter.localizedString(
+            for: date,
+            relativeTo: Date()
+        )
+    }
+}
