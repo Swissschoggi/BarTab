@@ -441,15 +441,23 @@ struct AddBarView: View {
         }
 
         Task {
-            await barRepository.addBar(
+            let saved = await barRepository.addBar(
                 name: trimmedName,
                 address: trimmedAddress,
                 coordinate: coordinate,
                 createdBy: user
             )
-        }
 
-        presentationMode.wrappedValue.dismiss()
+            if saved == nil {
+                self.errorMessage =
+                    "Could not save the bar. "
+                    + "Check your connection and try again."
+                self.showingError = true
+                return
+            }
+
+            presentationMode.wrappedValue.dismiss()
+        }
     }
 
     // MARK: - Clear selection

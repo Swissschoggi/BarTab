@@ -96,7 +96,7 @@ final class BarRepository: ObservableObject {
         size: DrinkSize,
         amount: Decimal,
         reportedBy user: User
-    ) async {
+    ) async -> Bool {
 
         let price = Price(
             id: UUID(),
@@ -113,8 +113,10 @@ final class BarRepository: ObservableObject {
         do {
             try await SupabaseClient.shared.addPrice(price)
             self.prices.append(price)
+            return true
         } catch {
             print("Failed to add price to Supabase: \(error)")
+            return false
         }
     }
 

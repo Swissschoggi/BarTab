@@ -9,6 +9,16 @@ final class SupabaseClient {
 
     static let shared = SupabaseClient()
 
+    struct SupabaseError: LocalizedError {
+
+        let statusCode: Int
+        let message: String
+
+        var errorDescription: String? {
+            "Supabase error \(statusCode): \(message)"
+        }
+    }
+
     // Replace with your project details from Supabase Dashboard -> Settings -> API
     private let baseURL = "https://xdyewakhzjnmpzhzhehl.supabase.co"
     private let apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkeWV3YWtoempubXB6aHpoZWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwODc2MjksImV4cCI6MjEwMjY2MzYyOX0.nAZASYlhS3OBFc-mBSUVenGUTuzfMZgcbt9eBhc4Dm4"
@@ -58,9 +68,21 @@ final class SupabaseClient {
         let (data, response) = try await
             URLSession.shared.data(for: request)
 
-        guard let http = response as? HTTPURLResponse,
-              (200...299).contains(http.statusCode) else {
+        guard let http = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
+        }
+
+        guard (200...299).contains(http.statusCode) else {
+
+            let message = String(
+                data: data,
+                encoding: .utf8
+            ) ?? "No response body"
+
+            throw SupabaseError(
+                statusCode: http.statusCode,
+                message: message
+            )
         }
 
         return data

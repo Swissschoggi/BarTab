@@ -14,6 +14,7 @@ struct AddPriceView: View {
     @State private var priceText = ""
     @State private var showingDuplicateWarning = false
     @State private var duplicatePrice: Price?
+    @State private var errorMessage: String?
 
     private var availableBrands: [String] {
 
@@ -273,6 +274,17 @@ struct AddPriceView: View {
                     )
                 }
             }
+            .alert(
+                "Couldn't save price",
+                isPresented: Binding(
+                    get: { errorMessage != nil },
+                    set: { if !$0 { errorMessage = nil } }
+                )
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage ?? "")
+            }
         }
     }
 
@@ -316,7 +328,8 @@ struct AddPriceView: View {
     ) {
 
         Task {
-            await barRepository.addPrice(
+
+            let success = await barRepository.addPrice(
                 to: bar,
                 drink: selectedDrink,
                 brand: selectedBrand,
@@ -324,11 +337,17 @@ struct AddPriceView: View {
                 amount: amount,
                 reportedBy: user
             )
-        }
 
-        presentationMode
-            .wrappedValue
-            .dismiss()
+            if success {
+                presentationMode
+                    .wrappedValue
+                    .dismiss()
+            } else {
+                self.errorMessage =
+                    "Could not save the price. "
+                    + "Check your connection and try again."
+            }
+        }
     }
 
 
