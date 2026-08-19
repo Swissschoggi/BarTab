@@ -77,312 +77,328 @@ struct BarView: View {
     }
 
     var body: some View {
-        ScrollView {
+        attachModals(
+            to: ScrollView {
+                content
+                    .padding()
+            }
+            .background(
+                Color.barTabBackground
+                    .ignoresSafeArea()
+            )
+            .navigationTitle(bar.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                toolbarContent
+            }
+            .onAppear {
+                locationService.requestPermission()
+            }
+        )
+    }
+
+    private var content: some View {
+        VStack(
+            alignment: .leading,
+            spacing: 24
+        ) {
+
             VStack(
                 alignment: .leading,
-                spacing: 24
+                spacing: 8
             ) {
 
-                VStack(
-                    alignment: .leading,
-                    spacing: 8
+                Text(bar.address)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                if let location =
+                    locationService.location {
+
+                    Label(
+                        DistanceService.formattedDistance(
+                            from: location,
+                            to: bar
+                        ),
+                        systemImage: "location.fill"
+                    )
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+            }
+
+            VStack(
+                alignment: .leading,
+                spacing: 12
+            ) {
+                HStack {
+                    Text("Prices")
+                        .font(.title2)
+                        .fontWeight(.bold)
+
+                    Spacer()
+
+                    Text("\(groupedPrices.count)")
+                        .foregroundColor(.secondary)
+                }
+
+                if groupedPrices.isEmpty {
+                    emptyPricesView
+                } else {
+                    ForEach(groupedPrices) { group in
+                        priceGroupRow(group)
+                    }
+                }
+            }
+
+            Button {
+                openDirections()
+            } label: {
+                HStack {
+                    Image(
+                        systemName: "arrow.triangle.turn.up.right.diamond.fill"
+                    )
+
+                    Text("Get Directions")
+                        .fontWeight(.semibold)
+
+                    Spacer()
+
+                    Image(
+                        systemName: "arrow.up.right"
+                    )
+                }
+                .foregroundColor(.barTabPrimary)
+                .padding()
+                .frame(
+                    maxWidth: .infinity
+                )
+                .background(
+                    Color.barTabPrimary.opacity(0.12)
+                )
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: 16,
+                        style: .continuous
+                    )
+                )
+            }
+
+            Button {
+                showingAddPrice = true
+            } label: {
+                HStack {
+                    Image(systemName: "plus")
+
+                    Text("Add a price")
+                        .fontWeight(.semibold)
+
+                    Spacer()
+
+                    Image(
+                        systemName: "chevron.right"
+                    )
+                }
+                .padding()
+                .barTabPrimaryButton()
+            }
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+
+        if allowsDismissal {
+
+            ToolbarItem(
+                placement: .navigationBarLeading
+            ) {
+                Button {
+                    presentationMode.wrappedValue.dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+            }
+        }
+
+        ToolbarItem(
+            placement: .navigationBarTrailing
+        ) {
+            Button {
+                withAnimation(
+                    .easeInOut(duration: 0.2)
                 ) {
+                    barRepository.toggleFavorite(bar)
+                }
+            } label: {
+                Image(
+                    systemName:
+                        barRepository.isFavorite(bar)
+                        ? "heart.fill"
+                        : "heart"
+                )
+                .foregroundColor(.barTabPrimary)
+            }
+        }
 
-                    Text(bar.address)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+        ToolbarItem(
+            placement: .navigationBarTrailing
+        ) {
+            ShareLink(
+                item: shareText
+            ) {
+                Image(systemName: "square.and.arrow.up")
+                    .foregroundColor(.barTabPrimary)
+            }
+        }
 
-                    if let location =
-                        locationService.location {
+        ToolbarItem(
+            placement: .navigationBarTrailing
+        ) {
+            Button {
+                handleBarReportTap()
+            } label: {
+                Image(
+                    systemName: currentUserReportedBar
+                    ? "flag.fill"
+                    : "flag"
+                )
+                .foregroundColor(.barTabPrimary)
+            }
+        }
 
-                        Label(
-                            DistanceService.formattedDistance(
-                                from: location,
-                                to: bar
-                            ),
-                            systemImage: "location.fill"
-                        )
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+        if canDeleteBar {
+
+            ToolbarItem(
+                placement: .navigationBarTrailing
+            ) {
+                Button {
+                    showingDeleteBarConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                        .foregroundColor(.red)
+                }
+            }
+        }
+    }
+        private func attachModals<V: View>(
+        to view: V
+    ) -> some View {
+        view
+            .sheet(
+                isPresented: $showingAddPrice
+            ) {
+                AddPriceView(bar: bar)
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+            }
+            .confirmationDialog(
+                "Report this bar?",
+                isPresented: $showingBarReport,
+                titleVisibility: .visible
+            ) {
+                ForEach(ReportReason.allCases) { reason in
+                    Button(reason.title) {
+                        reportBar(reason: reason)
                     }
                 }
 
-                VStack(
-                    alignment: .leading,
-                    spacing: 12
-                ) {
-                    HStack {
-                        Text("Prices")
-                            .font(.title2)
-                            .fontWeight(.bold)
-
-                        Spacer()
-
-                        Text("\(groupedPrices.count)")
-                            .foregroundColor(.secondary)
-                    }
-
-                    if groupedPrices.isEmpty {
-                        emptyPricesView
-                    } else {
-                        ForEach(groupedPrices) { group in
-                            priceGroupRow(group)
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(
+                    "Tell us why this bar looks wrong."
+                )
+            }
+            .confirmationDialog(
+                "Report this price?",
+                isPresented: $showingPriceReport,
+                titleVisibility: .visible
+            ) {
+                ForEach(ReportReason.allCases) { reason in
+                    Button(reason.title) {
+                        guard let group = pendingReportGroup else {
+                            return
                         }
+                        reportPriceGroup(group, reason: reason)
                     }
                 }
 
-                Button {
-                    openDirections()
-                } label: {
-                    HStack {
-                        Image(
-                            systemName: "arrow.triangle.turn.up.right.diamond.fill"
-                        )
-
-                        Text("Get Directions")
-                            .fontWeight(.semibold)
-
-                        Spacer()
-
-                        Image(
-                            systemName: "arrow.up.right"
-                        )
-                    }
-                    .foregroundColor(.barTabPrimary)
-                    .padding()
-                    .frame(
-                        maxWidth: .infinity
-                    )
-                    .background(
-                        Color.barTabPrimary.opacity(0.12)
-                    )
-                    .clipShape(
-                        RoundedRectangle(
-                            cornerRadius: 16,
-                            style: .continuous
-                        )
-                    )
-                }
-
-                Button {
-                    showingAddPrice = true
-                } label: {
-                    HStack {
-                        Image(systemName: "plus")
-
-                        Text("Add a price")
-                            .fontWeight(.semibold)
-
-                        Spacer()
-
-                        Image(
-                            systemName: "chevron.right"
-                        )
-                    }
-                    .padding()
-                    .barTabPrimaryButton()
-                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(
+                    "Tell us why this price looks wrong."
+                )
             }
-            .padding()
-        }
-        .background(
-            Color.barTabBackground
-                .ignoresSafeArea()
-        )
-        .navigationTitle(bar.name)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-
-            if allowsDismissal {
-
-                ToolbarItem(
-                    placement: .navigationBarLeading
-                ) {
-                    Button {
-                        presentationMode.wrappedValue.dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                    }
-                }
-            }
-
-            ToolbarItem(
-                placement: .navigationBarTrailing
+            .alert(
+                "Thanks for your report",
+                isPresented: $showingReportConfirmation
             ) {
-                Button {
-                    withAnimation(
-                        .easeInOut(duration: 0.2)
-                    ) {
-                        barRepository.toggleFavorite(bar)
-                    }
-                } label: {
-                    Image(
-                        systemName:
-                            barRepository.isFavorite(bar)
-                            ? "heart.fill"
-                            : "heart"
-                    )
-                    .foregroundColor(.barTabPrimary)
-                }
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(reportConfirmationText)
             }
-
-            ToolbarItem(
-                placement: .navigationBarTrailing
+            .alert(
+                "Already reported",
+                isPresented: $showingAlreadyReported
             ) {
-                ShareLink(
-                    item: shareText
-                ) {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundColor(.barTabPrimary)
-                }
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(alreadyReportedText)
             }
-
-            ToolbarItem(
-                placement: .navigationBarTrailing
+            .confirmationDialog(
+                "Delete this bar?",
+                isPresented: $showingDeleteBarConfirmation,
+                titleVisibility: .visible
             ) {
-                Button {
-                    handleBarReportTap()
-                } label: {
-                    Image(
-                        systemName: currentUserReportedBar
-                        ? "flag.fill"
-                        : "flag"
-                    )
-                    .foregroundColor(.barTabPrimary)
+                Button("Delete", role: .destructive) {
+                    deleteBar()
                 }
-            }
 
-            if canDeleteBar {
-
-                ToolbarItem(
-                    placement: .navigationBarTrailing
-                ) {
-                    Button {
-                        showingDeleteBarConfirmation = true
-                    } label: {
-                        Image(systemName: "trash")
-                            .foregroundColor(.red)
-                    }
-                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(
+                    "This removes the bar and all of its prices. This can't be undone."
+                )
             }
-        }
-        .onAppear {
-            locationService.requestPermission()
-        }
-        .sheet(
-            isPresented: $showingAddPrice
-        ) {
-            AddPriceView(bar: bar)
-                .environmentObject(barRepository)
-                .environmentObject(userSession)
-        }
-        .confirmationDialog(
-            "Report this bar?",
-            isPresented: $showingBarReport,
-            titleVisibility: .visible
-        ) {
-            ForEach(ReportReason.allCases) { reason in
-                Button(reason.title) {
-                    reportBar(reason: reason)
-                }
-            }
-
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text(
-                "Tell us why this bar looks wrong."
-            )
-        }
-        .confirmationDialog(
-            "Report this price?",
-            isPresented: $showingPriceReport,
-            titleVisibility: .visible
-        ) {
-            ForEach(ReportReason.allCases) { reason in
-                Button(reason.title) {
-                    guard let group = pendingReportGroup else {
+            .confirmationDialog(
+                "Delete this price?",
+                isPresented: $showingDeletePriceConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    guard let price = pendingDeletePrice else {
                         return
                     }
-                    reportPriceGroup(group, reason: reason)
+                    deletePrice(price)
                 }
-            }
 
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text(
-                "Tell us why this price looks wrong."
-            )
-        }
-        .alert(
-            "Thanks for your report",
-            isPresented: $showingReportConfirmation
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(reportConfirmationText)
-        }
-        .alert(
-            "Already reported",
-            isPresented: $showingAlreadyReported
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(alreadyReportedText)
-        }
-        .confirmationDialog(
-            "Delete this bar?",
-            isPresented: $showingDeleteBarConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                deleteBar()
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(
+                    "This removes this price report. This can't be undone."
+                )
             }
-
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text(
-                "This removes the bar and all of its prices. This can't be undone."
-            )
-        }
-        .confirmationDialog(
-            "Delete this price?",
-            isPresented: $showingDeletePriceConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                guard let price = pendingDeletePrice else {
-                    return
+            .confirmationDialog(
+                "Delete this drink?",
+                isPresented: Binding(
+                    get: { pendingDeleteGroup != nil },
+                    set: { if !$0 { pendingDeleteGroup = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    guard let group = pendingDeleteGroup else {
+                        return
+                    }
+                    deleteGroup(group)
                 }
-                deletePrice(price)
-            }
 
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text(
-                "This removes this price report. This can't be undone."
-            )
-        }
-        .confirmationDialog(
-            "Delete this drink?",
-            isPresented: Binding(
-                get: { pendingDeleteGroup != nil },
-                set: { if !$0 { pendingDeleteGroup = nil } }
-            ),
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                guard let group = pendingDeleteGroup else {
-                    return
-                }
-                deleteGroup(group)
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(
+                    "This removes all prices for this drink at this bar. This can't be undone."
+                )
             }
-
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text(
-                "This removes all prices for this drink at this bar. This can't be undone."
-            )
-        }
     }
 
     private func priceGroupRow(
