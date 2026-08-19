@@ -54,12 +54,11 @@ struct MyBarsView: View {
                                 allowsFullSwipe: true
                             ) {
 
-                                if let user =
-                                    userSession.currentUser {
+                                if let user = userSession.currentUser {
 
                                     Button(role: .destructive) {
-                                        withAnimation {
-                                            barRepository.deleteBar(
+                                        Task {
+                                            await barRepository.deleteBar(
                                                 bar,
                                                 createdBy: user
                                             )
@@ -189,8 +188,7 @@ struct MyBarsView: View {
 
                     HStack(spacing: 10) {
 
-                        if let location =
-                            locationService.location {
+                        if let location = locationService.location {
 
                             Label(
                                 DistanceService.formattedDistance(

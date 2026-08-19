@@ -234,7 +234,6 @@ struct LoginView: View {
 
                     Text(
                         "Accounts are stored securely "
-                        + "on this device only."
                     )
                     .font(.caption)
                     .foregroundColor(.secondary)

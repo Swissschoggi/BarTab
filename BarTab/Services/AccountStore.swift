@@ -150,24 +150,23 @@ final class AccountStore {
         salt: Data,
         iterations: Int
     ) -> Data {
+        let derivedLength = 32
+        var derived = Data(count: derivedLength)
 
-        var derived = Data(count: 32)
+        let passwordLength = password.utf8.count
+        let saltLength = salt.count
 
-        derived.withUnsafeMutableBytes {
-            derivedBytes in
-
+        derived.withUnsafeMutableBytes { derivedBytes in
             password.withCString { passwordBytes in
-
                 salt.withUnsafeBytes { saltBytes in
-
                     CCKeyDerivationPBKDF(
                         CCPBKDFAlgorithm(kCCPBKDF2),
                         passwordBytes,
-                        password.utf8.count,
+                        passwordLength,
                         saltBytes
                             .bindMemory(to: UInt8.self)
                             .baseAddress,
-                        salt.count,
+                        saltLength,
                         CCPseudoRandomAlgorithm(
                             kCCPRFHmacAlgSHA256
                         ),
@@ -175,7 +174,7 @@ final class AccountStore {
                         derivedBytes
                             .bindMemory(to: UInt8.self)
                             .baseAddress,
-                        derived.count
+                        derivedLength
                     )
                 }
             }
@@ -201,3 +200,4 @@ final class AccountStore {
         return data
     }
 }
+

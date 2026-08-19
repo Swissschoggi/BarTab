@@ -1,11 +1,8 @@
 import SwiftUI
 
-// MARK: - Trend helpers
 
 extension Array where Element == Price {
 
-    /// Percentage change between the oldest and newest report.
-    /// Positive means prices went up, negative means they went down.
     var priceChange: Double? {
 
         guard count >= 2 else {
@@ -34,7 +31,6 @@ extension Array where Element == Price {
     }
 }
 
-// MARK: - Chart
 
 struct PriceTrendChart: View {
 
@@ -86,31 +82,27 @@ struct PriceTrendChart: View {
     private func chart(
         _ points: [ReportPoint]
     ) -> some View {
-
         let amounts = points.map(\.amount)
         let dates = points.map(\.date)
 
         let minAmount = amounts.min() ?? 0
-        let maxAmount = amounts.max() ?? minAmount + 1
+        let maxAmount = amounts.max() ?? (minAmount + 1)
         let range = max(maxAmount - minAmount, 1)
 
         let minDate = dates.min() ?? Date()
         let maxDate = dates.max() ?? minDate
+
         let dateRange = max(
             maxDate.timeIntervalSince(minDate),
             1
         )
 
         return GeometryReader { geometry in
-
             let width = geometry.size.width
             let height = geometry.size.height
             let padding: CGFloat = 6
 
-            func position(
-                _ point: ReportPoint
-            ) -> CGPoint {
-
+            let chartPoints: [CGPoint] = points.map { point in
                 let t =
                     point.date.timeIntervalSince(minDate)
                     / dateRange
@@ -133,88 +125,81 @@ struct PriceTrendChart: View {
                 )
             }
 
-            let chartPoints = points.map(position)
-
             ZStack {
+                if let first = chartPoints.first,
+                   let last = chartPoints.last {
 
-                Path { path in
+                    Path { path in
+                        path.move(
+                            to: CGPoint(
+                                x: first.x,
+                                y: height - padding
+                            )
+                        )
 
-                    guard let first = chartPoints.first else {
-                        return
+                        path.addLine(to: first)
+
+                        for point in chartPoints.dropFirst() {
+                            path.addLine(to: point)
+                        }
+
+                        path.addLine(
+                            to: CGPoint(
+                                x: last.x,
+                                y: height - padding
+                            )
+                        )
+
+                        path.closeSubpath()
                     }
+                    .fill(
+                        Color.barTabPrimary.opacity(0.15)
+                    )
 
-                    path.move(
-                        to: CGPoint(
-                            x: first.x,
-                            y: height - padding
+                    Path { path in
+                        path.move(to: first)
+
+                        for point in chartPoints.dropFirst() {
+                            path.addLine(to: point)
+                        }
+                    }
+                    .stroke(
+                        Color.barTabPrimary,
+                        style: StrokeStyle(
+                            lineWidth: 2,
+                            lineCap: .round,
+                            lineJoin: .round
                         )
                     )
-
-                    path.addLine(to: first)
-
-                    for point in chartPoints.dropFirst() {
-                        path.addLine(to: point)
-                    }
-
-                    path.addLine(
-                        to: CGPoint(
-                            x: chartPoints.last!.x,
-                            y: height - padding
-                        )
-                    )
-
-                    path.closeSubpath()
                 }
-                .fill(
-                    Color.barTabPrimary.opacity(0.15)
-                )
-
-                Path { path in
-
-                    guard let first = chartPoints.first else {
-                        return
-                    }
-
-                    path.move(to: first)
-
-                    for point in chartPoints.dropFirst() {
-                        path.addLine(to: point)
-                    }
-                }
-                .stroke(
-                    Color.barTabPrimary,
-                    style: StrokeStyle(
-                        lineWidth: 2,
-                        lineCap: .round,
-                        lineJoin: .round
-                    )
-                )
 
                 ForEach(
                     chartPoints.indices,
                     id: \.self
                 ) { index in
-
                     Circle()
                         .fill(
                             index == chartPoints.count - 1
-                            ? Color.barTabAccent
-                            : Color.barTabPrimary
+                                ? Color.barTabAccent
+                                : Color.barTabPrimary
                         )
                         .frame(
-                            width: index == chartPoints.count - 1
-                                ? 8
-                                : 5,
-                            height: index == chartPoints.count - 1
-                                ? 8
-                                : 5
+                            width:
+                                index == chartPoints.count - 1
+                                    ? 8
+                                    : 5,
+                            height:
+                                index == chartPoints.count - 1
+                                    ? 8
+                                    : 5
                         )
-                        .position(chartPoints[index])
+                        .position(
+                            chartPoints[index]
+                        )
                 }
             }
         }
     }
-
     private func singlePoint(
         _ point: ReportPoint
     ) -> some View {

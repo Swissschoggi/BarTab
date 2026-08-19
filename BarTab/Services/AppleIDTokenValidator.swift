@@ -64,7 +64,7 @@ enum AppleIDTokenValidator {
         let keys: [JWK]
     }
 
-    private struct JWK: Decodable {
+    struct JWK: Decodable {
         let kty: String
         let kid: String
         let alg: String

@@ -6,7 +6,6 @@ struct MyContributionsView: View {
     @EnvironmentObject private var userSession: UserSession
 
     private var myPrices: [Price] {
-
         guard let user = userSession.currentUser else {
             return []
         }
@@ -54,12 +53,11 @@ struct MyContributionsView: View {
                                 allowsFullSwipe: true
                             ) {
 
-                                if let user =
-                                    userSession.currentUser {
+                                if let user = userSession.currentUser {
 
                                     Button(role: .destructive) {
-                                        withAnimation {
-                                            barRepository.deletePrice(
+                                        Task {
+                                            await barRepository.deletePrice(
                                                 price,
                                                 reportedBy: user
                                             )
