@@ -8,26 +8,25 @@ struct BarTabScreenHeader: View {
     let subtitle: LocalizedStringKey
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.largeTitle)
-                .fontWeight(.bold)
+                .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundColor(.barTabText)
 
             Text(subtitle)
-                .font(.subheadline)
+                .font(.system(size: 15, weight: .medium, design: .rounded))
                 .foregroundColor(.barTabSecondary)
         }
         .padding(.top, 8)
     }
 }
 
-// MARK: - Cards
+// MARK: - Cards (soft, warm, organic)
 
 extension View {
 
     func barTabCard(
-        cornerRadius: CGFloat = 16,
+        cornerRadius: CGFloat = 24,
         fill: Color = Color.barTabCardFill,
         padding: CGFloat = 16,
         shadow: Bool = true
@@ -38,11 +37,17 @@ extension View {
                 maxWidth: .infinity,
                 alignment: .leading
             )
-            .background(fill)
-            .clipShape(
+            .background(
                 RoundedRectangle(
                     cornerRadius: cornerRadius,
                     style: .continuous
+                )
+                .fill(fill)
+                .shadow(
+                    color: Color.barTabPrimary.opacity(shadow ? 0.04 : 0),
+                    radius: shadow ? 16 : 0,
+                    x: 0,
+                    y: shadow ? 6 : 0
                 )
             )
             .overlay(
@@ -50,35 +55,38 @@ extension View {
                     cornerRadius: cornerRadius,
                     style: .continuous
                 )
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
-            )
-            .shadow(
-                color: Color.black.opacity(shadow ? 0.04 : 0),
-                radius: shadow ? 8 : 0,
-                x: 0,
-                y: shadow ? 2 : 0
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color.barTabCardBorder.opacity(0.6),
+                            Color.barTabCardBorder.opacity(0.2)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
             )
     }
 }
 
-// MARK: - Primary button
+// MARK: - Primary button (warm gradient, soft shadow)
 
 extension View {
 
     func barTabPrimaryButton(
-        cornerRadius: CGFloat = 14
+        cornerRadius: CGFloat = 18
     ) -> some View {
         self
-            .font(.subheadline)
-            .fontWeight(.semibold)
+            .font(.system(size: 15, weight: .semibold, design: .rounded))
             .foregroundColor(.white)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
             .background(
                 LinearGradient(
                     colors: [
-                        Color.barTabPrimary,
-                        Color.barTabPrimary.opacity(0.85)
+                        Color.barTabGradientStart,
+                        Color.barTabGradientEnd
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -91,10 +99,10 @@ extension View {
                 )
             )
             .shadow(
-                color: Color.barTabPrimary.opacity(0.25),
-                radius: 6,
+                color: Color.barTabPrimary.opacity(0.2),
+                radius: 12,
                 x: 0,
-                y: 3
+                y: 6
             )
     }
 }
@@ -107,11 +115,10 @@ extension View {
         color: Color = .barTabPrimary
     ) -> some View {
         self
-            .font(.caption)
-            .fontWeight(.semibold)
+            .font(.system(size: 13, weight: .semibold, design: .rounded))
             .foregroundColor(color)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 7)
             .background(color.opacity(0.1))
             .clipShape(Capsule())
     }
@@ -127,21 +134,21 @@ struct BarTabSectionHeader: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.headline)
-                .fontWeight(.bold)
+                .font(.system(size: 17, weight: .bold, design: .rounded))
                 .foregroundColor(.barTabText)
 
             Spacer()
 
             if let count = count {
                 Text("\(count)")
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(.barTabSecondary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Color.barTabPillFill)
-                    .clipShape(Capsule())
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundColor(.barTabPrimary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Color.barTabPrimary.opacity(0.1))
+                    )
             }
         }
     }
@@ -164,6 +171,77 @@ extension Decimal {
     }
 }
 
+// MARK: - Organic blob shape (for decorative backgrounds)
+
+struct BlobShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let w = rect.size.width
+        let h = rect.size.height
+
+        path.move(to: CGPoint(x: w * 0.5, y: 0))
+        path.addCurve(
+            to: CGPoint(x: w, y: h * 0.4),
+            control1: CGPoint(x: w * 0.8, y: 0),
+            control2: CGPoint(x: w, y: h * 0.2)
+        )
+        path.addCurve(
+            to: CGPoint(x: w * 0.7, y: h),
+            control1: CGPoint(x: w, y: h * 0.7),
+            control2: CGPoint(x: w * 0.8, y: h)
+        )
+        path.addCurve(
+            to: CGPoint(x: 0, y: h * 0.6),
+            control1: CGPoint(x: w * 0.4, y: h),
+            control2: CGPoint(x: 0, y: h * 0.8)
+        )
+        path.addCurve(
+            to: CGPoint(x: w * 0.5, y: 0),
+            control1: CGPoint(x: 0, y: h * 0.3),
+            control2: CGPoint(x: w * 0.2, y: 0)
+        )
+        path.closeSubpath()
+        return path
+    }
+}
+
+// MARK: - Gradient accent bar (used for top accents)
+
+struct AccentBar: View {
+    var body: some View {
+        LinearGradient(
+            colors: [
+                Color.barTabGradientStart,
+                Color.barTabGradientEnd
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+        .frame(height: 3)
+        .clipShape(Capsule())
+    }
+}
+
+// MARK: - Subtle divider
+
+struct WarmDivider: View {
+    var body: some View {
+        Rectangle()
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.clear,
+                        Color.barTabCardBorder.opacity(0.5),
+                        Color.clear
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .frame(height: 1)
+    }
+}
+
 // MARK: - Modifier: subtle card border
 
 struct CardBorder: ViewModifier {
@@ -171,7 +249,7 @@ struct CardBorder: ViewModifier {
     func body(content: Content) -> some View {
         content
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .stroke(Color.barTabCardBorder, lineWidth: 0.5)
             )
     }

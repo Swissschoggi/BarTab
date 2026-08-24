@@ -462,4 +462,20 @@ final class SupabaseClient {
         )
         _ = try await perform(httpRequest)
     }
+
+    // MARK: - Profile
+
+    func updateProfileDisplayName(
+        userID: UUID,
+        displayName: String
+    ) async throws {
+        var httpRequest = makeRequest(
+            endpoint: "profiles?id=eq.\(userID.uuidString)",
+            method: "PATCH"
+        )
+        httpRequest.httpBody = try JSONEncoder().encode(
+            ["display_name": displayName]
+        )
+        _ = try await perform(httpRequest)
+    }
 }

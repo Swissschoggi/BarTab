@@ -32,7 +32,7 @@ struct MainTabView: View {
                 maxHeight: .infinity
             )
 
-            HStack(spacing: 2) {
+            HStack(spacing: 8) {
 
                 tabButton(
                     title: "Map",
@@ -52,22 +52,26 @@ struct MainTabView: View {
                     tab: .profile
                 )
             }
-            .padding(4)
-            .background(.ultraThinMaterial)
+            .padding(6)
+            .background(
+                Color.barTabCardFill
+                    .opacity(0.9)
+            )
             .clipShape(
-                RoundedRectangle(
-                    cornerRadius: 20,
-                    style: .continuous
-                )
+                RoundedRectangle(cornerRadius: 32, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 32, style: .continuous)
+                    .stroke(Color.barTabCardBorder.opacity(0.8), lineWidth: 0.5)
             )
             .shadow(
-                color: Color.black.opacity(0.08),
-                radius: 16,
+                color: Color.barTabPrimary.opacity(0.15),
+                radius: 24,
                 x: 0,
-                y: 4
+                y: 12
             )
-            .padding(.horizontal, 16)
-            .padding(.bottom, 8)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 20)
         }
         .background(
             Color.barTabBackground
@@ -85,38 +89,48 @@ struct MainTabView: View {
         Button {
 
             withAnimation(
-                .easeInOut(duration: 0.25)
+                .spring(response: 0.3, dampingFraction: 0.7)
             ) {
                 selectedTab = tab
             }
 
         } label: {
 
-            VStack(spacing: 3) {
+            HStack(spacing: 6) {
 
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 15, weight: .semibold))
 
-                Text(title)
-                    .font(.system(size: 10, weight: .medium))
+                if selectedTab == tab {
+                    Text(title)
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .transition(.scale.combined(with: .opacity))
+                }
             }
             .frame(maxWidth: .infinity)
             .foregroundColor(
                 selectedTab == tab
-                    ? .barTabPrimary
+                    ? .white
                     : .barTabSecondary
             )
-            .padding(.vertical, 8)
+            .padding(.vertical, 12)
             .background(
                 selectedTab == tab
-                    ? Color.barTabPrimary.opacity(0.08)
-                    : Color.clear
+                    ? LinearGradient(
+                        colors: [Color.barTabGradientStart, Color.barTabGradientEnd],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    : LinearGradient(colors: [Color.clear, Color.clear], startPoint: .leading, endPoint: .trailing)
             )
             .clipShape(
-                RoundedRectangle(
-                    cornerRadius: 12,
-                    style: .continuous
-                )
+                Capsule()
+            )
+            .shadow(
+                color: selectedTab == tab ? Color.barTabPrimary.opacity(0.3) : Color.clear,
+                radius: 6,
+                x: 0,
+                y: 3
             )
         }
     }

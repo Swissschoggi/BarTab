@@ -499,150 +499,192 @@ struct NearbyView: View {
             }
 
             // Collapsible filters
-            DisclosureGroup("Filters", isExpanded: $filtersExpanded) {
-                VStack(alignment: .leading, spacing: 14) {
-                    filterRow(label: "Drink") {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 6) {
-                                ForEach(Drink.allCases, id: \.self) { drink in
-                                    Button {
-                                        if selectedDrinks.contains(drink) {
-                                            if selectedDrinks.count > 1 {
-                                                selectedDrinks.remove(drink)
-                                            }
-                                        } else {
-                                            selectedDrinks.insert(drink)
-                                        }
-                                    } label: {
-                                        HStack(spacing: 4) {
-                                            Image(systemName: drink.icon)
-                                                .font(.caption2)
-                                            Text(drink.displayName)
-                                                .font(.caption)
-                                        }
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .foregroundColor(selectedDrinks.contains(drink) ? .white : .barTabPrimary)
-                                        .background(selectedDrinks.contains(drink) ? Color.barTabPrimary : Color.barTabPillFill)
-                                        .clipShape(Capsule())
-                                    }
-                                }
-                            }
-                        }
+            VStack(alignment: .leading, spacing: 8) {
+                Button {
+                    withAnimation(.spring()) {
+                        filtersExpanded.toggle()
                     }
-
-                    filterRow(label: "Size") {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 6) {
-                                ForEach(availableSizes, id: \.self) { size in
-                                    Button {
-                                        if selectedSizes.contains(size) {
-                                            if selectedSizes.count > 1 {
-                                                selectedSizes.remove(size)
-                                            }
-                                        } else {
-                                            selectedSizes.insert(size)
-                                        }
-                                    } label: {
-                                        Text(size.displayName)
-                                            .font(.caption)
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 6)
-                                            .foregroundColor(selectedSizes.contains(size) ? .white : .barTabPrimary)
-                                            .background(selectedSizes.contains(size) ? Color.barTabPrimary : Color.barTabPillFill)
-                                            .clipShape(Capsule())
-                                    }
-                                }
-                            }
-                        }
+                } label: {
+                    HStack {
+                        Text("Filters")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .rotationEffect(.degrees(filtersExpanded ? 90 : 0))
                     }
-
-                    filterRow(label: "Brand") {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 6) {
-                                Button {
-                                    selectedBrand = nil
-                                } label: {
-                                    Text("All")
-                                        .font(.caption)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .foregroundColor(selectedBrand == nil ? .white : .barTabPrimary)
-                                        .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabPillFill)
-                                        .clipShape(Capsule())
-                                }
-
-                                ForEach(availableBrands, id: \.self) { brand in
-                                    Button {
-                                        selectedBrand = brand
-                                    } label: {
-                                        Text(brand)
-                                            .font(.caption)
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 6)
-                                            .foregroundColor(selectedBrand == brand ? .white : .barTabPrimary)
-                                            .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabPillFill)
-                                            .clipShape(Capsule())
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    filterRow(label: "Vibe") {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 6) {
-                                Button {
-                                    selectedAmbience = []
-                                } label: {
-                                    Text("Any")
-                                        .font(.caption)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .foregroundColor(selectedAmbience.isEmpty ? .white : .barTabPrimary)
-                                        .background(selectedAmbience.isEmpty ? Color.barTabPrimary : Color.barTabPillFill)
-                                        .clipShape(Capsule())
-                                }
-
-                                ForEach(AmbienceStyle.allCases) { style in
-                                    Button {
-                                        if selectedAmbience.contains(style) {
-                                            selectedAmbience.remove(style)
-                                        } else {
-                                            selectedAmbience.insert(style)
-                                        }
-                                    } label: {
-                                        HStack(spacing: 3) {
-                                            Image(systemName: style.icon)
-                                                .font(.caption2)
-                                            Text(style.displayName)
-                                        }
-                                        .font(.caption)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .foregroundColor(selectedAmbience.contains(style) ? .white : .barTabPrimary)
-                                        .background(selectedAmbience.contains(style) ? Color.barTabPrimary : Color.barTabPillFill)
-                                        .clipShape(Capsule())
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    .padding(12)
+                    .background(Color.barTabPillFill)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
-                .padding(.top, 8)
+                .foregroundColor(.barTabText)
+
+                if filtersExpanded {
+                    VStack(alignment: .leading, spacing: 14) {
+                        filterRow(label: "Drink") {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 6) {
+                                    ForEach(Drink.allCases, id: \.self) { drink in
+                                        Button {
+                                            if selectedDrinks.contains(drink) {
+                                                if selectedDrinks.count > 1 {
+                                                    selectedDrinks.remove(drink)
+                                                }
+                                            } else {
+                                                selectedDrinks.insert(drink)
+                                            }
+                                        } label: {
+                                            HStack(spacing: 4) {
+                                                Image(systemName: drink.icon)
+                                                    .font(.caption2)
+                                                Text(drink.displayName)
+                                                    .font(.caption)
+                                            }
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .foregroundColor(selectedDrinks.contains(drink) ? .white : .barTabPrimary)
+                                            .background(selectedDrinks.contains(drink) ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .clipShape(Capsule())
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        filterRow(label: "Size") {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 6) {
+                                    ForEach(availableSizes, id: \.self) { size in
+                                        Button {
+                                            if selectedSizes.contains(size) {
+                                                if selectedSizes.count > 1 {
+                                                    selectedSizes.remove(size)
+                                                }
+                                            } else {
+                                                selectedSizes.insert(size)
+                                            }
+                                        } label: {
+                                            Text(size.displayName)
+                                                .font(.caption)
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 6)
+                                                .foregroundColor(selectedSizes.contains(size) ? .white : .barTabPrimary)
+                                                .background(selectedSizes.contains(size) ? Color.barTabPrimary : Color.barTabPillFill)
+                                                .clipShape(Capsule())
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        filterRow(label: "Brand") {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 6) {
+                                    Button {
+                                        selectedBrand = nil
+                                    } label: {
+                                        Text("All")
+                                            .font(.caption)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .foregroundColor(selectedBrand == nil ? .white : .barTabPrimary)
+                                            .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .clipShape(Capsule())
+                                    }
+
+                                    ForEach(availableBrands, id: \.self) { brand in
+                                        Button {
+                                            selectedBrand = brand
+                                        } label: {
+                                            Text(brand)
+                                                .font(.caption)
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 6)
+                                                .foregroundColor(selectedBrand == brand ? .white : .barTabPrimary)
+                                                .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabPillFill)
+                                                .clipShape(Capsule())
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        filterRow(label: "Vibe") {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 6) {
+                                    Button {
+                                        selectedAmbience = []
+                                    } label: {
+                                        Text("Any")
+                                            .font(.caption)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .foregroundColor(selectedAmbience.isEmpty ? .white : .barTabPrimary)
+                                            .background(selectedAmbience.isEmpty ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .clipShape(Capsule())
+                                    }
+
+                                    ForEach(AmbienceStyle.allCases) { style in
+                                        Button {
+                                            if selectedAmbience.contains(style) {
+                                                selectedAmbience.remove(style)
+                                            } else {
+                                                selectedAmbience.insert(style)
+                                            }
+                                        } label: {
+                                            HStack(spacing: 3) {
+                                                Image(systemName: style.icon)
+                                                    .font(.caption2)
+                                                Text(style.displayName)
+                                            }
+                                            .font(.caption)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .foregroundColor(selectedAmbience.contains(style) ? .white : .barTabPrimary)
+                                            .background(selectedAmbience.contains(style) ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .clipShape(Capsule())
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(.top, 8)
+                }
             }
             .font(.subheadline)
             .fontWeight(.medium)
             .foregroundColor(.barTabText)
 
             // Sort (collapsible)
-            DisclosureGroup("Sort by", isExpanded: $sortExpanded) {
-                HStack(spacing: 8) {
-                    sortButton(title: "Cheapest", option: .cheapest)
-                    sortButton(title: "Closest", option: .closest)
-                    sortButton(title: "Brand", option: .brand)
+            VStack(alignment: .leading, spacing: 8) {
+                Button {
+                    withAnimation(.spring()) {
+                        sortExpanded.toggle()
+                    }
+                } label: {
+                    HStack {
+                        Text("Sort by")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .rotationEffect(.degrees(sortExpanded ? 90 : 0))
+                    }
+                    .padding(12)
+                    .background(Color.barTabPillFill)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
-                .padding(.top, 8)
+                .foregroundColor(.barTabText)
+
+                if sortExpanded {
+                    HStack(spacing: 8) {
+                        sortButton(title: "Cheapest", option: .cheapest)
+                        sortButton(title: "Closest", option: .closest)
+                        sortButton(title: "Brand", option: .brand)
+                    }
+                    .padding(.top, 8)
+                }
             }
             .font(.subheadline)
             .fontWeight(.medium)

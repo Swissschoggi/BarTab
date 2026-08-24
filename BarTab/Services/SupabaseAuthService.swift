@@ -213,7 +213,15 @@ final class SupabaseAuthService {
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        _ = try await perform(request)
+        let userData = try await perform(request)
+
+        // Also update profiles.display_name
+        if let user = try? JSONDecoder().decode(GoTrueUser.self, from: userData) {
+            try? await SupabaseClient.shared.updateProfileDisplayName(
+                userID: user.id,
+                displayName: newUsername
+            )
+        }
     }
 
     func updatePassword(

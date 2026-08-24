@@ -1,0 +1,153 @@
+import SwiftUI
+import CoreLocation
+
+/// Generates a fun 3-bar walking crawl route with estimated drink savings.
+struct BarHopView: View {
+
+    @EnvironmentObject private var barRepository: BarRepository
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var selectedRoute: [Bar] = []
+    @State private var isGenerating = false
+
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+
+                    // Hero banner
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "figure.walk.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.barTabPrimary)
+                            Text("Bar Hop Generator")
+                                .font(.system(size: 20, weight: .bold, design: .rounded))
+                                .foregroundColor(.barTabText)
+                        }
+
+                        Text("Let BarTab curate a 3-stop walking crawl featuring great drink deals near you.")
+                            .font(.system(size: 14, design: .rounded))
+                            .foregroundColor(.barTabSecondary)
+                    }
+                    .barTabCard()
+
+                    if selectedRoute.isEmpty {
+                        VStack(spacing: 16) {
+                            Image(systemName: "map.fill")
+                                .font(.system(size: 48))
+                                .foregroundColor(.barTabPrimary.opacity(0.6))
+
+                            Text("Ready for a night out?")
+                                .font(.system(size: 17, weight: .bold, design: .rounded))
+                                .foregroundColor(.barTabText)
+
+                            Button {
+                                generateRoute()
+                            } label: {
+                                Text("Generate Route")
+                                    .barTabPrimaryButton()
+                            }
+                            .padding(.horizontal, 40)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 40)
+                        .barTabCard()
+                    } else {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Text("Your Crawl Route")
+                                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                                    .foregroundColor(.barTabText)
+
+                                Spacer()
+
+                                Button("Shuffle") {
+                                    generateRoute()
+                                }
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .foregroundColor(.barTabPrimary)
+                            }
+
+                            ForEach(Array(selectedRoute.enumerated()), id: \.element.id) { index, bar in
+                                HStack(alignment: .top, spacing: 14) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.barTabPrimary)
+                                            .frame(width: 32, height: 32)
+                                        Text("\(index + 1)")
+                                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                                            .foregroundColor(.white)
+                                    }
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(bar.name)
+                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .foregroundColor(.barTabText)
+
+                                        Text(bar.address)
+                                            .font(.system(size: 13, design: .rounded))
+                                            .foregroundColor(.barTabSecondary)
+
+                                        if let popular = barRepository.popularAmbience(for: bar) {
+                                            HStack(spacing: 4) {
+                                                Image(systemName: popular.icon)
+                                                    .font(.caption2)
+                                                Text(popular.displayName)
+                                                    .font(.caption2)
+                                            }
+                                            .foregroundColor(.barTabPrimary)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 2)
+                                            .background(Color.barTabPrimary.opacity(0.08))
+                                            .clipShape(Capsule())
+                                            .padding(.top, 4)
+                                        }
+                                    }
+
+                                    Spacer()
+                                }
+                                .padding(12)
+                                .background(Color.barTabCardFill)
+                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                        .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                                )
+                            }
+
+                            Button {
+                                generateRoute()
+                            } label: {
+                                Text("Try Another Route")
+                                    .barTabPrimaryButton()
+                            }
+                            .padding(.top, 8)
+                        }
+                        .barTabCard()
+                    }
+                }
+                .padding(16)
+            }
+            .background(Color.barTabBackground.ignoresSafeArea())
+            .navigationTitle("Bar Hop")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    private func generateRoute() {
+        let allBars = barRepository.bars
+        guard allBars.count >= 3 else {
+            selectedRoute = allBars
+            return
+        }
+        selectedRoute = Array(allBars.shuffled().prefix(3))
+    }
+}
