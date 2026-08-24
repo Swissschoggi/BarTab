@@ -192,6 +192,20 @@ final class SupabaseClient {
         _ = try await perform(request)
     }
 
+    /// Update an existing bar
+    func updateBar(_ bar: Bar) async throws {
+
+        var request = makeRequest(
+            endpoint: "bars?id=eq.\(bar.id.uuidString)",
+            method: "PATCH"
+        )
+
+        let dto = BarDTO(from: bar)
+        request.httpBody = try encoder.encode(dto)
+
+        _ = try await perform(request)
+    }
+
     // MARK: - Prices
 
     /// Fetch every price entry, mapped to domain Price models
@@ -385,6 +399,14 @@ final class SupabaseClient {
             StatusUpdate(status: status.rawValue)
         )
 
+        _ = try await perform(httpRequest)
+    }
+
+    func deleteBrandRequest(_ request: BrandRequest) async throws {
+        let httpRequest = makeRequest(
+            endpoint: "brand_requests?id=eq.\(request.id.uuidString)",
+            method: "DELETE"
+        )
         _ = try await perform(httpRequest)
     }
 }

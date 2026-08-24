@@ -271,10 +271,10 @@ struct NearbyBarsView: View {
     }
 
     private func emptyState(icon: String, title: LocalizedStringKey, message: LocalizedStringKey) -> some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.system(size: 35))
-                .foregroundColor(.barTabPrimary)
+                .foregroundStyle(.barTabPrimary)
 
             Text(title)
                 .font(.headline)

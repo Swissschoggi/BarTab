@@ -46,7 +46,7 @@ struct BarRatingDTO: Codable {
     let id: UUID
     let bar_id: UUID
     let rated_by: UUID
-    let ambience: Int?
+    let ambience: String?
     let wine_quality: Int?
     let created_at: Date
 
@@ -55,7 +55,7 @@ struct BarRatingDTO: Codable {
             id: id,
             barID: bar_id,
             ratedBy: rated_by,
-            ambience: ambience,
+            ambience: ambience.flatMap { AmbienceStyle(rawValue: $0) },
             wineQuality: wine_quality,
             createdAt: created_at
         )
@@ -65,7 +65,7 @@ struct BarRatingDTO: Codable {
         self.id = domain.id
         self.bar_id = domain.barID
         self.rated_by = domain.ratedBy
-        self.ambience = domain.ambience
+        self.ambience = domain.ambience?.rawValue
         self.wine_quality = domain.wineQuality
         self.created_at = domain.createdAt
     }

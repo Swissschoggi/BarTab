@@ -5,6 +5,9 @@ struct AdminReportsView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
 
+    @State private var pendingDeleteReport: ContentReport?
+    @State private var showingDeleteConfirmation = false
+
     private var reports: [ContentReport] {
         barRepository.reports.sorted {
             $0.reportedAt > $1.reportedAt
@@ -18,21 +21,18 @@ struct AdminReportsView: View {
 
                 if reports.isEmpty {
 
-                    VStack(spacing: 12) {
+                    VStack(spacing: 14) {
                         Image(systemName: "checkmark.shield")
                             .font(.system(size: 44))
-                            .foregroundColor(.barTabPrimary)
+                            .foregroundStyle(.barTabPrimary)
 
-                        Text("No reports yet")
+                        Text("All clear")
                             .font(.headline)
 
-                        Text(
-                            "Flagged bars and prices "
-                            + "will show up here."
-                        )
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
+                        Text("Flagged bars and prices will show up here for review.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
@@ -41,10 +41,10 @@ struct AdminReportsView: View {
                 } else {
 
                     HStack {
-
-                        Text(
+                        Label(
                             "\(barRepository.unreviewedReportCount) "
-                            + "\(barRepository.unreviewedReportCount == 1 ? "needs" : "need") review"
+                            + "\(barRepository.unreviewedReportCount == 1 ? "needs" : "need") review",
+                            systemImage: "exclamationmark.circle"
                         )
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -68,6 +68,17 @@ struct AdminReportsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             ReportNotificationService.requestPermission()
+        }
+        .alert("Delete this report?", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                guard let report = pendingDeleteReport else { return }
+                Task {
+                    await barRepository.deleteReport(report)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This removes the report permanently.")
         }
     }
 
@@ -118,7 +129,7 @@ struct AdminReportsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                Text("·")
+                Text("\u{00B7}")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
@@ -129,29 +140,35 @@ struct AdminReportsView: View {
                 Spacer()
 
                 if report.isReviewed {
-                    Label(
-                        "Reviewed",
-                        systemImage: "checkmark.circle.fill"
-                    )
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.green)
+                    HStack(spacing: 6) {
+                        Label(
+                            "Reviewed",
+                            systemImage: "checkmark.circle.fill"
+                        )
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.green)
+
+                        Button {
+                            pendingDeleteReport = report
+                            showingDeleteConfirmation = true
+                        } label: {
+                            Label("Remove", systemImage: "trash")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.red)
+                        }
+                    }
                 } else {
                     Button {
-                        withAnimation(
-                            .easeInOut(duration: 0.2)
-                        ) {
-                            barRepository.markReportReviewed(
-                                report
-                            )
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            barRepository.markReportReviewed(report)
                         }
                     } label: {
                         Text("Mark reviewed")
                             .font(.caption)
                             .fontWeight(.semibold)
-                            .foregroundColor(
-                                .barTabPrimary
-                            )
+                            .foregroundColor(.barTabPrimary)
                     }
                 }
             }

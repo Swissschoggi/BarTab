@@ -5,6 +5,9 @@ struct AdminBrandRequestsView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
 
+    @State private var pendingDeleteRequest: BrandRequest?
+    @State private var showingDeleteConfirmation = false
+
     private var requests: [BrandRequest] {
         barRepository.brandRequests.sorted {
             $0.createdAt > $1.createdAt
@@ -18,20 +21,18 @@ struct AdminBrandRequestsView: View {
 
                 if requests.isEmpty {
 
-                    VStack(spacing: 12) {
+                    VStack(spacing: 14) {
                         Image(systemName: "tag.circle")
                             .font(.system(size: 44))
-                            .foregroundColor(.barTabPrimary)
+                            .foregroundStyle(.barTabPrimary)
 
                         Text("No brand requests yet")
                             .font(.headline)
 
-                        Text(
-                            "Requests for new brands will show up here."
-                        )
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
+                        Text("Requests for new brands will show up here.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
@@ -40,8 +41,9 @@ struct AdminBrandRequestsView: View {
                 } else {
 
                     HStack {
-                        Text(
-                            "\(barRepository.pendingBrandRequestCount) pending"
+                        Label(
+                            "\(barRepository.pendingBrandRequestCount) pending",
+                            systemImage: "clock"
                         )
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -62,6 +64,17 @@ struct AdminBrandRequestsView: View {
         .background(Color.barTabBackground.ignoresSafeArea())
         .navigationTitle("Brand requests")
         .navigationBarTitleDisplayMode(.inline)
+        .alert("Delete this request?", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                guard let request = pendingDeleteRequest else { return }
+                Task {
+                    await barRepository.deleteBrandRequest(request)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This removes the brand request permanently.")
+        }
     }
 
     private func requestCard(_ request: BrandRequest) -> some View {
@@ -89,7 +102,7 @@ struct AdminBrandRequestsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                Text("·")
+                Text("\u{00B7}")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
@@ -121,6 +134,16 @@ struct AdminBrandRequestsView: View {
                             .font(.caption)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabPrimary)
+                    }
+                } else {
+                    Button {
+                        pendingDeleteRequest = request
+                        showingDeleteConfirmation = true
+                    } label: {
+                        Label("Remove", systemImage: "trash")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.red)
                     }
                 }
             }

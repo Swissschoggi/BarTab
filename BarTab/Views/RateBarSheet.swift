@@ -8,12 +8,12 @@ struct RateBarSheet: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
-    @State private var ambience: Int?
+    @State private var ambience: AmbienceStyle?
     @State private var wineQuality: Int?
 
-    init(bar: Bar, initialAmbience: Int?, initialWineQuality: Int?) {
+    init(bar: Bar, initialAmbience: AmbienceStyle?, initialWineQuality: Int?) {
         self.bar = bar
         _ambience = State(initialValue: initialAmbience)
         _wineQuality = State(initialValue: initialWineQuality)
@@ -27,11 +27,22 @@ struct RateBarSheet: View {
                     Text("Ambience")
                         .font(.headline)
 
-                    Text("How's the vibe at \(bar.name)?")
+                    Text("What's the vibe at \(bar.name)?")
                         .font(.caption)
                         .foregroundColor(.secondary)
 
-                    StarRatingView(rating: $ambience)
+                    Picker("Ambience", selection: $ambience) {
+                        Text("Select...").tag(AmbienceStyle?.none)
+                        ForEach(AmbienceStyle.allCases) { style in
+                            HStack {
+                                Image(systemName: style.icon)
+                                Text(style.displayName)
+                            }
+                            .tag(AmbienceStyle?.some(style))
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .tint(.barTabPrimary)
                 }
                 .barTabCard()
 
@@ -69,7 +80,7 @@ struct RateBarSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
             }
@@ -78,7 +89,7 @@ struct RateBarSheet: View {
 
     private func submit() {
         guard let user = userSession.currentUser else {
-            presentationMode.wrappedValue.dismiss()
+            dismiss()
             return
         }
 
@@ -89,7 +100,7 @@ struct RateBarSheet: View {
                 wineQuality: wineQuality,
                 by: user
             )
-            presentationMode.wrappedValue.dismiss()
+            dismiss()
         }
     }
 }

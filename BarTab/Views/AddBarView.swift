@@ -128,21 +128,22 @@ struct AddBarView: View {
 
                 } else if selectedCoordinate == nil {
 
-                    VStack(spacing: 12) {
+                    VStack(spacing: 14) {
 
                         Spacer()
 
                         Image(systemName: "building.2")
                             .font(.system(size: 45))
-                            .foregroundColor(.barTabPrimary)
+                            .foregroundStyle(.barTabPrimary)
 
                         Text("Find your bar")
                             .font(.title3)
                             .fontWeight(.semibold)
 
                         Text(
-                            "Search for a bar, pub, café or other place."
+                            "Search for a bar, pub, cafe or other place."
                         )
+                        .font(.subheadline)
                         .multilineTextAlignment(.center)
                         .foregroundColor(.secondary)
                         .padding(.horizontal, 40)
@@ -193,20 +194,10 @@ struct AddBarView: View {
                                     .font(.headline)
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .foregroundColor(.white)
-                                    .background(
-                                        canCreateBar
-                                        ? Color.barTabPrimary
-                                        : Color.gray
-                                    )
-                                    .clipShape(
-                                        RoundedRectangle(
-                                            cornerRadius: 16,
-                                            style: .continuous
-                                        )
-                                    )
+                                    .barTabPrimaryButton()
                             }
                             .disabled(!canCreateBar)
+                            .opacity(canCreateBar ? 1 : 0.5)
                         }
                         .padding()
                     }

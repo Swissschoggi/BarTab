@@ -36,8 +36,12 @@ struct BarView: View {
         self.allowsDismissal = allowsDismissal
     }
 
+    private var currentBar: Bar {
+        barRepository.getBar(id: bar.id) ?? bar
+    }
+
     private var prices: [Price] {
-        barRepository.getPrices(for: bar)
+        barRepository.getPrices(for: currentBar)
     }
 
     private struct PriceGroup: Identifiable {
@@ -88,7 +92,7 @@ struct BarView: View {
                 Color.barTabBackground
                     .ignoresSafeArea()
             )
-            .navigationTitle(bar.name)
+            .navigationTitle(currentBar.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 toolbarContent
@@ -110,7 +114,7 @@ struct BarView: View {
                 spacing: 8
             ) {
 
-                Text(bar.address)
+                Text(currentBar.address)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
@@ -120,7 +124,7 @@ struct BarView: View {
                     Label(
                         DistanceService.formattedDistance(
                             from: location,
-                            to: bar
+                            to: currentBar
                         ),
                         systemImage: "location.fill"
                     )
@@ -211,22 +215,34 @@ struct BarView: View {
 
     private var detailsSection: some View {
 
-        let ambience = barRepository.averageAmbience(for: bar)
-        let wine = barRepository.averageWineQuality(for: bar)
+        let popularAmbience = barRepository.popularAmbience(for: currentBar)
+        let ambienceCount = barRepository.ambienceCount(for: currentBar)
+        let wine = barRepository.averageWineQuality(for: currentBar)
 
         return VStack(alignment: .leading, spacing: 14) {
 
             HStack {
                 Label(
-                    bar.smokingFriendly ? "Smoking friendly" : "No smoking",
-                    systemImage: bar.smokingFriendly ? "smoke.fill" : "smoke"
+                    currentBar.smokingFriendly ? "Smoking friendly" : "No smoking",
+                    systemImage: currentBar.smokingFriendly ? "smoke.fill" : "smoke"
                 )
                 .font(.subheadline)
                 .foregroundColor(
-                    bar.smokingFriendly ? .barTabPrimary : .secondary
+                    currentBar.smokingFriendly ? .barTabPrimary : .secondary
                 )
 
                 Spacer()
+
+                Toggle("", isOn: Binding(
+                    get: { currentBar.smokingFriendly },
+                    set: { _ in
+                        Task {
+                            await barRepository.toggleSmokingPolicy(for: currentBar)
+                        }
+                    }
+                ))
+                .labelsHidden()
+                .tint(.barTabPrimary)
             }
 
             Divider()
@@ -239,11 +255,23 @@ struct BarView: View {
 
                     Spacer()
 
-                    if let ambience = ambience {
-                        StarRatingSummaryView(
-                            average: ambience.average,
-                            count: ambience.count
-                        )
+                    if let style = popularAmbience {
+                        HStack(spacing: 4) {
+                            Image(systemName: style.icon)
+                                .font(.caption)
+                            Text(style.displayName)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                        .foregroundColor(.barTabPrimary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.barTabPrimary.opacity(0.1))
+                        .clipShape(Capsule())
+
+                        Text("(\(ambienceCount))")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
                     } else {
                         Text("No ratings yet")
                             .font(.caption)
@@ -307,14 +335,14 @@ struct BarView: View {
                 withAnimation(
                     .easeInOut(duration: 0.2)
                 ) {
-                    barRepository.toggleFavorite(bar)
+                    barRepository.toggleFavorite(currentBar)
                 }
             } label: {
                 Image(
                     systemName:
-                        barRepository.isFavorite(bar)
-                        ? "heart.fill"
-                        : "heart"
+                    barRepository.isFavorite(currentBar)
+                    ? "heart.fill"
+                    : "heart"
                 )
                 .foregroundColor(.barTabPrimary)
             }
@@ -367,7 +395,7 @@ struct BarView: View {
             .sheet(
                 isPresented: $showingAddPrice
             ) {
-                AddPriceView(bar: bar)
+                AddPriceView(bar: currentBar)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
             }
@@ -375,11 +403,11 @@ struct BarView: View {
                 isPresented: $showingRateBar
             ) {
                 let mine = userSession.currentUser.flatMap {
-                    barRepository.myRating(for: bar, by: $0)
+                    barRepository.myRating(for: currentBar, by: $0)
                 }
 
                 RateBarSheet(
-                    bar: bar,
+                    bar: currentBar,
                     initialAmbience: mine?.ambience,
                     initialWineQuality: mine?.wineQuality
                 )
@@ -818,7 +846,7 @@ struct BarView: View {
 
     private var shareText: String {
 
-        var text = "\(bar.name)\n\(bar.address)"
+        var text = "\(currentBar.name)\n\(currentBar.address)"
 
         let lines = groupedPrices.prefix(3).map { group in
 
@@ -843,7 +871,7 @@ struct BarView: View {
         }
 
         return barRepository.hasReported(
-            bar.id.uuidString,
+            currentBar.id.uuidString,
             by: user
         )
     }
@@ -867,7 +895,7 @@ struct BarView: View {
         }
 
         barRepository.reportBar(
-            bar,
+            currentBar,
             reason: reason,
             reportedBy: user
         )
@@ -935,7 +963,7 @@ struct BarView: View {
 
         Task {
             await barRepository.deleteBar(
-                bar,
+                currentBar,
                 createdBy: user
             )
             presentationMode.wrappedValue.dismiss()
@@ -968,7 +996,7 @@ struct BarView: View {
 
         Task {
             await barRepository.deletePriceGroup(
-                for: bar,
+                for: currentBar,
                 drink: group.drink,
                 size: group.size,
                 brand: group.brand,
@@ -980,13 +1008,13 @@ struct BarView: View {
     private func openDirections() {
 
         let placemark = MKPlacemark(
-            coordinate: bar.coordinate
+            coordinate: currentBar.coordinate
         )
 
         let mapItem = MKMapItem(
             placemark: placemark
         )
-        mapItem.name = bar.name
+        mapItem.name = currentBar.name
 
         mapItem.openInMaps(
             launchOptions: [
@@ -1112,14 +1140,14 @@ struct BarView: View {
     }
 
     private var emptyPricesView: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 14) {
             Image(
                 systemName: "wineglass"
             )
             .font(
                 .system(size: 40)
             )
-            .foregroundColor(
+            .foregroundStyle(
                 .barTabPrimary
             )
 
@@ -1127,7 +1155,7 @@ struct BarView: View {
                 .font(.headline)
 
             Text(
-                "Be the first person to add a price here."
+                "Be the first to add a price here."
             )
             .font(.subheadline)
             .foregroundColor(.secondary)

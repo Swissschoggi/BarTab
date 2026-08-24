@@ -228,12 +228,19 @@ final class BarRepository: ObservableObject {
         barRatings.filter { $0.barID == bar.id }
     }
 
-    /// Average ambience rating and how many people rated it, or nil
-    /// if nobody has rated this bar's ambience yet.
-    func averageAmbience(for bar: Bar) -> (average: Double, count: Int)? {
-        let values = ratings(for: bar).compactMap { $0.ambience }
-        guard !values.isEmpty else { return nil }
-        return (Double(values.reduce(0, +)) / Double(values.count), values.count)
+    /// Most common ambience style for a bar, or nil if nobody has rated it.
+    func popularAmbience(for bar: Bar) -> AmbienceStyle? {
+        let styles = ratings(for: bar).compactMap { $0.ambience }
+        guard !styles.isEmpty else { return nil }
+        var counts: [AmbienceStyle: Int] = [:]
+        for style in styles {
+            counts[style, default: 0] += 1
+        }
+        return counts.max(by: { $0.value < $1.value })?.key
+    }
+
+    func ambienceCount(for bar: Bar) -> Int {
+        ratings(for: bar).compactMap { $0.ambience }.count
     }
 
     /// Average wine-quality rating and how many people rated it, or
@@ -252,7 +259,7 @@ final class BarRepository: ObservableObject {
     /// for a bar. Passing nil for a dimension leaves it unrated.
     func submitRating(
         for bar: Bar,
-        ambience: Int?,
+        ambience: AmbienceStyle?,
         wineQuality: Int?,
         by user: User
     ) async {
@@ -395,6 +402,20 @@ final class BarRepository: ObservableObject {
         }
     }
 
+    func deleteBrandRequest(_ request: BrandRequest) async {
+        brandRequests.removeAll { $0.id == request.id }
+
+        do {
+            try await SupabaseClient.shared.deleteBrandRequest(request)
+        } catch {
+            print("Failed to delete brand request: \(error)")
+        }
+    }
+
+    func deleteReport(_ report: ContentReport) async {
+        reports.removeAll { $0.id == report.id }
+    }
+
     // MARK: - Synchronous Read & Helper Methods
     // (Keep calculations like getPriceSummaries, calculateConfidence, and nearbyBars unchanged)
 
@@ -441,6 +462,27 @@ final class BarRepository: ObservableObject {
             favoriteBarIDs.remove(bar.id)
         } else {
             favoriteBarIDs.insert(bar.id)
+        }
+    }
+
+    func toggleSmokingPolicy(for bar: Bar) async {
+        guard let index = bars.firstIndex(where: { $0.id == bar.id }) else { return }
+        let currentValue = bars[index].smokingFriendly
+        let updated = Bar(
+            id: bar.id,
+            name: bar.name,
+            address: bar.address,
+            coordinate: bar.coordinate,
+            createdAt: bar.createdAt,
+            createdBy: bar.createdBy,
+            smokingFriendly: !currentValue
+        )
+        bars[index] = updated
+
+        do {
+            try await SupabaseClient.shared.updateBar(updated)
+        } catch {
+            print("Failed to update smoking policy: \(error)")
         }
     }
 

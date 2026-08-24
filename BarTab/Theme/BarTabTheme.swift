@@ -71,6 +71,49 @@ extension View {
     }
 }
 
+// MARK: - Pill button
+
+extension View {
+
+    func barTabPillButton(
+        color: Color = .barTabPrimary
+    ) -> some View {
+        self
+            .font(.caption)
+            .fontWeight(.semibold)
+            .foregroundColor(color)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(color.opacity(0.1))
+            .clipShape(Capsule())
+    }
+}
+
+// MARK: - Section header
+
+struct BarTabSectionHeader: View {
+
+    let title: String
+    var count: Int? = nil
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.title3)
+                .fontWeight(.bold)
+
+            Spacer()
+
+            if let count = count {
+                Text("\(count)")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+}
+
 // MARK: - Drink icons
 
 extension Drink {

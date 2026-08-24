@@ -5,7 +5,6 @@ struct MainTabView: View {
     enum Tab {
         case map
         case nearby
-        case search
         case profile
     }
 
@@ -23,10 +22,7 @@ struct MainTabView: View {
                     MapView()
 
                 case .nearby:
-                    NearbyBarsView()
-
-                case .search:
-                    PriceSearchView()
+                    NearbyView()
 
                 case .profile:
                     ProfileView()
@@ -47,15 +43,9 @@ struct MainTabView: View {
                 )
 
                 tabButton(
-                    title: "Nearby",
-                    icon: "location.circle.fill",
+                    title: "Discover",
+                    icon: "safari.fill",
                     tab: .nearby
-                )
-
-                tabButton(
-                    title: "Prices",
-                    icon: "magnifyingglass",
-                    tab: .search
                 )
 
                 tabButton(
@@ -76,10 +66,10 @@ struct MainTabView: View {
                 )
             )
             .shadow(
-                color: Color.black.opacity(0.2),
-                radius: 8,
+                color: Color.black.opacity(0.12),
+                radius: 12,
                 x: 0,
-                y: 4
+                y: 6
             )
             .padding(.horizontal, 20)
             .padding(.vertical, 8)

@@ -9,8 +9,8 @@ struct BarRating: Identifiable {
     let barID: UUID
     let ratedBy: UUID
 
-    /// 1...5, nil if this user hasn't rated ambience.
-    let ambience: Int?
+    /// The ambience style chosen by this user, nil if not rated.
+    let ambience: AmbienceStyle?
 
     /// 1...5, nil if this user hasn't rated the wine selection.
     let wineQuality: Int?
