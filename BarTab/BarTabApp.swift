@@ -7,6 +7,10 @@ struct BarTabApp: App {
     @StateObject private var userSession = UserSession()
     @StateObject private var languageManager = LanguageManager.shared
 
+    init() {
+        LanguageManager.shared.applyOnLaunch()
+    }
+
     var body: some Scene {
         WindowGroup {
             MainTabView()

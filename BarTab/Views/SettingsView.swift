@@ -7,11 +7,13 @@ struct SettingsView: View {
     @EnvironmentObject private var languageManager: LanguageManager
     @Environment(\.dismiss) private var dismiss
 
-    private let languages: [(code: String, name: String)] = [
-        ("en", "English"),
-        ("de", "Deutsch"),
-        ("fr", "Francais"),
-        ("it", "Italiano")
+    @State private var showingRestartAlert = false
+
+    private let languages: [(code: String, name: String, flag: String)] = [
+        ("en", "English", "🇬🇧"),
+        ("de", "Deutsch", "🇩🇪"),
+        ("fr", "Français", "🇫🇷"),
+        ("it", "Italiano", "🇮🇹")
     ]
 
     private var totalContributions: Int {
@@ -28,62 +30,93 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 20) {
 
                     // Language
-                    VStack(alignment: .leading, spacing: 10) {
-                        Label("Language", systemImage: "globe")
-                            .font(.headline)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "globe")
+                                .font(.subheadline)
+                                .foregroundColor(.barTabPrimary)
+                            Text("Language")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+                        }
 
-                        ForEach(languages, id: \.code) { lang in
-                            Button {
-                                withAnimation {
+                        VStack(spacing: 0) {
+                            ForEach(Array(languages.enumerated()), id: \.element.code) { index, lang in
+                                Button {
+                                    guard languageManager.selectedLanguage != lang.code else { return }
                                     languageManager.selectedLanguage = lang.code
-                                }
-                            } label: {
-                                HStack {
-                                    Text(lang.name)
-                                        .font(.subheadline)
-                                        .foregroundColor(.primary)
+                                    UserDefaults.standard.set([lang.code], forKey: "AppleLanguages")
+                                    showingRestartAlert = true
+                                } label: {
+                                    HStack {
+                                        Text(lang.flag)
+                                            .font(.title3)
 
-                                    Spacer()
+                                        Text(lang.name)
+                                            .font(.subheadline)
+                                            .foregroundColor(.barTabText)
 
-                                    if languageManager.selectedLanguage == lang.code {
-                                        Image(systemName: "checkmark")
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(.barTabPrimary)
+                                        Spacer()
+
+                                        if languageManager.selectedLanguage == lang.code {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.barTabPrimary)
+                                        } else {
+                                            Image(systemName: "circle")
+                                                .foregroundColor(.barTabCardBorder)
+                                        }
                                     }
+                                    .padding(.vertical, 12)
                                 }
-                                .padding(.vertical, 4)
+
+                                if index < languages.count - 1 {
+                                    Divider()
+                                        .foregroundColor(.barTabCardBorder)
+                                }
                             }
                         }
                     }
                     .barTabCard()
 
                     // About
-                    VStack(alignment: .leading, spacing: 10) {
-                        Label("About", systemImage: "info.circle")
-                            .font(.headline)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "info.circle")
+                                .font(.subheadline)
+                                .foregroundColor(.barTabPrimary)
+                            Text("About")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+                        }
 
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("BarTab")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
 
                             Text("Find bars, compare drinks, and discover the best drink deals around you.")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.barTabSecondary)
                         }
 
                         Divider()
+                            .foregroundColor(.barTabCardBorder)
 
                         HStack {
                             Text("Version")
                                 .font(.subheadline)
+                                .foregroundColor(.barTabText)
                             Spacer()
                             Text("1.0.0")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.barTabSecondary)
                         }
                     }
                     .barTabCard()
@@ -102,6 +135,14 @@ struct SettingsView: View {
                     }
                 }
             }
+        }
+        .alert("Restart Required", isPresented: $showingRestartAlert) {
+            Button("Restart Now") {
+                exit(0)
+            }
+            Button("Later", role: .cancel) {}
+        } message: {
+            Text("Please restart the app to apply the language change.")
         }
     }
 }

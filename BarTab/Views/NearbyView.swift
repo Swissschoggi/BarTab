@@ -49,6 +49,10 @@ struct NearbyView: View {
     @State private var selectedBrand: String?
     @State private var selectedAmbience: AmbienceStyle?
 
+    // Collapsible filter state
+    @State private var filtersExpanded = false
+    @State private var sortExpanded = false
+
     enum SortOption {
         case cheapest
         case closest
@@ -422,9 +426,10 @@ struct NearbyView: View {
     private var priceFiltersSection: some View {
         VStack(alignment: .leading, spacing: 12) {
 
+            // Search bar (always visible)
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.barTabSecondary)
                     .font(.subheadline)
 
                 TextField("Search bars...", text: $searchText)
@@ -436,165 +441,220 @@ struct NearbyView: View {
                         searchText = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.barTabSecondary)
                     }
                 }
             }
             .padding(10)
-            .background(Color.barTabPrimary.opacity(0.08))
+            .background(Color.barTabPillFill)
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Drink")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-
+            // Active filter summary (always visible)
+            if selectedDrinks.count > 1 || selectedBrand != nil || selectedAmbience != nil {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(Drink.allCases, id: \.self) { drink in
-                            Button {
-                                if selectedDrinks.contains(drink) {
-                                    if selectedDrinks.count > 1 {
-                                        selectedDrinks.remove(drink)
-                                    }
-                                } else {
-                                    selectedDrinks.insert(drink)
-                                }
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: drink.icon)
-                                        .font(.caption)
-                                    Text(drink.displayName)
-                                        .font(.caption)
-                                }
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 7)
-                                .foregroundColor(selectedDrinks.contains(drink) ? .white : .barTabPrimary)
-                                .background(selectedDrinks.contains(drink) ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    HStack(spacing: 6) {
+                        if selectedDrinks.count > 1 {
+                            HStack(spacing: 3) {
+                                Image(systemName: "line.3.horizontal.decrease.circle.fill")
+                                    .font(.caption2)
+                                Text("\(selectedDrinks.count) drinks")
                             }
-                        }
-                    }
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Size")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(availableSizes, id: \.self) { size in
-                            Button {
-                                if selectedSizes.contains(size) {
-                                    if selectedSizes.count > 1 {
-                                        selectedSizes.remove(size)
-                                    }
-                                } else {
-                                    selectedSizes.insert(size)
-                                }
-                            } label: {
-                                Text(size.displayName)
-                                    .font(.caption)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 7)
-                                    .foregroundColor(selectedSizes.contains(size) ? .white : .barTabPrimary)
-                                    .background(selectedSizes.contains(size) ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                            }
-                        }
-                    }
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Brand")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        Button {
-                            selectedBrand = nil
-                        } label: {
-                            Text("All")
-                                .font(.caption)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 7)
-                                .foregroundColor(selectedBrand == nil ? .white : .barTabPrimary)
-                                .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.barTabPrimary.opacity(0.1))
+                            .clipShape(Capsule())
                         }
 
-                        ForEach(availableBrands, id: \.self) { brand in
-                            Button {
-                                selectedBrand = brand
-                            } label: {
+                        if let brand = selectedBrand {
+                            HStack(spacing: 3) {
                                 Text(brand)
-                                    .font(.caption)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 7)
-                                    .foregroundColor(selectedBrand == brand ? .white : .barTabPrimary)
-                                    .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                Image(systemName: "xmark.circle.fill")
+                                    .onTapGesture { selectedBrand = nil }
                             }
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.barTabPrimary.opacity(0.1))
+                            .clipShape(Capsule())
+                        }
+
+                        if let ambience = selectedAmbience {
+                            HStack(spacing: 3) {
+                                Image(systemName: ambience.icon)
+                                    .font(.caption2)
+                                Text(ambience.displayName)
+                                Image(systemName: "xmark.circle.fill")
+                                    .onTapGesture { selectedAmbience = nil }
+                            }
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.barTabPrimary.opacity(0.1))
+                            .clipShape(Capsule())
                         }
                     }
                 }
             }
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Vibe")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        Button {
-                            selectedAmbience = nil
-                        } label: {
-                            Text("Any")
-                                .font(.caption)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 7)
-                                .foregroundColor(selectedAmbience == nil ? .white : .barTabPrimary)
-                                .background(selectedAmbience == nil ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        }
-
-                        ForEach(AmbienceStyle.allCases) { style in
-                            Button {
-                                selectedAmbience = style
-                            } label: {
-                                HStack(spacing: 3) {
-                                    Image(systemName: style.icon)
-                                        .font(.caption2)
-                                    Text(style.displayName)
+            // Collapsible filters
+            DisclosureGroup("Filters", isExpanded: $filtersExpanded) {
+                VStack(alignment: .leading, spacing: 14) {
+                    filterRow(label: "Drink") {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 6) {
+                                ForEach(Drink.allCases, id: \.self) { drink in
+                                    Button {
+                                        if selectedDrinks.contains(drink) {
+                                            if selectedDrinks.count > 1 {
+                                                selectedDrinks.remove(drink)
+                                            }
+                                        } else {
+                                            selectedDrinks.insert(drink)
+                                        }
+                                    } label: {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: drink.icon)
+                                                .font(.caption2)
+                                            Text(drink.displayName)
+                                                .font(.caption)
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .foregroundColor(selectedDrinks.contains(drink) ? .white : .barTabPrimary)
+                                        .background(selectedDrinks.contains(drink) ? Color.barTabPrimary : Color.barTabPillFill)
+                                        .clipShape(Capsule())
+                                    }
                                 }
-                                .font(.caption)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 7)
-                                .foregroundColor(selectedAmbience == style ? .white : .barTabPrimary)
-                                .background(selectedAmbience == style ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            }
+                        }
+                    }
+
+                    filterRow(label: "Size") {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 6) {
+                                ForEach(availableSizes, id: \.self) { size in
+                                    Button {
+                                        if selectedSizes.contains(size) {
+                                            if selectedSizes.count > 1 {
+                                                selectedSizes.remove(size)
+                                            }
+                                        } else {
+                                            selectedSizes.insert(size)
+                                        }
+                                    } label: {
+                                        Text(size.displayName)
+                                            .font(.caption)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .foregroundColor(selectedSizes.contains(size) ? .white : .barTabPrimary)
+                                            .background(selectedSizes.contains(size) ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    filterRow(label: "Brand") {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 6) {
+                                Button {
+                                    selectedBrand = nil
+                                } label: {
+                                    Text("All")
+                                        .font(.caption)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .foregroundColor(selectedBrand == nil ? .white : .barTabPrimary)
+                                        .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabPillFill)
+                                        .clipShape(Capsule())
+                                }
+
+                                ForEach(availableBrands, id: \.self) { brand in
+                                    Button {
+                                        selectedBrand = brand
+                                    } label: {
+                                        Text(brand)
+                                            .font(.caption)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .foregroundColor(selectedBrand == brand ? .white : .barTabPrimary)
+                                            .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    filterRow(label: "Vibe") {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 6) {
+                                Button {
+                                    selectedAmbience = nil
+                                } label: {
+                                    Text("Any")
+                                        .font(.caption)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .foregroundColor(selectedAmbience == nil ? .white : .barTabPrimary)
+                                        .background(selectedAmbience == nil ? Color.barTabPrimary : Color.barTabPillFill)
+                                        .clipShape(Capsule())
+                                }
+
+                                ForEach(AmbienceStyle.allCases) { style in
+                                    Button {
+                                        selectedAmbience = style
+                                    } label: {
+                                        HStack(spacing: 3) {
+                                            Image(systemName: style.icon)
+                                                .font(.caption2)
+                                            Text(style.displayName)
+                                        }
+                                        .font(.caption)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .foregroundColor(selectedAmbience == style ? .white : .barTabPrimary)
+                                        .background(selectedAmbience == style ? Color.barTabPrimary : Color.barTabPillFill)
+                                        .clipShape(Capsule())
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                .padding(.top, 8)
             }
+            .font(.subheadline)
+            .fontWeight(.medium)
+            .foregroundColor(.barTabText)
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Sort")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-
+            // Sort (collapsible)
+            DisclosureGroup("Sort by", isExpanded: $sortExpanded) {
                 HStack(spacing: 8) {
                     sortButton(title: "Cheapest", option: .cheapest)
                     sortButton(title: "Closest", option: .closest)
                     sortButton(title: "Brand", option: .brand)
                 }
+                .padding(.top, 8)
             }
+            .font(.subheadline)
+            .fontWeight(.medium)
+            .foregroundColor(.barTabText)
+        }
+    }
+
+    private func filterRow<Content: View>(
+        label: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label)
+                .font(.caption)
+                .fontWeight(.medium)
+                .foregroundColor(.barTabSecondary)
+            content()
         }
     }
 

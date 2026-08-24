@@ -14,6 +14,7 @@ struct BarView: View {
 
     @State private var showingAddPrice = false
     @State private var expandedGroupID: String?
+    @State private var expandedDrinkCategories: Set<Drink> = Set(Drink.allCases)
 
     @State private var showingBarReport = false
     @State private var showingPriceReport = false
@@ -172,29 +173,41 @@ struct BarView: View {
                     }) { drink in
 
                         let drinkGroups = groupedPrices.filter { $0.drink == drink }
+                        let isCategoryExpanded = expandedDrinkCategories.contains(drink)
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 4) {
+                        DisclosureGroup {
+                            VStack(alignment: .leading, spacing: 4) {
+                                ForEach(drinkGroups) { group in
+                                    priceGroupRow(group)
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 6) {
                                 Image(systemName: drink.icon)
                                     .font(.caption)
                                     .foregroundColor(.barTabPrimary)
+                                    .frame(width: 20)
 
                                 Text(drink.displayName)
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
+                                    .foregroundColor(.barTabText)
 
                                 Spacer()
 
                                 Text("\(drinkGroups.count)")
                                     .font(.caption2)
-                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.barTabPrimary.opacity(0.1))
+                                    .clipShape(Capsule())
+                                    .foregroundColor(.barTabPrimary)
                             }
-                            .padding(.horizontal, 4)
-                            .padding(.top, 4)
-
-                            ForEach(drinkGroups) { group in
-                                priceGroupRow(group)
-                            }
+                        }
+                        .tint(.barTabSecondary)
+                        .padding(.vertical, 2)
+                        .onAppear {
+                            expandedDrinkCategories.insert(drink)
                         }
                     }
                 }

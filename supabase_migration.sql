@@ -48,3 +48,15 @@ CREATE INDEX IF NOT EXISTS idx_drink_ratings_bar_id ON drink_ratings(bar_id);
 
 -- 9. Create index for fast lookups by drink product
 CREATE INDEX IF NOT EXISTS idx_drink_ratings_product ON drink_ratings(bar_id, drink, brand, size);
+
+-- 10. Create view for drink ratings with averages
+CREATE OR REPLACE VIEW drink_rating_averages AS
+SELECT 
+    bar_id,
+    drink,
+    brand,
+    size,
+    ROUND(AVG(quality)::numeric, 1) AS average_quality,
+    COUNT(*) AS rating_count
+FROM drink_ratings
+GROUP BY bar_id, drink, brand, size;
