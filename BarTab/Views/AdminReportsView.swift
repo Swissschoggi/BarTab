@@ -24,7 +24,7 @@ struct AdminReportsView: View {
                     VStack(spacing: 14) {
                         Image(systemName: "checkmark.shield")
                             .font(.system(size: 44))
-                            .foregroundStyle(.barTabPrimary)
+                            .foregroundColor(.barTabPrimary)
 
                         Text("All clear")
                             .font(.headline)

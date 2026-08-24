@@ -1147,7 +1147,7 @@ struct BarView: View {
             .font(
                 .system(size: 40)
             )
-            .foregroundStyle(
+            .foregroundColor(
                 .barTabPrimary
             )
 

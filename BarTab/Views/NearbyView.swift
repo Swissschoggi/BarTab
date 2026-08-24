@@ -629,7 +629,7 @@ struct NearbyView: View {
         VStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.system(size: 35))
-                .foregroundStyle(.barTabPrimary)
+                .foregroundColor(.barTabPrimary)
 
             Text(title)
                 .font(.headline)
