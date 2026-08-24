@@ -37,43 +37,61 @@ struct MapView: View {
                     Button {
                         selectedBar = bar
                     } label: {
-                        Image(systemName: "wineglass.fill")
-                            .font(.title2)
-                            .foregroundColor(.white)
-                            .frame(width: 44, height: 44)
-                            .background(Color.barTabPrimary)
-                            .clipShape(Circle())
-                            .shadow(radius: 3)
+                        VStack(spacing: 2) {
+                            Image(systemName: "wineglass.fill")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color.barTabPrimary, Color.barTabPrimary.opacity(0.8)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .shadow(color: Color.barTabPrimary.opacity(0.3), radius: 4, x: 0, y: 2)
+
+                            Image(systemName: "triangle.fill")
+                                .font(.system(size: 6))
+                                .foregroundColor(.barTabPrimary)
+                                .rotationEffect(.degrees(180))
+                        }
                     }
                 }
             }
             .ignoresSafeArea()
 
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
 
                 Button {
                     showingAddBar = true
                 } label: {
                     Image(systemName: "plus")
-                        .font(.title2)
-                        .fontWeight(.semibold)
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white)
-                        .frame(width: 50, height: 50)
-                        .background(Color.barTabPrimary)
-                        .clipShape(Circle())
-                        .shadow(radius: 4)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.barTabPrimary, Color.barTabPrimary.opacity(0.85)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .shadow(color: Color.barTabPrimary.opacity(0.3), radius: 6, x: 0, y: 3)
                 }
 
                 Button {
                     centerOnUser()
                 } label: {
                     Image(systemName: "location.fill")
-                        .font(.title2)
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.barTabPrimary)
-                        .frame(width: 50, height: 50)
-                        .background(Color.barTabBackground)
-                        .clipShape(Circle())
-                        .shadow(radius: 4)
+                        .frame(width: 44, height: 44)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 3)
                 }
             }
             .padding()

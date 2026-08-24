@@ -115,7 +115,7 @@ struct MyContributionsView: View {
                 .fontWeight(.semibold)
 
             Text(
-                "Prices you add to bars will appear here."
+                "Drinks you add to bars will appear here."
             )
             .font(.subheadline)
             .foregroundColor(.secondary)

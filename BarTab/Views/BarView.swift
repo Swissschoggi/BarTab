@@ -31,6 +31,8 @@ struct BarView: View {
 
     @State private var showingRateBar = false
     @State private var showingSmokingConfirmation = false
+    @State private var ratingDrinkGroup: PriceGroup?
+    @State private var showingDrinkRating = false
 
     init(bar: Bar, allowsDismissal: Bool = false) {
         self.bar = bar
@@ -49,10 +51,12 @@ struct BarView: View {
         let drink: Drink
         let size: DrinkSize
         let brand: String?
+        let style: String?
+        let serving: ServingMethod?
         var prices: [Price]
 
         var id: String {
-            "\(drink)-\(size)-\(brand ?? "")"
+            "\(drink)-\(size)-\(brand ?? "")-\(style ?? "")-\(serving?.rawValue ?? "")"
         }
     }
 
@@ -63,7 +67,9 @@ struct BarView: View {
             if let index = groups.firstIndex(where: {
                 $0.drink == price.drink &&
                 $0.size == price.size &&
-                $0.brand == price.brand
+                $0.brand == price.brand &&
+                $0.style == price.style &&
+                $0.serving == price.serving
             }) {
                 groups[index].prices.append(price)
             } else {
@@ -72,6 +78,8 @@ struct BarView: View {
                         drink: price.drink,
                         size: price.size,
                         brand: price.brand,
+                        style: price.style,
+                        serving: price.serving,
                         prices: [price]
                     )
                 )
@@ -107,17 +115,17 @@ struct BarView: View {
     private var content: some View {
         VStack(
             alignment: .leading,
-            spacing: 24
+            spacing: 20
         ) {
 
             VStack(
                 alignment: .leading,
-                spacing: 8
+                spacing: 6
             ) {
 
                 Text(currentBar.address)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.barTabSecondary)
 
                 if let location =
                     locationService.location {
@@ -130,7 +138,12 @@ struct BarView: View {
                         systemImage: "location.fill"
                     )
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .fontWeight(.medium)
+                    .foregroundColor(.barTabPrimary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.barTabPrimary.opacity(0.08))
+                    .clipShape(Capsule())
                 }
             }
 
@@ -138,17 +151,16 @@ struct BarView: View {
 
             VStack(
                 alignment: .leading,
-                spacing: 12
+                spacing: 8
             ) {
                 HStack {
                     Text("Menu")
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(.headline)
 
                     Spacer()
 
                     Text("\(groupedPrices.count) items")
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundColor(.secondary)
                 }
 
@@ -161,22 +173,24 @@ struct BarView: View {
 
                         let drinkGroups = groupedPrices.filter { $0.drink == drink }
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack(spacing: 6) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(spacing: 4) {
                                 Image(systemName: drink.icon)
-                                    .font(.subheadline)
+                                    .font(.caption)
                                     .foregroundColor(.barTabPrimary)
 
                                 Text(drink.displayName)
-                                    .font(.headline)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
 
                                 Spacer()
 
                                 Text("\(drinkGroups.count)")
-                                    .font(.caption)
+                                    .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
                             .padding(.horizontal, 4)
+                            .padding(.top, 4)
 
                             ForEach(drinkGroups) { group in
                                 priceGroupRow(group)
@@ -189,12 +203,14 @@ struct BarView: View {
             Button {
                 openDirections()
             } label: {
-                HStack {
+                HStack(spacing: 8) {
                     Image(
                         systemName: "arrow.triangle.turn.up.right.diamond.fill"
                     )
+                    .font(.subheadline)
 
                     Text("Get Directions")
+                        .font(.subheadline)
                         .fontWeight(.semibold)
 
                     Spacer()
@@ -202,18 +218,21 @@ struct BarView: View {
                     Image(
                         systemName: "arrow.up.right"
                     )
+                    .font(.caption)
+                    .fontWeight(.semibold)
                 }
                 .foregroundColor(.barTabPrimary)
-                .padding()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
                 .frame(
                     maxWidth: .infinity
                 )
                 .background(
-                    Color.barTabPrimary.opacity(0.12)
+                    Color.barTabPrimary.opacity(0.06)
                 )
                 .clipShape(
                     RoundedRectangle(
-                        cornerRadius: 16,
+                        cornerRadius: 14,
                         style: .continuous
                     )
                 )
@@ -222,10 +241,12 @@ struct BarView: View {
             Button {
                 showingAddPrice = true
             } label: {
-                HStack {
+                HStack(spacing: 8) {
                     Image(systemName: "plus")
+                        .font(.subheadline)
 
-                    Text("Add a price")
+                    Text("Add a drink")
+                        .font(.subheadline)
                         .fontWeight(.semibold)
 
                     Spacer()
@@ -233,6 +254,8 @@ struct BarView: View {
                     Image(
                         systemName: "chevron.right"
                     )
+                    .font(.caption)
+                    .fontWeight(.semibold)
                 }
                 .padding()
                 .barTabPrimaryButton()
@@ -246,28 +269,28 @@ struct BarView: View {
         let ambienceCount = barRepository.ambienceCount(for: currentBar)
         let wine = barRepository.averageWineQuality(for: currentBar)
 
-        return VStack(alignment: .leading, spacing: 14) {
+        return VStack(alignment: .leading, spacing: 0) {
 
             Button {
                 showingSmokingConfirmation = true
             } label: {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     Image(systemName: currentBar.smokingFriendly ? "smoke.fill" : "smoke")
                         .font(.subheadline)
                         .foregroundColor(currentBar.smokingFriendly ? .white : .barTabPrimary)
-                        .frame(width: 30, height: 30)
-                        .background(currentBar.smokingFriendly ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.1))
+                        .frame(width: 32, height: 32)
+                        .background(currentBar.smokingFriendly ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.08))
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
                     VStack(alignment: .leading, spacing: 1) {
                         Text(currentBar.smokingFriendly ? "Smoking friendly" : "No smoking")
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(.primary)
+                            .foregroundColor(.barTabText)
 
                         Text("Tap to change")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.barTabSecondary)
                     }
 
                     Spacer()
@@ -275,18 +298,19 @@ struct BarView: View {
                     Image(systemName: "chevron.right")
                         .font(.caption)
                         .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.barTabSecondary)
                 }
             }
             .buttonStyle(.plain)
 
             Divider()
+                .foregroundColor(.barTabCardBorder)
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Text("Ambience")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.barTabSecondary)
 
                     Spacer()
 
@@ -301,23 +325,23 @@ struct BarView: View {
                         .foregroundColor(.barTabPrimary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Color.barTabPrimary.opacity(0.1))
+                        .background(Color.barTabPrimary.opacity(0.08))
                         .clipShape(Capsule())
 
                         Text("(\(ambienceCount))")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.barTabSecondary)
                     } else {
                         Text("No ratings yet")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.barTabSecondary)
                     }
                 }
 
                 HStack {
                     Text("Wine selection")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.barTabSecondary)
 
                     Spacer()
 
@@ -329,19 +353,26 @@ struct BarView: View {
                     } else {
                         Text("No ratings yet")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.barTabSecondary)
                     }
                 }
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
 
                 Button {
                     showingRateBar = true
                 } label: {
-                    Label("Rate this bar", systemImage: "star")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.barTabPrimary)
+                    HStack(spacing: 6) {
+                        Image(systemName: "star.fill")
+                            .font(.caption)
+                        Text("Rate this bar")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.barTabAccent)
+                    }
                 }
-                .padding(.top, 2)
+                .padding(.top, 4)
             }
         }
         .barTabCard()
@@ -467,7 +498,7 @@ struct BarView: View {
                 )
             }
             .confirmationDialog(
-                "Report this price?",
+                "Report this drink?",
                 isPresented: $showingPriceReport,
                 titleVisibility: .visible
             ) {
@@ -483,7 +514,7 @@ struct BarView: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text(
-                    "Tell us why this price looks wrong."
+                    "Tell us why this drink looks wrong."
                 )
             }
             .alert(
@@ -514,11 +545,11 @@ struct BarView: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text(
-                    "This removes the bar and all of its prices. This can't be undone."
+                    "This removes the bar and all of its drinks. This can't be undone."
                 )
             }
             .confirmationDialog(
-                "Delete this price?",
+                "Delete this drink entry?",
                 isPresented: $showingDeletePriceConfirmation,
                 titleVisibility: .visible
             ) {
@@ -532,7 +563,7 @@ struct BarView: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text(
-                    "This removes this price report. This can't be undone."
+                    "This removes this drink entry. This can't be undone."
                 )
             }
             .confirmationDialog(
@@ -553,7 +584,7 @@ struct BarView: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text(
-                    "This removes all prices for this drink at this bar. This can't be undone."
+                    "This removes all entries for this drink at this bar. This can't be undone."
                 )
             }
             .alert(
@@ -612,19 +643,21 @@ struct BarView: View {
 
                 VStack(
                     alignment: .leading,
-                    spacing: 12
+                    spacing: 6
                 ) {
 
                     HStack {
 
                         VStack(
                             alignment: .leading,
-                            spacing: 4
+                            spacing: 3
                         ) {
 
                             HStack(spacing: 6) {
                                 Text(group.drink.displayName)
-                                    .font(.headline)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabText)
 
                                 if isFlagged {
                                     Image(
@@ -636,44 +669,62 @@ struct BarView: View {
 
                                 if let brand = group.brand {
                                     Text("·")
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.barTabSecondary)
 
                                     Text(brand)
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
+                                        .font(.caption)
+                                        .foregroundColor(.barTabSecondary)
+                                }
+
+                                if let style = group.style {
+                                    Text("·")
+                                        .foregroundColor(.barTabSecondary)
+
+                                    Text(style)
+                                        .font(.caption)
+                                        .foregroundColor(.barTabSecondary)
                                 }
                             }
 
-                            Text(group.size.displayName)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                            HStack(spacing: 6) {
+                                Text(group.size.displayName)
+                                    .font(.caption)
+                                    .foregroundColor(.barTabSecondary)
+
+                                if let serving = group.serving {
+                                    Text("·")
+                                        .foregroundColor(.barTabSecondary)
+
+                                    HStack(spacing: 2) {
+                                        Image(systemName: serving.icon)
+                                            .font(.caption2)
+                                        Text(serving.displayName)
+                                    }
+                                    .font(.caption)
+                                    .foregroundColor(.barTabSecondary)
+                                }
+                            }
                         }
 
                         Spacer()
 
                         VStack(
                             alignment: .trailing,
-                            spacing: 2
+                            spacing: 1
                         ) {
                             Text(
                                 "\(average.formattedAmount) CHF"
                             )
-                            .font(
-                                .system(
-                                    size: 19,
-                                    weight: .bold
-                                )
-                            )
-                            .foregroundColor(
-                                .barTabPrimary
-                            )
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.barTabPrimary)
 
                             Text(
                                 group.prices.count == 1
                                 ? "1 report"
                                 : "\(group.prices.count) reports"
                             )
-                            .font(.caption)
+                            .font(.caption2)
                             .foregroundColor(.secondary)
                         }
                     }
@@ -694,24 +745,24 @@ struct BarView: View {
                                 ? "chevron.up"
                                 : "chevron.down"
                         )
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundColor(.secondary)
                     }
 
                     VStack(
                         alignment: .leading,
-                        spacing: 6
+                        spacing: 4
                     ) {
 
                         HStack {
-                            Text("Price confidence")
-                                .font(.caption)
+                            Text("Confidence")
+                                .font(.caption2)
                                 .fontWeight(.medium)
 
                             Spacer()
 
                             Text("\(confidence)%")
-                                .font(.caption)
+                                .font(.caption2)
                                 .fontWeight(.bold)
                         }
 
@@ -736,7 +787,7 @@ struct BarView: View {
                                     )
                             }
                         }
-                        .frame(height: 7)
+                        .frame(height: 5)
 
                         Text(
                             confidenceDescription(
@@ -745,6 +796,7 @@ struct BarView: View {
                         )
                         .font(.caption2)
                         .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .contentShape(Rectangle())
@@ -761,7 +813,7 @@ struct BarView: View {
                     spacing: 10
                 ) {
 
-                    Text("Price history")
+                    Text("History")
                         .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -812,6 +864,9 @@ struct BarView: View {
                         }
                     }
 
+                    // Drink quality rating
+                    drinkQualitySection(group: group)
+
                     if canDeleteGroup(group) {
 
                         Divider()
@@ -847,7 +902,7 @@ struct BarView: View {
                         Label(
                             alreadyReported
                             ? "Reported — thanks"
-                            : "Report this price",
+                            : "Report this drink",
                             systemImage: alreadyReported
                                 ? "checkmark.circle"
                                 : "flag"
@@ -913,7 +968,7 @@ struct BarView: View {
         }
 
         if !lines.isEmpty {
-            text += "\n\nPrices:\n" + lines.joined(
+            text += "\n\nDrinks:\n" + lines.joined(
                 separator: "\n"
             )
         }
@@ -978,7 +1033,7 @@ struct BarView: View {
             reportedBy: user
         )
 
-        reportConfirmationText = String(localized: "We'll review this price and correct it if it looks wrong.")
+        reportConfirmationText = String(localized: "We'll review this drink and correct it if it looks wrong.")
         showingReportConfirmation = true
     }
 
@@ -1178,6 +1233,77 @@ struct BarView: View {
 
         default:
             return "Very low confidence — more reports needed"
+        }
+    }
+
+    private func drinkQualitySection(group: PriceGroup) -> some View {
+        let quality = barRepository.averageDrinkQuality(
+            for: currentBar,
+            drink: group.drink,
+            brand: group.brand,
+            size: group.size
+        )
+
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text("Quality")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.secondary)
+
+                Spacer()
+
+                if let quality {
+                    HStack(spacing: 4) {
+                        StarRatingSummaryView(
+                            average: quality.average,
+                            count: quality.count
+                        )
+                    }
+                } else {
+                    Text("No ratings")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            if let user = userSession.currentUser {
+                let myRating = barRepository.myDrinkRating(
+                    for: currentBar,
+                    drink: group.drink,
+                    brand: group.brand,
+                    size: group.size,
+                    by: user
+                )
+
+                HStack(spacing: 2) {
+                    ForEach(1...5, id: \.self) { star in
+                        Button {
+                            Task {
+                                await barRepository.submitDrinkRating(
+                                    for: currentBar,
+                                    drink: group.drink,
+                                    brand: group.brand,
+                                    size: group.size,
+                                    quality: star,
+                                    by: user
+                                )
+                            }
+                        } label: {
+                            Image(systemName: star <= (myRating?.quality ?? 0) ? "star.fill" : "star")
+                                .font(.caption)
+                                .foregroundColor(star <= (myRating?.quality ?? 0) ? .yellow : .secondary)
+                        }
+                    }
+
+                    if let myRating {
+                        Text("Your rating")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.leading, 4)
+                    }
+                }
+            }
         }
     }
 

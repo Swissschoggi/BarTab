@@ -55,7 +55,7 @@ struct LoginView: View {
                             .font(.system(size: 26, weight: .bold))
 
                         Text(
-                            "Create an account to add and manage prices."
+                            "Create an account to add and manage drinks."
                         )
                         .font(.subheadline)
                         .foregroundColor(.secondary)

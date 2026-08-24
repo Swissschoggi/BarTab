@@ -200,8 +200,8 @@ struct MyBarsView: View {
                         }
 
                         Label(
-                            "\(summaries.count) \(summaries.count == 1 ? "price" : "prices")",
-                            systemImage: "tag.fill"
+                            "\(summaries.count) \(summaries.count == 1 ? "drink" : "drinks")",
+                            systemImage: "mug.fill"
                         )
                     }
                     .font(.caption)

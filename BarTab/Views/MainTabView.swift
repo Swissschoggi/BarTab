@@ -14,7 +14,6 @@ struct MainTabView: View {
 
         VStack(spacing: 0) {
 
-
             Group {
                 switch selectedTab {
 
@@ -33,8 +32,7 @@ struct MainTabView: View {
                 maxHeight: .infinity
             )
 
-
-            HStack(spacing: 4) {
+            HStack(spacing: 2) {
 
                 tabButton(
                     title: "Map",
@@ -54,25 +52,22 @@ struct MainTabView: View {
                     tab: .profile
                 )
             }
-            .padding(6)
-            .background(
-                Color.barTabBackground
-                    .opacity(0.95)
-            )
+            .padding(4)
+            .background(.ultraThinMaterial)
             .clipShape(
                 RoundedRectangle(
-                    cornerRadius: 18,
+                    cornerRadius: 20,
                     style: .continuous
                 )
             )
             .shadow(
-                color: Color.black.opacity(0.12),
-                radius: 12,
+                color: Color.black.opacity(0.08),
+                radius: 16,
                 x: 0,
-                y: 6
+                y: 4
             )
-            .padding(.horizontal, 20)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
         }
         .background(
             Color.barTabBackground
@@ -90,43 +85,36 @@ struct MainTabView: View {
         Button {
 
             withAnimation(
-                .easeInOut(duration: 0.2)
+                .easeInOut(duration: 0.25)
             ) {
                 selectedTab = tab
             }
 
         } label: {
 
-            HStack(spacing: 6) {
+            VStack(spacing: 3) {
 
                 Image(systemName: icon)
-                    .font(
-                        .system(
-                            size: 15,
-                            weight: .semibold
-                        )
-                    )
+                    .font(.system(size: 16, weight: .medium))
 
                 Text(title)
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                    .font(.system(size: 10, weight: .medium))
             }
             .frame(maxWidth: .infinity)
             .foregroundColor(
                 selectedTab == tab
-                    ? .white
-                    : .barTabText
+                    ? .barTabPrimary
+                    : .barTabSecondary
             )
-            .padding(.horizontal, 12)
-            .padding(.vertical, 9)
+            .padding(.vertical, 8)
             .background(
                 selectedTab == tab
-                    ? Color.barTabPrimary
+                    ? Color.barTabPrimary.opacity(0.08)
                     : Color.clear
             )
             .clipShape(
                 RoundedRectangle(
-                    cornerRadius: 13,
+                    cornerRadius: 12,
                     style: .continuous
                 )
             )

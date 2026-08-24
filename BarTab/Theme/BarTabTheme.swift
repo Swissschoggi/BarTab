@@ -8,20 +8,17 @@ struct BarTabScreenHeader: View {
     let subtitle: LocalizedStringKey
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(
-                    .system(
-                        size: 30,
-                        weight: .bold
-                    )
-                )
+                .font(.largeTitle)
+                .fontWeight(.bold)
                 .foregroundColor(.barTabText)
 
             Text(subtitle)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(.barTabSecondary)
         }
+        .padding(.top, 8)
     }
 }
 
@@ -30,9 +27,10 @@ struct BarTabScreenHeader: View {
 extension View {
 
     func barTabCard(
-        cornerRadius: CGFloat = 18,
+        cornerRadius: CGFloat = 16,
         fill: Color = Color.barTabCardFill,
-        padding: CGFloat = 16
+        padding: CGFloat = 16,
+        shadow: Bool = true
     ) -> some View {
         self
             .padding(padding)
@@ -47,6 +45,19 @@ extension View {
                     style: .continuous
                 )
             )
+            .overlay(
+                RoundedRectangle(
+                    cornerRadius: cornerRadius,
+                    style: .continuous
+                )
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            )
+            .shadow(
+                color: Color.black.opacity(shadow ? 0.04 : 0),
+                radius: shadow ? 8 : 0,
+                x: 0,
+                y: shadow ? 2 : 0
+            )
     }
 }
 
@@ -55,18 +66,35 @@ extension View {
 extension View {
 
     func barTabPrimaryButton(
-        cornerRadius: CGFloat = 16
+        cornerRadius: CGFloat = 14
     ) -> some View {
         self
+            .font(.subheadline)
+            .fontWeight(.semibold)
             .foregroundColor(.white)
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity)
             .background(
-                Color.barTabPrimary
+                LinearGradient(
+                    colors: [
+                        Color.barTabPrimary,
+                        Color.barTabPrimary.opacity(0.85)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
             )
             .clipShape(
                 RoundedRectangle(
                     cornerRadius: cornerRadius,
                     style: .continuous
                 )
+            )
+            .shadow(
+                color: Color.barTabPrimary.opacity(0.25),
+                radius: 6,
+                x: 0,
+                y: 3
             )
     }
 }
@@ -82,8 +110,8 @@ extension View {
             .font(.caption)
             .fontWeight(.semibold)
             .foregroundColor(color)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
             .background(color.opacity(0.1))
             .clipShape(Capsule())
     }
@@ -99,47 +127,22 @@ struct BarTabSectionHeader: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.title3)
+                .font(.headline)
                 .fontWeight(.bold)
+                .foregroundColor(.barTabText)
 
             Spacer()
 
             if let count = count {
                 Text("\(count)")
-                    .font(.subheadline)
+                    .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.barTabSecondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.barTabPillFill)
+                    .clipShape(Capsule())
             }
-        }
-    }
-}
-
-// MARK: - Drink icons
-
-extension Drink {
-
-    var icon: String {
-        switch self {
-        case .beer:
-            return "mug.fill"
-
-        case .wine:
-            return "wineglass.fill"
-
-        case .cocktail:
-            return "wineglass"
-
-        case .shot:
-            return "flask.fill"
-
-        case .softDrink:
-            return "cup.and.saucer.fill"
-
-        case .coffee:
-            return "cup.and.saucer.fill"
-
-        case .other:
-            return "fork.knife"
         }
     }
 }
@@ -161,16 +164,22 @@ extension Decimal {
     }
 }
 
-extension Price {
+// MARK: - Modifier: subtle card border
 
-    var formattedAmount: String {
-        amount.formattedAmount
+struct CardBorder: ViewModifier {
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            )
     }
 }
 
-extension PriceSummary {
+extension View {
 
-    var formattedAmount: String {
-        amount.formattedAmount
+    func cardBorder() -> some View {
+        modifier(CardBorder())
     }
 }

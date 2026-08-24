@@ -316,6 +316,59 @@ final class SupabaseClient {
         _ = try await perform(request)
     }
 
+    // MARK: - Drink Ratings
+
+    /// Fetch drink ratings for a specific bar.
+    func fetchDrinkRatings(for barID: UUID) async throws -> [DrinkRating] {
+
+        let request = makeRequest(
+            endpoint: "drink_ratings?bar_id=eq.\(barID.uuidString)&select=*"
+        )
+
+        let data = try await perform(request)
+
+        let dtos = try decoder.decode(
+            [DrinkRatingDTO].self,
+            from: data
+        )
+
+        return dtos.compactMap { $0.toDomain }
+    }
+
+    /// Fetch all drink ratings.
+    func fetchAllDrinkRatings() async throws -> [DrinkRating] {
+
+        let request = makeRequest(endpoint: "drink_ratings?select=*")
+        let data = try await perform(request)
+
+        let dtos = try decoder.decode(
+            [DrinkRatingDTO].self,
+            from: data
+        )
+
+        return dtos.compactMap { $0.toDomain }
+    }
+
+    /// Insert or update a user's drink rating (upsert on
+    /// bar_id + drink + brand + size + rated_by).
+    func upsertDrinkRating(_ rating: DrinkRating) async throws {
+
+        var request = makeRequest(
+            endpoint: "drink_ratings?on_conflict=bar_id,drink,brand,size,rated_by",
+            method: "POST"
+        )
+
+        request.setValue(
+            "resolution=merge-duplicates,return=representation",
+            forHTTPHeaderField: "Prefer"
+        )
+
+        let dto = DrinkRatingDTO(from: rating)
+        request.httpBody = try encoder.encode(dto)
+
+        _ = try await perform(request)
+    }
+
     // MARK: - Drink Brands
 
     /// Fetch the shared, admin-approved brand catalog.

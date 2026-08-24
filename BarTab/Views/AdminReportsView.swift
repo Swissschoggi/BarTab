@@ -29,7 +29,7 @@ struct AdminReportsView: View {
                         Text("All clear")
                             .font(.headline)
 
-                        Text("Flagged bars and prices will show up here for review.")
+                        Text("Flagged bars and drinks will show up here for review.")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)

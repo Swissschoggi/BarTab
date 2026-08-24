@@ -10,6 +10,8 @@ struct PriceSummary: Identifiable {
     let currency: String
     let reports: [Price]
     let confidence: Int
+    let style: String?
+    let serving: ServingMethod?
 
     var reportCount: Int {
         reports.count
@@ -17,6 +19,11 @@ struct PriceSummary: Identifiable {
 
     var latestReportDate: Date? {
         reports.map(\.reportedAt).max()
+    }
+
+    var formattedAmount: String {
+        NSDecimalNumber(decimal: amount)
+            .description(withLocale: Locale(identifier: "de_CH"))
     }
 
     var confidenceLabel: String {

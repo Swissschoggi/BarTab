@@ -65,7 +65,7 @@ struct ProfileView: View {
 
             ScrollView {
 
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 20) {
 
 
                     VStack(alignment: .leading, spacing: 6) {
@@ -81,44 +81,52 @@ struct ProfileView: View {
                     if let user = currentUser {
 
 
-                        VStack(alignment: .leading, spacing: 14) {
+                        VStack(alignment: .leading, spacing: 12) {
 
                             HStack(spacing: 14) {
 
                                 ZStack {
                                     Circle()
                                         .fill(
-                                            Color.barTabPrimary.opacity(0.15)
+                                            LinearGradient(
+                                                colors: [
+                                                    Color.barTabPrimary,
+                                                    Color.barTabPrimary.opacity(0.7)
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
                                         )
 
                                     Image(
                                         systemName: "person.fill"
                                     )
-                                    .font(.title2)
+                                    .font(.title3)
                                     .foregroundColor(
-                                        .barTabPrimary
+                                        .white
                                     )
                                 }
                                 .frame(
-                                    width: 56,
-                                    height: 56
+                                    width: 48,
+                                    height: 48
                                 )
 
                                 VStack(
                                     alignment: .leading,
-                                    spacing: 4
+                                    spacing: 2
                                 ) {
 
                                     Text(user.username)
-                                        .font(.title3)
+                                        .font(.headline)
                                         .fontWeight(.bold)
+                                        .foregroundColor(.barTabText)
 
                                     Text(
                                         "Member since \(user.createdAt.formatted(date: .abbreviated, time: .omitted))"
                                     )
                                     .font(.caption)
                                     .foregroundColor(
-                                        .secondary
+                                        .barTabSecondary
                                     )
                                 }
 
@@ -129,63 +137,75 @@ struct ProfileView: View {
 
                         // Level card
                         VStack(alignment: .leading, spacing: 10) {
-                            HStack {
+                            HStack(spacing: 12) {
                                 Image(systemName: currentLevel.icon)
-                                    .font(.title2)
-                                    .foregroundColor(.barTabAccent)
+                                    .font(.body)
+                                    .foregroundColor(.white)
+                                    .frame(width: 32, height: 32)
+                                    .background(Color.barTabAccent)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-                                VStack(alignment: .leading, spacing: 2) {
+                                VStack(alignment: .leading, spacing: 1) {
                                     Text(currentLevel.name)
-                                        .font(.headline)
-                                        .foregroundColor(.barTabAccent)
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.barTabText)
 
                                     if let remaining = UserLevel.remaining(for: totalContributions) {
                                         Text("\(remaining) more to next level")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
+                                            .font(.caption2)
+                                            .foregroundColor(.barTabSecondary)
                                     } else {
                                         Text("Max level reached!")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
+                                            .font(.caption2)
+                                            .foregroundColor(.barTabAccent)
                                     }
                                 }
 
                                 Spacer()
 
                                 Text("\(totalContributions)")
-                                    .font(.title2)
+                                    .font(.title3)
                                     .fontWeight(.bold)
-                                    .foregroundColor(.barTabPrimary)
+                                    .foregroundColor(.barTabAccent)
                             }
 
                             GeometryReader { geometry in
                                 ZStack(alignment: .leading) {
                                     Capsule()
-                                        .fill(Color.barTabPrimary.opacity(0.12))
+                                        .fill(Color.barTabPillFill)
 
                                     Capsule()
-                                        .fill(Color.barTabAccent)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [.barTabAccent, .barTabAccent.opacity(0.7)],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
                                         .frame(width: geometry.size.width * CGFloat(UserLevel.progress(for: totalContributions)))
                                 }
                             }
-                            .frame(height: 6)
+                            .frame(height: 5)
                         }
                         .barTabCard()
 
                         VStack(
                             alignment: .leading,
-                            spacing: 12
+                            spacing: 10
                         ) {
 
                             Text("Your activity")
-                                .font(.headline)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
 
-                            HStack(spacing: 12) {
+                            HStack(spacing: 10) {
 
                                 statisticCard(
                                     value: myPrices.count,
-                                    title: "Prices",
-                                    icon: "tag.fill"
+                                    title: "Drinks",
+                                    icon: "mug.fill"
                                 )
 
                                 statisticCard(
@@ -206,7 +226,7 @@ struct ProfileView: View {
                                 .font(.headline)
 
                             navigationRow(
-                                title: String(localized: "My prices"),
+                                title: String(localized: "My drinks"),
                                 subtitle: "\(myPrices.count) contributions",
                                 icon: "tag.fill"
                             ) {
@@ -364,7 +384,7 @@ struct ProfileView: View {
                                 .fontWeight(.semibold)
 
                             Text(
-                                "Sign in to add bars, report prices and keep track of your contributions."
+                                "Sign in to add bars, report drinks and keep track of your contributions."
                             )
                             .multilineTextAlignment(.center)
                             .foregroundColor(.secondary)
@@ -402,6 +422,7 @@ struct ProfileView: View {
             SettingsView()
                 .environmentObject(userSession)
                 .environmentObject(barRepository)
+                .environmentObject(LanguageManager.shared)
         }
     }
 
@@ -412,25 +433,25 @@ struct ProfileView: View {
         icon: String
     ) -> some View {
 
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
 
             Image(systemName: icon)
-                .foregroundColor(
-                    .barTabPrimary
-                )
+                .font(.subheadline)
+                .foregroundColor(.barTabPrimary)
+                .frame(width: 28, height: 28)
+                .background(Color.barTabPrimary.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
 
             Text("\(value)")
-                .font(
-                    .system(
-                        size: 26,
-                        weight: .bold
-                    )
-                )
+                .font(.title3)
+                .fontWeight(.bold)
+                .foregroundColor(.barTabText)
 
             Text(title)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.barTabSecondary)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .barTabCard()
     }
 
@@ -446,27 +467,28 @@ struct ProfileView: View {
             destination()
         } label: {
 
-            HStack(spacing: 14) {
+            HStack(spacing: 12) {
 
                 Image(systemName: icon)
-                    .foregroundColor(
-                        .barTabPrimary
-                    )
-                    .frame(width: 24)
+                    .font(.subheadline)
+                    .foregroundColor(.barTabPrimary)
+                    .frame(width: 28, height: 28)
+                    .background(Color.barTabPrimary.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
 
                 VStack(
                     alignment: .leading,
-                    spacing: 3
+                    spacing: 1
                 ) {
 
                     Text(title)
                         .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
+                        .fontWeight(.medium)
+                        .foregroundColor(.barTabText)
 
                     Text(subtitle)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.barTabSecondary)
                 }
 
                 Spacer()
@@ -474,7 +496,8 @@ struct ProfileView: View {
                 Image(
                     systemName: "chevron.right"
                 )
-                .font(.caption)
+                .font(.caption2)
+                .foregroundColor(.barTabSecondary)
                 .foregroundColor(.secondary)
             }
             .barTabCard()

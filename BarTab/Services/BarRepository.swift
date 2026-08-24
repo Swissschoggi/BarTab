@@ -26,12 +26,14 @@ final class BarRepository: ObservableObject {
             async let fetchedBars = SupabaseClient.shared.fetchBars()
             async let fetchedPrices = SupabaseClient.shared.fetchAllPrices()
             async let fetchedRatings = SupabaseClient.shared.fetchBarRatings()
+            async let fetchedDrinkRatings = SupabaseClient.shared.fetchAllDrinkRatings()
             async let fetchedBrands = SupabaseClient.shared.fetchBrands()
             async let fetchedBrandRequests = SupabaseClient.shared.fetchBrandRequests()
 
             self.bars = try await fetchedBars
             self.prices = try await fetchedPrices
             self.barRatings = try await fetchedRatings
+            self.drinkRatings = try await fetchedDrinkRatings
             self.brandRequests = try await fetchedBrandRequests
 
             // Merge the server-approved catalog with the bundled
@@ -116,6 +118,8 @@ final class BarRepository: ObservableObject {
         brand: String?,
         size: DrinkSize,
         amount: Decimal,
+        style: String? = nil,
+        serving: ServingMethod? = nil,
         reportedBy user: User
     ) async -> Bool {
 
@@ -128,7 +132,9 @@ final class BarRepository: ObservableObject {
             amount: amount,
             currency: "CHF",
             reportedAt: Date(),
-            reportedBy: user.id
+            reportedBy: user.id,
+            style: style,
+            serving: serving
         )
 
         do {
@@ -285,6 +291,81 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.upsertBarRating(rating)
         } catch {
             print("Failed to submit bar rating: \(error)")
+        }
+    }
+
+    // MARK: - Drink Ratings (per product)
+
+    @Published private(set) var drinkRatings: [DrinkRating] = []
+
+    func drinkRatings(for bar: Bar) -> [DrinkRating] {
+        drinkRatings.filter { $0.barID == bar.id }
+    }
+
+    /// Average quality rating for a specific drink product at a bar.
+    func averageDrinkQuality(
+        for bar: Bar,
+        drink: Drink,
+        brand: String?,
+        size: DrinkSize
+    ) -> (average: Double, count: Int)? {
+        let values = drinkRatings(for: bar).filter {
+            $0.drink == drink && $0.brand == brand && $0.size == size
+        }.map(\.quality)
+        guard !values.isEmpty else { return nil }
+        return (Double(values.reduce(0, +)) / Double(values.count), values.count)
+    }
+
+    /// The current user's rating for a specific drink product.
+    func myDrinkRating(
+        for bar: Bar,
+        drink: Drink,
+        brand: String?,
+        size: DrinkSize,
+        by user: User
+    ) -> DrinkRating? {
+        drinkRatings(for: bar).first {
+            $0.drink == drink &&
+            $0.brand == brand &&
+            $0.size == size &&
+            $0.ratedBy == user.id
+        }
+    }
+
+    /// Submits or updates a drink product quality rating.
+    func submitDrinkRating(
+        for bar: Bar,
+        drink: Drink,
+        brand: String?,
+        size: DrinkSize,
+        quality: Int,
+        by user: User
+    ) async {
+        let existing = myDrinkRating(
+            for: bar, drink: drink, brand: brand, size: size, by: user
+        )
+
+        let rating = DrinkRating(
+            id: existing?.id ?? UUID(),
+            barID: bar.id,
+            drink: drink,
+            brand: brand,
+            size: size,
+            quality: quality,
+            ratedBy: user.id,
+            createdAt: Date()
+        )
+
+        if let index = drinkRatings.firstIndex(where: { $0.id == rating.id }) {
+            drinkRatings[index] = rating
+        } else {
+            drinkRatings.append(rating)
+        }
+
+        do {
+            try await SupabaseClient.shared.upsertDrinkRating(rating)
+        } catch {
+            print("Failed to submit drink rating: \(error)")
         }
     }
 
@@ -602,7 +683,9 @@ final class BarRepository: ObservableObject {
 
     private func priceGroupKey(_ price: Price) -> String {
         let brand = price.brand ?? ""
-        return [price.drink.displayName, price.size.displayName, brand].joined(separator: "|")
+        let style = price.style ?? ""
+        let serving = price.serving?.rawValue ?? ""
+        return [price.drink.displayName, price.size.displayName, brand, style, serving].joined(separator: "|")
     }
 
     private func makePriceSummary(reports: [Price], barID: UUID) -> PriceSummary? {
@@ -628,7 +711,9 @@ final class BarRepository: ObservableObject {
             amount: Decimal(median),
             currency: first.currency,
             reports: reports.sorted { $0.reportedAt > $1.reportedAt },
-            confidence: confidence
+            confidence: confidence,
+            style: first.style,
+            serving: first.serving
         )
     }
 

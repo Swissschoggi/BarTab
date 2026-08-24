@@ -83,6 +83,8 @@ struct PriceDTO: Codable {
     let currency: String
     let reported_at: Date
     let reported_by: UUID
+    let style: String?
+    let serving: String?
 
     var toDomain: Price? {
         guard let drinkEnum = Drink(rawValue: drink),
@@ -99,7 +101,9 @@ struct PriceDTO: Codable {
             amount: amount,
             currency: currency,
             reportedAt: reported_at,
-            reportedBy: reported_by
+            reportedBy: reported_by,
+            style: style,
+            serving: serving.flatMap { ServingMethod(rawValue: $0) }
         )
     }
 
@@ -113,6 +117,25 @@ struct PriceDTO: Codable {
         self.currency = domain.currency
         self.reported_at = domain.reportedAt
         self.reported_by = domain.reportedBy
+        self.style = domain.style
+        self.serving = domain.serving?.rawValue
+    }
+
+    /// Custom decoder that handles missing style/serving fields
+    /// gracefully for backward compatibility with existing Supabase data.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        bar_id = try container.decode(UUID.self, forKey: .bar_id)
+        drink = try container.decode(String.self, forKey: .drink)
+        brand = try container.decodeIfPresent(String.self, forKey: .brand)
+        size = try container.decode(String.self, forKey: .size)
+        amount = try container.decode(Decimal.self, forKey: .amount)
+        currency = try container.decode(String.self, forKey: .currency)
+        reported_at = try container.decode(Date.self, forKey: .reported_at)
+        reported_by = try container.decode(UUID.self, forKey: .reported_by)
+        style = try container.decodeIfPresent(String.self, forKey: .style)
+        serving = try container.decodeIfPresent(String.self, forKey: .serving)
     }
 }
 
@@ -163,6 +186,48 @@ struct BrandRequestDTO: Codable {
         self.requested_by = domain.requestedBy
         self.requested_by_name = domain.requestedByName
         self.status = domain.status.rawValue
+        self.created_at = domain.createdAt
+    }
+}
+
+// MARK: - Drink Rating DTO
+
+struct DrinkRatingDTO: Codable {
+    let id: UUID
+    let bar_id: UUID
+    let drink: String
+    let brand: String?
+    let size: String
+    let quality: Int
+    let rated_by: UUID
+    let created_at: Date
+
+    var toDomain: DrinkRating? {
+        guard let drinkEnum = Drink(rawValue: drink),
+              let sizeEnum = DrinkSize(rawValue: size) else {
+            return nil
+        }
+
+        return DrinkRating(
+            id: id,
+            barID: bar_id,
+            drink: drinkEnum,
+            brand: brand,
+            size: sizeEnum,
+            quality: quality,
+            ratedBy: rated_by,
+            createdAt: created_at
+        )
+    }
+
+    init(from domain: DrinkRating) {
+        self.id = domain.id
+        self.bar_id = domain.barID
+        self.drink = domain.drink.rawValue
+        self.brand = domain.brand
+        self.size = domain.size.rawValue
+        self.quality = domain.quality
+        self.rated_by = domain.ratedBy
         self.created_at = domain.createdAt
     }
 }

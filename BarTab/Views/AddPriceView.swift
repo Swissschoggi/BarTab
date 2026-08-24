@@ -11,6 +11,8 @@ struct AddPriceView: View {
     @State private var selectedDrink: Drink = .beer
     @State private var selectedSize: DrinkSize = .fiveDeciliters
     @State private var selectedBrand: String? = nil
+    @State private var selectedStyle: DrinkStyle? = nil
+    @State private var selectedServing: ServingMethod? = nil
     @State private var priceText = ""
     @State private var showingDuplicateWarning = false
     @State private var duplicatePrice: Price?
@@ -21,6 +23,28 @@ struct AddPriceView: View {
         barRepository.brands(for: selectedDrink).map(\.name)
     }
 
+    private var availableStyles: [DrinkStyle] {
+        DrinkStyle.styles(for: selectedDrink)
+    }
+
+    private var availableServingMethods: [ServingMethod] {
+        switch selectedDrink {
+        case .beer:
+            return [.tap, .bottle, .can]
+        case .wine:
+            return [.glass, .bottle]
+        case .cocktail:
+            return [.glass]
+        case .softDrink:
+            return [.bottle, .can, .glass]
+        case .coffee:
+            return [.glass]
+        case .shot:
+            return [.glass]
+        case .other:
+            return ServingMethod.allCases
+        }
+    }
 
     private var availableSizes: [DrinkSize] {
 
@@ -102,8 +126,50 @@ struct AddPriceView: View {
                     }
                 }
 
+                if !availableStyles.isEmpty {
+                    Section(header: Text("Style")) {
+                        Picker(
+                            "Style",
+                            selection: $selectedStyle
+                        ) {
+                            Text("Not specified")
+                                .tag(DrinkStyle?.none)
 
-                Section(header: Text("Brand / Type")) {
+                            ForEach(availableStyles) { style in
+                                HStack {
+                                    Image(systemName: "tag.fill")
+                                        .font(.caption)
+                                    Text(style.displayName)
+                                }
+                                .tag(DrinkStyle?.some(style))
+                            }
+                        }
+                    }
+                }
+
+                if !availableServingMethods.isEmpty {
+                    Section(header: Text("Serving")) {
+                        Picker(
+                            "Serving",
+                            selection: $selectedServing
+                        ) {
+                            Text("Not specified")
+                                .tag(ServingMethod?.none)
+
+                            ForEach(availableServingMethods) { method in
+                                HStack {
+                                    Image(systemName: method.icon)
+                                        .font(.caption)
+                                    Text(method.displayName)
+                                }
+                                .tag(ServingMethod?.some(method))
+                            }
+                        }
+                    }
+                }
+
+
+                Section(header: Text("Brand")) {
 
                     if !availableBrands.isEmpty {
 
@@ -191,7 +257,7 @@ struct AddPriceView: View {
 
                     } label: {
 
-                        Text("Add Price")
+                        Text("Add Drink")
                             .frame(maxWidth: .infinity)
                             .foregroundColor(.white)
                     }
@@ -200,7 +266,7 @@ struct AddPriceView: View {
                     )
                 }
             }
-            .navigationTitle("Add Price")
+            .navigationTitle("Add Drink")
             .navigationBarTitleDisplayMode(.inline)
             .scrollContentBackground(.hidden)
             .background(
@@ -211,6 +277,8 @@ struct AddPriceView: View {
             .onChange(of: selectedDrink) { _ in
 
                 selectedBrand = nil
+                selectedStyle = nil
+                selectedServing = nil
 
                 if !availableSizes.contains(selectedSize) {
 
@@ -220,7 +288,7 @@ struct AddPriceView: View {
                 }
             }
             .alert(
-                "Price already exists",
+                "Drink already exists",
                 isPresented: $showingDuplicateWarning
             ) {
 
@@ -260,7 +328,7 @@ struct AddPriceView: View {
                 }
             }
             .alert(
-                "Couldn't save price",
+                "Couldn't save drink",
                 isPresented: Binding(
                     get: { errorMessage != nil },
                     set: { if !$0 { errorMessage = nil } }
@@ -299,7 +367,9 @@ struct AddPriceView: View {
 
             price.drink == selectedDrink &&
             price.size == selectedSize &&
-            price.brand == selectedBrand
+            price.brand == selectedBrand &&
+            price.style == selectedStyle?.rawValue &&
+            price.serving == selectedServing
         }) {
 
             duplicatePrice = existing
@@ -325,6 +395,8 @@ struct AddPriceView: View {
                 brand: selectedBrand,
                 size: selectedSize,
                 amount: amount,
+                style: selectedStyle?.rawValue,
+                serving: selectedServing,
                 reportedBy: user
             )
 
@@ -334,7 +406,7 @@ struct AddPriceView: View {
                     .dismiss()
             } else {
                 self.errorMessage =
-                    "Could not save the price. "
+                    "Could not save the drink. "
                     + "Check your connection and try again."
             }
         }

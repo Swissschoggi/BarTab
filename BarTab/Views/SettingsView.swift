@@ -4,9 +4,8 @@ struct SettingsView: View {
 
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var barRepository: BarRepository
+    @EnvironmentObject private var languageManager: LanguageManager
     @Environment(\.dismiss) private var dismiss
-
-    @AppStorage("selectedLanguage") private var selectedLanguage = "en"
 
     private let languages: [(code: String, name: String)] = [
         ("en", "English"),
@@ -39,7 +38,7 @@ struct SettingsView: View {
                         ForEach(languages, id: \.code) { lang in
                             Button {
                                 withAnimation {
-                                    selectedLanguage = lang.code
+                                    languageManager.selectedLanguage = lang.code
                                 }
                             } label: {
                                 HStack {
@@ -49,7 +48,7 @@ struct SettingsView: View {
 
                                     Spacer()
 
-                                    if selectedLanguage == lang.code {
+                                    if languageManager.selectedLanguage == lang.code {
                                         Image(systemName: "checkmark")
                                             .fontWeight(.semibold)
                                             .foregroundColor(.barTabPrimary)
@@ -71,7 +70,7 @@ struct SettingsView: View {
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
 
-                            Text("Find bars, compare prices, and discover the best drink deals around you.")
+                            Text("Find bars, compare drinks, and discover the best drink deals around you.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -112,5 +111,6 @@ struct SettingsView_Previews: PreviewProvider {
         SettingsView()
             .environmentObject(UserSession())
             .environmentObject(BarRepository())
+            .environmentObject(LanguageManager.shared)
     }
 }

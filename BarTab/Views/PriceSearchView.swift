@@ -200,7 +200,7 @@ struct PriceSearchView: View {
                     VStack(alignment: .leading, spacing: 6) {
 
                         BarTabScreenHeader(
-                            title: "Find a price",
+                            title: "Find a drink",
                             subtitle: "See what bars around you charge."
                         )
                     }
@@ -457,13 +457,13 @@ struct PriceSearchView: View {
                                     .barTabPrimary
                                 )
 
-                                Text("No prices found")
+                                Text("No drinks found")
                                     .font(.headline)
 
                                 Text(
                                     !trimmedSearchText.isEmpty
                                     ? "No bars match \"\(trimmedSearchText)\"."
-                                    : "Be the first to add this price."
+                                    : "Be the first to add this drink."
                                 )
                                 .font(.subheadline)
                                 .foregroundColor(
@@ -714,7 +714,7 @@ struct PriceSearchView: View {
         ) {
             HStack {
 
-                Text("Price confidence")
+                Text("Confidence")
                     .font(.caption)
                     .foregroundColor(.secondary)
 

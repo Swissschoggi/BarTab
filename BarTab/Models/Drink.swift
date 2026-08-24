@@ -10,7 +10,19 @@ enum Drink: String, Codable, CaseIterable, Identifiable {
     case other
 
     var id: String { rawValue }
-    
+
+    var icon: String {
+        switch self {
+        case .beer: return "mug.fill"
+        case .wine: return "wineglass.fill"
+        case .cocktail: return "cocktail.fill"
+        case .shot: return "drop.fill"
+        case .softDrink: return "cup.and.saucer.fill"
+        case .coffee: return "cup.and.saucer.fill"
+        case .other: return "questionmark"
+        }
+    }
+
     var displayName: String {
         switch self {
         case .beer:

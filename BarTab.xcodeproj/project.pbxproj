@@ -63,6 +63,10 @@
 		BRTA00013060000100000012 /* NearbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000013 /* NearbyView.swift */; };
 		BRTA00013060000100000014 /* UserLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000015 /* UserLevel.swift */; };
 		BRTA00013060000100000016 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000017 /* SettingsView.swift */; };
+		BRTA00013060000100000018 /* DrinkStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000019 /* DrinkStyle.swift */; };
+		BRTA0001306000010000001A /* ServingMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001B /* ServingMethod.swift */; };
+		BRTA0001306000010000001C /* DrinkRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001D /* DrinkRating.swift */; };
+		BRTA0001306000010000001E /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001F /* LanguageManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,6 +147,14 @@
 		BRTA00013060000100000013 /* NearbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyView.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000015 /* UserLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLevel.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000017 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000019 /* DrinkStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkStyle.swift; sourceTree = "<group>"; };
+		BRTA0001306000010000001B /* ServingMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServingMethod.swift; sourceTree = "<group>"; };
+		BRTA0001306000010000001D /* DrinkRating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkRating.swift; sourceTree = "<group>"; };
+		BRTA0001306000010000001F /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000020 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
+		BRTA00013060000100000021 /* de.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = de.lproj; sourceTree = "<group>"; };
+		BRTA00013060000100000022 /* fr.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fr.lproj; sourceTree = "<group>"; };
+		BRTA00013060000100000023 /* it.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = it.lproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,6 +215,7 @@
 				AE7839663034F16A00F1555E /* BarTabApp.swift */,
 				AE7839683034F16A00F1555E /* ContentView.swift */,
 				AE78396A3034F16B00F1555E /* Assets.xcassets */,
+				BRTA00013060000100000024 /* Resources */,
 				AEF036603035D00000BDA1CC /* BarTab.entitlements */,
 				AE78396C3034F16B00F1555E /* Preview Content */,
 			);
@@ -215,6 +228,17 @@
 				AE78396D3034F16B00F1555E /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		BRTA00013060000100000024 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				BRTA00013060000100000020 /* en.lproj */,
+				BRTA00013060000100000021 /* de.lproj */,
+				BRTA00013060000100000022 /* fr.lproj */,
+				BRTA00013060000100000023 /* it.lproj */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		AE7839763034F16B00F1555E /* BarTabTests */ = {
@@ -288,6 +312,7 @@
 				AEF036673035E20000BDA1CC /* ReportNotificationService.swift */,
 				AEF036693035E30000BDA1CC /* KeychainService.swift */,
 				AEF036713035E40000BDA1CC /* SupabaseAuthService.swift */,
+				BRTA0001306000010000001F /* LanguageManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -310,6 +335,9 @@
 				BRTA0001306000010000000C /* BrandRequest.swift */,
 				BRTA00013060000100000010 /* AmbienceStyle.swift */,
 				BRTA00013060000100000015 /* UserLevel.swift */,
+				BRTA00013060000100000019 /* DrinkStyle.swift */,
+				BRTA0001306000010000001B /* ServingMethod.swift */,
+				BRTA0001306000010000001D /* DrinkRating.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -507,6 +535,10 @@
 				BRTA00013060000100000012 /* NearbyView.swift in Sources */,
 				BRTA00013060000100000014 /* UserLevel.swift in Sources */,
 				BRTA00013060000100000016 /* SettingsView.swift in Sources */,
+				BRTA00013060000100000018 /* DrinkStyle.swift in Sources */,
+				BRTA0001306000010000001A /* ServingMethod.swift in Sources */,
+				BRTA0001306000010000001C /* DrinkRating.swift in Sources */,
+				BRTA0001306000010000001E /* LanguageManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
