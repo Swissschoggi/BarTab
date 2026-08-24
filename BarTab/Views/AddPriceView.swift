@@ -239,7 +239,7 @@ struct AddPriceView: View {
 
                     HStack {
 
-                        Text("CHF")
+                        Text(Currency.defaultCurrency.symbol)
 
                         TextField(
                             "0.00",

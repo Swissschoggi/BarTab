@@ -183,6 +183,70 @@ final class SupabaseAuthService {
         _ = try await perform(request)
     }
 
+    // MARK: - Account updates
+
+    func updateUsername(
+        _ newUsername: String,
+        accessToken: String
+    ) async throws {
+
+        let url = baseURL
+            .appendingPathComponent("auth/v1/user")
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue(
+            apiKey,
+            forHTTPHeaderField: "apikey"
+        )
+        request.setValue(
+            "Bearer \(accessToken)",
+            forHTTPHeaderField: "Authorization"
+        )
+        request.setValue(
+            "application/json",
+            forHTTPHeaderField: "Content-Type"
+        )
+
+        let body: [String: Any] = [
+            "data": ["username": newUsername]
+        ]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        _ = try await perform(request)
+    }
+
+    func updatePassword(
+        _ newPassword: String,
+        accessToken: String
+    ) async throws {
+
+        let url = baseURL
+            .appendingPathComponent("auth/v1/user")
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue(
+            apiKey,
+            forHTTPHeaderField: "apikey"
+        )
+        request.setValue(
+            "Bearer \(accessToken)",
+            forHTTPHeaderField: "Authorization"
+        )
+        request.setValue(
+            "application/json",
+            forHTTPHeaderField: "Content-Type"
+        )
+
+        let body: [String: Any] = [
+            "password": newPassword
+        ]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        _ = try await perform(request)
+    }
+
     // MARK: - Admin lookup
 
     func fetchIsAdmin(

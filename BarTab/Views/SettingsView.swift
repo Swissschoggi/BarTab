@@ -8,6 +8,13 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var showingRestartAlert = false
+    @State private var showingUsernameEditor = false
+    @State private var showingPasswordEditor = false
+    @State private var newUsername = ""
+    @State private var newPassword = ""
+    @State private var confirmPassword = ""
+    @State private var errorMessage: String?
+    @State private var successMessage: String?
 
     private let languages: [(code: String, name: String, flag: String)] = [
         ("en", "English", "🇬🇧"),
@@ -16,21 +23,114 @@ struct SettingsView: View {
         ("it", "Italiano", "🇮🇹")
     ]
 
-    private var totalContributions: Int {
-        guard let user = userSession.currentUser else { return 0 }
-        let prices = barRepository.getPrices(reportedBy: user).count
-        let bars = barRepository.getBars().filter { $0.createdBy == user.id }.count
-        return prices + bars
-    }
-
-    private var currentLevel: UserLevel {
-        .current(for: totalContributions)
-    }
-
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+
+                    // Account section
+                    if userSession.isLoggedIn {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "person.circle")
+                                    .font(.subheadline)
+                                    .foregroundColor(.barTabPrimary)
+                                Text("Account")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabText)
+                            }
+
+                            VStack(spacing: 0) {
+                                Button {
+                                    newUsername = userSession.currentUser?.username ?? ""
+                                    showingUsernameEditor = true
+                                } label: {
+                                    settingsRow(
+                                        icon: "person.fill",
+                                        iconColor: .barTabPrimary,
+                                        title: "Username",
+                                        value: userSession.currentUser?.username ?? "Not set"
+                                    )
+                                }
+
+                                Divider()
+                                    .foregroundColor(.barTabCardBorder)
+                                    .padding(.leading, 44)
+
+                                Button {
+                                    newPassword = ""
+                                    confirmPassword = ""
+                                    showingPasswordEditor = true
+                                } label: {
+                                    settingsRow(
+                                        icon: "lock.fill",
+                                        iconColor: .barTabPrimary,
+                                        title: "Change Password",
+                                        value: ""
+                                    )
+                                }
+                            }
+                        }
+                        .barTabCard()
+                    }
+
+                    // Currency
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "dollarsign.circle")
+                                .font(.subheadline)
+                                .foregroundColor(.barTabPrimary)
+                            Text("Default Currency")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+                        }
+
+                        VStack(spacing: 0) {
+                            ForEach(Currency.allCases) { currency in
+                                Button {
+                                    Currency.defaultCurrency = currency
+                                } label: {
+                                    HStack {
+                                        Text(currency.symbol)
+                                            .font(.title3)
+                                            .fontWeight(.semibold)
+                                            .frame(width: 32)
+
+                                        VStack(alignment: .leading, spacing: 1) {
+                                            Text(currency.rawValue)
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.barTabText)
+                                            Text(currency.displayName)
+                                                .font(.caption)
+                                                .foregroundColor(.barTabSecondary)
+                                        }
+
+                                        Spacer()
+
+                                        if Currency.defaultCurrency == currency {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.barTabPrimary)
+                                        } else {
+                                            Image(systemName: "circle")
+                                                .foregroundColor(.barTabCardBorder)
+                                        }
+                                    }
+                                    .padding(.vertical, 10)
+                                }
+
+                                if currency != Currency.allCases.last {
+                                    Divider()
+                                        .foregroundColor(.barTabCardBorder)
+                                        .padding(.leading, 44)
+                                }
+                            }
+                        }
+                    }
+                    .barTabCard()
 
                     // Language
                     VStack(alignment: .leading, spacing: 12) {
@@ -144,6 +244,109 @@ struct SettingsView: View {
         } message: {
             Text("Please restart the app to apply the language change.")
         }
+        .alert("Edit Username", isPresented: $showingUsernameEditor) {
+            TextField("Username", text: $newUsername)
+            Button("Save") {
+                guard !newUsername.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+                Task {
+                    do {
+                        try await userSession.updateUsername(newUsername.trimmingCharacters(in: .whitespaces))
+                        successMessage = "Username updated"
+                        errorMessage = nil
+                    } catch {
+                        errorMessage = "Could not update username: \(error.localizedDescription)"
+                        successMessage = nil
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Enter your new display name.")
+        }
+        .alert("Change Password", isPresented: $showingPasswordEditor) {
+            SecureField("New password", text: $newPassword)
+            SecureField("Confirm password", text: $confirmPassword)
+            Button("Update") {
+                guard newPassword.count >= 6 else {
+                    errorMessage = "Password must be at least 6 characters."
+                    return
+                }
+                guard newPassword == confirmPassword else {
+                    errorMessage = "Passwords do not match."
+                    return
+                }
+                Task {
+                    do {
+                        try await userSession.updatePassword(newPassword)
+                        successMessage = "Password updated"
+                        errorMessage = nil
+                        newPassword = ""
+                        confirmPassword = ""
+                    } catch {
+                        errorMessage = "Could not update password: \(error.localizedDescription)"
+                        successMessage = nil
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                newPassword = ""
+                confirmPassword = ""
+            }
+        } message: {
+            Text("Enter your new password (at least 6 characters).")
+        }
+        .alert(
+            "Error",
+            isPresented: Binding(
+                get: { errorMessage != nil },
+                set: { if !$0 { errorMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage ?? "")
+        }
+        .alert(
+            "Success",
+            isPresented: Binding(
+                get: { successMessage != nil },
+                set: { if !$0 { successMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(successMessage ?? "")
+        }
+    }
+
+    private func settingsRow(
+        icon: String,
+        iconColor: Color,
+        title: String,
+        value: String
+    ) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(iconColor)
+                .frame(width: 24)
+
+            Text(title)
+                .font(.subheadline)
+                .foregroundColor(.barTabText)
+
+            Spacer()
+
+            if !value.isEmpty {
+                Text(value)
+                    .font(.subheadline)
+                    .foregroundColor(.barTabSecondary)
+            }
+
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.barTabSecondary)
+        }
+        .padding(.vertical, 12)
     }
 }
 

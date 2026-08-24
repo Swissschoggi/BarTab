@@ -130,7 +130,7 @@ final class BarRepository: ObservableObject {
             brand: brand,
             size: size,
             amount: amount,
-            currency: "CHF",
+            currency: Currency.defaultCurrency.rawValue,
             reportedAt: Date(),
             reportedBy: user.id,
             style: style,

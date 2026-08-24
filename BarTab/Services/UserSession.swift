@@ -107,6 +107,39 @@ final class UserSession: ObservableObject {
         }
     }
 
+    func updateUsername(_ newUsername: String) async throws {
+
+        guard let session = authService.restoreSession() else {
+            return
+        }
+
+        try await authService.updateUsername(
+            newUsername,
+            accessToken: session.tokens.accessToken
+        )
+
+        if let user = currentUser {
+            currentUser = User(
+                id: user.id,
+                username: newUsername,
+                createdAt: user.createdAt,
+                isAdmin: user.isAdmin
+            )
+        }
+    }
+
+    func updatePassword(_ newPassword: String) async throws {
+
+        guard let session = authService.restoreSession() else {
+            return
+        }
+
+        try await authService.updatePassword(
+            newPassword,
+            accessToken: session.tokens.accessToken
+        )
+    }
+
     // MARK: - Helpers
 
     private func makeUser(

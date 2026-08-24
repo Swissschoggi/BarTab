@@ -715,7 +715,7 @@ struct BarView: View {
                             spacing: 1
                         ) {
                             Text(
-                                "\(average.formattedAmount) CHF"
+                                "\(average.formattedAmount) \(Currency.defaultCurrency.rawValue)"
                             )
                             .font(.subheadline)
                             .fontWeight(.bold)
@@ -966,7 +966,7 @@ struct BarView: View {
 
             "• \(group.drink.displayName) " +
             "(\(group.size.displayName)) — " +
-            "\(averageAmount(for: group).formattedAmount) CHF"
+            "\(averageAmount(for: group).formattedAmount) \(Currency.defaultCurrency.rawValue)"
         }
 
         if !lines.isEmpty {
