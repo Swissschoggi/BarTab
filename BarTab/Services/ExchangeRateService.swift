@@ -6,9 +6,7 @@ final class ExchangeRateService {
 
     static let shared = ExchangeRateService()
 
-    /// Fallback rates relative to CHF (1 CHF = X foreign currency).
-    /// These are approximate and should be updated periodically.
-    private static let fallbackRates: [String: Double] = [
+    private var rates: [String: Double] = [
         "CHF": 1.0,
         "EUR": 0.94,
         "USD": 1.12,
@@ -19,8 +17,6 @@ final class ExchangeRateService {
         "PLN": 4.55,
         "CZK": 25.30
     ]
-
-    private var rates: [String: Double] = Self.fallbackRates
     private var lastFetched: Date?
     private let cacheKey = "exchangeRates"
     private let cacheDateKey = "exchangeRatesDate"
@@ -68,7 +64,7 @@ final class ExchangeRateService {
             self.lastFetched = Date()
             saveCache()
         } catch {
-            // Use fallback rates silently
+            // Keep using fallback/cached rates
         }
     }
 
