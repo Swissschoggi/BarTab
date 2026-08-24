@@ -31,14 +31,12 @@ struct LeaderboardView: View {
                     } else {
                         ForEach(Array(leaderboardEntries.enumerated()), id: \.element.id) { index, entry in
                             HStack(spacing: 12) {
-                                // Rank
                                 Text("#\(index + 1)")
                                     .font(.subheadline)
                                     .fontWeight(.bold)
                                     .foregroundColor(index < 3 ? .barTabAccent : .barTabSecondary)
                                     .frame(width: 32, alignment: .leading)
 
-                                // Level icon
                                 Image(systemName: entry.level.icon)
                                     .font(.body)
                                     .foregroundColor(.white)
@@ -46,7 +44,6 @@ struct LeaderboardView: View {
                                     .background(Color.barTabAccent.opacity(index < 3 ? 1.0 : 0.7))
                                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-                                // Username + level
                                 VStack(alignment: .leading, spacing: 1) {
                                     Text(entry.username)
                                         .font(.subheadline)
@@ -60,7 +57,6 @@ struct LeaderboardView: View {
 
                                 Spacer()
 
-                                // Contribution count
                                 Text("\(entry.contributions)")
                                     .font(.caption)
                                     .fontWeight(.semibold)
@@ -90,36 +86,31 @@ struct LeaderboardView: View {
     }
 
     private var leaderboardEntries: [LeaderboardEntry] {
-        // Build from all users in the system
-        // For now, use local data — in production, fetch from a public view
-        var entries: [LeaderboardEntry] = []
-
-        // Count contributions per user
-        var userContributions: [String: (username: String, count: Int)] = [:]
+        var contributionsByUser: [UUID: Int] = [:]
 
         for price in barRepository.prices {
-            let userId = price.reportedBy
-            let current = userContributions[userId] ?? (username: String(userId.prefix(8)), count: 0)
-            userContributions[userId] = (current.username, current.count + 1)
+            contributionsByUser[price.reportedBy, default: 0] += 1
         }
-
         for bar in barRepository.bars {
-            let userId = bar.createdBy
-            let current = userContributions[userId] ?? (username: String(userId.prefix(8)), count: 0)
-            userContributions[userId] = (current.username, current.count + 1)
+            contributionsByUser[bar.createdBy, default: 0] += 1
         }
 
-        for (userId, data) in userContributions {
-            let level = UserLevel.current(for: data.count)
-            entries.append(LeaderboardEntry(
-                id: userId,
-                username: data.username,
-                contributions: data.count,
-                level: level
-            ))
+        let isCurrentUser: (UUID) -> Bool = { id in
+            guard let user = userSession.currentUser else { return false }
+            return id == user.id
         }
 
-        return entries.sorted { $0.contributions > $1.contributions }
+        return contributionsByUser.map { userId, count in
+            LeaderboardEntry(
+                id: userId.uuidString,
+                username: isCurrentUser(userId)
+                    ? (userSession.currentUser?.username ?? "You")
+                    : "User \(userId.uuidString.prefix(6))",
+                contributions: count,
+                level: UserLevel.current(for: count)
+            )
+        }
+        .sorted { $0.contributions > $1.contributions }
     }
 }
 
