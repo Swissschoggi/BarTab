@@ -833,22 +833,26 @@ struct BarView: View {
 
                         HStack {
 
-                            Text(
-                                "\(price.formattedAmount) \(price.currency)"
-                            )
-                            .font(.caption)
-                            .foregroundColor(.barTabSecondary)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(
+                                    "\(price.formattedAmount) \(price.currency)"
+                                )
+                                .font(.caption)
+                                .foregroundColor(.barTabSecondary)
 
-                            if price.currency != Currency.defaultCurrency.rawValue {
-                                Text("≈ \(NSDecimalNumber(decimal: ExchangeRateService.shared.convert(price.amount, from: price.currency, to: Currency.defaultCurrency.rawValue)).description(withLocale: Locale(identifier: "de_CH"))) \(Currency.defaultCurrency.rawValue)")
-                                    .font(.caption)
-                                    .foregroundColor(.barTabPrimary)
+                                if price.currency != Currency.defaultCurrency.rawValue {
+                                    let converted = ExchangeRateService.shared.convert(
+                                        price.amount,
+                                        from: price.currency,
+                                        to: Currency.defaultCurrency.rawValue
+                                    )
+                                    let convertedStr = NSDecimalNumber(decimal: converted)
+                                        .description(withLocale: Locale(identifier: "de_CH"))
+                                    Text("≈ \(convertedStr) \(Currency.defaultCurrency.rawValue)")
+                                        .font(.caption)
+                                        .foregroundColor(.barTabPrimary)
+                                }
                             }
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(
-                                .barTabPrimary
-                            )
 
                             Spacer()
 
