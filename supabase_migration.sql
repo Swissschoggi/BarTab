@@ -60,3 +60,22 @@ SELECT
     COUNT(*) AS rating_count
 FROM drink_ratings
 GROUP BY bar_id, drink, brand, size;
+
+-- 11. Create public leaderboard view (privacy-safe: username + level only)
+CREATE OR REPLACE VIEW public_leaderboard AS
+SELECT 
+    u.id AS user_id,
+    COALESCE(p.username, 'User ' || LEFT(u.id::text, 8)) AS username,
+    (
+        SELECT COUNT(*) FROM prices WHERE reported_by = u.id
+    ) + (
+        SELECT COUNT(*) FROM bars WHERE created_by = u.id
+    ) AS contributions
+FROM auth.users u
+LEFT JOIN profiles p ON p.id = u.id
+HAVING (
+    SELECT COUNT(*) FROM prices WHERE reported_by = u.id
+) + (
+    SELECT COUNT(*) FROM bars WHERE created_by = u.id
+) > 0
+ORDER BY contributions DESC;

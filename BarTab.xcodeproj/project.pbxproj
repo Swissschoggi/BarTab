@@ -67,6 +67,11 @@
 		BRTA0001306000010000001A /* ServingMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001B /* ServingMethod.swift */; };
 		BRTA0001306000010000001C /* DrinkRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001D /* DrinkRating.swift */; };
 		BRTA0001306000010000001E /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001F /* LanguageManager.swift */; };
+		BRTA00013060000100000024 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000025 /* LeaderboardView.swift */; };
+		BRTA00013070000100000020 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000020 /* en.lproj */; };
+		BRTA00013070000100000021 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000021 /* de.lproj */; };
+		BRTA00013070000100000022 /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000022 /* fr.lproj */; };
+		BRTA00013070000100000023 /* it.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000023 /* it.lproj */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,6 +160,7 @@
 		BRTA00013060000100000021 /* de.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = de.lproj; sourceTree = "<group>"; };
 		BRTA00013060000100000022 /* fr.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fr.lproj; sourceTree = "<group>"; };
 		BRTA00013060000100000023 /* it.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = it.lproj; sourceTree = "<group>"; };
+		BRTA00013060000100000025 /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -216,6 +222,10 @@
 				AE7839683034F16A00F1555E /* ContentView.swift */,
 				AE78396A3034F16B00F1555E /* Assets.xcassets */,
 				BRTA00013060000100000024 /* Resources */,
+				BRTA00013060000100000020 /* en.lproj */,
+				BRTA00013060000100000021 /* de.lproj */,
+				BRTA00013060000100000022 /* fr.lproj */,
+				BRTA00013060000100000023 /* it.lproj */,
 				AEF036603035D00000BDA1CC /* BarTab.entitlements */,
 				AE78396C3034F16B00F1555E /* Preview Content */,
 			);
@@ -233,10 +243,6 @@
 		BRTA00013060000100000024 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				BRTA00013060000100000020 /* en.lproj */,
-				BRTA00013060000100000021 /* de.lproj */,
-				BRTA00013060000100000022 /* fr.lproj */,
-				BRTA00013060000100000023 /* it.lproj */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -295,6 +301,7 @@
 				BRTA0001306000010000000E /* RateBarSheet.swift */,
 				BRTA00013060000100000013 /* NearbyView.swift */,
 				BRTA00013060000100000017 /* SettingsView.swift */,
+				BRTA00013060000100000025 /* LeaderboardView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -437,6 +444,9 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				de,
+				fr,
+				it,
 				Base,
 			);
 			mainGroup = AE78395A3034F16A00F1555E;
@@ -461,6 +471,10 @@
 				AE7839973034F4E700F1555E /* README.md in Resources */,
 				AE78396E3034F16B00F1555E /* Preview Assets.xcassets in Resources */,
 				AE78396B3034F16B00F1555E /* Assets.xcassets in Resources */,
+				BRTA00013070000100000020 /* en.lproj in Resources */,
+				BRTA00013070000100000021 /* de.lproj in Resources */,
+				BRTA00013070000100000022 /* fr.lproj in Resources */,
+				BRTA00013070000100000023 /* it.lproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -535,6 +549,7 @@
 				BRTA00013060000100000012 /* NearbyView.swift in Sources */,
 				BRTA00013060000100000014 /* UserLevel.swift in Sources */,
 				BRTA00013060000100000016 /* SettingsView.swift in Sources */,
+				BRTA00013060000100000024 /* LeaderboardView.swift in Sources */,
 				BRTA00013060000100000018 /* DrinkStyle.swift in Sources */,
 				BRTA0001306000010000001A /* ServingMethod.swift in Sources */,
 				BRTA0001306000010000001C /* DrinkRating.swift in Sources */,

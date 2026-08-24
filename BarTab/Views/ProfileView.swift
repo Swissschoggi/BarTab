@@ -7,6 +7,7 @@ struct ProfileView: View {
 
     @State private var showingLogin = false
     @State private var showingSettings = false
+    @State private var showingLeaderboard = false
 
     private var currentUser: User? {
         userSession.currentUser
@@ -345,6 +346,31 @@ struct ProfileView: View {
                             }
 
                             Button {
+                                showingLeaderboard = true
+                            } label: {
+
+                                HStack(spacing: 12) {
+
+                                    Image(
+                                        systemName: "trophy.fill"
+                                    )
+                                    .foregroundColor(.barTabAccent)
+
+                                    Text("Leaderboard")
+                                        .foregroundColor(.primary)
+
+                                    Spacer()
+
+                                    Image(
+                                        systemName: "chevron.right"
+                                    )
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                }
+                                .barTabCard()
+                            }
+
+                            Button {
                                 userSession.logout()
                             } label: {
 
@@ -423,6 +449,11 @@ struct ProfileView: View {
                 .environmentObject(userSession)
                 .environmentObject(barRepository)
                 .environmentObject(LanguageManager.shared)
+        }
+        .sheet(isPresented: $showingLeaderboard) {
+            LeaderboardView()
+                .environmentObject(barRepository)
+                .environmentObject(userSession)
         }
     }
 

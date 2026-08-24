@@ -280,7 +280,6 @@ struct BarView: View {
 
         let popularAmbience = barRepository.popularAmbience(for: currentBar)
         let ambienceCount = barRepository.ambienceCount(for: currentBar)
-        let wine = barRepository.averageWineQuality(for: currentBar)
 
         return VStack(alignment: .leading, spacing: 0) {
 
@@ -318,75 +317,56 @@ struct BarView: View {
 
             Divider()
                 .foregroundColor(.barTabCardBorder)
+                .padding(.horizontal, 16)
 
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text("Ambience")
+            HStack {
+                Text("Ambience")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.barTabText)
+
+                Spacer()
+
+                if let style = popularAmbience {
+                    HStack(spacing: 4) {
+                        Image(systemName: style.icon)
+                            .font(.caption)
+                        Text(style.displayName)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+                    .foregroundColor(.barTabPrimary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.barTabPrimary.opacity(0.08))
+                    .clipShape(Capsule())
+
+                    Text("(\(ambienceCount))")
+                        .font(.caption2)
+                        .foregroundColor(.barTabSecondary)
+                } else {
+                    Text("No ratings yet")
                         .font(.caption)
                         .foregroundColor(.barTabSecondary)
-
-                    Spacer()
-
-                    if let style = popularAmbience {
-                        HStack(spacing: 4) {
-                            Image(systemName: style.icon)
-                                .font(.caption)
-                            Text(style.displayName)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundColor(.barTabPrimary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.barTabPrimary.opacity(0.08))
-                        .clipShape(Capsule())
-
-                        Text("(\(ambienceCount))")
-                            .font(.caption2)
-                            .foregroundColor(.barTabSecondary)
-                    } else {
-                        Text("No ratings yet")
-                            .font(.caption)
-                            .foregroundColor(.barTabSecondary)
-                    }
                 }
-
-                HStack {
-                    Text("Wine selection")
-                        .font(.caption)
-                        .foregroundColor(.barTabSecondary)
-
-                    Spacer()
-
-                    if let wine = wine {
-                        StarRatingSummaryView(
-                            average: wine.average,
-                            count: wine.count
-                        )
-                    } else {
-                        Text("No ratings yet")
-                            .font(.caption)
-                            .foregroundColor(.barTabSecondary)
-                    }
-                }
-
-                Divider()
-                    .foregroundColor(.barTabCardBorder)
-
-                Button {
-                    showingRateBar = true
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "star.fill")
-                            .font(.caption)
-                        Text("Rate this bar")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.barTabAccent)
-                    }
-                }
-                .padding(.top, 4)
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
+            Button {
+                showingRateBar = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "star.fill")
+                        .font(.caption)
+                    Text("Rate this bar")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabAccent)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 12)
         }
         .barTabCard()
     }
@@ -487,8 +467,7 @@ struct BarView: View {
 
                 RateBarSheet(
                     bar: currentBar,
-                    initialAmbience: mine?.ambience,
-                    initialWineQuality: mine?.wineQuality
+                    initialAmbience: mine?.ambience
                 )
                 .environmentObject(barRepository)
                 .environmentObject(userSession)

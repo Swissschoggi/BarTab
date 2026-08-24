@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Lets the current user rate a bar's ambience and wine selection.
+/// Lets the current user rate a bar's ambience.
 /// Submitting upserts their existing rating for this bar, if any.
 struct RateBarSheet: View {
 
@@ -11,12 +11,10 @@ struct RateBarSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var ambience: AmbienceStyle?
-    @State private var wineQuality: Int?
 
-    init(bar: Bar, initialAmbience: AmbienceStyle?, initialWineQuality: Int?) {
+    init(bar: Bar, initialAmbience: AmbienceStyle?) {
         self.bar = bar
         _ambience = State(initialValue: initialAmbience)
-        _wineQuality = State(initialValue: initialWineQuality)
     }
 
     var body: some View {
@@ -46,15 +44,13 @@ struct RateBarSheet: View {
                 }
                 .barTabCard()
 
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Wine selection")
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Drink quality")
                         .font(.headline)
 
-                    Text("How good is the wine here?")
+                    Text("Rate the quality of specific drinks in the menu below.")
                         .font(.caption)
                         .foregroundColor(.secondary)
-
-                    StarRatingView(rating: $wineQuality)
                 }
                 .barTabCard()
 
@@ -69,7 +65,7 @@ struct RateBarSheet: View {
                         .padding()
                         .barTabPrimaryButton()
                 }
-                .disabled(ambience == nil && wineQuality == nil)
+                .disabled(ambience == nil)
             }
             .padding()
             .background(
@@ -97,7 +93,7 @@ struct RateBarSheet: View {
             await barRepository.submitRating(
                 for: bar,
                 ambience: ambience,
-                wineQuality: wineQuality,
+                wineQuality: nil,
                 by: user
             )
             dismiss()
