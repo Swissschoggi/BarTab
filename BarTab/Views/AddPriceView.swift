@@ -13,6 +13,7 @@ struct AddPriceView: View {
     @State private var selectedBrand: String? = nil
     @State private var selectedStyle: DrinkStyle? = nil
     @State private var selectedServing: ServingMethod? = nil
+    @State private var isSaving = false
     @State private var priceText = ""
     @State private var showingDuplicateWarning = false
     @State private var duplicatePrice: Price?
@@ -264,6 +265,7 @@ struct AddPriceView: View {
                     .listRowBackground(
                         Color.barTabPrimary
                     )
+                    .disabled(isSaving)
                 }
             }
             .navigationTitle("Add Drink")
@@ -302,6 +304,7 @@ struct AddPriceView: View {
                         return
                     }
 
+                    isSaving = true
                     actuallySavePrice(
                         amount: amount,
                         user: user
@@ -349,6 +352,8 @@ struct AddPriceView: View {
 
     private func savePrice() {
 
+        guard !isSaving else { return }
+
         guard let amount = Decimal(string: priceText) else {
             return
         }
@@ -377,6 +382,7 @@ struct AddPriceView: View {
             return
         }
 
+        isSaving = true
         actuallySavePrice(
             amount: amount,
             user: user
@@ -405,6 +411,7 @@ struct AddPriceView: View {
                     .wrappedValue
                     .dismiss()
             } else {
+                isSaving = false
                 self.errorMessage =
                     "Could not save the drink. "
                     + "Check your connection and try again."

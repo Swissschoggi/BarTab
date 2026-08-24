@@ -236,17 +236,26 @@ final class BarRepository: ObservableObject {
 
     /// Most common ambience style for a bar, or nil if nobody has rated it.
     func popularAmbience(for bar: Bar) -> AmbienceStyle? {
-        let styles = ratings(for: bar).compactMap { $0.ambience }
-        guard !styles.isEmpty else { return nil }
+        let allStyles = ratings(for: bar).flatMap { $0.ambience }
+        guard !allStyles.isEmpty else { return nil }
         var counts: [AmbienceStyle: Int] = [:]
-        for style in styles {
+        for style in allStyles {
             counts[style, default: 0] += 1
         }
         return counts.max(by: { $0.value < $1.value })?.key
     }
 
+    func ambienceStyles(for bar: Bar) -> [AmbienceStyle] {
+        let allStyles = ratings(for: bar).flatMap { $0.ambience }
+        var counts: [AmbienceStyle: Int] = [:]
+        for style in allStyles {
+            counts[style, default: 0] += 1
+        }
+        return counts.sorted(by: { $0.value > $1.value }).map(\.key)
+    }
+
     func ambienceCount(for bar: Bar) -> Int {
-        ratings(for: bar).compactMap { $0.ambience }.count
+        ratings(for: bar).reduce(0) { $0 + $1.ambience.count }
     }
 
     /// Average wine-quality rating and how many people rated it, or
@@ -265,7 +274,7 @@ final class BarRepository: ObservableObject {
     /// for a bar. Passing nil for a dimension leaves it unrated.
     func submitRating(
         for bar: Bar,
-        ambience: AmbienceStyle?,
+        ambience: [AmbienceStyle],
         wineQuality: Int?,
         by user: User
     ) async {

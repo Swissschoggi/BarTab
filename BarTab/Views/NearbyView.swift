@@ -47,7 +47,7 @@ struct NearbyView: View {
     @State private var selectedDrinks: Set<Drink> = [.beer]
     @State private var selectedSizes: Set<DrinkSize> = [.fiveDeciliters]
     @State private var selectedBrand: String?
-    @State private var selectedAmbience: AmbienceStyle?
+    @State private var selectedAmbience: Set<AmbienceStyle> = []
 
     // Collapsible filter state
     @State private var filtersExpanded = false
@@ -172,9 +172,10 @@ struct NearbyView: View {
             }
         }
 
-        if let ambience = selectedAmbience {
+        if !selectedAmbience.isEmpty {
             results = results.filter { result in
-                barRepository.popularAmbience(for: result.bar) == ambience
+                let barStyles = barRepository.ambienceStyles(for: result.bar)
+                return !Set(barStyles).isDisjoint(with: selectedAmbience)
             }
         }
 
@@ -450,7 +451,7 @@ struct NearbyView: View {
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             // Active filter summary (always visible)
-            if selectedDrinks.count > 1 || selectedBrand != nil || selectedAmbience != nil {
+            if selectedDrinks.count > 1 || selectedBrand != nil || !selectedAmbience.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
                         if selectedDrinks.count > 1 {
@@ -479,13 +480,13 @@ struct NearbyView: View {
                             .clipShape(Capsule())
                         }
 
-                        if let ambience = selectedAmbience {
+                        ForEach(Array(selectedAmbience)) { ambience in
                             HStack(spacing: 3) {
                                 Image(systemName: ambience.icon)
                                     .font(.caption2)
                                 Text(ambience.displayName)
                                 Image(systemName: "xmark.circle.fill")
-                                    .onTapGesture { selectedAmbience = nil }
+                                    .onTapGesture { selectedAmbience.remove(ambience) }
                             }
                             .font(.caption)
                             .padding(.horizontal, 8)
@@ -592,20 +593,24 @@ struct NearbyView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 6) {
                                 Button {
-                                    selectedAmbience = nil
+                                    selectedAmbience = []
                                 } label: {
                                     Text("Any")
                                         .font(.caption)
                                         .padding(.horizontal, 10)
                                         .padding(.vertical, 6)
-                                        .foregroundColor(selectedAmbience == nil ? .white : .barTabPrimary)
-                                        .background(selectedAmbience == nil ? Color.barTabPrimary : Color.barTabPillFill)
+                                        .foregroundColor(selectedAmbience.isEmpty ? .white : .barTabPrimary)
+                                        .background(selectedAmbience.isEmpty ? Color.barTabPrimary : Color.barTabPillFill)
                                         .clipShape(Capsule())
                                 }
 
                                 ForEach(AmbienceStyle.allCases) { style in
                                     Button {
-                                        selectedAmbience = style
+                                        if selectedAmbience.contains(style) {
+                                            selectedAmbience.remove(style)
+                                        } else {
+                                            selectedAmbience.insert(style)
+                                        }
                                     } label: {
                                         HStack(spacing: 3) {
                                             Image(systemName: style.icon)
@@ -615,8 +620,8 @@ struct NearbyView: View {
                                         .font(.caption)
                                         .padding(.horizontal, 10)
                                         .padding(.vertical, 6)
-                                        .foregroundColor(selectedAmbience == style ? .white : .barTabPrimary)
-                                        .background(selectedAmbience == style ? Color.barTabPrimary : Color.barTabPillFill)
+                                        .foregroundColor(selectedAmbience.contains(style) ? .white : .barTabPrimary)
+                                        .background(selectedAmbience.contains(style) ? Color.barTabPrimary : Color.barTabPillFill)
                                         .clipShape(Capsule())
                                     }
                                 }

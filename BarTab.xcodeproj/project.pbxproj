@@ -68,6 +68,7 @@
 		BRTA0001306000010000001C /* DrinkRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001D /* DrinkRating.swift */; };
 		BRTA0001306000010000001E /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001F /* LanguageManager.swift */; };
 		BRTA00013060000100000026 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000025 /* LeaderboardView.swift */; };
+		BRTA00013060000100000027 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000028 /* FlowLayout.swift */; };
 		BRTA00013070000100000020 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000020 /* en.lproj */; };
 		BRTA00013070000100000021 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000021 /* de.lproj */; };
 		BRTA00013070000100000022 /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000022 /* fr.lproj */; };
@@ -161,6 +162,7 @@
 		BRTA00013060000100000022 /* fr.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fr.lproj; sourceTree = "<group>"; };
 		BRTA00013060000100000023 /* it.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = it.lproj; sourceTree = "<group>"; };
 		BRTA00013060000100000025 /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000028 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -353,6 +355,7 @@
 			isa = PBXGroup;
 			children = (
 				AEF0362E30350E1200BDA1CC /* BarTabColors.swift */,
+				BRTA00013060000100000028 /* FlowLayout.swift */,
 				AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */,
 				BRTA00013060000100000006 /* StarRatingView.swift */,
 			);
@@ -515,6 +518,7 @@
 				AEF0366A3035E30000BDA1CC /* KeychainService.swift in Sources */,
 				AEF036723035E40000BDA1CC /* SupabaseAuthService.swift in Sources */,
 				AEF0362F30350E1200BDA1CC /* BarTabColors.swift in Sources */,
+				BRTA00013060000100000027 /* FlowLayout.swift in Sources */,
 				AEF0361A3034F92700BDA1CC /* MapView.swift in Sources */,
 				AEA1BD703035ECF800DE059C /* SupabaseDTOs.swift in Sources */,
 				AEF0363130350EA400BDA1CC /* Price.swift in Sources */,

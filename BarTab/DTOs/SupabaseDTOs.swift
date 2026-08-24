@@ -51,11 +51,16 @@ struct BarRatingDTO: Codable {
     let created_at: Date
 
     var toDomain: BarRating {
-        BarRating(
+        let styles: [AmbienceStyle] = {
+            guard let ambience else { return [] }
+            return ambience.split(separator: ",")
+                .compactMap { AmbienceStyle(rawValue: String($0).trimmingCharacters(in: .whitespaces)) }
+        }()
+        return BarRating(
             id: id,
             barID: bar_id,
             ratedBy: rated_by,
-            ambience: ambience.flatMap { AmbienceStyle(rawValue: $0) },
+            ambience: styles,
             wineQuality: wine_quality,
             createdAt: created_at
         )
@@ -65,7 +70,7 @@ struct BarRatingDTO: Codable {
         self.id = domain.id
         self.bar_id = domain.barID
         self.rated_by = domain.ratedBy
-        self.ambience = domain.ambience?.rawValue
+        self.ambience = domain.ambience.isEmpty ? nil : domain.ambience.map(\.rawValue).joined(separator: ",")
         self.wine_quality = domain.wineQuality
         self.created_at = domain.createdAt
     }

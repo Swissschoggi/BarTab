@@ -278,7 +278,7 @@ struct BarView: View {
 
     private var detailsSection: some View {
 
-        let popularAmbience = barRepository.popularAmbience(for: currentBar)
+        let ambienceStyles = barRepository.ambienceStyles(for: currentBar)
         let ambienceCount = barRepository.ambienceCount(for: currentBar)
 
         return VStack(alignment: .leading, spacing: 0) {
@@ -312,6 +312,8 @@ struct BarView: View {
                         .fontWeight(.semibold)
                         .foregroundColor(.barTabSecondary)
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
             .buttonStyle(.plain)
 
@@ -319,35 +321,43 @@ struct BarView: View {
                 .foregroundColor(.barTabCardBorder)
                 .padding(.horizontal, 16)
 
-            HStack {
-                Text("Ambience")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.barTabText)
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Ambience")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.barTabText)
 
-                Spacer()
+                    Spacer()
 
-                if let style = popularAmbience {
-                    HStack(spacing: 4) {
-                        Image(systemName: style.icon)
+                    if ambienceCount > 0 {
+                        Text("\(ambienceCount) ratings")
+                            .font(.caption2)
+                            .foregroundColor(.barTabSecondary)
+                    } else {
+                        Text("No ratings yet")
                             .font(.caption)
-                        Text(style.displayName)
-                            .font(.caption)
-                            .fontWeight(.medium)
+                            .foregroundColor(.barTabSecondary)
                     }
-                    .foregroundColor(.barTabPrimary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Color.barTabPrimary.opacity(0.08))
-                    .clipShape(Capsule())
+                }
 
-                    Text("(\(ambienceCount))")
-                        .font(.caption2)
-                        .foregroundColor(.barTabSecondary)
-                } else {
-                    Text("No ratings yet")
-                        .font(.caption)
-                        .foregroundColor(.barTabSecondary)
+                if !ambienceStyles.isEmpty {
+                    FlowLayout(spacing: 6) {
+                        ForEach(ambienceStyles) { style in
+                            HStack(spacing: 3) {
+                                Image(systemName: style.icon)
+                                    .font(.caption2)
+                                Text(style.displayName)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                            }
+                            .foregroundColor(.barTabPrimary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.barTabPrimary.opacity(0.08))
+                            .clipShape(Capsule())
+                        }
+                    }
                 }
             }
             .padding(.horizontal, 16)
@@ -467,7 +477,7 @@ struct BarView: View {
 
                 RateBarSheet(
                     bar: currentBar,
-                    initialAmbience: mine?.ambience
+                    initialAmbience: mine?.ambience ?? []
                 )
                 .environmentObject(barRepository)
                 .environmentObject(userSession)

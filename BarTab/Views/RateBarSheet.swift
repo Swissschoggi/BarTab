@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// Lets the current user rate a bar's ambience.
-/// Submitting upserts their existing rating for this bar, if any.
+/// Lets the current user rate a bar's ambience (multi-select).
 struct RateBarSheet: View {
 
     let bar: Bar
@@ -10,11 +9,11 @@ struct RateBarSheet: View {
     @EnvironmentObject private var userSession: UserSession
     @Environment(\.dismiss) private var dismiss
 
-    @State private var ambience: AmbienceStyle?
+    @State private var selectedAmbiences: Set<AmbienceStyle>
 
-    init(bar: Bar, initialAmbience: AmbienceStyle?) {
+    init(bar: Bar, initialAmbience: [AmbienceStyle]) {
         self.bar = bar
-        _ambience = State(initialValue: initialAmbience)
+        _selectedAmbiences = State(initialValue: Set(initialAmbience))
     }
 
     var body: some View {
@@ -25,22 +24,37 @@ struct RateBarSheet: View {
                     Text("Ambience")
                         .font(.headline)
 
-                    Text("What's the vibe at \(bar.name)?")
+                    Text("What's the vibe at \(bar.name)? Select all that apply.")
                         .font(.caption)
                         .foregroundColor(.secondary)
 
-                    Picker("Ambience", selection: $ambience) {
-                        Text("Select...").tag(AmbienceStyle?.none)
+                    LazyVGrid(columns: [
+                        GridItem(.flexible()),
+                        GridItem(.flexible())
+                    ], spacing: 8) {
                         ForEach(AmbienceStyle.allCases) { style in
-                            HStack {
-                                Image(systemName: style.icon)
-                                Text(style.displayName)
+                            Button {
+                                if selectedAmbiences.contains(style) {
+                                    selectedAmbiences.remove(style)
+                                } else {
+                                    selectedAmbiences.insert(style)
+                                }
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: style.icon)
+                                        .font(.caption)
+                                    Text(style.displayName)
+                                        .font(.caption)
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity)
+                                .foregroundColor(selectedAmbiences.contains(style) ? .white : .barTabPrimary)
+                                .background(selectedAmbiences.contains(style) ? Color.barTabPrimary : Color.barTabPillFill)
+                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             }
-                            .tag(AmbienceStyle?.some(style))
                         }
                     }
-                    .pickerStyle(.menu)
-                    .tint(.barTabPrimary)
                 }
                 .barTabCard()
 
@@ -65,7 +79,7 @@ struct RateBarSheet: View {
                         .padding()
                         .barTabPrimaryButton()
                 }
-                .disabled(ambience == nil)
+                .disabled(selectedAmbiences.isEmpty)
             }
             .padding()
             .background(
@@ -92,7 +106,7 @@ struct RateBarSheet: View {
         Task {
             await barRepository.submitRating(
                 for: bar,
-                ambience: ambience,
+                ambience: Array(selectedAmbiences),
                 wineQuality: nil,
                 by: user
             )
