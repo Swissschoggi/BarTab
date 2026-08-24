@@ -33,7 +33,6 @@
 		AEF0363F303515D400BDA1CC /* UserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0363E303515D400BDA1CC /* UserSession.swift */; };
 		AEF036413035160F00BDA1CC /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036403035160F00BDA1CC /* ProfileView.swift */; };
 		AEF03643303518F900BDA1CC /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF03642303518F900BDA1CC /* MainTabView.swift */; };
-		AEF036453035193E00BDA1CC /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036443035193E00BDA1CC /* SearchView.swift */; };
 		AEF0364730351C9700BDA1CC /* MyContributionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364630351C9700BDA1CC /* MyContributionsView.swift */; };
 		AEF03649303523E200BDA1CC /* PriceSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF03648303523E200BDA1CC /* PriceSearchView.swift */; };
 		AEF0364B3035260A00BDA1CC /* DistanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364A3035260A00BDA1CC /* DistanceService.swift */; };
@@ -102,7 +101,6 @@
 		AEF0363E303515D400BDA1CC /* UserSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSession.swift; sourceTree = "<group>"; };
 		AEF036403035160F00BDA1CC /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		AEF03642303518F900BDA1CC /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
-		AEF036443035193E00BDA1CC /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		AEF0364630351C9700BDA1CC /* MyContributionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyContributionsView.swift; sourceTree = "<group>"; };
 		AEF03648303523E200BDA1CC /* PriceSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceSearchView.swift; sourceTree = "<group>"; };
 		AEF0364A3035260A00BDA1CC /* DistanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceService.swift; sourceTree = "<group>"; };
@@ -237,7 +235,6 @@
 				AEF03638303510D700BDA1CC /* AddPriceView.swift */,
 				AEF036403035160F00BDA1CC /* ProfileView.swift */,
 				AEF03642303518F900BDA1CC /* MainTabView.swift */,
-				AEF036443035193E00BDA1CC /* SearchView.swift */,
 				AEF0364630351C9700BDA1CC /* MyContributionsView.swift */,
 				AEF0365E3035C80000BDA1CC /* MyBarsView.swift */,
 				AEF036613035E00000BDA1CC /* PriceTrendChart.swift */,
@@ -428,7 +425,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AEF0362C30350C5100BDA1CC /* BarView.swift in Sources */,
-				AEF036453035193E00BDA1CC /* SearchView.swift in Sources */,
 				AEF03628303509AB00BDA1CC /* Bar.swift in Sources */,
 				AEF036593035C62000BDA1CC /* PriceConfidence.swift in Sources */,
 				AEF03639303510D700BDA1CC /* AddPriceView.swift in Sources */,
@@ -626,6 +622,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BarTab/Preview Content\"";
+				DEVELOPMENT_TEAM = LUHP6G9833;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarTab uses your Location to show nearby bars and their drink prices.";
@@ -656,6 +653,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BarTab/Preview Content\"";
+				DEVELOPMENT_TEAM = LUHP6G9833;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarTab uses your Location to show nearby bars and their drink prices.";

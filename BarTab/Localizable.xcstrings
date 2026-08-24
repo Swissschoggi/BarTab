@@ -1,0 +1,1376 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "1 dl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 dl"
+          }
+        }
+      }
+    },
+    "2 dl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 dl"
+          }
+        }
+      }
+    },
+    "20 cl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 cl"
+          }
+        }
+      }
+    },
+    "25 cl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "25 cl"
+          }
+        }
+      }
+    },
+    "3 dl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 dl"
+          }
+        }
+      }
+    },
+    "33 cl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "33 cl"
+          }
+        }
+      }
+    },
+    "5 dl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 dl"
+          }
+        }
+      }
+    },
+    "50 cl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "50 cl"
+          }
+        }
+      }
+    },
+    "Account": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konto"
+          }
+        }
+      }
+    },
+    "Add Anyway": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trotzdem hinzufügen"
+          }
+        }
+      }
+    },
+    "Add Bar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bar hinzufügen"
+          }
+        }
+      }
+    },
+    "Add Price": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preis hinzufügen"
+          }
+        }
+      }
+    },
+    "Add a Bar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bar hinzufügen"
+          }
+        }
+      }
+    },
+    "Add a price": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preis hinzufügen"
+          }
+        }
+      }
+    },
+    "Adjust location": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standort anpassen"
+          }
+        }
+      }
+    },
+    "Admin": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admin"
+          }
+        }
+      }
+    },
+    "Allow location access, or search for a place to look near.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erlaube den Standortzugriff oder suche nach einem Ort in der Nähe."
+          }
+        }
+      }
+    },
+    "Already reported": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereits gemeldet"
+          }
+        }
+      }
+    },
+    "Ambience": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambiente"
+          }
+        }
+      }
+    },
+    "Approve": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genehmigen"
+          }
+        }
+      }
+    },
+    "Approved": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genehmigt"
+          }
+        }
+      }
+    },
+    "Bar may already exist": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bar existiert möglicherweise bereits"
+          }
+        }
+      }
+    },
+    "Bar no longer available": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bar nicht mehr verfügbar"
+          }
+        }
+      }
+    },
+    "Bars": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bars"
+          }
+        }
+      }
+    },
+    "Beer": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bier"
+          }
+        }
+      }
+    },
+    "Best deal": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestes Angebot"
+          }
+        }
+      }
+    },
+    "Bottle": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flasche"
+          }
+        }
+      }
+    },
+    "Brand": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marke"
+          }
+        }
+      }
+    },
+    "Brand / Type": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marke / Typ"
+          }
+        }
+      }
+    },
+    "Brand requests": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markenanfragen"
+          }
+        }
+      }
+    },
+    "CHF": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CHF"
+          }
+        }
+      }
+    },
+    "Can't find it? Request a brand": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht gefunden? Marke vorschlagen"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
+          }
+        }
+      }
+    },
+    "Change": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ändern"
+          }
+        }
+      }
+    },
+    "Cheapest": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Günstigste"
+          }
+        }
+      }
+    },
+    "Closest": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächstgelegen"
+          }
+        }
+      }
+    },
+    "Cocktail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cocktail"
+          }
+        }
+      }
+    },
+    "Coffee": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaffee"
+          }
+        }
+      }
+    },
+    "Confirm password": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwort bestätigen"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiter"
+          }
+        }
+      }
+    },
+    "Contributions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beiträge"
+          }
+        }
+      }
+    },
+    "Couldn't add bar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bar konnte nicht hinzugefügt werden"
+          }
+        }
+      }
+    },
+    "Create account": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konto erstellen"
+          }
+        }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen"
+          }
+        }
+      }
+    },
+    "Doesn't exist": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Existiert nicht"
+          }
+        }
+      }
+    },
+    "Drink": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getränk"
+          }
+        }
+      }
+    },
+    "Email": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "E-Mail"
+          }
+        }
+      }
+    },
+    "Favorites": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favoriten"
+          }
+        }
+      }
+    },
+    "Find a price": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preis finden"
+          }
+        }
+      }
+    },
+    "Find bars close to you or any other place.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finde Bars in deiner Nähe oder an einem anderen Ort."
+          }
+        }
+      }
+    },
+    "Find your bar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finde deine Bar"
+          }
+        }
+      }
+    },
+    "Get Directions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Route anzeigen"
+          }
+        }
+      }
+    },
+    "Glass": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glas"
+          }
+        }
+      }
+    },
+    "Good confidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gute Zuverlässigkeit"
+          }
+        }
+      }
+    },
+    "High confidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hohe Zuverlässigkeit"
+          }
+        }
+      }
+    },
+    "How good is the wine here?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie gut ist der Wein hier?"
+          }
+        }
+      }
+    },
+    "Inappropriate content": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unangemessener Inhalt"
+          }
+        }
+      }
+    },
+    "Log out": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abmelden"
+          }
+        }
+      }
+    },
+    "Low confidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geringe Zuverlässigkeit"
+          }
+        }
+      }
+    },
+    "Map": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karte"
+          }
+        }
+      }
+    },
+    "Mark reviewed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als geprüft markieren"
+          }
+        }
+      }
+    },
+    "Me": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ich"
+          }
+        }
+      }
+    },
+    "Moderate confidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mittlere Zuverlässigkeit"
+          }
+        }
+      }
+    },
+    "My Bars": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meine Bars"
+          }
+        }
+      }
+    },
+    "My Contributions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meine Beiträge"
+          }
+        }
+      }
+    },
+    "My bars": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meine Bars"
+          }
+        }
+      }
+    },
+    "My location": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mein Standort"
+          }
+        }
+      }
+    },
+    "My prices": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meine Preise"
+          }
+        }
+      }
+    },
+    "Near": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In der Nähe von"
+          }
+        }
+      }
+    },
+    "Nearby": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In der Nähe"
+          }
+        }
+      }
+    },
+    "Nearby bars": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bars in der Nähe"
+          }
+        }
+      }
+    },
+    "New": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neu"
+          }
+        }
+      }
+    },
+    "No bars nearby": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Bars in der Nähe"
+          }
+        }
+      }
+    },
+    "No bars yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Bars"
+          }
+        }
+      }
+    },
+    "No brand requests yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Markenanfragen"
+          }
+        }
+      }
+    },
+    "No contributions yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Beiträge"
+          }
+        }
+      }
+    },
+    "No location yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch kein Standort"
+          }
+        }
+      }
+    },
+    "No prices found": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Preise gefunden"
+          }
+        }
+      }
+    },
+    "No prices yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Preise"
+          }
+        }
+      }
+    },
+    "No ratings yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Bewertungen"
+          }
+        }
+      }
+    },
+    "No reports yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Meldungen"
+          }
+        }
+      }
+    },
+    "No smoking": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rauchfrei"
+          }
+        }
+      }
+    },
+    "Not specified": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht angegeben"
+          }
+        }
+      }
+    },
+    "Nothing to review": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts zu prüfen"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "Only one report so far — add another to see a trend.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisher nur eine Meldung — füge eine weitere hinzu, um einen Trend zu sehen."
+          }
+        }
+      }
+    },
+    "Other": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andere"
+          }
+        }
+      }
+    },
+    "Password": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwort"
+          }
+        }
+      }
+    },
+    "Pending": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausstehend"
+          }
+        }
+      }
+    },
+    "Price": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preis"
+          }
+        }
+      }
+    },
+    "Price confidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preiszuverlässigkeit"
+          }
+        }
+      }
+    },
+    "Price history": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preisverlauf"
+          }
+        }
+      }
+    },
+    "Price is outdated": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preis ist veraltet"
+          }
+        }
+      }
+    },
+    "Prices": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preise"
+          }
+        }
+      }
+    },
+    "Radius": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umkreis"
+          }
+        }
+      }
+    },
+    "Rate this bar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bar bewerten"
+          }
+        }
+      }
+    },
+    "Reject": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ablehnen"
+          }
+        }
+      }
+    },
+    "Rejected": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgelehnt"
+          }
+        }
+      }
+    },
+    "Reported content": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gemeldete Inhalte"
+          }
+        }
+      }
+    },
+    "Request a brand": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marke vorschlagen"
+          }
+        }
+      }
+    },
+    "Request sent": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anfrage gesendet"
+          }
+        }
+      }
+    },
+    "Requests for new brands will show up here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anfragen für neue Marken erscheinen hier."
+          }
+        }
+      }
+    },
+    "Results": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ergebnisse"
+          }
+        }
+      }
+    },
+    "Save rating": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewertung speichern"
+          }
+        }
+      }
+    },
+    "Search a city or place": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stadt oder Ort suchen"
+          }
+        }
+      }
+    },
+    "Search a place": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ort suchen"
+          }
+        }
+      }
+    },
+    "Search a place…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ort suchen…"
+          }
+        }
+      }
+    },
+    "Search by bar name": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach Barname suchen"
+          }
+        }
+      }
+    },
+    "Search for a bar or place": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach einer Bar oder einem Ort suchen"
+          }
+        }
+      }
+    },
+    "Search for a bar, pub, café or other place.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suche nach einer Bar, Kneipe, einem Café oder einem anderen Ort."
+          }
+        }
+      }
+    },
+    "See what bars around you charge.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sieh, was Bars in deiner Umgebung verlangen."
+          }
+        }
+      }
+    },
+    "Selected place": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgewählter Ort"
+          }
+        }
+      }
+    },
+    "Send request": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anfrage senden"
+          }
+        }
+      }
+    },
+    "Shot": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schnaps"
+          }
+        }
+      }
+    },
+    "Sign In": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anmelden"
+          }
+        }
+      }
+    },
+    "Sign in to manage your contributions.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Melde dich an, um deine Beiträge zu verwalten."
+          }
+        }
+      }
+    },
+    "Size": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grösse"
+          }
+        }
+      }
+    },
+    "Smoking friendly": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raucherfreundlich"
+          }
+        }
+      }
+    },
+    "Soft Drink": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Softdrink"
+          }
+        }
+      }
+    },
+    "Sort by": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sortieren nach"
+          }
+        }
+      }
+    },
+    "Spam": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spam"
+          }
+        }
+      }
+    },
+    "That brand is already in the list.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Marke ist bereits in der Liste."
+          }
+        }
+      }
+    },
+    "Try widening the radius or picking a different place.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergrössere den Umkreis oder wähle einen anderen Ort."
+          }
+        }
+      }
+    },
+    "Waiting for location…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warte auf Standort…"
+          }
+        }
+      }
+    },
+    "We'll review this bar and remove it if it doesn't belong.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wir prüfen diese Bar und entfernen sie, falls sie nicht hierher gehört."
+          }
+        }
+      }
+    },
+    "We'll review this price and correct it if it looks wrong.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wir prüfen diesen Preis und korrigieren ihn, falls er falsch ist."
+          }
+        }
+      }
+    },
+    "Welcome to BarTab": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Willkommen bei BarTab"
+          }
+        }
+      }
+    },
+    "Wine": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wein"
+          }
+        }
+      }
+    },
+    "Wine selection": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weinauswahl"
+          }
+        }
+      }
+    },
+    "Wrong place": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falscher Ort"
+          }
+        }
+      }
+    },
+    "Wrong price": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falscher Preis"
+          }
+        }
+      }
+    },
+    "You're not signed in": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du bist nicht angemeldet"
+          }
+        }
+      }
+    },
+    "You've already reported this bar.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du hast diese Bar bereits gemeldet."
+          }
+        }
+      }
+    },
+    "You've already requested this brand.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du hast diese Marke bereits vorgeschlagen."
+          }
+        }
+      }
+    },
+    "Your BarTab profile.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein BarTab-Profil."
+          }
+        }
+      }
+    },
+    "Your activity": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Aktivität"
+          }
+        }
+      }
+    },
+    "or use an email": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "oder verwende eine E-Mail"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

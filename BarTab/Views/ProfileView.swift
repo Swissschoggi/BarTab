@@ -150,7 +150,7 @@ struct ProfileView: View {
                                 .font(.headline)
 
                             navigationRow(
-                                title: "My prices",
+                                title: String(localized: "My prices"),
                                 subtitle: "\(myPrices.count) contributions",
                                 icon: "tag.fill"
                             ) {
@@ -158,7 +158,7 @@ struct ProfileView: View {
                             }
 
                             navigationRow(
-                                title: "My bars",
+                                title: String(localized: "My bars"),
                                 subtitle: "\(myBars.count) bars added",
                                 icon: "building.2.fill"
                             ) {
@@ -179,14 +179,25 @@ struct ProfileView: View {
                                     .font(.headline)
 
                                 navigationRow(
-                                    title: "Reported content",
+                                    title: String(localized: "Reported content"),
                                     subtitle: unreviewedReportCount == 0
-                                        ? "Nothing to review"
+                                        ? String(localized: "Nothing to review")
                                         : "\(unreviewedReportCount) "
                                         + "\(unreviewedReportCount == 1 ? "report" : "reports") to review",
                                     icon: "flag.fill"
                                 ) {
                                     AdminReportsView()
+                                }
+
+                                navigationRow(
+                                    title: String(localized: "Brand requests"),
+                                    subtitle: barRepository.pendingBrandRequestCount == 0
+                                        ? String(localized: "Nothing to review")
+                                        : "\(barRepository.pendingBrandRequestCount) "
+                                        + "\(barRepository.pendingBrandRequestCount == 1 ? "request" : "requests") to review",
+                                    icon: "tag.fill"
+                                ) {
+                                    AdminBrandRequestsView()
                                 }
                             }
                         }
@@ -311,7 +322,7 @@ struct ProfileView: View {
 
     private func statisticCard(
         value: Int,
-        title: String,
+        title: LocalizedStringKey,
         icon: String
     ) -> some View {
 

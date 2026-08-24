@@ -9,6 +9,9 @@ final class BarRepository: ObservableObject {
     @Published private(set) var prices: [Price] = []
     @Published private(set) var favoriteBarIDs: Set<UUID> = []
     @Published private(set) var reports: [ContentReport] = []
+    @Published private(set) var barRatings: [BarRating] = []
+    @Published private(set) var brands: [DrinkBrand] = DrinkBrand.all
+    @Published private(set) var brandRequests: [BrandRequest] = []
 
     init() {
         Task {
@@ -22,9 +25,25 @@ final class BarRepository: ObservableObject {
         do {
             async let fetchedBars = SupabaseClient.shared.fetchBars()
             async let fetchedPrices = SupabaseClient.shared.fetchAllPrices()
+            async let fetchedRatings = SupabaseClient.shared.fetchBarRatings()
+            async let fetchedBrands = SupabaseClient.shared.fetchBrands()
+            async let fetchedBrandRequests = SupabaseClient.shared.fetchBrandRequests()
 
             self.bars = try await fetchedBars
             self.prices = try await fetchedPrices
+            self.barRatings = try await fetchedRatings
+            self.brandRequests = try await fetchedBrandRequests
+
+            // Merge the server-approved catalog with the bundled
+            // defaults, so the app still has sensible brands to
+            // offer even before the backend is seeded.
+            let serverBrands = try await fetchedBrands
+            var merged: [String: DrinkBrand] = [:]
+            for brand in DrinkBrand.all + serverBrands {
+                let key = "\(brand.drink.rawValue)|\(brand.name.lowercased())"
+                merged[key] = brand
+            }
+            self.brands = Array(merged.values)
         } catch {
             print("Failed to fetch initial data: \(error)")
         }
@@ -48,6 +67,7 @@ final class BarRepository: ObservableObject {
         name: String,
         address: String,
         coordinate: CLLocationCoordinate2D,
+        smokingFriendly: Bool = false,
         createdBy user: User
     ) async -> Bar? {
 
@@ -57,7 +77,8 @@ final class BarRepository: ObservableObject {
             address: address,
             coordinate: coordinate,
             createdAt: Date(),
-            createdBy: user.id
+            createdBy: user.id,
+            smokingFriendly: smokingFriendly
         )
 
         do {
@@ -198,6 +219,179 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.updatePrice(updatedPrice)
         } catch {
             print("Failed to update price on Supabase: \(error)")
+        }
+    }
+
+    // MARK: - Bar Ratings
+
+    func ratings(for bar: Bar) -> [BarRating] {
+        barRatings.filter { $0.barID == bar.id }
+    }
+
+    /// Average ambience rating and how many people rated it, or nil
+    /// if nobody has rated this bar's ambience yet.
+    func averageAmbience(for bar: Bar) -> (average: Double, count: Int)? {
+        let values = ratings(for: bar).compactMap { $0.ambience }
+        guard !values.isEmpty else { return nil }
+        return (Double(values.reduce(0, +)) / Double(values.count), values.count)
+    }
+
+    /// Average wine-quality rating and how many people rated it, or
+    /// nil if nobody has rated this bar's wine yet.
+    func averageWineQuality(for bar: Bar) -> (average: Double, count: Int)? {
+        let values = ratings(for: bar).compactMap { $0.wineQuality }
+        guard !values.isEmpty else { return nil }
+        return (Double(values.reduce(0, +)) / Double(values.count), values.count)
+    }
+
+    func myRating(for bar: Bar, by user: User) -> BarRating? {
+        ratings(for: bar).first { $0.ratedBy == user.id }
+    }
+
+    /// Submits (or updates) the current user's ambience/wine rating
+    /// for a bar. Passing nil for a dimension leaves it unrated.
+    func submitRating(
+        for bar: Bar,
+        ambience: Int?,
+        wineQuality: Int?,
+        by user: User
+    ) async {
+
+        let existing = myRating(for: bar, by: user)
+
+        let rating = BarRating(
+            id: existing?.id ?? UUID(),
+            barID: bar.id,
+            ratedBy: user.id,
+            ambience: ambience,
+            wineQuality: wineQuality,
+            createdAt: Date()
+        )
+
+        if let index = barRatings.firstIndex(where: { $0.id == rating.id }) {
+            barRatings[index] = rating
+        } else {
+            barRatings.append(rating)
+        }
+
+        do {
+            try await SupabaseClient.shared.upsertBarRating(rating)
+        } catch {
+            print("Failed to submit bar rating: \(error)")
+        }
+    }
+
+    // MARK: - Drink Brands
+
+    func brands(for drink: Drink) -> [DrinkBrand] {
+        brands
+            .filter { $0.drink == drink }
+            .sorted { $0.name < $1.name }
+    }
+
+    var pendingBrandRequestCount: Int {
+        brandRequests.filter { $0.status == .pending }.count
+    }
+
+    func hasPendingRequest(
+        name: String,
+        for drink: Drink,
+        by user: User
+    ) -> Bool {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return brandRequests.contains {
+            $0.drink == drink
+            && $0.requestedBy == user.id
+            && $0.status == .pending
+            && $0.name.caseInsensitiveCompare(trimmed) == .orderedSame
+        }
+    }
+
+    /// Submits a request for a new brand. Does nothing if the brand
+    /// already exists in the catalog or this user already has a
+    /// pending request for it.
+    func requestBrand(
+        name: String,
+        for drink: Drink,
+        by user: User
+    ) async {
+
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        let alreadyExists = brands(for: drink).contains {
+            $0.name.caseInsensitiveCompare(trimmed) == .orderedSame
+        }
+        guard !alreadyExists else { return }
+        guard !hasPendingRequest(name: trimmed, for: drink, by: user) else { return }
+
+        let request = BrandRequest(
+            id: UUID(),
+            drink: drink,
+            name: trimmed,
+            requestedBy: user.id,
+            requestedByName: user.username,
+            status: .pending,
+            createdAt: Date()
+        )
+
+        brandRequests.append(request)
+
+        do {
+            try await SupabaseClient.shared.submitBrandRequest(request)
+        } catch {
+            print("Failed to submit brand request: \(error)")
+        }
+    }
+
+    /// Approves a brand request: adds it to the shared catalog and
+    /// marks the request as approved. Only call this from
+    /// admin-gated UI.
+    func approveBrandRequest(_ request: BrandRequest) async {
+
+        guard let index = brandRequests.firstIndex(where: { $0.id == request.id }) else {
+            return
+        }
+
+        brandRequests[index].status = .approved
+
+        let newBrand = DrinkBrand(
+            id: UUID().uuidString,
+            name: request.name,
+            drink: request.drink
+        )
+        brands.append(newBrand)
+
+        do {
+            try await SupabaseClient.shared.insertBrand(
+                drink: request.drink,
+                name: request.name
+            )
+            try await SupabaseClient.shared.updateBrandRequestStatus(
+                request.id,
+                status: .approved
+            )
+        } catch {
+            print("Failed to approve brand request: \(error)")
+        }
+    }
+
+    /// Rejects a brand request. Only call this from admin-gated UI.
+    func rejectBrandRequest(_ request: BrandRequest) async {
+
+        guard let index = brandRequests.firstIndex(where: { $0.id == request.id }) else {
+            return
+        }
+
+        brandRequests[index].status = .rejected
+
+        do {
+            try await SupabaseClient.shared.updateBrandRequestStatus(
+                request.id,
+                status: .rejected
+            )
+        } catch {
+            print("Failed to reject brand request: \(error)")
         }
     }
 

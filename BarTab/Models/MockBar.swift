@@ -14,7 +14,8 @@ extension Bar {
                 longitude: 8.5332
             ),
             createdAt: Date(),
-            createdBy: User.mockUser.id
+            createdBy: User.mockUser.id,
+            smokingFriendly: true
         ),
 
         Bar(
@@ -26,7 +27,8 @@ extension Bar {
                 longitude: 8.5430
             ),
             createdAt: Date(),
-            createdBy: User.mockUser.id
+            createdBy: User.mockUser.id,
+            smokingFriendly: false
         )
     ]
 }

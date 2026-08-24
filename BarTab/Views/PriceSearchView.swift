@@ -15,6 +15,7 @@ struct PriceSearchView: View {
     enum SortOption {
         case cheapest
         case closest
+        case brand
     }
 
     @State private var sortOption: SortOption = .cheapest
@@ -141,6 +142,12 @@ struct PriceSearchView: View {
         }
 
 
+        if sortOption == .brand {
+            return results.sorted {
+                ($0.summary.brand ?? "") < ($1.summary.brand ?? "")
+            }
+        }
+
         guard let userLocation = locationService.location else {
 
             return results.sorted {
@@ -155,6 +162,10 @@ struct PriceSearchView: View {
             return results.sorted {
                 $0.summary.amount < $1.summary.amount
             }
+
+        case .brand:
+            // Handled above, before location is required.
+            return results
 
         case .closest:
 
@@ -401,6 +412,11 @@ struct PriceSearchView: View {
                                 title: "Closest",
                                 option: .closest
                             )
+
+                            sortButton(
+                                title: "Brand",
+                                option: .brand
+                            )
                         }
                     }
 
@@ -634,7 +650,7 @@ struct PriceSearchView: View {
 
 
     private func sortButton(
-        title: String,
+        title: LocalizedStringKey,
         option: SortOption
     ) -> some View {
 

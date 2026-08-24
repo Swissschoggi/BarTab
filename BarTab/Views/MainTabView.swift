@@ -4,6 +4,7 @@ struct MainTabView: View {
 
     enum Tab {
         case map
+        case nearby
         case search
         case profile
     }
@@ -20,6 +21,9 @@ struct MainTabView: View {
 
                 case .map:
                     MapView()
+
+                case .nearby:
+                    NearbyBarsView()
 
                 case .search:
                     PriceSearchView()
@@ -43,7 +47,13 @@ struct MainTabView: View {
                 )
 
                 tabButton(
-                    title: "Search",
+                    title: "Nearby",
+                    icon: "location.circle.fill",
+                    tab: .nearby
+                )
+
+                tabButton(
+                    title: "Prices",
                     icon: "magnifyingglass",
                     tab: .search
                 )
@@ -82,7 +92,7 @@ struct MainTabView: View {
 
 
     private func tabButton(
-        title: String,
+        title: LocalizedStringKey,
         icon: String,
         tab: Tab
     ) -> some View {

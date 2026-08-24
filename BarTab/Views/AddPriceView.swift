@@ -15,36 +15,10 @@ struct AddPriceView: View {
     @State private var showingDuplicateWarning = false
     @State private var duplicatePrice: Price?
     @State private var errorMessage: String?
+    @State private var showingRequestBrand = false
 
     private var availableBrands: [String] {
-
-        switch selectedDrink {
-
-        case .beer:
-            return [
-                "Feldschlösschen",
-                "Calanda",
-                "Quöllfrisch",
-                "Cardinal",
-                "Appenzeller",
-                "Heineken",
-                "Corona",
-                "Guinness"
-            ]
-
-        case .wine:
-            return [
-                "Féchy",
-                "Epesses",
-                "Pinot Noir",
-                "Merlot",
-                "Chardonnay",
-                "Sauvignon Blanc"
-            ]
-
-        default:
-            return []
-        }
+        barRepository.brands(for: selectedDrink).map(\.name)
     }
 
 
@@ -129,9 +103,9 @@ struct AddPriceView: View {
                 }
 
 
-                if !availableBrands.isEmpty {
+                Section(header: Text("Brand / Type")) {
 
-                    Section(header: Text("Brand / Type")) {
+                    if !availableBrands.isEmpty {
 
                         Picker(
                             "Brand",
@@ -160,6 +134,17 @@ struct AddPriceView: View {
                                     .tag(brand)
                             }
                         }
+                    }
+
+                    Button {
+                        showingRequestBrand = true
+                    } label: {
+                        Label(
+                            "Can't find it? Request a brand",
+                            systemImage: "plus.circle"
+                        )
+                        .font(.subheadline)
+                        .foregroundColor(.barTabPrimary)
                     }
                 }
 
@@ -284,6 +269,11 @@ struct AddPriceView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage ?? "")
+            }
+            .sheet(isPresented: $showingRequestBrand) {
+                RequestBrandSheet(drink: selectedDrink)
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
             }
         }
     }

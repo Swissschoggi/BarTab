@@ -21,40 +21,40 @@ enum DrinkSize: String, Codable, CaseIterable, Hashable {
     var displayName: String {
         switch self {
         case .oneDeciliter:
-            return "1 dl"
+            return String(localized: "1 dl")
 
         case .twoDeciliters:
-            return "2 dl"
+            return String(localized: "2 dl")
 
         case .threeDeciliters:
-            return "3 dl"
+            return String(localized: "3 dl")
 
         case .fiveDeciliters:
-            return "5 dl"
+            return String(localized: "5 dl")
 
         case .twentyCentiliters:
-            return "20 cl"
+            return String(localized: "20 cl")
 
         case .twentyFiveCentiliters:
-            return "25 cl"
+            return String(localized: "25 cl")
 
         case .thirtyThreeCentiliters:
-            return "33 cl"
+            return String(localized: "33 cl")
 
         case .fiftyCentiliters:
-            return "50 cl"
+            return String(localized: "50 cl")
 
         case .shot:
-            return "Shot"
+            return String(localized: "Shot")
 
         case .bottle:
-            return "Bottle"
+            return String(localized: "Bottle")
 
         case .glass:
-            return "Glass"
+            return String(localized: "Glass")
 
         case .other:
-            return "Other"
+            return String(localized: "Other")
         }
     }
 

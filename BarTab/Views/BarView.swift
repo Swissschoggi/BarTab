@@ -29,6 +29,8 @@ struct BarView: View {
     @State private var pendingDeleteGroup: PriceGroup?
     @State private var showingDeleteGroupConfirmation = false
 
+    @State private var showingRateBar = false
+
     init(bar: Bar, allowsDismissal: Bool = false) {
         self.bar = bar
         self.allowsDismissal = allowsDismissal
@@ -127,6 +129,8 @@ struct BarView: View {
                 }
             }
 
+            detailsSection
+
             VStack(
                 alignment: .leading,
                 spacing: 12
@@ -203,6 +207,81 @@ struct BarView: View {
                 .barTabPrimaryButton()
             }
         }
+    }
+
+    private var detailsSection: some View {
+
+        let ambience = barRepository.averageAmbience(for: bar)
+        let wine = barRepository.averageWineQuality(for: bar)
+
+        return VStack(alignment: .leading, spacing: 14) {
+
+            HStack {
+                Label(
+                    bar.smokingFriendly ? "Smoking friendly" : "No smoking",
+                    systemImage: bar.smokingFriendly ? "smoke.fill" : "smoke"
+                )
+                .font(.subheadline)
+                .foregroundColor(
+                    bar.smokingFriendly ? .barTabPrimary : .secondary
+                )
+
+                Spacer()
+            }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Ambience")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    Spacer()
+
+                    if let ambience = ambience {
+                        StarRatingSummaryView(
+                            average: ambience.average,
+                            count: ambience.count
+                        )
+                    } else {
+                        Text("No ratings yet")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                HStack {
+                    Text("Wine selection")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    Spacer()
+
+                    if let wine = wine {
+                        StarRatingSummaryView(
+                            average: wine.average,
+                            count: wine.count
+                        )
+                    } else {
+                        Text("No ratings yet")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                Button {
+                    showingRateBar = true
+                } label: {
+                    Label("Rate this bar", systemImage: "star")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabPrimary)
+                }
+                .padding(.top, 2)
+            }
+        }
+        .barTabCard()
     }
 
     @ToolbarContentBuilder
@@ -291,6 +370,21 @@ struct BarView: View {
                 AddPriceView(bar: bar)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
+            }
+            .sheet(
+                isPresented: $showingRateBar
+            ) {
+                let mine = userSession.currentUser.flatMap {
+                    barRepository.myRating(for: bar, by: $0)
+                }
+
+                RateBarSheet(
+                    bar: bar,
+                    initialAmbience: mine?.ambience,
+                    initialWineQuality: mine?.wineQuality
+                )
+                .environmentObject(barRepository)
+                .environmentObject(userSession)
             }
             .confirmationDialog(
                 "Report this bar?",
@@ -758,7 +852,7 @@ struct BarView: View {
 
         if currentUserReportedBar {
             alreadyReportedText =
-                "You've already reported this bar."
+                String(localized: "You've already reported this bar.")
             showingAlreadyReported = true
             return
         }
@@ -778,9 +872,7 @@ struct BarView: View {
             reportedBy: user
         )
 
-        reportConfirmationText =
-            "We'll review this bar and remove it "
-            + "if it doesn't belong."
+        reportConfirmationText = String(localized: "We'll review this bar and remove it if it doesn't belong.")
         showingReportConfirmation = true
     }
 
@@ -801,9 +893,7 @@ struct BarView: View {
             reportedBy: user
         )
 
-        reportConfirmationText =
-            "We'll review this price and correct it "
-            + "if it looks wrong."
+        reportConfirmationText = String(localized: "We'll review this price and correct it if it looks wrong.")
         showingReportConfirmation = true
     }
 

@@ -22,13 +22,13 @@ struct PriceSummary: Identifiable {
     var confidenceLabel: String {
         switch confidence {
         case 80...:
-            return "High confidence"
+            return String(localized: "High confidence")
         case 60..<80:
-            return "Good confidence"
+            return String(localized: "Good confidence")
         case 40..<60:
-            return "Moderate confidence"
+            return String(localized: "Moderate confidence")
         default:
-            return "Low confidence"
+            return String(localized: "Low confidence")
         }
     }
 }

@@ -264,4 +264,127 @@ final class SupabaseClient {
 
         _ = try await perform(request)
     }
+
+    // MARK: - Bar Ratings
+
+    /// Fetch every ambience/wine rating, mapped to domain BarRating models
+    func fetchBarRatings() async throws -> [BarRating] {
+
+        let request = makeRequest(endpoint: "bar_ratings?select=*")
+        let data = try await perform(request)
+
+        let dtos = try decoder.decode(
+            [BarRatingDTO].self,
+            from: data
+        )
+
+        return dtos.map { $0.toDomain }
+    }
+
+    /// Insert or update a user's rating for a bar (one row per
+    /// bar/user pair, matched on the `bar_ratings_bar_id_rated_by_key`
+    /// unique constraint).
+    func upsertBarRating(_ rating: BarRating) async throws {
+
+        var request = makeRequest(
+            endpoint: "bar_ratings?on_conflict=bar_id,rated_by",
+            method: "POST"
+        )
+
+        request.setValue(
+            "resolution=merge-duplicates,return=representation",
+            forHTTPHeaderField: "Prefer"
+        )
+
+        let dto = BarRatingDTO(from: rating)
+        request.httpBody = try encoder.encode(dto)
+
+        _ = try await perform(request)
+    }
+
+    // MARK: - Drink Brands
+
+    /// Fetch the shared, admin-approved brand catalog.
+    func fetchBrands() async throws -> [DrinkBrand] {
+
+        let request = makeRequest(endpoint: "drink_brands?select=*")
+        let data = try await perform(request)
+
+        let dtos = try decoder.decode(
+            [DrinkBrandDTO].self,
+            from: data
+        )
+
+        return dtos.map { $0.toDomain }
+    }
+
+    /// Add a brand to the shared catalog (used when an admin
+    /// approves a request).
+    func insertBrand(drink: Drink, name: String) async throws {
+
+        var request = makeRequest(
+            endpoint: "drink_brands",
+            method: "POST"
+        )
+
+        struct NewBrand: Codable {
+            let drink: String
+            let name: String
+        }
+
+        request.httpBody = try encoder.encode(
+            NewBrand(drink: drink.rawValue, name: name)
+        )
+
+        _ = try await perform(request)
+    }
+
+    // MARK: - Brand Requests
+
+    func fetchBrandRequests() async throws -> [BrandRequest] {
+
+        let request = makeRequest(endpoint: "brand_requests?select=*")
+        let data = try await perform(request)
+
+        let dtos = try decoder.decode(
+            [BrandRequestDTO].self,
+            from: data
+        )
+
+        return dtos.map { $0.toDomain }
+    }
+
+    func submitBrandRequest(_ request: BrandRequest) async throws {
+
+        var httpRequest = makeRequest(
+            endpoint: "brand_requests",
+            method: "POST"
+        )
+
+        let dto = BrandRequestDTO(from: request)
+        httpRequest.httpBody = try encoder.encode(dto)
+
+        _ = try await perform(httpRequest)
+    }
+
+    func updateBrandRequestStatus(
+        _ requestID: UUID,
+        status: BrandRequestStatus
+    ) async throws {
+
+        var httpRequest = makeRequest(
+            endpoint: "brand_requests?id=eq.\(requestID.uuidString)",
+            method: "PATCH"
+        )
+
+        struct StatusUpdate: Codable {
+            let status: String
+        }
+
+        httpRequest.httpBody = try encoder.encode(
+            StatusUpdate(status: status.rawValue)
+        )
+
+        _ = try await perform(httpRequest)
+    }
 }

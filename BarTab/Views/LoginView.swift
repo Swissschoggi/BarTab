@@ -263,8 +263,8 @@ struct LoginView: View {
 
     private var submitTitle: String {
         mode == .createAccount
-        ? "Create account"
-        : "Continue"
+        ? String(localized: "Create account")
+        : String(localized: "Continue")
     }
 
     private var canSubmit: Bool {

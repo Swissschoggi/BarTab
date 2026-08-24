@@ -4,6 +4,10 @@ import CoreLocation
 
 struct AddBarView: View {
 
+    /// Called with the newly created bar right before this view
+    /// dismisses, so a presenting view (e.g. the map) can jump to it.
+    var onBarAdded: ((Bar) -> Void)? = nil
+
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @Environment(\.presentationMode) private var presentationMode
@@ -20,6 +24,8 @@ struct AddBarView: View {
     @State private var showingLocationPicker = false
     @State private var showingError = false
     @State private var errorMessage = ""
+
+    @State private var smokingFriendly = false
 
     var body: some View {
         NavigationView {
@@ -154,6 +160,8 @@ struct AddBarView: View {
                         ) {
 
                             selectedPlaceCard
+
+                            barDetailsCard
 
                             Button {
                                 showingLocationPicker = true
@@ -290,6 +298,23 @@ struct AddBarView: View {
             Text(address)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
+        }
+        .barTabCard()
+    }
+
+
+    private var barDetailsCard: some View {
+
+        VStack(alignment: .leading, spacing: 16) {
+
+            Toggle(isOn: $smokingFriendly) {
+                Label(
+                    "Smoking friendly",
+                    systemImage: "smoke.fill"
+                )
+                .foregroundColor(.primary)
+            }
+            .tint(.barTabPrimary)
         }
         .barTabCard()
     }
@@ -445,10 +470,11 @@ struct AddBarView: View {
                 name: trimmedName,
                 address: trimmedAddress,
                 coordinate: coordinate,
+                smokingFriendly: smokingFriendly,
                 createdBy: user
             )
 
-            if saved == nil {
+            guard let saved = saved else {
                 self.errorMessage =
                     "Could not save the bar. "
                     + "Check your connection and try again."
@@ -456,6 +482,7 @@ struct AddBarView: View {
                 return
             }
 
+            onBarAdded?(saved)
             presentationMode.wrappedValue.dismiss()
         }
     }
@@ -468,6 +495,7 @@ struct AddBarView: View {
         address = ""
         selectedCoordinate = nil
         duplicateBars.removeAll()
+        smokingFriendly = false
 
         searchService.updateQuery("")
         searchService.clearResults()

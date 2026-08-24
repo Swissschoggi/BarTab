@@ -21,22 +21,22 @@ enum ReportReason: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .wrongBar:
-            return "Wrong place"
+            return String(localized: "Wrong place")
 
         case .notReal:
-            return "Doesn't exist"
+            return String(localized: "Doesn't exist")
 
         case .spam:
-            return "Spam"
+            return String(localized: "Spam")
 
         case .wrongPrice:
-            return "Wrong price"
+            return String(localized: "Wrong price")
 
         case .priceOutdated:
-            return "Price is outdated"
+            return String(localized: "Price is outdated")
 
         case .inappropriate:
-            return "Inappropriate content"
+            return String(localized: "Inappropriate content")
         }
     }
 }

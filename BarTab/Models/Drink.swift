@@ -12,19 +12,19 @@ enum Drink: String, Codable, CaseIterable {
     var displayName: String {
         switch self {
         case .beer:
-            return "Beer"
+            return String(localized: "Beer")
         case .wine:
-            return "Wine"
+            return String(localized: "Wine")
         case .cocktail:
-            return "Cocktail"
+            return String(localized: "Cocktail")
         case .shot:
-            return "Shot"
+            return String(localized: "Shot")
         case .softDrink:
-            return "Soft Drink"
+            return String(localized: "Soft Drink")
         case .coffee:
-            return "Coffee"
+            return String(localized: "Coffee")
         case .other:
-            return "Other"
+            return String(localized: "Other")
         }
     }
 }

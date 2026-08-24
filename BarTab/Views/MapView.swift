@@ -104,9 +104,11 @@ struct MapView: View {
             .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showingAddBar) {
-            AddBarView()
-                .environmentObject(barRepository)
-                .environmentObject(userSession)
+            AddBarView(onBarAdded: { bar in
+                teleport(to: bar)
+            })
+            .environmentObject(barRepository)
+            .environmentObject(userSession)
         }
     }
 
@@ -127,6 +129,21 @@ struct MapView: View {
                 longitudeDelta: 0.01
             )
         )
+    }
+
+    /// Jumps the map to a newly created bar and opens its detail sheet.
+    private func teleport(to bar: Bar) {
+        withAnimation {
+            region = MKCoordinateRegion(
+                center: bar.coordinate,
+                span: MKCoordinateSpan(
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01
+                )
+            )
+        }
+
+        selectedBar = bar
     }
 }
 
