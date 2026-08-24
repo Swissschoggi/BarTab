@@ -6,6 +6,7 @@ struct ProfileView: View {
     @EnvironmentObject private var barRepository: BarRepository
 
     @State private var showingLogin = false
+    @State private var showingSettings = false
 
     private var currentUser: User? {
         userSession.currentUser
@@ -13,6 +14,17 @@ struct ProfileView: View {
 
     private var unreviewedReportCount: Int {
         barRepository.unreviewedReportCount
+    }
+
+    private var totalContributions: Int {
+        guard let user = currentUser else { return 0 }
+        let prices = myPrices.count
+        let bars = myBars.count
+        return prices + bars
+    }
+
+    private var currentLevel: UserLevel {
+        .current(for: totalContributions)
     }
 
     private var myBars: [Bar] {
@@ -115,6 +127,50 @@ struct ProfileView: View {
                         }
                         .barTabCard()
 
+                        // Level card
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                Image(systemName: currentLevel.icon)
+                                    .font(.title2)
+                                    .foregroundColor(.barTabAccent)
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(currentLevel.name)
+                                        .font(.headline)
+                                        .foregroundColor(.barTabAccent)
+
+                                    if let remaining = UserLevel.remaining(for: totalContributions) {
+                                        Text("\(remaining) more to next level")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    } else {
+                                        Text("Max level reached!")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+
+                                Spacer()
+
+                                Text("\(totalContributions)")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.barTabPrimary)
+                            }
+
+                            GeometryReader { geometry in
+                                ZStack(alignment: .leading) {
+                                    Capsule()
+                                        .fill(Color.barTabPrimary.opacity(0.12))
+
+                                    Capsule()
+                                        .fill(Color.barTabAccent)
+                                        .frame(width: geometry.size.width * CGFloat(UserLevel.progress(for: totalContributions)))
+                                }
+                            }
+                            .frame(height: 6)
+                        }
+                        .barTabCard()
 
                         VStack(
                             alignment: .leading,
@@ -244,6 +300,31 @@ struct ProfileView: View {
                                 .font(.headline)
 
                             Button {
+                                showingSettings = true
+                            } label: {
+
+                                HStack(spacing: 12) {
+
+                                    Image(
+                                        systemName: "gearshape.fill"
+                                    )
+                                    .foregroundColor(.barTabPrimary)
+
+                                    Text("Settings")
+                                        .foregroundColor(.primary)
+
+                                    Spacer()
+
+                                    Image(
+                                        systemName: "chevron.right"
+                                    )
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                }
+                                .barTabCard()
+                            }
+
+                            Button {
                                 userSession.logout()
                             } label: {
 
@@ -316,6 +397,11 @@ struct ProfileView: View {
         .sheet(isPresented: $showingLogin) {
             LoginView()
                 .environmentObject(userSession)
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+                .environmentObject(userSession)
+                .environmentObject(barRepository)
         }
     }
 

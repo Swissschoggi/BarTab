@@ -141,21 +141,47 @@ struct BarView: View {
                 spacing: 12
             ) {
                 HStack {
-                    Text("Prices")
+                    Text("Menu")
                         .font(.title2)
                         .fontWeight(.bold)
 
                     Spacer()
 
-                    Text("\(groupedPrices.count)")
+                    Text("\(groupedPrices.count) items")
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
 
                 if groupedPrices.isEmpty {
                     emptyPricesView
                 } else {
-                    ForEach(groupedPrices) { group in
-                        priceGroupRow(group)
+                    ForEach(Drink.allCases.filter { drink in
+                        groupedPrices.contains { $0.drink == drink }
+                    }) { drink in
+
+                        let drinkGroups = groupedPrices.filter { $0.drink == drink }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack(spacing: 6) {
+                                Image(systemName: drink.icon)
+                                    .font(.subheadline)
+                                    .foregroundColor(.barTabPrimary)
+
+                                Text(drink.displayName)
+                                    .font(.headline)
+
+                                Spacer()
+
+                                Text("\(drinkGroups.count)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.horizontal, 4)
+
+                            ForEach(drinkGroups) { group in
+                                priceGroupRow(group)
+                            }
+                        }
                     }
                 }
             }
@@ -1173,7 +1199,7 @@ struct BarView: View {
     private var emptyPricesView: some View {
         VStack(spacing: 14) {
             Image(
-                systemName: "wineglass"
+                systemName: "menu"
             )
             .font(
                 .system(size: 40)
@@ -1182,7 +1208,7 @@ struct BarView: View {
                 .barTabPrimary
             )
 
-            Text("No prices yet")
+            Text("No items on the menu")
                 .font(.headline)
 
             Text(

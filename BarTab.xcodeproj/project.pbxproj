@@ -61,6 +61,8 @@
 		BRTA0001306000010000000D /* RateBarSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000000E /* RateBarSheet.swift */; };
 		BRTA00013060000100000011 /* AmbienceStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000010 /* AmbienceStyle.swift */; };
 		BRTA00013060000100000012 /* NearbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000013 /* NearbyView.swift */; };
+		BRTA00013060000100000014 /* UserLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000015 /* UserLevel.swift */; };
+		BRTA00013060000100000016 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000017 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -139,6 +141,8 @@
 		BRTA0001306000010000000E /* RateBarSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RateBarSheet.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000010 /* AmbienceStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbienceStyle.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000013 /* NearbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyView.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000015 /* UserLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLevel.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000017 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -266,6 +270,7 @@
 				BRTA0001306000010000000A /* AdminBrandRequestsView.swift */,
 				BRTA0001306000010000000E /* RateBarSheet.swift */,
 				BRTA00013060000100000013 /* NearbyView.swift */,
+				BRTA00013060000100000017 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -304,6 +309,7 @@
 				AEA1BD713035ED1C00DE059C /* SupbabaseClient.swift */,
 				BRTA0001306000010000000C /* BrandRequest.swift */,
 				BRTA00013060000100000010 /* AmbienceStyle.swift */,
+				BRTA00013060000100000015 /* UserLevel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -499,6 +505,8 @@
 				BRTA0001306000010000000D /* RateBarSheet.swift in Sources */,
 				BRTA00013060000100000011 /* AmbienceStyle.swift in Sources */,
 				BRTA00013060000100000012 /* NearbyView.swift in Sources */,
+				BRTA00013060000100000014 /* UserLevel.swift in Sources */,
+				BRTA00013060000100000016 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

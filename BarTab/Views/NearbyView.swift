@@ -46,6 +46,7 @@ struct NearbyView: View {
     @State private var searchText = ""
     @State private var selectedDrinks: Set<Drink> = [.beer]
     @State private var selectedSizes: Set<DrinkSize> = [.fiveDeciliters]
+    @State private var selectedBrand: String?
 
     enum SortOption {
         case cheapest
@@ -125,6 +126,16 @@ struct NearbyView: View {
         return DrinkSize.allCases.filter { sizes.contains($0) }
     }
 
+    private var availableBrands: [String] {
+        var brandSet = Set<String>()
+        for drink in selectedDrinks {
+            for brand in barRepository.brands(for: drink) {
+                brandSet.insert(brand.name)
+            }
+        }
+        return brandSet.sorted()
+    }
+
     private var priceResults: [(bar: Bar, summary: PriceSummary)] {
         var results: [(bar: Bar, summary: PriceSummary)] = []
 
@@ -147,6 +158,12 @@ struct NearbyView: View {
         if !trimmedSearchText.isEmpty {
             results = results.filter {
                 $0.bar.name.localizedCaseInsensitiveContains(trimmedSearchText)
+            }
+        }
+
+        if let brand = selectedBrand, !brand.isEmpty {
+            results = results.filter {
+                $0.summary.brand?.localizedCaseInsensitiveCompare(brand) == .orderedSame
             }
         }
 
@@ -227,6 +244,7 @@ struct NearbyView: View {
                 if selectedSizes.isEmpty, let firstSize = availableSizes.first {
                     selectedSizes.insert(firstSize)
                 }
+                selectedBrand = nil
             }
         }
     }
@@ -456,6 +474,39 @@ struct NearbyView: View {
                                     .padding(.vertical, 10)
                                     .foregroundColor(selectedSizes.contains(size) ? .white : .barTabPrimary)
                                     .background(selectedSizes.contains(size) ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
+                                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                            }
+                        }
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Brand")
+                    .font(.headline)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        Button {
+                            selectedBrand = nil
+                        } label: {
+                            Text("All")
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .foregroundColor(selectedBrand == nil ? .white : .barTabPrimary)
+                                .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
+                                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        }
+
+                        ForEach(availableBrands, id: \.self) { brand in
+                            Button {
+                                selectedBrand = brand
+                            } label: {
+                                Text(brand)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .foregroundColor(selectedBrand == brand ? .white : .barTabPrimary)
+                                    .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
                                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                             }
                         }

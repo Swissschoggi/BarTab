@@ -103,7 +103,6 @@ struct MapView: View {
             }
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
-            .presentationCornerRadius(20)
         }
         .sheet(isPresented: $showingAddBar) {
             AddBarView(onBarAdded: { bar in
