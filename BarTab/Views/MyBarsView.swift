@@ -239,7 +239,7 @@ struct MyBarsView: View {
                             Spacer()
 
                             Text(
-                                "\(summary.formattedAmount) \(summary.currency)"
+                                "\(summary.formattedConvertedAmount) \(Currency.defaultCurrency.rawValue)"
                             )
                             .font(.subheadline)
                             .fontWeight(.semibold)

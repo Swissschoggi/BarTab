@@ -15,6 +15,8 @@ struct SettingsView: View {
     @State private var confirmPassword = ""
     @State private var errorMessage: String?
     @State private var successMessage: String?
+    @State private var currencyExpanded = false
+    @State private var selectedCurrency: Currency = Currency.defaultCurrency
 
     private let languages: [(code: String, name: String, flag: String)] = [
         ("en", "English", "🇬🇧"),
@@ -75,60 +77,75 @@ struct SettingsView: View {
                         .barTabCard()
                     }
 
-                    // Currency
+                    // Currency (collapsible)
                     VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "dollarsign.circle")
-                                .font(.subheadline)
-                                .foregroundColor(.barTabPrimary)
-                            Text("Default Currency")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
-                        }
-
-                        VStack(spacing: 0) {
-                            ForEach(Currency.allCases) { currency in
-                                Button {
-                                    Currency.defaultCurrency = currency
-                                } label: {
-                                    HStack {
-                                        Text(currency.symbol)
-                                            .font(.title3)
-                                            .fontWeight(.semibold)
-                                            .frame(width: 32)
-
-                                        VStack(alignment: .leading, spacing: 1) {
-                                            Text(currency.rawValue)
-                                                .font(.subheadline)
-                                                .fontWeight(.medium)
-                                                .foregroundColor(.barTabText)
-                                            Text(currency.displayName)
-                                                .font(.caption)
-                                                .foregroundColor(.barTabSecondary)
-                                        }
-
-                                        Spacer()
-
-                                        if Currency.defaultCurrency == currency {
-                                            Image(systemName: "checkmark.circle.fill")
+                        DisclosureGroup(isExpanded: $currencyExpanded) {
+                            VStack(spacing: 0) {
+                                ForEach(Currency.allCases) { currency in
+                                    Button {
+                                        selectedCurrency = currency
+                                        Currency.defaultCurrency = currency
+                                    } label: {
+                                        HStack {
+                                            Text(currency.symbol)
+                                                .font(.title3)
                                                 .fontWeight(.semibold)
-                                                .foregroundColor(.barTabPrimary)
-                                        } else {
-                                            Image(systemName: "circle")
-                                                .foregroundColor(.barTabCardBorder)
-                                        }
-                                    }
-                                    .padding(.vertical, 10)
-                                }
+                                                .frame(width: 32)
 
-                                if currency != Currency.allCases.last {
-                                    Divider()
-                                        .foregroundColor(.barTabCardBorder)
-                                        .padding(.leading, 44)
+                                            VStack(alignment: .leading, spacing: 1) {
+                                                Text(currency.rawValue)
+                                                    .font(.subheadline)
+                                                    .fontWeight(.medium)
+                                                    .foregroundColor(.barTabText)
+                                                Text(currency.displayName)
+                                                    .font(.caption)
+                                                    .foregroundColor(.barTabSecondary)
+                                            }
+
+                                            Spacer()
+
+                                            if selectedCurrency == currency {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .fontWeight(.semibold)
+                                                    .foregroundColor(.barTabPrimary)
+                                            } else {
+                                                Image(systemName: "circle")
+                                                    .foregroundColor(.barTabCardBorder)
+                                            }
+                                        }
+                                        .padding(.vertical, 10)
+                                    }
+
+                                    if currency != Currency.allCases.last {
+                                        Divider()
+                                            .foregroundColor(.barTabCardBorder)
+                                            .padding(.leading, 44)
+                                    }
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "dollarsign.circle")
+                                    .font(.subheadline)
+                                    .foregroundColor(.barTabPrimary)
+                                Text("Default Currency")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabText)
+
+                                Spacer()
+
+                                HStack(spacing: 4) {
+                                    Text(selectedCurrency.symbol)
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                    Text(selectedCurrency.rawValue)
+                                        .font(.caption)
+                                        .foregroundColor(.barTabSecondary)
                                 }
                             }
                         }
+                        .tint(.barTabSecondary)
                     }
                     .barTabCard()
 

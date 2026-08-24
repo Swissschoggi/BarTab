@@ -21,9 +21,28 @@ struct PriceSummary: Identifiable {
         reports.map(\.reportedAt).max()
     }
 
+    /// The amount converted to the user's default currency.
+    var convertedAmount: Decimal {
+        ExchangeRateService.shared.convert(
+            amount,
+            from: currency,
+            to: Currency.defaultCurrency.rawValue
+        )
+    }
+
     var formattedAmount: String {
         NSDecimalNumber(decimal: amount)
             .description(withLocale: Locale(identifier: "de_CH"))
+    }
+
+    var formattedConvertedAmount: String {
+        NSDecimalNumber(decimal: convertedAmount)
+            .description(withLocale: Locale(identifier: "de_CH"))
+    }
+
+    /// Whether this price is in a different currency than the default.
+    var isConverted: Bool {
+        currency != Currency.defaultCurrency.rawValue
     }
 
     var confidenceLabel: String {

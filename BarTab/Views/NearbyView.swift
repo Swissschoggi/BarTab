@@ -184,12 +184,12 @@ struct NearbyView: View {
         }
 
         guard let userLocation = locationService.location else {
-            return results.sorted { $0.summary.amount < $1.summary.amount }
+            return results.sorted { $0.summary.convertedAmount < $1.summary.convertedAmount }
         }
 
         switch sortOption {
         case .cheapest:
-            return results.sorted { $0.summary.amount < $1.summary.amount }
+            return results.sorted { $0.summary.convertedAmount < $1.summary.convertedAmount }
         case .brand:
             return results
         case .closest:
@@ -765,7 +765,7 @@ struct NearbyView: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 1) {
-                    Text("\(summary.formattedAmount) \(summary.currency)")
+                    Text("\(summary.formattedConvertedAmount) \(Currency.defaultCurrency.rawValue)")
                         .font(.subheadline)
                         .fontWeight(.bold)
                         .foregroundColor(.barTabPrimary)

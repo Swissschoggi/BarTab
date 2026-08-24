@@ -9,6 +9,9 @@ struct BarTabApp: App {
 
     init() {
         LanguageManager.shared.applyOnLaunch()
+        Task {
+            await ExchangeRateService.shared.fetchRates()
+        }
     }
 
     var body: some Scene {

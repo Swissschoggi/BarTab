@@ -626,7 +626,7 @@ struct PriceSearchView: View {
                     spacing: 2
                 ) {
                     Text(
-                        "\(summary.formattedAmount) \(summary.currency)"
+                        "\(summary.formattedConvertedAmount) \(Currency.defaultCurrency.rawValue)"
                     )
                     .font(.headline)
                     .foregroundColor(
