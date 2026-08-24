@@ -67,7 +67,7 @@
 		BRTA0001306000010000001A /* ServingMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001B /* ServingMethod.swift */; };
 		BRTA0001306000010000001C /* DrinkRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001D /* DrinkRating.swift */; };
 		BRTA0001306000010000001E /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000001F /* LanguageManager.swift */; };
-		BRTA00013060000100000024 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000025 /* LeaderboardView.swift */; };
+		BRTA00013060000100000026 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000025 /* LeaderboardView.swift */; };
 		BRTA00013070000100000020 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000020 /* en.lproj */; };
 		BRTA00013070000100000021 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000021 /* de.lproj */; };
 		BRTA00013070000100000022 /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000022 /* fr.lproj */; };
@@ -549,7 +549,7 @@
 				BRTA00013060000100000012 /* NearbyView.swift in Sources */,
 				BRTA00013060000100000014 /* UserLevel.swift in Sources */,
 				BRTA00013060000100000016 /* SettingsView.swift in Sources */,
-				BRTA00013060000100000024 /* LeaderboardView.swift in Sources */,
+				BRTA00013060000100000026 /* LeaderboardView.swift in Sources */,
 				BRTA00013060000100000018 /* DrinkStyle.swift in Sources */,
 				BRTA0001306000010000001A /* ServingMethod.swift in Sources */,
 				BRTA0001306000010000001C /* DrinkRating.swift in Sources */,
