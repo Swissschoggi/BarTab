@@ -1,6 +1,6 @@
 import Foundation
 
-enum Drink: String, Codable, CaseIterable {
+enum Drink: String, Codable, CaseIterable, Identifiable {
     case beer
     case wine
     case cocktail
@@ -8,6 +8,8 @@ enum Drink: String, Codable, CaseIterable {
     case softDrink
     case coffee
     case other
+
+    var id: String { rawValue }
     
     var displayName: String {
         switch self {
