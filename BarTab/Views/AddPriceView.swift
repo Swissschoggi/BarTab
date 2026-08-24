@@ -13,6 +13,7 @@ struct AddPriceView: View {
     @State private var selectedBrand: String? = nil
     @State private var selectedStyle: DrinkStyle? = nil
     @State private var selectedServing: ServingMethod? = nil
+    @State private var selectedCurrency: Currency = Currency.defaultCurrency
     @State private var isSaving = false
     @State private var priceText = ""
     @State private var showingDuplicateWarning = false
@@ -237,9 +238,35 @@ struct AddPriceView: View {
 
                 Section(header: Text("Price")) {
 
-                    HStack {
+                    HStack(spacing: 8) {
 
-                        Text(Currency.defaultCurrency.symbol)
+                        Menu {
+                            ForEach(Currency.allCases) { currency in
+                                Button {
+                                    selectedCurrency = currency
+                                } label: {
+                                    HStack {
+                                        Text(currency.symbol)
+                                        Text(currency.rawValue)
+                                        if selectedCurrency == currency {
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(selectedCurrency.symbol)
+                                    .fontWeight(.semibold)
+                                Image(systemName: "chevron.down")
+                                    .font(.caption2)
+                            }
+                            .font(.subheadline)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.barTabPillFill)
+                            .clipShape(Capsule())
+                        }
 
                         TextField(
                             "0.00",
@@ -373,6 +400,7 @@ struct AddPriceView: View {
             price.drink == selectedDrink &&
             price.size == selectedSize &&
             price.brand == selectedBrand &&
+            price.currency == selectedCurrency.rawValue &&
             price.style == selectedStyle?.rawValue &&
             price.serving == selectedServing
         }) {
@@ -401,6 +429,7 @@ struct AddPriceView: View {
                 brand: selectedBrand,
                 size: selectedSize,
                 amount: amount,
+                currency: selectedCurrency.rawValue,
                 style: selectedStyle?.rawValue,
                 serving: selectedServing,
                 reportedBy: user

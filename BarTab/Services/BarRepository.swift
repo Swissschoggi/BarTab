@@ -118,6 +118,7 @@ final class BarRepository: ObservableObject {
         brand: String?,
         size: DrinkSize,
         amount: Decimal,
+        currency: String? = nil,
         style: String? = nil,
         serving: ServingMethod? = nil,
         reportedBy user: User
@@ -130,7 +131,7 @@ final class BarRepository: ObservableObject {
             brand: brand,
             size: size,
             amount: amount,
-            currency: Currency.defaultCurrency.rawValue,
+            currency: currency ?? Currency.defaultCurrency.rawValue,
             reportedAt: Date(),
             reportedBy: user.id,
             style: style,
