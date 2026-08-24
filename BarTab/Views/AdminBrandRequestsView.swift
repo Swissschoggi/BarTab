@@ -102,8 +102,8 @@ struct AdminBrandRequestsView: View {
                 if request.status == .pending {
 
                     Button {
-                        withAnimation {
-                            Task {
+                        Task {
+                            withAnimation {
                                 await barRepository.rejectBrandRequest(request)
                             }
                         }
@@ -115,8 +115,8 @@ struct AdminBrandRequestsView: View {
                     }
 
                     Button {
-                        withAnimation {
-                            Task {
+                        Task {
+                            withAnimation {
                                 await barRepository.approveBrandRequest(request)
                             }
                         }
