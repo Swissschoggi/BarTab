@@ -103,9 +103,7 @@ struct AdminBrandRequestsView: View {
 
                     Button {
                         Task {
-                            withAnimation {
-                                await barRepository.rejectBrandRequest(request)
-                            }
+                            await barRepository.rejectBrandRequest(request)
                         }
                     } label: {
                         Text("Reject")
@@ -116,9 +114,7 @@ struct AdminBrandRequestsView: View {
 
                     Button {
                         Task {
-                            withAnimation {
-                                await barRepository.approveBrandRequest(request)
-                            }
+                            await barRepository.approveBrandRequest(request)
                         }
                     } label: {
                         Text("Approve")
