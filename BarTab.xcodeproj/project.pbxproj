@@ -52,6 +52,11 @@
 		AEF036683035E20000BDA1CC /* ReportNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036673035E20000BDA1CC /* ReportNotificationService.swift */; };
 		AEF0366A3035E30000BDA1CC /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036693035E30000BDA1CC /* KeychainService.swift */; };
 		AEF036723035E40000BDA1CC /* SupabaseAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036713035E40000BDA1CC /* SupabaseAuthService.swift */; };
+		BRTA00013060000100000001 /* BarRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000002 /* BarRating.swift */; };
+		BRTA00013060000100000003 /* NearbyBarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000004 /* NearbyBarsView.swift */; };
+		BRTA00013060000100000005 /* StarRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000006 /* StarRatingView.swift */; };
+		BRTA00013060000100000007 /* RequestBrandSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000008 /* RequestBrandSheet.swift */; };
+		BRTA00013060000100000009 /* AdminBrandRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000000A /* AdminBrandRequestsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +126,11 @@
 		AEF036673035E20000BDA1CC /* ReportNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportNotificationService.swift; sourceTree = "<group>"; };
 		AEF036693035E30000BDA1CC /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		AEF036713035E40000BDA1CC /* SupabaseAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseAuthService.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000002 /* BarRating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarRating.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000004 /* NearbyBarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyBarsView.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000006 /* StarRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarRatingView.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000008 /* RequestBrandSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestBrandSheet.swift; sourceTree = "<group>"; };
+		BRTA0001306000010000000A /* AdminBrandRequestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminBrandRequestsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -243,6 +253,9 @@
 				AEF0364E3035B7DB00BDA1CC /* LocationPickerView.swift */,
 				AEF036563035BF5100BDA1CC /* LoginView.swift */,
 				AEF036653035E20000BDA1CC /* AdminReportsView.swift */,
+				BRTA00013060000100000004 /* NearbyBarsView.swift */,
+				BRTA00013060000100000008 /* RequestBrandSheet.swift */,
+				BRTA0001306000010000000A /* AdminBrandRequestsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -277,6 +290,7 @@
 				AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */,
 				AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */,
 				AEF036633035E10000BDA1CC /* ContentReport.swift */,
+				BRTA00013060000100000002 /* BarRating.swift */,
 				AEA1BD713035ED1C00DE059C /* SupbabaseClient.swift */,
 			);
 			path = Models;
@@ -287,6 +301,7 @@
 			children = (
 				AEF0362E30350E1200BDA1CC /* BarTabColors.swift */,
 				AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */,
+				BRTA00013060000100000006 /* StarRatingView.swift */,
 			);
 			path = Theme;
 			sourceTree = "<group>";
@@ -463,6 +478,11 @@
 				AEA1BD723035ED1C00DE059C /* SupbabaseClient.swift in Sources */,
 				AEF0365F3035C80000BDA1CC /* MyBarsView.swift in Sources */,
 				AEF036623035E00000BDA1CC /* PriceTrendChart.swift in Sources */,
+				BRTA00013060000100000001 /* BarRating.swift in Sources */,
+				BRTA00013060000100000003 /* NearbyBarsView.swift in Sources */,
+				BRTA00013060000100000005 /* StarRatingView.swift in Sources */,
+				BRTA00013060000100000007 /* RequestBrandSheet.swift in Sources */,
+				BRTA00013060000100000009 /* AdminBrandRequestsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
