@@ -30,6 +30,7 @@ struct BarView: View {
     @State private var showingDeleteGroupConfirmation = false
 
     @State private var showingRateBar = false
+    @State private var showingSmokingConfirmation = false
 
     init(bar: Bar, allowsDismissal: Bool = false) {
         self.bar = bar
@@ -221,29 +222,37 @@ struct BarView: View {
 
         return VStack(alignment: .leading, spacing: 14) {
 
-            HStack {
-                Label(
-                    currentBar.smokingFriendly ? "Smoking friendly" : "No smoking",
-                    systemImage: currentBar.smokingFriendly ? "smoke.fill" : "smoke"
-                )
-                .font(.subheadline)
-                .foregroundColor(
-                    currentBar.smokingFriendly ? .barTabPrimary : .secondary
-                )
+            Button {
+                showingSmokingConfirmation = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: currentBar.smokingFriendly ? "smoke.fill" : "smoke")
+                        .font(.subheadline)
+                        .foregroundColor(currentBar.smokingFriendly ? .white : .barTabPrimary)
+                        .frame(width: 30, height: 30)
+                        .background(currentBar.smokingFriendly ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-                Spacer()
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(currentBar.smokingFriendly ? "Smoking friendly" : "No smoking")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
 
-                Toggle("", isOn: Binding(
-                    get: { currentBar.smokingFriendly },
-                    set: { _ in
-                        Task {
-                            await barRepository.toggleSmokingPolicy(for: currentBar)
-                        }
+                        Text("Tap to change")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
                     }
-                ))
-                .labelsHidden()
-                .tint(.barTabPrimary)
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                }
             }
+            .buttonStyle(.plain)
 
             Divider()
 
@@ -519,6 +528,28 @@ struct BarView: View {
             } message: {
                 Text(
                     "This removes all prices for this drink at this bar. This can't be undone."
+                )
+            }
+            .alert(
+                currentBar.smokingFriendly
+                    ? "Remove smoking policy?"
+                    : "Mark as smoking friendly?",
+                isPresented: $showingSmokingConfirmation
+            ) {
+                Button("Cancel", role: .cancel) {}
+
+                Button {
+                    Task {
+                        await barRepository.toggleSmokingPolicy(for: currentBar)
+                    }
+                } label: {
+                    Text(currentBar.smokingFriendly ? "Remove" : "Confirm")
+                }
+            } message: {
+                Text(
+                    currentBar.smokingFriendly
+                        ? "This bar will be marked as no smoking."
+                        : "This bar will be marked as smoking friendly."
                 )
             }
     }

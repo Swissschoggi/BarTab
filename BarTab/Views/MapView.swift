@@ -101,7 +101,9 @@ struct MapView: View {
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
             }
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationCornerRadius(20)
         }
         .sheet(isPresented: $showingAddBar) {
             AddBarView(onBarAdded: { bar in
