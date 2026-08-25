@@ -391,7 +391,8 @@ struct LoginView: View {
 
             guard let error else { return }
 
-            if (error as? URLError)?.code == .cancelledAuthenticationSession {
+            if let authError = error as? ASWebAuthenticationSessionError,
+               authError.code == .canceledLogin {
                 return
             }
 
