@@ -530,7 +530,7 @@ struct ProfileView: View {
 
     private func uploadAvatar(from item: PhotosPickerItem) {
 
-        Task {
+        Task { @MainActor in
             isUploadingAvatar = true
             defer { isUploadingAvatar = false }
 
