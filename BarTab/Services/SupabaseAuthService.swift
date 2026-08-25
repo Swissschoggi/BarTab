@@ -302,7 +302,7 @@ final class SupabaseAuthService {
         let expiresIn = Int(params["expires_in"] ?? "")
         let userData = try await fetchGoTrueUser(accessToken: accessToken)
 
-        let session = makeSession(
+        let session = Self.makeSession(
             user: userData,
             accessToken: accessToken,
             refreshToken: refreshToken,
@@ -549,7 +549,7 @@ final class SupabaseAuthService {
             from: data
         ), response.access_token != nil {
             return (
-                user: response.user.goTrueUser,
+                user: response.goTrueUser,
                 session: response.session
             )
         }
@@ -582,7 +582,7 @@ final class SupabaseAuthService {
         return direct
     }
 
-    private func makeSession(
+    private static func makeSession(
         user: GoTrueUser,
         accessToken: String,
         refreshToken: String,
@@ -680,7 +680,7 @@ final class SupabaseAuthService {
                 user_metadata: nil
             )
 
-            let base = makeSession(
+            let base = Self.makeSession(
                 user: createdUser,
                 accessToken: access,
                 refreshToken: refresh_token ?? "",
