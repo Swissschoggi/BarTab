@@ -680,7 +680,7 @@ final class SupabaseAuthService {
                 user_metadata: nil
             )
 
-            let base = Self.makeSession(
+            let base = SupabaseAuthService.makeSession(
                 user: createdUser,
                 accessToken: access,
                 refreshToken: refresh_token ?? "",
