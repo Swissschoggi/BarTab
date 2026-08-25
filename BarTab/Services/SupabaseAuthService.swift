@@ -3,10 +3,13 @@ import CryptoKit
 import Security
 
 /// Handles Supabase Auth (GoTrue) over REST, plus the `profiles` lookup
-/// used to determine whether a signed-in user is an admin.
+/// used to determine a signed-in user's display name, admin status and
+/// avatar.
 ///
 /// Tokens are persisted in the Keychain via `KeychainService` so the
-/// session survives app launches.
+/// session survives app launches. Access tokens expire after roughly
+/// one hour, so restoring a session transparently refreshes it using
+/// the stored refresh token.
 final class SupabaseAuthService {
 
     private let baseURL = SupabaseConfig.projectURL
@@ -36,11 +39,19 @@ final class SupabaseAuthService {
         let tokens: AuthTokens
     }
 
+    struct ProfileInfo {
+        let username: String
+        let isAdmin: Bool
+        let avatarURL: URL?
+    }
+
     enum AuthError: LocalizedError {
 
         case invalidAppleToken
         case emailConfirmationRequired
         case invalidResponse
+        case invalidCallbackURL
+        case oauthCancelled
         case network(String)
         case server(Int, String)
 
@@ -54,6 +65,12 @@ final class SupabaseAuthService {
 
             case .invalidResponse:
                 return "The server returned an unexpected response."
+
+            case .invalidCallbackURL:
+                return "Google sign-in could not be completed. Please try again."
+
+            case .oauthCancelled:
+                return nil
 
             case .network(let message):
                 return "Could not reach the server: \(message)"
@@ -72,9 +89,11 @@ final class SupabaseAuthService {
                   AuthSession.self,
                   from: data
               ) else {
+            AuthTokenStore.shared.clear()
             return nil
         }
 
+        mirrorTokens(from: session)
         return session
     }
 
@@ -84,10 +103,69 @@ final class SupabaseAuthService {
         }
 
         keychain.write(data, account: sessionAccount)
+        mirrorTokens(from: session)
     }
 
     func clearSession() {
         keychain.delete(account: sessionAccount)
+        AuthTokenStore.shared.clear()
+    }
+
+    /// True when the access token is missing or expires within the
+    /// next 5 minutes.
+    private var sessionNeedsRefresh: Bool {
+        guard let tokens = restoreSession()?.tokens else {
+            return false
+        }
+
+        guard let expiresAt = tokens.expiresAt else {
+            return false
+        }
+
+        return Date().addingTimeInterval(300) >= expiresAt
+    }
+
+    /// Exchanges the stored refresh token for a fresh access token.
+    @discardableResult
+    func refreshSession() async throws -> AuthSession {
+
+        guard let stored = restoreSession(),
+              !stored.tokens.refreshToken.isEmpty else {
+            throw AuthError.invalidResponse
+        }
+
+        let body = [
+            "refresh_token": stored.tokens.refreshToken
+        ]
+
+        let data = try await performAuth(
+            endpoint: "token?grant_type=refresh_token",
+            body: body
+        )
+
+        guard let response = try decodeSessionResponse(data).session else {
+            throw AuthError.invalidResponse
+        }
+
+        saveSession(response)
+        return response
+    }
+
+    /// Returns a valid session, refreshing it first when needed.
+    /// Returns nil when nobody is signed in or the refresh fails.
+    func validSession() async -> AuthSession? {
+        if sessionNeedsRefresh {
+            return try? await refreshSession()
+        }
+        return restoreSession()
+    }
+
+    private func mirrorTokens(from session: AuthSession) {
+        AuthTokenStore.shared.update(
+            accessToken: session.tokens.accessToken,
+            refreshToken: session.tokens.refreshToken,
+            expiresAt: session.tokens.expiresAt
+        )
     }
 
     // MARK: - Auth requests
@@ -114,6 +192,7 @@ final class SupabaseAuthService {
             throw AuthError.emailConfirmationRequired
         }
 
+        saveSession(session)
         return session
     }
 
@@ -136,6 +215,7 @@ final class SupabaseAuthService {
             throw AuthError.invalidResponse
         }
 
+        saveSession(session)
         return session
     }
 
@@ -146,8 +226,16 @@ final class SupabaseAuthService {
 
         let body = [
             "id_token": idToken,
-            "nonce": rawNonce
+            "nonce": rawNonce,
+            "provider": "apple"
         ]
+
+        return try await signInWithIDToken(body: body)
+    }
+
+    private func signInWithIDToken(
+        body: [String: String]
+    ) async throws -> AuthSession {
 
         let data = try await performAuth(
             endpoint: "token?grant_type=id_token",
@@ -158,7 +246,88 @@ final class SupabaseAuthService {
             throw AuthError.invalidResponse
         }
 
+        saveSession(session)
         return session
+    }
+
+    // MARK: - Google OAuth
+
+    /// The Supabase authorize URL that starts the Google OAuth flow.
+    /// Present it with ASWebAuthenticationSession; the browser
+    /// redirects back to `<scheme>://auth/callback`.
+    static func googleAuthorizeURL() -> URL? {
+        var components = URLComponents(
+            url: SupabaseConfig.projectURL.appendingPathComponent("auth/v1/authorize"),
+            resolvingAgainstBaseURL: false
+        )
+
+        components?.queryItems = [
+            URLQueryItem(name: "provider", value: "google"),
+            URLQueryItem(
+                name: "redirect_to",
+                value: "\(SupabaseConfig.oauthCallbackScheme)://auth/callback"
+            )
+        ]
+
+        return components?.url
+    }
+
+    /// Handles the deep link returned by the Google OAuth flow.
+    /// Tokens arrive in the URL fragment:
+    /// `bartab://auth/callback#access_token=…&refresh_token=…&expires_in=…`
+    func handleGoogleCallback(_ callbackURL: URL) async throws -> AuthSession {
+
+        guard callbackURL.scheme == SupabaseConfig.oauthCallbackScheme else {
+            throw AuthError.invalidCallbackURL
+        }
+
+        guard let fragment = callbackURL.fragment else {
+            throw AuthError.invalidCallbackURL
+        }
+
+        var params: [String: String] = [:]
+        for pair in fragment.split(separator: "&") {
+            let keyValue = pair.split(separator: "=", maxSplits: 1)
+            guard keyValue.count == 2 else { continue }
+            params[String(keyValue[0])] =
+                String(keyValue[1])
+                    .removingPercentEncoding ?? String(keyValue[1])
+        }
+
+        guard let accessToken = params["access_token"],
+              let refreshToken = params["refresh_token"] else {
+            throw AuthError.invalidCallbackURL
+        }
+
+        let expiresIn = Int(params["expires_in"] ?? "")
+        let userData = try await fetchGoTrueUser(accessToken: accessToken)
+
+        let session = makeSession(
+            user: userData,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            expiresIn: expiresIn
+        )
+
+        saveSession(session)
+        return session
+    }
+
+    private func fetchGoTrueUser(
+        accessToken: String
+    ) async throws -> GoTrueUser {
+
+        let url = baseURL.appendingPathComponent("auth/v1/user")
+
+        var request = URLRequest(url: url)
+        request.setValue(apiKey, forHTTPHeaderField: "apikey")
+        request.setValue(
+            "Bearer \(accessToken)",
+            forHTTPHeaderField: "Authorization"
+        )
+
+        let data = try await perform(request)
+        return try decodeGoTrueUser(data)
     }
 
     func logout(accessToken: String) async throws {
@@ -216,7 +385,7 @@ final class SupabaseAuthService {
         let userData = try await perform(request)
 
         // Also update profiles.display_name
-        if let user = try? JSONDecoder().decode(GoTrueUser.self, from: userData) {
+        if let user = try? decodeGoTrueUser(userData) {
             try? await SupabaseClient.shared.updateProfileDisplayName(
                 userID: user.id,
                 displayName: newUsername
@@ -255,39 +424,37 @@ final class SupabaseAuthService {
         _ = try await perform(request)
     }
 
-    // MARK: - Admin lookup
+    // MARK: - Profile lookup
 
-    func fetchIsAdmin(
+    /// Reads display name, admin flag and avatar from the
+    /// `profiles` table. Falls back to the email prefix when the
+    /// profile row doesn't exist yet.
+    func fetchProfile(
         userID: UUID,
-        accessToken: String
-    ) async -> Bool {
+        fallbackUsername: String
+    ) async -> ProfileInfo {
 
-        let endpoint =
-            "profiles?select=is_admin&id=eq.\(userID.uuidString)"
+        do {
+            let profile = try await SupabaseClient.shared.fetchProfile(
+                userID: userID
+            )
 
-        var request = URLRequest(
-            url: URL(
-                string: "\(baseURL.absoluteString)/rest/v1/\(endpoint)"
-            )!
-        )
-        request.setValue(
-            apiKey,
-            forHTTPHeaderField: "apikey"
-        )
-        request.setValue(
-            "Bearer \(accessToken)",
-            forHTTPHeaderField: "Authorization"
-        )
+            let name = profile.display_name?.isEmpty == false
+                ? profile.display_name!
+                : fallbackUsername
 
-        guard let data = try? await perform(request),
-              let rows = try? JSONDecoder().decode(
-                  [[String: Bool]].self,
-                  from: data
-              ) else {
-            return false
+            return ProfileInfo(
+                username: name,
+                isAdmin: profile.is_admin,
+                avatarURL: profile.avatar_url.flatMap(URL.init(string:))
+            )
+        } catch {
+            return ProfileInfo(
+                username: fallbackUsername,
+                isAdmin: false,
+                avatarURL: nil
+            )
         }
-
-        return rows.first?["is_admin"] ?? false
     }
 
     // MARK: - Helpers
@@ -380,84 +547,163 @@ final class SupabaseAuthService {
         if let response = try? decoder.decode(
             SessionResponse.self,
             from: data
-        ) {
-            return (user: response.user, session: response.session)
+        ), response.access_token != nil {
+            return (
+                user: response.user.goTrueUser,
+                session: response.session
+            )
         }
 
         // Confirmation-required shape: the raw user object, no session.
-        if let user = try? decoder.decode(
-            GoTrueUser.self,
-            from: data
-        ) {
+        if let user = try? decodeGoTrueUser(data) {
             return (user: user, session: nil)
         }
 
         throw AuthError.invalidResponse
     }
 
+    private func decodeGoTrueUser(
+        _ data: Data
+    ) throws -> GoTrueUser {
+
+        let wrapper = try? JSONDecoder().decode(
+            GoTrueUserWrapper.self,
+            from: data
+        )
+
+        if let wrapper, let user = wrapper.user {
+            return user
+        }
+
+        let direct = try JSONDecoder().decode(
+            GoTrueUser.self,
+            from: data
+        )
+        return direct
+    }
+
+    private func makeSession(
+        user: GoTrueUser,
+        accessToken: String,
+        refreshToken: String,
+        expiresIn: Int?
+    ) -> AuthSession {
+
+        let createdAt: Date
+
+        if let createdString = user.created_at,
+           let date = SupabaseAuthService.parseISODate(createdString) {
+            createdAt = date
+        } else {
+            createdAt = Date()
+        }
+
+        let email = user.email ?? ""
+
+        let username: String
+
+        if let metadataUsername = user.user_metadata?.username,
+           !metadataUsername.isEmpty {
+            username = metadataUsername
+        } else if !email.isEmpty {
+            username = email.components(
+                separatedBy: "@"
+            ).first ?? email
+        } else {
+            username = "BarTab User"
+        }
+
+        let expiresAt: Date?
+
+        if let expiresIn {
+            expiresAt = Date().addingTimeInterval(
+                TimeInterval(expiresIn)
+            )
+        } else {
+            expiresAt = nil
+        }
+
+        return AuthSession(
+            user: AuthUser(
+                id: user.id,
+                email: email,
+                username: username,
+                createdAt: createdAt
+            ),
+            tokens: AuthTokens(
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                expiresAt: expiresAt
+            )
+        )
+    }
+
     private struct SessionResponse: Decodable {
         let access_token: String?
         let refresh_token: String?
         let expires_in: Int?
-        let user: GoTrueUser
+        let user: ResponseUser?
+
+        struct ResponseUser: Decodable {
+            let id: UUID
+            let email: String?
+            let created_at: String?
+            let user_metadata: UserMetadata?
+        }
+
+        struct UserMetadata: Decodable {
+            let username: String?
+        }
+
+        var goTrueUser: GoTrueUser {
+            GoTrueUser(
+                id: user?.id ?? UUID(),
+                email: user?.email,
+                created_at: user?.created_at,
+                user_metadata: user.map {
+                    GoTrueUser.UserMetadata(
+                        username: $0.user_metadata?.username
+                    )
+                }
+            )
+        }
 
         var session: AuthSession? {
             guard let access = access_token else {
                 return nil
             }
 
-            let createdAt: Date
-
-            if let createdString = user.created_at,
-               let date = SupabaseAuthService
-                   .parseISODate(createdString) {
-                createdAt = date
-            } else {
-                createdAt = Date()
-            }
-
-            let email = user.email ?? ""
-
-            let username: String
-
-            if !email.isEmpty {
-                username = email.components(
-                    separatedBy: "@"
-                ).first ?? email
-            } else {
-                username = "BarTab User"
-            }
-
-            let expiresAt: Date?
-
-            if let expiresIn = expires_in {
-                expiresAt = Date().addingTimeInterval(
-                    TimeInterval(expiresIn)
-                )
-            } else {
-                expiresAt = nil
-            }
-
-            return AuthSession(
-                user: AuthUser(
-                    id: user.id,
-                    email: email,
-                    username: username,
-                    createdAt: createdAt
-                ),
-                tokens: AuthTokens(
-                    accessToken: access,
-                    refreshToken: refresh_token ?? "",
-                    expiresAt: expiresAt
-                )
+            let createdUser = GoTrueUser(
+                id: user?.id ?? UUID(),
+                email: user?.email,
+                created_at: user?.created_at,
+                user_metadata: nil
             )
+
+            let base = makeSession(
+                user: createdUser,
+                accessToken: access,
+                refreshToken: refresh_token ?? "",
+                expiresIn: expires_in
+            )
+
+            return base
         }
     }
 
-    private struct GoTrueUser: Decodable {
+    struct GoTrueUser: Decodable {
         let id: UUID
         let email: String?
         let created_at: String?
+        let user_metadata: UserMetadata?
+
+        struct UserMetadata: Decodable {
+            let username: String?
+        }
+    }
+
+    private struct GoTrueUserWrapper: Decodable {
+        let user: GoTrueUser?
     }
 
     // MARK: - Nonce helpers (used by Sign in with Apple)

@@ -16,6 +16,9 @@ struct Bar: Identifiable {
     /// Whether smoking (or a smoking area) is allowed at this bar.
     let smokingFriendly: Bool
 
+    /// Whether there is seating outside (terrace, garden, street…).
+    let outdoorSeating: Bool
+
     init(
         id: UUID,
         name: String,
@@ -23,7 +26,8 @@ struct Bar: Identifiable {
         coordinate: CLLocationCoordinate2D,
         createdAt: Date,
         createdBy: UUID,
-        smokingFriendly: Bool = false
+        smokingFriendly: Bool = false,
+        outdoorSeating: Bool = false
     ) {
         self.id = id
         self.name = name
@@ -32,5 +36,6 @@ struct Bar: Identifiable {
         self.createdAt = createdAt
         self.createdBy = createdBy
         self.smokingFriendly = smokingFriendly
+        self.outdoorSeating = outdoorSeating
     }
 }

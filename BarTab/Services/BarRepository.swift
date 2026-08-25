@@ -13,6 +13,18 @@ final class BarRepository: ObservableObject {
     @Published private(set) var brands: [DrinkBrand] = DrinkBrand.all
     @Published private(set) var brandRequests: [BrandRequest] = []
 
+    /// 1…4 dollar-sign level per bar, relative to the overall
+    /// average drink price across all bars. Empty when unknown.
+    @Published private(set) var priceLevelByBarID: [UUID: Int] = [:]
+
+    /// Optional toast sink so background failures surface as
+    /// friendly banners instead of silent prints.
+    private var toastCenter: ToastCenter?
+
+    func attachToastCenter(_ center: ToastCenter) {
+        toastCenter = center
+    }
+
     init() {
         Task {
             await fetchAllData()
@@ -29,12 +41,14 @@ final class BarRepository: ObservableObject {
             async let fetchedDrinkRatings = SupabaseClient.shared.fetchAllDrinkRatings()
             async let fetchedBrands = SupabaseClient.shared.fetchBrands()
             async let fetchedBrandRequests = SupabaseClient.shared.fetchBrandRequests()
+            async let fetchedReports = SupabaseClient.shared.fetchContentReports()
 
             self.bars = try await fetchedBars
             self.prices = try await fetchedPrices
             self.barRatings = try await fetchedRatings
             self.drinkRatings = try await fetchedDrinkRatings
             self.brandRequests = try await fetchedBrandRequests
+            self.reports = try await fetchedReports
 
             // Merge the server-approved catalog with the bundled
             // defaults, so the app still has sensible brands to
@@ -46,18 +60,29 @@ final class BarRepository: ObservableObject {
                 merged[key] = brand
             }
             self.brands = Array(merged.values)
+            recomputePriceLevels()
         } catch {
             print("Failed to fetch initial data: \(error)")
+            toastCenter?.showError(error)
+        }
+    }
+
+    func refreshReports() async {
+        do {
+            self.reports = try await SupabaseClient.shared.fetchContentReports()
+        } catch {
+            print("Failed to fetch reports: \(error)")
         }
     }
 
     func fetchPrices(for bar: Bar) async {
         do {
             let fetchedPrices = try await SupabaseClient.shared.fetchPrices(for: bar.id)
-            
+
             // Merge or update local prices for this bar
             self.prices.removeAll { $0.barID == bar.id }
             self.prices.append(contentsOf: fetchedPrices)
+            recomputePriceLevels()
         } catch {
             print("Failed to fetch prices for bar \(bar.id): \(error)")
         }
@@ -70,6 +95,7 @@ final class BarRepository: ObservableObject {
         address: String,
         coordinate: CLLocationCoordinate2D,
         smokingFriendly: Bool = false,
+        outdoorSeating: Bool = false,
         createdBy user: User
     ) async -> Bar? {
 
@@ -80,7 +106,8 @@ final class BarRepository: ObservableObject {
             coordinate: coordinate,
             createdAt: Date(),
             createdBy: user.id,
-            smokingFriendly: smokingFriendly
+            smokingFriendly: smokingFriendly,
+            outdoorSeating: outdoorSeating
         )
 
         do {
@@ -89,6 +116,7 @@ final class BarRepository: ObservableObject {
             return bar
         } catch {
             print("Failed to save bar to Supabase: \(error)")
+            toastCenter?.showError(error)
             return nil
         }
     }
@@ -105,8 +133,10 @@ final class BarRepository: ObservableObject {
 
         do {
             try await SupabaseClient.shared.deleteBar(bar)
+            recomputePriceLevels()
         } catch {
             print("Failed to delete bar from Supabase: \(error)")
+            toastCenter?.showError(error)
         }
     }
 
@@ -141,9 +171,11 @@ final class BarRepository: ObservableObject {
         do {
             try await SupabaseClient.shared.addPrice(price)
             self.prices.append(price)
+            recomputePriceLevels()
             return true
         } catch {
             print("Failed to add price to Supabase: \(error)")
+            toastCenter?.showError(error)
             return false
         }
     }
@@ -157,8 +189,10 @@ final class BarRepository: ObservableObject {
 
         do {
             try await SupabaseClient.shared.deletePrice(price)
+            recomputePriceLevels()
         } catch {
             print("Failed to delete price from Supabase: \(error)")
+            toastCenter?.showError(error)
         }
     }
 
@@ -192,8 +226,10 @@ final class BarRepository: ObservableObject {
             for price in groupPrices {
                 try await SupabaseClient.shared.deletePrice(price)
             }
+            recomputePriceLevels()
         } catch {
             print("Failed to delete price group from Supabase: \(error)")
+            toastCenter?.showError(error)
         }
     }
 
@@ -224,9 +260,81 @@ final class BarRepository: ObservableObject {
 
         do {
             try await SupabaseClient.shared.updatePrice(updatedPrice)
+            recomputePriceLevels()
         } catch {
             print("Failed to update price on Supabase: \(error)")
+            toastCenter?.showError(error)
         }
+    }
+
+    // MARK: - Price Levels ($ signs)
+
+    /// Average converted price of all drinks reported at this bar.
+    func averageBarPrice(for bar: Bar) -> Decimal? {
+
+        let amounts = getPriceSummaries(for: bar).map {
+            NSDecimalNumber(decimal: $0.convertedAmount).doubleValue
+        }
+
+        guard !amounts.isEmpty else { return nil }
+
+        return Decimal(amounts.reduce(0, +) / Double(amounts.count))
+    }
+
+    /// Dollar-sign level 1…4 for the bar, relative to the average
+    /// drink price across every bar. Nil when there's no data yet.
+    func priceLevel(for bar: Bar) -> String? {
+        guard let level = priceLevelByBarID[bar.id] else { return nil }
+        return String(repeating: "$", count: level)
+    }
+
+    private func recomputePriceLevels() {
+
+        var totalsPerBar: [UUID: Double] = [:]
+        var countsPerBar: [UUID: Int] = [:]
+
+        var grandTotal = 0.0
+        var grandCount = 0
+
+        for bar in bars {
+            let summaries = getPriceSummaries(for: bar)
+            guard !summaries.isEmpty else { continue }
+
+            let total = summaries.reduce(0.0) { partial, summary in
+                partial + NSDecimalNumber(decimal: summary.convertedAmount).doubleValue
+            }
+
+            totalsPerBar[bar.id] = total
+            countsPerBar[bar.id] = summaries.count
+            grandTotal += total
+            grandCount += summaries.count
+        }
+
+        guard grandCount > 0 else {
+            priceLevelByBarID = [:]
+            return
+        }
+
+        let globalAverage = grandTotal / Double(grandCount)
+
+        var levels: [UUID: Int] = [:]
+        for (barID, total) in totalsPerBar {
+            let count = countsPerBar[barID] ?? 1
+            let ratio = (total / Double(count)) / globalAverage
+
+            switch ratio {
+            case ..<0.8:
+                levels[barID] = 1
+            case ..<1.1:
+                levels[barID] = 2
+            case ..<1.4:
+                levels[barID] = 3
+            default:
+                levels[barID] = 4
+            }
+        }
+
+        priceLevelByBarID = levels
     }
 
     // MARK: - Bar Ratings
@@ -287,7 +395,10 @@ final class BarRepository: ObservableObject {
             barID: bar.id,
             ratedBy: user.id,
             ambience: ambience,
-            wineQuality: wineQuality,
+            // Keep the previously saved wine quality when this
+            // submission doesn't touch it, so an upsert never
+            // wipes that dimension.
+            wineQuality: wineQuality ?? existing?.wineQuality,
             createdAt: Date()
         )
 
@@ -301,6 +412,7 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.upsertBarRating(rating)
         } catch {
             print("Failed to submit bar rating: \(error)")
+            toastCenter?.showError(error)
         }
     }
 
@@ -376,6 +488,7 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.upsertDrinkRating(rating)
         } catch {
             print("Failed to submit drink rating: \(error)")
+            toastCenter?.showError(error)
         }
     }
 
@@ -439,6 +552,8 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.submitBrandRequest(request)
         } catch {
             print("Failed to submit brand request: \(error)")
+            toastCenter?.showError(error)
+            brandRequests.removeAll { $0.id == request.id }
         }
     }
 
@@ -471,6 +586,7 @@ final class BarRepository: ObservableObject {
             )
         } catch {
             print("Failed to approve brand request: \(error)")
+            toastCenter?.showError(error)
         }
     }
 
@@ -490,6 +606,7 @@ final class BarRepository: ObservableObject {
             )
         } catch {
             print("Failed to reject brand request: \(error)")
+            toastCenter?.showError(error)
         }
     }
 
@@ -499,12 +616,20 @@ final class BarRepository: ObservableObject {
         do {
             try await SupabaseClient.shared.deleteBrandRequest(request)
         } catch {
-            print("Failed to delete brand request: \(error)")
+            print("Failed to delete brand request from Supabase: \(error)")
+            toastCenter?.showError(error)
         }
     }
 
     func deleteReport(_ report: ContentReport) async {
         reports.removeAll { $0.id == report.id }
+
+        do {
+            try await SupabaseClient.shared.deleteContentReport(report.id)
+        } catch {
+            print("Failed to delete report from Supabase: \(error)")
+            toastCenter?.showError(error)
+        }
     }
 
     // MARK: - Synchronous Read & Helper Methods
@@ -566,7 +691,8 @@ final class BarRepository: ObservableObject {
             coordinate: bar.coordinate,
             createdAt: bar.createdAt,
             createdBy: bar.createdBy,
-            smokingFriendly: !currentValue
+            smokingFriendly: !currentValue,
+            outdoorSeating: bar.outdoorSeating
         )
         bars[index] = updated
 
@@ -574,6 +700,30 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.updateBar(updated)
         } catch {
             print("Failed to update smoking policy: \(error)")
+            toastCenter?.showError(error)
+        }
+    }
+
+    func toggleOutdoorSeating(for bar: Bar) async {
+        guard let index = bars.firstIndex(where: { $0.id == bar.id }) else { return }
+        let currentValue = bars[index].outdoorSeating
+        let updated = Bar(
+            id: bar.id,
+            name: bar.name,
+            address: bar.address,
+            coordinate: bar.coordinate,
+            createdAt: bar.createdAt,
+            createdBy: bar.createdBy,
+            smokingFriendly: bar.smokingFriendly,
+            outdoorSeating: !currentValue
+        )
+        bars[index] = updated
+
+        do {
+            try await SupabaseClient.shared.updateBar(updated)
+        } catch {
+            print("Failed to update outdoor seating: \(error)")
+            toastCenter?.showError(error)
         }
     }
 
@@ -620,8 +770,22 @@ final class BarRepository: ObservableObject {
 
     func markReportReviewed(_ report: ContentReport) {
         guard let index = reports.firstIndex(where: { $0.id == report.id }) else { return }
+
+        let now = Date()
         reports[index].isReviewed = true
-        reports[index].reviewedAt = Date()
+        reports[index].reviewedAt = now
+
+        Task { [weak self] in
+            do {
+                try await SupabaseClient.shared.markContentReportReviewed(
+                    report.id,
+                    reviewedAt: now
+                )
+            } catch {
+                print("Failed to mark report reviewed on Supabase: \(error)")
+                self?.toastCenter?.showError(error)
+            }
+        }
     }
 
     var unreviewedReportCount: Int {
@@ -672,6 +836,16 @@ final class BarRepository: ObservableObject {
 
         reports.append(report)
         ReportNotificationService.schedule(for: report)
+
+        Task { [weak self] in
+            do {
+                try await SupabaseClient.shared.insertContentReport(report)
+            } catch {
+                print("Failed to save report to Supabase: \(error)")
+                self?.toastCenter?.showError(error)
+                self?.reports.removeAll { $0.id == report.id }
+            }
+        }
     }
 
     func getPriceSummaries(for bar: Bar) -> [PriceSummary] {

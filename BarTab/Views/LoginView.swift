@@ -1,6 +1,17 @@
 import SwiftUI
 import AuthenticationServices
 
+/// Presents the OAuth web sheet for Google sign-in.
+final class OAuthPresentationAnchorProvider: NSObject,
+    ASWebAuthenticationPresentationContextProviding {
+
+    func presentationAnchor(
+        for session: ASWebAuthenticationSession
+    ) -> ASPresentationAnchor {
+        ASPresentationAnchor()
+    }
+}
+
 struct LoginView: View {
 
     enum Mode: String, CaseIterable, Identifiable {
@@ -21,6 +32,7 @@ struct LoginView: View {
     }
 
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
     @Environment(\.presentationMode) private var presentationMode
 
     @State private var mode: Mode = .signIn
@@ -30,6 +42,9 @@ struct LoginView: View {
     @State private var currentNonce: String?
     @State private var errorMessage: String?
     @State private var isSubmitting = false
+    @State private var isGoogleSigningIn = false
+
+    @State private var oauthPresenter = OAuthPresentationAnchorProvider()
 
     var body: some View {
 
@@ -64,6 +79,8 @@ struct LoginView: View {
                     .padding(.top, 24)
 
 
+                    googleSignInButton
+
                     SignInWithAppleButton(
                         .signIn
                     ) { request in
@@ -96,7 +113,7 @@ struct LoginView: View {
                     .signInWithAppleButtonStyle(
                         .whiteOutline
                     )
-                    .disabled(isSubmitting)
+                    .disabled(isSubmitting || isGoogleSigningIn)
 
 
                     HStack(spacing: 12) {
@@ -213,24 +230,54 @@ struct LoginView: View {
                         submit()
                     } label: {
 
-                        Text(submitTitle)
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                canSubmit
-                                ? Color.barTabPrimary
-                                : Color.gray
+                        HStack(spacing: 8) {
+                            if isSubmitting {
+                                ProgressView()
+                                    .tint(.white)
+                            }
+
+                            Text(submitTitle)
+                        }
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            canSubmit && !isSubmitting
+                            ? Color.barTabPrimary
+                            : Color.gray
+                        )
+                        .clipShape(
+                            RoundedRectangle(
+                                cornerRadius: 14,
+                                style: .continuous
                             )
-                            .clipShape(
-                                RoundedRectangle(
-                                    cornerRadius: 14,
-                                    style: .continuous
-                                )
-                            )
+                        )
                     }
                     .disabled(!canSubmit || isSubmitting)
+
+
+                    if let errorMessage {
+
+                        Label {
+                            Text(errorMessage)
+                                .font(.footnote)
+                                .multilineTextAlignment(.leading)
+                        } icon: {
+                            Image(systemName: "exclamationmark.circle.fill")
+                        }
+                        .foregroundColor(.red)
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            Color.red.opacity(0.08),
+                            in: RoundedRectangle(
+                                cornerRadius: 12,
+                                style: .continuous
+                            )
+                        )
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
 
 
                     Text(
@@ -248,17 +295,112 @@ struct LoginView: View {
             .navigationTitle("Sign In")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .alert(
-            "Something went wrong",
-            isPresented: Binding(
-                get: { errorMessage != nil },
-                set: { if !$0 { errorMessage = nil } }
+        .animation(.easeOut(duration: 0.2), value: errorMessage)
+    }
+
+    // MARK: - Google sign-in
+
+    private var googleSignInButton: some View {
+
+        Button {
+            startGoogleSignIn()
+        } label: {
+
+            HStack(spacing: 10) {
+
+                if isGoogleSigningIn {
+                    ProgressView()
+                } else {
+                    Text("G")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(
+                            Color(red: 0.26, green: 0.52, blue: 0.96)
+                        )
+                }
+
+                Text(isGoogleSigningIn ? "Connecting…" : "Continue with Google")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.primary)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .background(
+                RoundedRectangle(
+                    cornerRadius: 14,
+                    style: .continuous
+                )
+                .fill(Color.white)
+                .shadow(
+                    color: Color.black.opacity(0.06),
+                    radius: 6,
+                    x: 0,
+                    y: 2
+                )
             )
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(errorMessage ?? "")
+            .overlay(
+                RoundedRectangle(
+                    cornerRadius: 14,
+                    style: .continuous
+                )
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            )
         }
+        .disabled(isSubmitting || isGoogleSigningIn)
+    }
+
+    private func startGoogleSignIn() {
+
+        guard let authorizeURL = SupabaseAuthService.googleAuthorizeURL() else {
+            errorMessage = "Google sign-in isn't configured."
+            return
+        }
+
+        errorMessage = nil
+        isGoogleSigningIn = true
+
+        let session = ASWebAuthenticationSession(
+            url: authorizeURL,
+            callbackURLScheme: SupabaseConfig.oauthCallbackScheme
+        ) { callbackURL, error in
+
+            if let callbackURL {
+                Task {
+                    do {
+                        try await userSession.signInWithGoogle(
+                            callbackURL: callbackURL
+                        )
+                        isGoogleSigningIn = false
+                        toastCenter.show(
+                            "Signed in with Google",
+                            kind: .success
+                        )
+                        presentationMode.wrappedValue.dismiss()
+                    } catch {
+                        isGoogleSigningIn = false
+                        if (error as? SupabaseAuthService.AuthError) != nil {
+                            errorMessage = FriendlyError.message(for: error)
+                        } else {
+                            errorMessage = "Google sign-in failed. Please try again."
+                        }
+                    }
+                }
+                return
+            }
+
+            isGoogleSigningIn = false
+
+            guard let error else { return }
+
+            if (error as? URLError)?.code == .cancelledAuthenticationSession {
+                return
+            }
+
+            errorMessage = FriendlyError.message(for: error)
+        }
+
+        session.presentationContextProvider = oauthPresenter
+        session.prefersEphemeralWebBrowserSession = true
+        session.start()
     }
 
     private var submitTitle: String {
@@ -318,6 +460,7 @@ struct LoginView: View {
             }
         }
 
+        errorMessage = nil
         isSubmitting = true
 
         Task {
@@ -341,7 +484,7 @@ struct LoginView: View {
             } catch {
 
                 isSubmitting = false
-                errorMessage = error.localizedDescription
+                errorMessage = FriendlyError.message(for: error)
             }
         }
     }
@@ -356,8 +499,15 @@ struct LoginView: View {
                 authorization.credential
                     as? ASAuthorizationAppleIDCredential
         else {
-            errorMessage =
-                "Sign in with Apple failed. Please try again."
+            if let error = result.failure {
+                if (error as? ASAuthorizationError)?.code == .canceled {
+                    return
+                }
+                errorMessage = FriendlyError.message(for: error)
+            } else {
+                errorMessage =
+                    "Sign in with Apple failed. Please try again."
+            }
             return
         }
 
@@ -367,6 +517,7 @@ struct LoginView: View {
             return
         }
 
+        errorMessage = nil
         isSubmitting = true
 
         Task {
@@ -383,8 +534,20 @@ struct LoginView: View {
             } catch {
 
                 isSubmitting = false
-                errorMessage = error.localizedDescription
+                errorMessage = FriendlyError.message(for: error)
             }
+        }
+    }
+}
+
+private extension Result where Success == ASAuthorization, Failure == Error {
+
+    var failure: Error? {
+        switch self {
+        case .failure(let error):
+            return error
+        default:
+            return nil
         }
     }
 }
@@ -396,6 +559,9 @@ struct LoginView_Previews: PreviewProvider {
         LoginView()
             .environmentObject(
                 UserSession()
+            )
+            .environmentObject(
+                ToastCenter()
             )
     }
 }

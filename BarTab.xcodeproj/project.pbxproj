@@ -75,6 +75,8 @@
 		BRTA00013070000100000021 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000021 /* de.lproj */; };
 		BRTA00013070000100000022 /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000022 /* fr.lproj */; };
 		BRTA00013070000100000023 /* it.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000023 /* it.lproj */; };
+		BRTA00013060000100000033 /* ToastCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000030 /* ToastCenter.swift */; };
+		BRTA00013060000100000034 /* AvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000031 /* AvatarService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -167,6 +169,9 @@
 		BRTA00013060000100000028 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		BRTA0001306000010000002A /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
 		BRTA0001306000010000002C /* ExchangeRateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeRateService.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000030 /* ToastCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCenter.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000031 /* AvatarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarService.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000032 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -233,6 +238,7 @@
 				BRTA00013060000100000022 /* fr.lproj */,
 				BRTA00013060000100000023 /* it.lproj */,
 				AEF036603035D00000BDA1CC /* BarTab.entitlements */,
+				BRTA00013060000100000032 /* Info.plist */,
 				AE78396C3034F16B00F1555E /* Preview Content */,
 			);
 			path = BarTab;
@@ -327,6 +333,8 @@
 				AEF036693035E30000BDA1CC /* KeychainService.swift */,
 				AEF036713035E40000BDA1CC /* SupabaseAuthService.swift */,
 				BRTA0001306000010000001F /* LanguageManager.swift */,
+				BRTA00013060000100000030 /* ToastCenter.swift */,
+				BRTA00013060000100000031 /* AvatarService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -566,6 +574,8 @@
 				BRTA0001306000010000001A /* ServingMethod.swift in Sources */,
 				BRTA0001306000010000001C /* DrinkRating.swift in Sources */,
 				BRTA0001306000010000001E /* LanguageManager.swift in Sources */,
+				BRTA00013060000100000033 /* ToastCenter.swift in Sources */,
+				BRTA00013060000100000034 /* AvatarService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -728,6 +738,7 @@
 				DEVELOPMENT_TEAM = LUHP6G9833;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BarTab/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarTab uses your Location to show nearby bars and their drink prices.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -759,6 +770,7 @@
 				DEVELOPMENT_TEAM = LUHP6G9833;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BarTab/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarTab uses your Location to show nearby bars and their drink prices.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

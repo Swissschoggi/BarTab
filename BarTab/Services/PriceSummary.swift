@@ -30,14 +30,13 @@ struct PriceSummary: Identifiable {
         )
     }
 
+    /// Always formatted with exactly two decimal places.
     var formattedAmount: String {
-        NSDecimalNumber(decimal: amount)
-            .description(withLocale: Locale(identifier: "de_CH"))
+        amount.formattedAmount
     }
 
     var formattedConvertedAmount: String {
-        NSDecimalNumber(decimal: convertedAmount)
-            .description(withLocale: Locale(identifier: "de_CH"))
+        convertedAmount.formattedAmount
     }
 
     /// Whether this price is in a different currency than the default.

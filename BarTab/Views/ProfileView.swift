@@ -1,13 +1,18 @@
 import SwiftUI
+import PhotosUI
 
 struct ProfileView: View {
 
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var barRepository: BarRepository
+    @EnvironmentObject private var toastCenter: ToastCenter
 
     @State private var showingLogin = false
     @State private var showingSettings = false
     @State private var showingLeaderboard = false
+    @State private var selectedAvatarItem: PhotosPickerItem?
+    @State private var isUploadingAvatar = false
+    @State private var showingLogoutConfirmation = false
 
     private var currentUser: User? {
         userSession.currentUser
@@ -86,31 +91,7 @@ struct ProfileView: View {
 
                             HStack(spacing: 14) {
 
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color.barTabPrimary,
-                                                    Color.barTabPrimary.opacity(0.7)
-                                                ],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-
-                                    Image(
-                                        systemName: "person.fill"
-                                    )
-                                    .font(.title3)
-                                    .foregroundColor(
-                                        .white
-                                    )
-                                }
-                                .frame(
-                                    width: 48,
-                                    height: 48
-                                )
+                                avatarView(user: user)
 
                                 VStack(
                                     alignment: .leading,
@@ -129,6 +110,21 @@ struct ProfileView: View {
                                     .foregroundColor(
                                         .barTabSecondary
                                     )
+
+                                    PhotosPicker(
+                                        selection: $selectedAvatarItem,
+                                        matching: .images
+                                    ) {
+                                        Text(
+                                            isUploadingAvatar
+                                                ? "Uploading…"
+                                                : "Change photo"
+                                        )
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.barTabPrimary)
+                                    }
+                                    .disabled(isUploadingAvatar)
                                 }
 
                                 Spacer()
@@ -371,7 +367,7 @@ struct ProfileView: View {
                             }
 
                             Button {
-                                userSession.logout()
+                                showingLogoutConfirmation = true
                             } label: {
 
                                 HStack(spacing: 12) {
@@ -443,6 +439,7 @@ struct ProfileView: View {
         .sheet(isPresented: $showingLogin) {
             LoginView()
                 .environmentObject(userSession)
+                .environmentObject(toastCenter)
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
@@ -454,6 +451,108 @@ struct ProfileView: View {
             LeaderboardView()
                 .environmentObject(barRepository)
                 .environmentObject(userSession)
+        }
+        .confirmationDialog(
+            "Log out?",
+            isPresented: $showingLogoutConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Log out", role: .destructive) {
+                userSession.logout()
+                toastCenter.show(
+                    "You've been logged out.",
+                    kind: .info
+                )
+            }
+
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("You'll need to sign in again to add bars, prices and ratings.")
+        }
+        .onChange(of: selectedAvatarItem) { item in
+            guard let item else { return }
+            selectedAvatarItem = nil
+            uploadAvatar(from: item)
+        }
+    }
+
+    @ViewBuilder
+    private func avatarView(user: User) -> some View {
+
+        ZStack {
+            if let url = user.avatarURL,
+               !isUploadingAvatar {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    case .failure:
+                        placeholderAvatar
+                    default:
+                        ProgressView()
+                    }
+                }
+                .frame(width: 48, height: 48)
+                .clipShape(Circle())
+            } else {
+                placeholderAvatar
+                    .opacity(isUploadingAvatar ? 0.5 : 1)
+
+                if isUploadingAvatar {
+                    ProgressView()
+                }
+            }
+        }
+        .frame(width: 48, height: 48)
+    }
+
+    private var placeholderAvatar: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.barTabPrimary,
+                            Color.barTabPrimary.opacity(0.7)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            Image(systemName: "person.fill")
+                .font(.title3)
+                .foregroundColor(.white)
+        }
+    }
+
+    private func uploadAvatar(from item: PhotosPickerItem) {
+
+        Task {
+            isUploadingAvatar = true
+            defer { isUploadingAvatar = false }
+
+            do {
+                guard let data = try await item.loadTransferable(
+                    type: Data.self
+                ), let image = UIImage(data: data) else {
+                    toastCenter.show(
+                        "That photo couldn't be loaded.",
+                        kind: .error
+                    )
+                    return
+                }
+
+                try await userSession.updateAvatar(image: image)
+                toastCenter.show(
+                    "Profile photo updated",
+                    kind: .success
+                )
+            } catch {
+                toastCenter.showError(error)
+            }
         }
     }
 

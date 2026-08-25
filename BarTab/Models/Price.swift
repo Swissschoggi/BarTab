@@ -40,8 +40,8 @@ struct Price: Identifiable {
         self.serving = serving
     }
 
+    /// Always formatted with exactly two decimal places.
     var formattedAmount: String {
-        NSDecimalNumber(decimal: amount)
-            .description(withLocale: Locale(identifier: "de_CH"))
+        amount.formattedAmount
     }
 }

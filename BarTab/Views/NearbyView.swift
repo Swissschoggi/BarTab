@@ -6,6 +6,7 @@ struct NearbyView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
 
     @StateObject private var locationService = LocationService()
 
@@ -48,6 +49,7 @@ struct NearbyView: View {
     @State private var selectedSizes: Set<DrinkSize> = [.fiveDeciliters]
     @State private var selectedBrand: String?
     @State private var selectedAmbience: Set<AmbienceStyle> = []
+    @State private var outdoorOnly = false
 
     // Collapsible filter state
     @State private var filtersExpanded = false
@@ -96,6 +98,9 @@ struct NearbyView: View {
 
         return barRepository
             .nearbyBars(coordinate: coordinate, radius: radiusMeters)
+            .filter { bar in
+                !outdoorOnly || bar.outdoorSeating
+            }
             .map { bar in
                 (bar: bar, distance: DistanceService.distance(from: originLocation, to: bar))
             }
@@ -152,6 +157,7 @@ struct NearbyView: View {
         }
 
         for bar in barsInRadius {
+            if outdoorOnly && !bar.outdoorSeating { continue }
             let summaries = barRepository.getPriceSummaries(for: bar)
             for summary in summaries {
                 guard selectedDrinks.contains(summary.drink) else { continue }
@@ -344,6 +350,16 @@ struct NearbyView: View {
         VStack(alignment: .leading, spacing: 12) {
             BarTabSectionHeader(title: "Bars", count: nearbyBars.count)
 
+            HStack(spacing: 8) {
+                filterPill(
+                    icon: "sun.max.fill",
+                    label: "Outdoor",
+                    isActive: outdoorOnly
+                ) {
+                    outdoorOnly.toggle()
+                }
+            }
+
             if originCoordinate == nil {
                 emptyState(
                     icon: "location.slash",
@@ -362,6 +378,7 @@ struct NearbyView: View {
                         destination: BarView(bar: result.bar)
                             .environmentObject(barRepository)
                             .environmentObject(userSession)
+                            .environmentObject(toastCenter)
                     ) {
                         barRow(bar: result.bar, distance: result.distance)
                     }
@@ -397,6 +414,17 @@ struct NearbyView: View {
                         Image(systemName: "flag.fill")
                             .font(.caption2)
                             .foregroundColor(.orange)
+                    }
+
+                    if let level = barRepository.priceLevel(for: bar) {
+                        Text(level)
+                            .font(.caption2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.barTabAccent)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1)
+                            .background(Color.barTabAccent.opacity(0.12))
+                            .clipShape(Capsule())
                     }
                 }
 
@@ -449,6 +477,16 @@ struct NearbyView: View {
             .padding(10)
             .background(Color.barTabPillFill)
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+            HStack(spacing: 8) {
+                filterPill(
+                    icon: "sun.max.fill",
+                    label: "Outdoor",
+                    isActive: outdoorOnly
+                ) {
+                    outdoorOnly.toggle()
+                }
+            }
 
             // Active filter summary (always visible)
             if selectedDrinks.count > 1 || selectedBrand != nil || !selectedAmbience.isEmpty {
@@ -705,6 +743,27 @@ struct NearbyView: View {
         }
     }
 
+    private func filterPill(
+        icon: String,
+        label: String,
+        isActive: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.caption2)
+                Text(label)
+                    .font(.caption)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .foregroundColor(isActive ? .white : .barTabPrimary)
+            .background(isActive ? Color.barTabPrimary : Color.barTabPillFill)
+            .clipShape(Capsule())
+        }
+    }
+
     // MARK: - Price results
 
     private var priceResultsSection: some View {
@@ -725,6 +784,7 @@ struct NearbyView: View {
                         destination: BarView(bar: result.bar)
                             .environmentObject(barRepository)
                             .environmentObject(userSession)
+                            .environmentObject(toastCenter)
                     ) {
                         priceRow(
                             bar: result.bar,
@@ -1002,5 +1062,6 @@ struct NearbyView_Previews: PreviewProvider {
         NearbyView()
             .environmentObject(BarRepository())
             .environmentObject(UserSession())
+            .environmentObject(ToastCenter())
     }
 }

@@ -8,6 +8,7 @@ struct BarView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
     @Environment(\.presentationMode) private var presentationMode
 
     @StateObject private var locationService = LocationService()
@@ -19,10 +20,6 @@ struct BarView: View {
     @State private var showingBarReport = false
     @State private var showingPriceReport = false
     @State private var pendingReportGroup: PriceGroup?
-    @State private var showingReportConfirmation = false
-    @State private var reportConfirmationText = ""
-    @State private var showingAlreadyReported = false
-    @State private var alreadyReportedText = ""
 
     @State private var showingDeleteBarConfirmation = false
     @State private var pendingDeletePrice: Price?
@@ -32,6 +29,7 @@ struct BarView: View {
 
     @State private var showingRateBar = false
     @State private var showingSmokingConfirmation = false
+    @State private var showingOutdoorConfirmation = false
     @State private var ratingDrinkGroup: PriceGroup?
     @State private var showingDrinkRating = false
 
@@ -283,6 +281,72 @@ struct BarView: View {
 
         return VStack(alignment: .leading, spacing: 0) {
 
+            if let priceLevel = barRepository.priceLevel(for: currentBar) {
+                HStack(spacing: 8) {
+                    Text(priceLevel)
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.barTabPrimary)
+
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(priceLevelTitle(priceLevel))
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.barTabText)
+
+                        Text("Average drink price at this bar")
+                            .font(.caption2)
+                            .foregroundColor(.barTabSecondary)
+                    }
+
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
+                    .padding(.horizontal, 16)
+            }
+
+            Button {
+                showingOutdoorConfirmation = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: currentBar.outdoorSeating ? "sun.max.fill" : "sun.max")
+                        .font(.subheadline)
+                        .foregroundColor(currentBar.outdoorSeating ? .white : .barTabPrimary)
+                        .frame(width: 32, height: 32)
+                        .background(currentBar.outdoorSeating ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(currentBar.outdoorSeating ? "Outdoor seating" : "Indoor only")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.barTabText)
+
+                        Text("Tap to change")
+                            .font(.caption2)
+                            .foregroundColor(.barTabSecondary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabSecondary)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+
+            Divider()
+                .foregroundColor(.barTabCardBorder)
+                .padding(.horizontal, 16)
+
             Button {
                 showingSmokingConfirmation = true
             } label: {
@@ -467,6 +531,7 @@ struct BarView: View {
                 AddPriceView(bar: currentBar)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
+                    .environmentObject(toastCenter)
             }
             .sheet(
                 isPresented: $showingRateBar
@@ -518,22 +583,6 @@ struct BarView: View {
                 Text(
                     "Tell us why this drink looks wrong."
                 )
-            }
-            .alert(
-                "Thanks for your report",
-                isPresented: $showingReportConfirmation
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(reportConfirmationText)
-            }
-            .alert(
-                "Already reported",
-                isPresented: $showingAlreadyReported
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(alreadyReportedText)
             }
             .confirmationDialog(
                 "Delete this bar?",
@@ -589,7 +638,6 @@ struct BarView: View {
                     "This removes all entries for this drink at this bar. This can't be undone."
                 )
             }
-            .alert(
                 currentBar.smokingFriendly
                     ? "Remove smoking policy?"
                     : "Mark as smoking friendly?",
@@ -609,6 +657,28 @@ struct BarView: View {
                     currentBar.smokingFriendly
                         ? "This bar will be marked as no smoking."
                         : "This bar will be marked as smoking friendly."
+                )
+            }
+            .alert(
+                currentBar.outdoorSeating
+                    ? "Remove outdoor seating?"
+                    : "Mark as outdoor seating?",
+                isPresented: $showingOutdoorConfirmation
+            ) {
+                Button("Cancel", role: .cancel) {}
+
+                Button {
+                    Task {
+                        await barRepository.toggleOutdoorSeating(for: currentBar)
+                    }
+                } label: {
+                    Text(currentBar.outdoorSeating ? "Remove" : "Confirm")
+                }
+            } message: {
+                Text(
+                    currentBar.outdoorSeating
+                        ? "This bar will be marked as indoor only."
+                        : "This bar will be marked as having outdoor seating."
                 )
             }
     }
@@ -846,9 +916,7 @@ struct BarView: View {
                                         from: price.currency,
                                         to: Currency.defaultCurrency.rawValue
                                     )
-                                    let convertedStr = NSDecimalNumber(decimal: converted)
-                                        .description(withLocale: Locale(identifier: "de_CH"))
-                                    Text("≈ \(convertedStr) \(Currency.defaultCurrency.rawValue)")
+                                    Text("≈ \(converted.formattedAmount) \(Currency.defaultCurrency.rawValue)")
                                         .font(.caption)
                                         .foregroundColor(.barTabPrimary)
                                 }
@@ -1005,9 +1073,10 @@ struct BarView: View {
     private func handleBarReportTap() {
 
         if currentUserReportedBar {
-            alreadyReportedText =
-                String(localized: "You've already reported this bar.")
-            showingAlreadyReported = true
+            toastCenter.show(
+                "You've already reported this bar.",
+                kind: .info
+            )
             return
         }
 
@@ -1017,6 +1086,10 @@ struct BarView: View {
     private func reportBar(reason: ReportReason) {
 
         guard let user = userSession.currentUser else {
+            toastCenter.show(
+                "Please sign in to report content.",
+                kind: .info
+            )
             return
         }
 
@@ -1026,8 +1099,10 @@ struct BarView: View {
             reportedBy: user
         )
 
-        reportConfirmationText = String(localized: "We'll review this bar and remove it if it doesn't belong.")
-        showingReportConfirmation = true
+        toastCenter.show(
+            "Thanks! We'll review this bar.",
+            kind: .success
+        )
     }
 
     private func reportPriceGroup(
@@ -1036,6 +1111,10 @@ struct BarView: View {
     ) {
 
         guard let user = userSession.currentUser else {
+            toastCenter.show(
+                "Please sign in to report content.",
+                kind: .info
+            )
             return
         }
 
@@ -1047,8 +1126,25 @@ struct BarView: View {
             reportedBy: user
         )
 
-        reportConfirmationText = String(localized: "We'll review this drink and correct it if it looks wrong.")
-        showingReportConfirmation = true
+        toastCenter.show(
+            "Thanks! We'll review this drink.",
+            kind: .success
+        )
+    }
+
+    private func priceLevelTitle(
+        _ level: String
+    ) -> String {
+        switch level.count {
+        case 1:
+            return String(localized: "Budget-friendly")
+        case 2:
+            return String(localized: "Moderately priced")
+        case 3:
+            return String(localized: "On the pricier side")
+        default:
+            return String(localized: "Expensive")
+        }
     }
 
     private var canDeleteBar: Bool {
@@ -1380,6 +1476,9 @@ struct BarView_Previews: PreviewProvider {
                 )
                 .environmentObject(
                     UserSession()
+                )
+                .environmentObject(
+                    ToastCenter()
                 )
         }
     }

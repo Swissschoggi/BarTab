@@ -5,17 +5,20 @@ struct User: Identifiable, Codable {
     let username: String
     let createdAt: Date
     let isAdmin: Bool
+    let avatarURL: URL?
 
     init(
         id: UUID,
         username: String,
         createdAt: Date,
-        isAdmin: Bool = false
+        isAdmin: Bool = false,
+        avatarURL: URL? = nil
     ) {
         self.id = id
         self.username = username
         self.createdAt = createdAt
         self.isAdmin = isAdmin
+        self.avatarURL = avatarURL
     }
 
     static let mockUser = User(

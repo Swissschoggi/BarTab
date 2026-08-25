@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import AuthenticationServices
+import UIKit
 
 @MainActor
 final class UserSession: ObservableObject {
@@ -15,16 +16,21 @@ final class UserSession: ObservableObject {
             return
         }
 
+        // Show the cached identity immediately, then refresh it
+        // from the profiles table (and the token itself) in the
+        // background so username/admin/avatar stay accurate.
         currentUser = makeUser(from: session)
 
         Task {
-            await refreshAdminStatus(from: session)
+            await restoreFreshUser(from: session)
         }
     }
 
     var isLoggedIn: Bool {
         currentUser != nil
     }
+
+    // MARK: - Sign in
 
     func signIn(
         email: String,
@@ -36,11 +42,9 @@ final class UserSession: ObservableObject {
             password: password
         )
 
-        let user = await makeUserWithAdminCheck(
+        currentUser = await makeUserWithAdminCheck(
             from: session
         )
-
-        currentUser = user
         authService.saveSession(session)
     }
 
@@ -54,11 +58,9 @@ final class UserSession: ObservableObject {
             password: password
         )
 
-        let user = await makeUserWithAdminCheck(
+        currentUser = await makeUserWithAdminCheck(
             from: session
         )
-
-        currentUser = user
         authService.saveSession(session)
     }
 
@@ -80,11 +82,24 @@ final class UserSession: ObservableObject {
             rawNonce: rawNonce
         )
 
-        let user = await makeUserWithAdminCheck(
+        currentUser = await makeUserWithAdminCheck(
             from: session
         )
+        authService.saveSession(session)
+    }
 
-        currentUser = user
+    /// Completes the Google OAuth flow started by the login screen.
+    func signInWithGoogle(
+        callbackURL: URL
+    ) async throws {
+
+        let session = try await authService.handleGoogleCallback(
+            callbackURL
+        )
+
+        currentUser = await makeUserWithAdminCheck(
+            from: session
+        )
         authService.saveSession(session)
     }
 
@@ -107,9 +122,11 @@ final class UserSession: ObservableObject {
         }
     }
 
+    // MARK: - Account updates
+
     func updateUsername(_ newUsername: String) async throws {
 
-        guard let session = authService.restoreSession() else {
+        guard let session = await authService.validSession() else {
             return
         }
 
@@ -123,14 +140,15 @@ final class UserSession: ObservableObject {
                 id: user.id,
                 username: newUsername,
                 createdAt: user.createdAt,
-                isAdmin: user.isAdmin
+                isAdmin: user.isAdmin,
+                avatarURL: user.avatarURL
             )
         }
     }
 
     func updatePassword(_ newPassword: String) async throws {
 
-        guard let session = authService.restoreSession() else {
+        guard let session = await authService.validSession() else {
             return
         }
 
@@ -138,6 +156,44 @@ final class UserSession: ObservableObject {
             newPassword,
             accessToken: session.tokens.accessToken
         )
+    }
+
+    /// Uploads a new avatar image and stores its public URL on the
+    /// profile.
+    func updateAvatar(image: UIImage) async throws {
+
+        guard let user = currentUser else { return }
+
+        guard let jpegData = AvatarService.processedJPEGData(
+            from: image
+        ) else {
+            throw AvatarService.AvatarError.processingFailed
+        }
+
+        let url = try await SupabaseClient.shared.uploadAvatar(
+            userID: user.id,
+            jpegData: jpegData
+        )
+
+        try await SupabaseClient.shared.updateProfileAvatarURL(
+            userID: user.id,
+            avatarURL: url.absoluteString
+        )
+
+        currentUser = User(
+            id: user.id,
+            username: user.username,
+            createdAt: user.createdAt,
+            isAdmin: user.isAdmin,
+            avatarURL: url
+        )
+    }
+
+    func refreshProfile() async {
+        guard let session = await authService.validSession() else {
+            return
+        }
+        await refreshAdminStatus(from: session)
     }
 
     // MARK: - Helpers
@@ -154,43 +210,54 @@ final class UserSession: ObservableObject {
         )
     }
 
+    /// Refreshes the stored tokens if they are close to expiry and
+    /// rebuilds the current user from the server profile.
+    private func restoreFreshUser(
+        from session: SupabaseAuthService.AuthSession
+    ) async {
+
+        guard let freshSession = await authService.validSession() else {
+            // Refresh failed (e.g. revoked); keep the cached user
+            // visible but they'll be prompted to sign in again on
+            // their next write.
+            return
+        }
+
+        currentUser = await makeUserWithAdminCheck(
+            from: freshSession
+        )
+    }
+
     private func refreshAdminStatus(
         from session: SupabaseAuthService.AuthSession
     ) async {
 
-        let isAdmin = await authService.fetchIsAdmin(
-            userID: session.user.id,
-            accessToken: session.tokens.accessToken
-        )
+        let profile = await makeUserWithAdminCheck(from: session)
 
-        guard let user = currentUser,
-              user.id == session.user.id,
-              user.isAdmin != isAdmin else {
-            return
-        }
+        guard currentUser?.id == profile.id else { return }
 
-        currentUser = User(
-            id: user.id,
-            username: user.username,
-            createdAt: user.createdAt,
-            isAdmin: isAdmin
-        )
+        currentUser = profile
     }
 
     private func makeUserWithAdminCheck(
         from session: SupabaseAuthService.AuthSession
     ) async -> User {
 
-        let isAdmin = await authService.fetchIsAdmin(
+        let fallbackUsername = session.user.username.isEmpty
+            ? "BarTab User"
+            : session.user.username
+
+        let profile = await authService.fetchProfile(
             userID: session.user.id,
-            accessToken: session.tokens.accessToken
+            fallbackUsername: fallbackUsername
         )
 
         return User(
             id: session.user.id,
-            username: session.user.username,
+            username: profile.username,
             createdAt: session.user.createdAt,
-            isAdmin: isAdmin
+            isAdmin: profile.isAdmin,
+            avatarURL: profile.avatarURL
         )
     }
 }

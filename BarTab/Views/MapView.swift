@@ -8,6 +8,7 @@ struct MapView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
 
     @State private var selectedBar: Bar?
 
@@ -38,6 +39,17 @@ struct MapView: View {
                         selectedBar = bar
                     } label: {
                         VStack(spacing: 2) {
+
+                            if let level = barRepository.priceLevel(for: bar) {
+                                Text(level)
+                                    .font(.system(size: 8, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 1)
+                                    .background(Color.barTabAccent)
+                                    .clipShape(Capsule())
+                            }
+
                             Image(systemName: "wineglass.fill")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(.white)
@@ -118,6 +130,7 @@ struct MapView: View {
                 BarView(bar: bar, allowsDismissal: true)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
+                    .environmentObject(toastCenter)
             }
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
@@ -128,6 +141,7 @@ struct MapView: View {
             })
             .environmentObject(barRepository)
             .environmentObject(userSession)
+            .environmentObject(toastCenter)
         }
     }
 
@@ -171,5 +185,6 @@ struct MapView_Previews: PreviewProvider {
         MapView()
             .environmentObject(BarRepository())
             .environmentObject(UserSession())
+            .environmentObject(ToastCenter())
     }
 }

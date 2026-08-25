@@ -147,5 +147,8 @@ struct MainTabView_Previews: PreviewProvider {
             .environmentObject(
                 UserSession()
             )
+            .environmentObject(
+                ToastCenter()
+            )
     }
 }

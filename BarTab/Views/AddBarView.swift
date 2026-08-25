@@ -10,6 +10,7 @@ struct AddBarView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
     @Environment(\.presentationMode) private var presentationMode
 
     @StateObject private var searchService = PlaceSearchService()
@@ -22,10 +23,8 @@ struct AddBarView: View {
     @State private var selectedCoordinate: CLLocationCoordinate2D?
 
     @State private var showingLocationPicker = false
-    @State private var showingError = false
-    @State private var errorMessage = ""
-
     @State private var smokingFriendly = false
+    @State private var outdoorSeating = false
 
     var body: some View {
         NavigationView {
@@ -218,17 +217,6 @@ struct AddBarView: View {
                 )
             }
 
-
-            .alert(
-                "Couldn't add bar",
-                isPresented: $showingError
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(errorMessage)
-            }
-
-
             .alert(
                 "Bar may already exist",
                 isPresented: $showingDuplicateWarning
@@ -302,6 +290,17 @@ struct AddBarView: View {
                 Label(
                     "Smoking friendly",
                     systemImage: "smoke.fill"
+                )
+                .foregroundColor(.primary)
+            }
+            .tint(.barTabPrimary)
+
+            Divider()
+
+            Toggle(isOn: $outdoorSeating) {
+                Label(
+                    "Outdoor seating",
+                    systemImage: "sun.max.fill"
                 )
                 .foregroundColor(.primary)
             }
@@ -421,19 +420,19 @@ struct AddBarView: View {
 
         guard let user = userSession.currentUser else {
 
-            errorMessage =
-                "You must be logged in to add a bar."
-
-            showingError = true
+            toastCenter.show(
+                "You must be logged in to add a bar.",
+                kind: .error
+            )
             return
         }
 
         guard let coordinate = selectedCoordinate else {
 
-            errorMessage =
-                "Please select a location."
-
-            showingError = true
+            toastCenter.show(
+                "Please select a location.",
+                kind: .error
+            )
             return
         }
 
@@ -449,10 +448,10 @@ struct AddBarView: View {
 
         guard !trimmedName.isEmpty else {
 
-            errorMessage =
-                "Please select a place."
-
-            showingError = true
+            toastCenter.show(
+                "Please select a place.",
+                kind: .error
+            )
             return
         }
 
@@ -462,14 +461,15 @@ struct AddBarView: View {
                 address: trimmedAddress,
                 coordinate: coordinate,
                 smokingFriendly: smokingFriendly,
+                outdoorSeating: outdoorSeating,
                 createdBy: user
             )
 
-            guard let saved = saved else {
-                self.errorMessage =
-                    "Could not save the bar. "
-                    + "Check your connection and try again."
-                self.showingError = true
+            guard let saved else {
+                toastCenter.show(
+                    "Could not save the bar",
+                    kind: .error
+                )
                 return
             }
 
@@ -487,6 +487,7 @@ struct AddBarView: View {
         selectedCoordinate = nil
         duplicateBars.removeAll()
         smokingFriendly = false
+        outdoorSeating = false
 
         searchService.updateQuery("")
         searchService.clearResults()

@@ -12,6 +12,7 @@ struct BarDTO: Codable {
     let created_at: Date
     let created_by: UUID
     let smoking_friendly: Bool
+    let outdoor_seating: Bool
 
     var toDomain: Bar {
         Bar(
@@ -24,7 +25,8 @@ struct BarDTO: Codable {
             ),
             createdAt: created_at,
             createdBy: created_by,
-            smokingFriendly: smoking_friendly
+            smokingFriendly: smoking_friendly,
+            outdoorSeating: outdoor_seating
         )
     }
 
@@ -37,6 +39,7 @@ struct BarDTO: Codable {
         self.created_at = domain.createdAt
         self.created_by = domain.createdBy
         self.smoking_friendly = domain.smokingFriendly
+        self.outdoor_seating = domain.outdoorSeating
     }
 }
 
@@ -73,6 +76,18 @@ struct BarRatingDTO: Codable {
         self.ambience = domain.ambience.isEmpty ? nil : domain.ambience.map(\.rawValue).joined(separator: ",")
         self.wine_quality = domain.wineQuality
         self.created_at = domain.createdAt
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(bar_id, forKey: .bar_id)
+        try container.encode(rated_by, forKey: .rated_by)
+        // Skip unset dimensions so an upsert never overwrites the
+        // other dimension with NULL in the database.
+        try container.encodeIfPresent(ambience, forKey: .ambience)
+        try container.encodeIfPresent(wine_quality, forKey: .wine_quality)
+        try container.encode(created_at, forKey: .created_at)
     }
 }
 
@@ -235,4 +250,79 @@ struct DrinkRatingDTO: Codable {
         self.rated_by = domain.ratedBy
         self.created_at = domain.createdAt
     }
+}
+
+// MARK: - Content Report DTO
+
+struct ContentReportDTO: Codable {
+    let id: UUID
+    let target_id: String
+    let target_type: String
+    let target_label: String
+    let reason: String
+    let reported_by: UUID
+    let reported_by_name: String
+    let reported_at: Date
+    let is_reviewed: Bool
+    let reviewed_at: Date?
+
+    var toDomain: ContentReport? {
+        guard let type = reportTargetType(from: target_type),
+              let reason = ReportReason(rawValue: reason) else {
+            return nil
+        }
+
+        return ContentReport(
+            id: id,
+            targetID: target_id,
+            targetType: type,
+            targetLabel: target_label,
+            reason: reason,
+            reportedBy: reported_by,
+            reportedByName: reported_by_name,
+            reportedAt: reported_at,
+            isReviewed: is_reviewed,
+            reviewedAt: reviewed_at
+        )
+    }
+
+    init(from domain: ContentReport) {
+        self.id = domain.id
+        self.target_id = domain.targetID
+        switch domain.targetType {
+        case .bar:
+            self.target_type = "bar"
+        case .price:
+            self.target_type = "price"
+        }
+        self.target_label = domain.targetLabel
+        self.reason = domain.reason.rawValue
+        self.reported_by = domain.reportedBy
+        self.reported_by_name = domain.reportedByName
+        self.reported_at = domain.reportedAt
+        self.is_reviewed = domain.isReviewed
+        self.reviewed_at = domain.reviewedAt
+    }
+
+    private func reportTargetType(
+        from rawValue: String
+    ) -> ReportTargetType? {
+        switch rawValue {
+        case "bar":
+            return .bar
+        case "price":
+            return .price
+        default:
+            return nil
+        }
+    }
+}
+
+// MARK: - Profile DTO
+
+struct ProfileDTO: Codable {
+    let id: UUID
+    let display_name: String?
+    let is_admin: Bool
+    let avatar_url: String?
 }

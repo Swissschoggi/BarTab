@@ -6,6 +6,7 @@ struct NearbyBarsView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
 
     @StateObject private var locationService = LocationService()
 
@@ -224,6 +225,7 @@ struct NearbyBarsView: View {
                         destination: BarView(bar: result.bar)
                             .environmentObject(barRepository)
                             .environmentObject(userSession)
+                            .environmentObject(toastCenter)
                     ) {
                         resultRow(bar: result.bar, distance: result.distance)
                     }
@@ -251,6 +253,17 @@ struct NearbyBarsView: View {
                         Image(systemName: "flag.fill")
                             .font(.caption2)
                             .foregroundColor(.orange)
+                    }
+
+                    if let level = barRepository.priceLevel(for: bar) {
+                        Text(level)
+                            .font(.caption2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.barTabAccent)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1)
+                            .background(Color.barTabAccent.opacity(0.12))
+                            .clipShape(Capsule())
                     }
                 }
 
@@ -392,5 +405,6 @@ struct NearbyBarsView_Previews: PreviewProvider {
         NearbyBarsView()
             .environmentObject(BarRepository())
             .environmentObject(UserSession())
+            .environmentObject(ToastCenter())
     }
 }

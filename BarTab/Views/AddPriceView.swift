@@ -6,6 +6,7 @@ struct AddPriceView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
     @Environment(\.presentationMode) private var presentationMode
 
     @State private var selectedDrink: Drink = .beer
@@ -18,7 +19,6 @@ struct AddPriceView: View {
     @State private var priceText = ""
     @State private var showingDuplicateWarning = false
     @State private var duplicatePrice: Price?
-    @State private var errorMessage: String?
     @State private var showingRequestBrand = false
 
     private var availableBrands: [String] {
@@ -357,17 +357,6 @@ struct AddPriceView: View {
                     )
                 }
             }
-            .alert(
-                "Couldn't save drink",
-                isPresented: Binding(
-                    get: { errorMessage != nil },
-                    set: { if !$0 { errorMessage = nil } }
-                )
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(errorMessage ?? "")
-            }
             .sheet(isPresented: $showingRequestBrand) {
                 RequestBrandSheet(drink: selectedDrink)
                     .environmentObject(barRepository)
@@ -441,9 +430,10 @@ struct AddPriceView: View {
                     .dismiss()
             } else {
                 isSaving = false
-                self.errorMessage =
-                    "Could not save the drink. "
-                    + "Check your connection and try again."
+                toastCenter.show(
+                    "Couldn't save drink",
+                    kind: .error
+                )
             }
         }
     }
@@ -464,6 +454,9 @@ struct AddPriceView_Previews: PreviewProvider {
         )
         .environmentObject(
             UserSession()
+        )
+        .environmentObject(
+            ToastCenter()
         )
     }
 }

@@ -5,6 +5,7 @@ struct SettingsView: View {
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var languageManager: LanguageManager
+    @EnvironmentObject private var toastCenter: ToastCenter
     @Environment(\.dismiss) private var dismiss
 
     @State private var showingRestartAlert = false
@@ -13,8 +14,6 @@ struct SettingsView: View {
     @State private var newUsername = ""
     @State private var newPassword = ""
     @State private var confirmPassword = ""
-    @State private var errorMessage: String?
-    @State private var successMessage: String?
     @State private var currencyExpanded = false
     @State private var selectedCurrency: Currency = Currency.defaultCurrency
 
@@ -264,15 +263,23 @@ struct SettingsView: View {
         .alert("Edit Username", isPresented: $showingUsernameEditor) {
             TextField("Username", text: $newUsername)
             Button("Save") {
-                guard !newUsername.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+                let trimmed = newUsername.trimmingCharacters(in: .whitespaces)
+                guard !trimmed.isEmpty else {
+                    toastCenter.show(
+                        "Please enter a username.",
+                        kind: .error
+                    )
+                    return
+                }
                 Task {
                     do {
-                        try await userSession.updateUsername(newUsername.trimmingCharacters(in: .whitespaces))
-                        successMessage = "Username updated"
-                        errorMessage = nil
+                        try await userSession.updateUsername(trimmed)
+                        toastCenter.show(
+                            "Username updated",
+                            kind: .success
+                        )
                     } catch {
-                        errorMessage = "Could not update username: \(error.localizedDescription)"
-                        successMessage = nil
+                        toastCenter.showError(error)
                     }
                 }
             }
@@ -284,24 +291,31 @@ struct SettingsView: View {
             SecureField("New password", text: $newPassword)
             SecureField("Confirm password", text: $confirmPassword)
             Button("Update") {
-                guard newPassword.count >= 6 else {
-                    errorMessage = "Password must be at least 6 characters."
+                guard newPassword.count >= 8 else {
+                    toastCenter.show(
+                        "Password must be at least 8 characters.",
+                        kind: .error
+                    )
                     return
                 }
                 guard newPassword == confirmPassword else {
-                    errorMessage = "Passwords do not match."
+                    toastCenter.show(
+                        "Passwords do not match.",
+                        kind: .error
+                    )
                     return
                 }
                 Task {
                     do {
                         try await userSession.updatePassword(newPassword)
-                        successMessage = "Password updated"
-                        errorMessage = nil
+                        toastCenter.show(
+                            "Password updated",
+                            kind: .success
+                        )
                         newPassword = ""
                         confirmPassword = ""
                     } catch {
-                        errorMessage = "Could not update password: \(error.localizedDescription)"
-                        successMessage = nil
+                        toastCenter.showError(error)
                     }
                 }
             }
@@ -310,29 +324,7 @@ struct SettingsView: View {
                 confirmPassword = ""
             }
         } message: {
-            Text("Enter your new password (at least 6 characters).")
-        }
-        .alert(
-            "Error",
-            isPresented: Binding(
-                get: { errorMessage != nil },
-                set: { if !$0 { errorMessage = nil } }
-            )
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(errorMessage ?? "")
-        }
-        .alert(
-            "Success",
-            isPresented: Binding(
-                get: { successMessage != nil },
-                set: { if !$0 { successMessage = nil } }
-            )
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(successMessage ?? "")
+            Text("Enter your new password (at least 8 characters).")
         }
     }
 
@@ -373,5 +365,6 @@ struct SettingsView_Previews: PreviewProvider {
             .environmentObject(UserSession())
             .environmentObject(BarRepository())
             .environmentObject(LanguageManager.shared)
+            .environmentObject(ToastCenter())
     }
 }
