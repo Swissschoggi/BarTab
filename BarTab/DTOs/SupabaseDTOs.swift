@@ -43,6 +43,26 @@ struct BarDTO: Codable {
     }
 }
 
+/// Minimal DTO for PATCH — only mutable fields, avoids sending
+/// immutable columns that PostgREST may reject.
+struct BarPatchDTO: Codable {
+    let name: String
+    let address: String
+    let latitude: Double
+    let longitude: Double
+    let smoking_friendly: Bool
+    let outdoor_seating: Bool
+
+    init(from bar: Bar) {
+        self.name = bar.name
+        self.address = bar.address
+        self.latitude = bar.coordinate.latitude
+        self.longitude = bar.coordinate.longitude
+        self.smoking_friendly = bar.smokingFriendly
+        self.outdoor_seating = bar.outdoorSeating
+    }
+}
+
 // MARK: - Bar Rating DTO
 
 struct BarRatingDTO: Codable {
@@ -83,9 +103,13 @@ struct BarRatingDTO: Codable {
         try container.encode(id, forKey: .id)
         try container.encode(bar_id, forKey: .bar_id)
         try container.encode(rated_by, forKey: .rated_by)
-        // Skip unset dimensions so an upsert never overwrites the
-        // other dimension with NULL in the database.
-        try container.encodeIfPresent(ambience, forKey: .ambience)
+        // Always encode both dimensions so an upsert never
+        // overwrites the other dimension with NULL.
+        if let ambience {
+            try container.encode(ambience, forKey: .ambience)
+        } else {
+            try container.encodeNil(forKey: .ambience)
+        }
         try container.encodeIfPresent(wine_quality, forKey: .wine_quality)
         try container.encode(created_at, forKey: .created_at)
     }

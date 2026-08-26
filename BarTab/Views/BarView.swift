@@ -497,6 +497,25 @@ struct BarView: View {
                 .environmentObject(barRepository)
                 .environmentObject(userSession)
             }
+            .sheet(isPresented: $showingDrinkRating) {
+                if let group = ratingDrinkGroup, let user = userSession.currentUser {
+                    DrinkRatingSheet(
+                        bar: currentBar,
+                        drink: group.drink,
+                        brand: group.brand,
+                        size: group.size,
+                        initialQuality: barRepository.myDrinkRating(
+                            for: currentBar,
+                            drink: group.drink,
+                            brand: group.brand,
+                            size: group.size,
+                            by: user
+                        )?.quality
+                    )
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+                }
+            }
             .confirmationDialog(
                 "Report this bar?",
                 isPresented: $showingBarReport,
@@ -665,10 +684,20 @@ struct BarView: View {
 
                         Spacer()
 
-                        Text(String(format: "$%.2f", averageAmount(for: group)))
+                        Text("\(Currency.defaultCurrency.symbol)\(averageAmount(for: group).formattedAmount)")
                             .font(.subheadline)
                             .fontWeight(.bold)
                             .foregroundColor(.barTabPrimary)
+
+                        Button {
+                            ratingDrinkGroup = group
+                            showingDrinkRating = true
+                        } label: {
+                            Image(systemName: myDrinkRatingIcon(for: group))
+                                .font(.caption)
+                                .foregroundColor(.barTabPrimary)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.vertical, 8)
@@ -708,4 +737,18 @@ struct BarView: View {
     private func deletePrice(_ price: Price) {}
     private func deleteGroup(_ group: PriceGroup) {}
     private func handleBarReportTap() {}
+
+    private func myDrinkRatingIcon(for group: PriceGroup) -> String {
+        guard let user = userSession.currentUser else { return "star" }
+        if barRepository.myDrinkRating(
+            for: currentBar,
+            drink: group.drink,
+            brand: group.brand,
+            size: group.size,
+            by: user
+        ) != nil {
+            return "star.fill"
+        }
+        return "star"
+    }
 }

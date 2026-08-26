@@ -29,8 +29,8 @@ struct RateBarSheet: View {
                         .foregroundColor(.secondary)
 
                     LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
+                        GridItem(.flexible(), spacing: 8),
+                        GridItem(.flexible(), spacing: 8)
                     ], spacing: 8) {
                         ForEach(AmbienceStyle.allCases) { style in
                             Button {
@@ -46,6 +46,7 @@ struct RateBarSheet: View {
                                     Text(style.displayName)
                                         .font(.caption)
                                 }
+                                .fixedSize(horizontal: true, vertical: false)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
                                 .frame(maxWidth: .infinity)

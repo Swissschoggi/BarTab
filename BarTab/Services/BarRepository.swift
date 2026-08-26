@@ -390,14 +390,16 @@ final class BarRepository: ObservableObject {
 
         let existing = myRating(for: bar, by: user)
 
+        let mergedAmbience: [AmbienceStyle] = {
+            if ambience.isEmpty { return existing?.ambience ?? [] }
+            return ambience
+        }()
+
         let rating = BarRating(
             id: existing?.id ?? UUID(),
             barID: bar.id,
             ratedBy: user.id,
-            ambience: ambience,
-            // Keep the previously saved wine quality when this
-            // submission doesn't touch it, so an upsert never
-            // wipes that dimension.
+            ambience: mergedAmbience,
             wineQuality: wineQuality ?? existing?.wineQuality,
             createdAt: Date()
         )

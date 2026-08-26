@@ -354,16 +354,6 @@ struct NearbyView: View {
         VStack(alignment: .leading, spacing: 12) {
             BarTabSectionHeader(title: "Bars", count: nearbyBars.count)
 
-            HStack(spacing: 8) {
-                filterPill(
-                    icon: "sun.max.fill",
-                    label: "Outdoor",
-                    isActive: outdoorOnly
-                ) {
-                    outdoorOnly.toggle()
-                }
-            }
-
             if originCoordinate == nil {
                 emptyState(
                     icon: "location.slash",
@@ -687,6 +677,18 @@ struct NearbyView: View {
                                             .clipShape(Capsule())
                                         }
                                     }
+                                }
+                            }
+                        }
+
+                        filterRow(label: "Seating") {
+                            HStack(spacing: 6) {
+                                filterPill(
+                                    icon: "sun.max.fill",
+                                    label: "Outdoor",
+                                    isActive: outdoorOnly
+                                ) {
+                                    outdoorOnly.toggle()
                                 }
                             }
                         }

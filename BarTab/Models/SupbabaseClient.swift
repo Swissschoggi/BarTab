@@ -325,7 +325,7 @@ final class SupabaseClient {
             method: "PATCH"
         )
 
-        let dto = BarDTO(from: bar)
+        let dto = BarPatchDTO(from: bar)
         request.httpBody = try encoder.encode(dto)
 
         _ = try await performAuthorized(request)
@@ -719,7 +719,7 @@ final class SupabaseClient {
         )!
 
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
+        request.httpMethod = "PUT"
         request.setValue(apiKey, forHTTPHeaderField: "apikey")
 
         if let token = AuthTokenStore.shared.accessToken {
