@@ -23,7 +23,6 @@ struct BarTabApp: App {
                 .environmentObject(languageManager)
                 .environmentObject(toastCenter)
                 .environment(\.locale, languageManager.currentLocale)
-                .barTabToast()
-        }
+            .barTabToast(center: toastCenter)        }
     }
 }

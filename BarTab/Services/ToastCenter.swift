@@ -249,13 +249,13 @@ private struct ToastOverlay: View {
 }
 
 struct BarTabToastModifier: ViewModifier {
-
-    @EnvironmentObject private var toastCenter: ToastCenter
+    @ObservedObject var toastCenter: ToastCenter
 
     func body(content: Content) -> some View {
         content.overlay(alignment: .top) {
             if let toast = toastCenter.currentToast {
                 ToastOverlay(toast: toast)
+                    .environmentObject(toastCenter)
                     .padding(.top, 8)
                     .transition(
                         .move(edge: .top)
@@ -271,9 +271,8 @@ struct BarTabToastModifier: ViewModifier {
 }
 
 extension View {
-
     /// Attach once near the root of a scene; toasts appear at the top.
-    func barTabToast() -> some View {
-        modifier(BarTabToastModifier())
+    func barTabToast(center: ToastCenter) -> some View {
+        modifier(BarTabToastModifier(toastCenter: center))
     }
 }

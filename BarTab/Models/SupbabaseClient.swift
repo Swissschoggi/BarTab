@@ -186,19 +186,20 @@ final class SupabaseClient {
                   AuthTokenStore.shared.hasToken else {
                 throw error
             }
+            Self.isRefreshing = true
+            defer { Self.isRefreshing = false }
 
-            Self.refreshLock.lock()
-            defer { Self.refreshLock.unlock() }
-
-            guard !Self.isRefreshing else {
-                let retried = retriedRequest(request)
-                guard let retried else { throw error }
-                retried.setValue(
-                    "Bearer \(AuthTokenStore.shared.accessToken ?? "")",
-                    forHTTPHeaderField: "Authorization"
-                )
-                return try await perform(retried)
+            guard (try? await SupabaseAuthService().refreshSession()) != nil,
+                  let baseRequest = retriedRequest(request) else {
+                throw error
             }
+
+            var retried = baseRequest
+            retried.setValue(
+                "Bearer \(AuthTokenStore.shared.accessToken ?? "")",
+                forHTTPHeaderField: "Authorization"
+            )
+            return try await perform(retried)
 
             Self.isRefreshing = true
             defer { Self.isRefreshing = false }
@@ -599,7 +600,8 @@ final class SupabaseClient {
             from: data
         )
 
-        return dtos.map { $0.toDomain }
+        return dtos.compactMap { $0.toDomain }
+        
     }
 
     func insertContentReport(_ report: ContentReport) async throws {

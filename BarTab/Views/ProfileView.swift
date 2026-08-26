@@ -529,28 +529,22 @@ struct ProfileView: View {
     }
 
     private func uploadAvatar(from item: PhotosPickerItem) {
-
         Task { @MainActor in
             isUploadingAvatar = true
-            defer { isUploadingAvatar = false }
-
+            
             do {
-                guard let data = try await item.loadTransferable(
-                    type: Data.self
-                ), let image = UIImage(data: data) else {
-                    toastCenter.show(
-                        "That photo couldn't be loaded.",
-                        kind: .error
-                    )
+                guard let data = try await item.loadTransferable(type: Data.self),
+                      let image = UIImage(data: data) else {
+                    isUploadingAvatar = false
+                    toastCenter.show("That photo couldn't be loaded.", kind: .error)
                     return
                 }
 
                 try await userSession.updateAvatar(image: image)
-                toastCenter.show(
-                    "Profile photo updated",
-                    kind: .success
-                )
+                isUploadingAvatar = false
+                toastCenter.show("Profile photo updated", kind: .success)
             } catch {
+                isUploadingAvatar = false
                 toastCenter.showError(error)
             }
         }

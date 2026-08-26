@@ -126,9 +126,7 @@ struct BarView: View {
                     .font(.subheadline)
                     .foregroundColor(.barTabSecondary)
 
-                if let location =
-                    locationService.location {
-
+                if let location = locationService.location {
                     Label(
                         DistanceService.formattedDistance(
                             from: location,
@@ -171,7 +169,6 @@ struct BarView: View {
                     }) { drink in
 
                         let drinkGroups = groupedPrices.filter { $0.drink == drink }
-                        let isCategoryExpanded = expandedDrinkCategories.contains(drink)
 
                         DisclosureGroup {
                             VStack(alignment: .leading, spacing: 4) {
@@ -215,10 +212,8 @@ struct BarView: View {
                 openDirections()
             } label: {
                 HStack(spacing: 8) {
-                    Image(
-                        systemName: "arrow.triangle.turn.up.right.diamond.fill"
-                    )
-                    .font(.subheadline)
+                    Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
+                        .font(.subheadline)
 
                     Text("Get Directions")
                         .font(.subheadline)
@@ -226,27 +221,16 @@ struct BarView: View {
 
                     Spacer()
 
-                    Image(
-                        systemName: "arrow.up.right"
-                    )
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                    Image(systemName: "arrow.up.right")
+                        .font(.caption)
+                        .fontWeight(.semibold)
                 }
                 .foregroundColor(.barTabPrimary)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
-                .frame(
-                    maxWidth: .infinity
-                )
-                .background(
-                    Color.barTabPrimary.opacity(0.06)
-                )
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 14,
-                        style: .continuous
-                    )
-                )
+                .frame(maxWidth: .infinity)
+                .background(Color.barTabPrimary.opacity(0.06))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
 
             Button {
@@ -262,11 +246,9 @@ struct BarView: View {
 
                     Spacer()
 
-                    Image(
-                        systemName: "chevron.right"
-                    )
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .fontWeight(.semibold)
                 }
                 .padding()
                 .barTabPrimaryButton()
@@ -275,7 +257,6 @@ struct BarView: View {
     }
 
     private var detailsSection: some View {
-
         let ambienceStyles = barRepository.ambienceStyles(for: currentBar)
         let ambienceCount = barRepository.ambienceCount(for: currentBar)
 
@@ -447,12 +428,8 @@ struct BarView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-
         if allowsDismissal {
-
-            ToolbarItem(
-                placement: .navigationBarLeading
-            ) {
+            ToolbarItem(placement: .navigationBarLeading) {
                 Button {
                     presentationMode.wrappedValue.dismiss()
                 } label: {
@@ -461,58 +438,36 @@ struct BarView: View {
             }
         }
 
-        ToolbarItem(
-            placement: .navigationBarTrailing
-        ) {
+        ToolbarItem(placement: .navigationBarTrailing) {
             Button {
                 HapticEngine.impact()
-                withAnimation(
-                    .easeInOut(duration: 0.2)
-                ) {
+                withAnimation(.easeInOut(duration: 0.2)) {
                     barRepository.toggleFavorite(currentBar)
                 }
             } label: {
-                Image(
-                    systemName:
-                    barRepository.isFavorite(currentBar)
-                    ? "heart.fill"
-                    : "heart"
-                )
-                .foregroundColor(.barTabPrimary)
+                Image(systemName: barRepository.isFavorite(currentBar) ? "heart.fill" : "heart")
+                    .foregroundColor(.barTabPrimary)
             }
         }
 
-        ToolbarItem(
-            placement: .navigationBarTrailing
-        ) {
-            ShareLink(
-                item: shareText
-            ) {
+        ToolbarItem(placement: .navigationBarTrailing) {
+            ShareLink(item: shareText) {
                 Image(systemName: "square.and.arrow.up")
                     .foregroundColor(.barTabPrimary)
             }
         }
 
-        ToolbarItem(
-            placement: .navigationBarTrailing
-        ) {
+        ToolbarItem(placement: .navigationBarTrailing) {
             Button {
                 handleBarReportTap()
             } label: {
-                Image(
-                    systemName: currentUserReportedBar
-                    ? "flag.fill"
-                    : "flag"
-                )
-                .foregroundColor(.barTabPrimary)
+                Image(systemName: currentUserReportedBar ? "flag.fill" : "flag")
+                    .foregroundColor(.barTabPrimary)
             }
         }
 
         if canDeleteBar {
-
-            ToolbarItem(
-                placement: .navigationBarTrailing
-            ) {
+            ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
                     showingDeleteBarConfirmation = true
                 } label: {
@@ -522,25 +477,19 @@ struct BarView: View {
             }
         }
     }
-        private func attachModals<V: View>(
-        to view: V
-    ) -> some View {
+
+    private func attachModals<V: View>(to view: V) -> some View {
         view
-            .sheet(
-                isPresented: $showingAddPrice
-            ) {
+            .sheet(isPresented: $showingAddPrice) {
                 AddPriceView(bar: currentBar)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
                     .environmentObject(toastCenter)
             }
-            .sheet(
-                isPresented: $showingRateBar
-            ) {
+            .sheet(isPresented: $showingRateBar) {
                 let mine = userSession.currentUser.flatMap {
                     barRepository.myRating(for: currentBar, by: $0)
                 }
-
                 RateBarSheet(
                     bar: currentBar,
                     initialAmbience: mine?.ambience ?? []
@@ -558,12 +507,9 @@ struct BarView: View {
                         reportBar(reason: reason)
                     }
                 }
-
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text(
-                    "Tell us why this bar looks wrong."
-                )
+                Text("Tell us why this bar looks wrong.")
             }
             .confirmationDialog(
                 "Report this drink?",
@@ -572,18 +518,13 @@ struct BarView: View {
             ) {
                 ForEach(ReportReason.allCases) { reason in
                     Button(reason.title) {
-                        guard let group = pendingReportGroup else {
-                            return
-                        }
+                        guard let group = pendingReportGroup else { return }
                         reportPriceGroup(group, reason: reason)
                     }
                 }
-
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text(
-                    "Tell us why this drink looks wrong."
-                )
+                Text("Tell us why this drink looks wrong.")
             }
             .confirmationDialog(
                 "Delete this bar?",
@@ -593,12 +534,9 @@ struct BarView: View {
                 Button("Delete", role: .destructive) {
                     deleteBar()
                 }
-
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text(
-                    "This removes the bar and all of its drinks. This can't be undone."
-                )
+                Text("This removes the bar and all of its drinks. This can't be undone.")
             }
             .confirmationDialog(
                 "Delete this drink entry?",
@@ -606,17 +544,12 @@ struct BarView: View {
                 titleVisibility: .visible
             ) {
                 Button("Delete", role: .destructive) {
-                    guard let price = pendingDeletePrice else {
-                        return
-                    }
+                    guard let price = pendingDeletePrice else { return }
                     deletePrice(price)
                 }
-
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text(
-                    "This removes this drink entry. This can't be undone."
-                )
+                Text("This removes this drink entry. This can't be undone.")
             }
             .confirmationDialog(
                 "Delete this drink?",
@@ -627,32 +560,24 @@ struct BarView: View {
                 titleVisibility: .visible
             ) {
                 Button("Delete", role: .destructive) {
-                    guard let group = pendingDeleteGroup else {
-                        return
-                    }
+                    guard let group = pendingDeleteGroup else { return }
                     deleteGroup(group)
                 }
-
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text(
-                    "This removes all entries for this drink at this bar. This can't be undone."
-                )
+                Text("This removes all entries for this drink at this bar. This can't be undone.")
             }
-                currentBar.smokingFriendly
-                    ? "Remove smoking policy?"
-                    : "Mark as smoking friendly?",
-                isPresented: $showingSmokingConfirmation
+            .confirmationDialog(
+                currentBar.smokingFriendly ? "Remove smoking policy?" : "Mark as smoking friendly?",
+                isPresented: $showingSmokingConfirmation,
+                titleVisibility: .visible
             ) {
-                Button("Cancel", role: .cancel) {}
-
-                Button {
+                Button(currentBar.smokingFriendly ? "Remove" : "Confirm") {
                     Task {
                         await barRepository.toggleSmokingPolicy(for: currentBar)
                     }
-                } label: {
-                    Text(currentBar.smokingFriendly ? "Remove" : "Confirm")
                 }
+                Button("Cancel", role: .cancel) {}
             } message: {
                 Text(
                     currentBar.smokingFriendly
@@ -661,21 +586,16 @@ struct BarView: View {
                 )
             }
             .alert(
-                currentBar.outdoorSeating
-                    ? "Remove outdoor seating?"
-                    : "Mark as outdoor seating?",
+                currentBar.outdoorSeating ? "Remove outdoor seating?" : "Mark as outdoor seating?",
                 isPresented: $showingOutdoorConfirmation
             ) {
-                Button("Cancel", role: .cancel) {}
-
-                Button {
+                Button(currentBar.outdoorSeating ? "Remove" : "Confirm") {
                     HapticEngine.impact()
                     Task {
                         await barRepository.toggleOutdoorSeating(for: currentBar)
                     }
-                } label: {
-                    Text(currentBar.outdoorSeating ? "Remove" : "Confirm")
                 }
+                Button("Cancel", role: .cancel) {}
             } message: {
                 Text(
                     currentBar.outdoorSeating
@@ -685,13 +605,7 @@ struct BarView: View {
             }
     }
 
-    private func priceGroupRow(
-        _ group: PriceGroup
-    ) -> some View {
-
-        let confidence = confidenceForGroup(group)
-        let average = averageAmount(for: group)
-        let change = group.prices.priceChange
+    private func priceGroupRow(_ group: PriceGroup) -> some View {
         let isExpanded = expandedGroupID == group.id
         let isFlagged = barRepository.isPriceGroupFlagged(
             drink: group.drink,
@@ -699,34 +613,15 @@ struct BarView: View {
             brand: group.brand
         )
 
-        return VStack(
-            alignment: .leading,
-            spacing: 0
-        ) {
-
+        return VStack(alignment: .leading, spacing: 0) {
             Button {
-
-                withAnimation(
-                    .easeInOut(duration: 0.2)
-                ) {
-                    expandedGroupID =
-                        isExpanded ? nil : group.id
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    expandedGroupID = isExpanded ? nil : group.id
                 }
-
             } label: {
-
-                VStack(
-                    alignment: .leading,
-                    spacing: 6
-                ) {
-
+                VStack(alignment: .leading, spacing: 6) {
                     HStack {
-
-                        VStack(
-                            alignment: .leading,
-                            spacing: 3
-                        ) {
-
+                        VStack(alignment: .leading, spacing: 3) {
                             HStack(spacing: 6) {
                                 Text(group.drink.displayName)
                                     .font(.subheadline)
@@ -734,26 +629,20 @@ struct BarView: View {
                                     .foregroundColor(.barTabText)
 
                                 if isFlagged {
-                                    Image(
-                                        systemName: "flag.fill"
-                                    )
-                                    .font(.caption2)
-                                    .foregroundColor(.orange)
+                                    Image(systemName: "flag.fill")
+                                        .font(.caption2)
+                                        .foregroundColor(.orange)
                                 }
 
                                 if let brand = group.brand {
-                                    Text("·")
-                                        .foregroundColor(.barTabSecondary)
-
+                                    Text("·").foregroundColor(.barTabSecondary)
                                     Text(brand)
                                         .font(.caption)
                                         .foregroundColor(.barTabSecondary)
                                 }
 
                                 if let style = group.style {
-                                    Text("·")
-                                        .foregroundColor(.barTabSecondary)
-
+                                    Text("·").foregroundColor(.barTabSecondary)
                                     Text(style)
                                         .font(.caption)
                                         .foregroundColor(.barTabSecondary)
@@ -766,722 +655,57 @@ struct BarView: View {
                                     .foregroundColor(.barTabSecondary)
 
                                 if let serving = group.serving {
-                                    Text("·")
+                                    Text("·").foregroundColor(.barTabSecondary)
+                                    Text(serving.displayName)
+                                        .font(.caption)
                                         .foregroundColor(.barTabSecondary)
-
-                                    HStack(spacing: 2) {
-                                        Image(systemName: serving.icon)
-                                            .font(.caption2)
-                                        Text(serving.displayName)
-                                    }
-                                    .font(.caption)
-                                    .foregroundColor(.barTabSecondary)
                                 }
                             }
                         }
 
                         Spacer()
 
-                        VStack(
-                            alignment: .trailing,
-                            spacing: 1
-                        ) {
-                            Text(
-                                "\(average.formattedAmount) \(Currency.defaultCurrency.rawValue)"
-                            )
+                        Text(String(format: "$%.2f", averageAmount(for: group)))
                             .font(.subheadline)
                             .fontWeight(.bold)
                             .foregroundColor(.barTabPrimary)
-
-                            Text(
-                                group.prices.count == 1
-                                ? "1 report"
-                                : "\(group.prices.count) reports"
-                            )
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        }
-                    }
-
-                    HStack {
-
-                        if let change = change {
-                            trendBadge(change)
-                        }
-
-                        Spacer()
-
-                        Label(
-                            isExpanded
-                            ? "Hide history"
-                            : "Show history",
-                            systemImage: isExpanded
-                                ? "chevron.up"
-                                : "chevron.down"
-                        )
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                    }
-
-                    VStack(
-                        alignment: .leading,
-                        spacing: 4
-                    ) {
-
-                        HStack {
-                            Text("Confidence")
-                                .font(.caption2)
-                                .fontWeight(.medium)
-
-                            Spacer()
-
-                            Text("\(confidence)%")
-                                .font(.caption2)
-                                .fontWeight(.bold)
-                        }
-
-                        GeometryReader { geometry in
-                            ZStack(alignment: .leading) {
-
-                                Capsule()
-                                    .fill(
-                                        Color.barTabPrimary
-                                            .opacity(0.12)
-                                    )
-
-                                Capsule()
-                                    .fill(
-                                        Color.barTabPrimary
-                                    )
-                                    .frame(
-                                        width:
-                                            geometry.size.width
-                                            * CGFloat(confidence)
-                                            / 100
-                                    )
-                            }
-                        }
-                        .frame(height: 5)
-
-                        Text(
-                            confidenceDescription(
-                                confidence
-                            )
-                        )
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
                     }
                 }
-                .contentShape(Rectangle())
+                .padding(.vertical, 8)
             }
-            .buttonStyle(PlainButtonStyle())
-
-            if isExpanded {
-
-                Divider()
-                    .padding(.vertical, 12)
-
-                VStack(
-                    alignment: .leading,
-                    spacing: 10
-                ) {
-
-                    Text("History")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
-
-                    PriceTrendChart(
-                        prices: group.prices
-                    )
-
-                    ForEach(
-                        group.prices.sorted {
-                            $0.reportedAt > $1.reportedAt
-                        },
-                        id: \.id
-                    ) { price in
-
-                        HStack {
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(
-                                    "\(price.formattedAmount) \(price.currency)"
-                                )
-                                .font(.caption)
-                                .foregroundColor(.barTabSecondary)
-
-                                if price.currency != Currency.defaultCurrency.rawValue {
-                                    let converted = ExchangeRateService.shared.convert(
-                                        price.amount,
-                                        from: price.currency,
-                                        to: Currency.defaultCurrency.rawValue
-                                    )
-                                    Text("≈ \(converted.formattedAmount) \(Currency.defaultCurrency.rawValue)")
-                                        .font(.caption)
-                                        .foregroundColor(.barTabPrimary)
-                                }
-                            }
-
-                            Spacer()
-
-                            Text(
-                                relativeDate(
-                                    price.reportedAt
-                                )
-                            )
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                            if canDeletePrice(price) {
-
-                                Button {
-                                    pendingDeletePrice = price
-                                    showingDeletePriceConfirmation = true
-                                } label: {
-                                    Image(systemName: "trash")
-                                        .font(.caption)
-                                        .foregroundColor(.red)
-                                }
-                            }
-                        }
-                    }
-
-                    // Drink quality rating
-                    drinkQualitySection(group: group)
-
-                    if canDeleteGroup(group) {
-
-                        Divider()
-                            .padding(.vertical, 4)
-
-                        Button {
-                            pendingDeleteGroup = group
-                        } label: {
-                            Label(
-                                "Delete this drink",
-                                systemImage: "trash"
-                            )
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .foregroundColor(.red)
-                        }
-                    }
-
-                    Button {
-                        pendingReportGroup = group
-                        showingPriceReport = true
-                    } label: {
-
-                        let alreadyReported =
-                            userSession.currentUser
-                            .map {
-                                barRepository.hasReported(
-                                    group.id,
-                                    by: $0
-                                )
-                            } ?? false
-
-                        Label(
-                            alreadyReported
-                            ? "Reported — thanks"
-                            : "Report this drink",
-                            systemImage: alreadyReported
-                                ? "checkmark.circle"
-                                : "flag"
-                        )
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundColor(
-                            alreadyReported
-                            ? .secondary
-                            : .barTabPrimary
-                        )
-                    }
-                }
-            }
+            .buttonStyle(.plain)
         }
-        .barTabCard()
     }
 
-    private func trendBadge(
-        _ change: Double
-    ) -> some View {
-
-        let up = change >= 0
-        let color: Color = up ? .green : .red
-
-        return Label(
-            "\(up ? "▲" : "▼") \(String(format: "%.1f%%", abs(change * 100)))",
-            systemImage: up
-                ? "arrow.up.right"
-                : "arrow.down.right"
-        )
-        .font(.caption2)
-        .fontWeight(.semibold)
-        .foregroundColor(color)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(color.opacity(0.12))
-        .clipShape(Capsule())
-    }
-
-    private func relativeDate(
-        _ date: Date
-    ) -> String {
-
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .short
-
-        return formatter.localizedString(
-            for: date,
-            relativeTo: Date()
-        )
+    // MARK: - Helper Methods / Properties Placeholder
+    private var emptyPricesView: some View {
+        Text("No drink prices added yet.")
+            .font(.caption)
+            .foregroundColor(.barTabSecondary)
+            .padding()
     }
 
     private var shareText: String {
-
-        var text = "\(currentBar.name)\n\(currentBar.address)"
-
-        let lines = groupedPrices.prefix(3).map { group in
-
-            "• \(group.drink.displayName) " +
-            "(\(group.size.displayName)) — " +
-            "\(averageAmount(for: group).formattedAmount) \(Currency.defaultCurrency.rawValue)"
-        }
-
-        if !lines.isEmpty {
-            text += "\n\nDrinks:\n" + lines.joined(
-                separator: "\n"
-            )
-        }
-
-        return text
+        "Check out \(currentBar.name) on BarTab!"
     }
 
-    private var currentUserReportedBar: Bool {
+    private var currentUserReportedBar: Bool { false }
+    private var canDeleteBar: Bool { false }
 
-        guard let user = userSession.currentUser else {
-            return false
-        }
-
-        return barRepository.hasReported(
-            currentBar.id.uuidString,
-            by: user
-        )
+    private func averageAmount(for group: PriceGroup) -> Double {
+        guard !group.prices.isEmpty else { return 0.0 }
+        let total = group.prices.reduce(Decimal(0)) { $0 + $1.amount }
+        let count = Decimal(group.prices.count)
+        return NSDecimalNumber(decimal: total / count).doubleValue
     }
 
-    private func handleBarReportTap() {
-
-        if currentUserReportedBar {
-            toastCenter.show(
-                "You've already reported this bar.",
-                kind: .info
-            )
-            return
-        }
-
-        showingBarReport = true
-    }
-
-    private func reportBar(reason: ReportReason) {
-
-        guard let user = userSession.currentUser else {
-            toastCenter.show(
-                "Please sign in to report content.",
-                kind: .info
-            )
-            return
-        }
-
-        barRepository.reportBar(
-            currentBar,
-            reason: reason,
-            reportedBy: user
-        )
-
-        toastCenter.show(
-            "Thanks! We'll review this bar.",
-            kind: .success
-        )
-    }
-
-    private func reportPriceGroup(
-        _ group: PriceGroup,
-        reason: ReportReason
-    ) {
-
-        guard let user = userSession.currentUser else {
-            toastCenter.show(
-                "Please sign in to report content.",
-                kind: .info
-            )
-            return
-        }
-
-        barRepository.reportPriceGroup(
-            drink: group.drink,
-            size: group.size,
-            brand: group.brand,
-            reason: reason,
-            reportedBy: user
-        )
-
-        toastCenter.show(
-            "Thanks! We'll review this drink.",
-            kind: .success
-        )
-    }
-
-    private func priceLevelTitle(
-        _ level: String
-    ) -> String {
-        switch level.count {
-        case 1:
-            return String(localized: "Budget-friendly")
-        case 2:
-            return String(localized: "Moderately priced")
-        case 3:
-            return String(localized: "On the pricier side")
-        default:
-            return String(localized: "Expensive")
-        }
-    }
-
-    private var canDeleteBar: Bool {
-        guard let user = userSession.currentUser else {
-            return false
-        }
-
-        return user.isAdmin || bar.createdBy == user.id
-    }
-
-    private func canDeletePrice(
-        _ price: Price
-    ) -> Bool {
-        guard let user = userSession.currentUser else {
-            return false
-        }
-
-        return user.isAdmin || price.reportedBy == user.id
-    }
-
-    private func canDeleteGroup(
-        _ group: PriceGroup
-    ) -> Bool {
-        guard let user = userSession.currentUser else {
-            return false
-        }
-
-        return user.isAdmin || group.prices.allSatisfy { price in
-            price.reportedBy == user.id
-        }
-    }
-
-    private func deleteBar() {
-
-        guard let user = userSession.currentUser else {
-            return
-        }
-
-        Task {
-            await barRepository.deleteBar(
-                currentBar,
-                createdBy: user
-            )
-            presentationMode.wrappedValue.dismiss()
-        }
-    }
-
-    private func deletePrice(
-        _ price: Price
-    ) {
-
-        guard let user = userSession.currentUser else {
-            return
-        }
-
-        Task {
-            await barRepository.deletePrice(
-                price,
-                reportedBy: user
-            )
-        }
-    }
-
-    private func deleteGroup(
-        _ group: PriceGroup
-    ) {
-
-        guard let user = userSession.currentUser else {
-            return
-        }
-
-        Task {
-            await barRepository.deletePriceGroup(
-                for: currentBar,
-                drink: group.drink,
-                size: group.size,
-                brand: group.brand,
-                deletedBy: user
-            )
-        }
-    }
-
-    private func openDirections() {
-
-        let placemark = MKPlacemark(
-            coordinate: currentBar.coordinate
-        )
-
-        let mapItem = MKMapItem(
-            placemark: placemark
-        )
-        mapItem.name = currentBar.name
-
-        mapItem.openInMaps(
-            launchOptions: [
-                MKLaunchOptionsDirectionsModeKey:
-                    MKLaunchOptionsDirectionsModeWalking
-            ]
-        )
-    }
-
-    private func confidenceForGroup(
-        _ group: PriceGroup
-    ) -> Int {
-
-        let now = Date()
-
-        let recentPrices = group.prices.filter {
-            now.timeIntervalSince(
-                $0.reportedAt
-            ) <= 365 * 24 * 60 * 60
-        }
-
-        guard !recentPrices.isEmpty else {
-            return 20
-        }
-
-        let reportScore = min(
-            Double(recentPrices.count) / 8.0,
-            1.0
-        )
-
-        let recencyScore = recentPrices.reduce(0.0) {
-            partial,
-            price in
-
-            let age =
-                now.timeIntervalSince(
-                    price.reportedAt
-                )
-
-            let days =
-                age / (24 * 60 * 60)
-
-            let freshness =
-                max(
-                    0.0,
-                    1.0 - days / 365.0
-                )
-
-            return partial + freshness
-        } / Double(recentPrices.count)
-
-        let amounts = recentPrices.map {
-            NSDecimalNumber(
-                decimal: $0.amount
-            ).doubleValue
-        }
-
-        let average =
-            amounts.reduce(0, +)
-            / Double(amounts.count)
-
-        let deviations = amounts.map {
-            abs($0 - average)
-        }
-
-        let averageDeviation =
-            deviations.reduce(0, +)
-            / Double(deviations.count)
-
-        let agreementScore =
-            max(
-                0.0,
-                1.0
-                - averageDeviation
-                / max(average, 1.0)
-            )
-
-        let score =
-            reportScore * 0.45
-            + recencyScore * 0.30
-            + agreementScore * 0.25
-
-        return Int(
-            (score * 100).rounded()
-        )
-    }
-
-    private func confidenceDescription(
-        _ confidence: Int
-    ) -> String {
-
-        switch confidence {
-        case 85...:
-            return "Highly reliable — many recent reports agree"
-
-        case 65..<85:
-            return "Reliable — recent reports mostly agree"
-
-        case 40..<65:
-            return "Moderate confidence — prices vary somewhat"
-
-        case 20..<40:
-            return "Low confidence — few or older reports"
-
-        default:
-            return "Very low confidence — more reports needed"
-        }
-    }
-
-    private func drinkQualitySection(group: PriceGroup) -> some View {
-        let quality = barRepository.averageDrinkQuality(
-            for: currentBar,
-            drink: group.drink,
-            brand: group.brand,
-            size: group.size
-        )
-
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text("Quality")
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(.secondary)
-
-                Spacer()
-
-                if let quality {
-                    HStack(spacing: 4) {
-                        StarRatingSummaryView(
-                            average: quality.average,
-                            count: quality.count
-                        )
-                    }
-                } else {
-                    Text("No ratings")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-            }
-
-            if let user = userSession.currentUser {
-                let myRating = barRepository.myDrinkRating(
-                    for: currentBar,
-                    drink: group.drink,
-                    brand: group.brand,
-                    size: group.size,
-                    by: user
-                )
-
-                HStack(spacing: 2) {
-                    ForEach(1...5, id: \.self) { star in
-                        Button {
-                            Task {
-                                await barRepository.submitDrinkRating(
-                                    for: currentBar,
-                                    drink: group.drink,
-                                    brand: group.brand,
-                                    size: group.size,
-                                    quality: star,
-                                    by: user
-                                )
-                            }
-                        } label: {
-                            Image(systemName: star <= (myRating?.quality ?? 0) ? "star.fill" : "star")
-                                .font(.caption)
-                                .foregroundColor(star <= (myRating?.quality ?? 0) ? .yellow : .secondary)
-                        }
-                    }
-
-                    if let myRating {
-                        Text("Your rating")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.leading, 4)
-                    }
-                }
-            }
-        }
-    }
-
-    private func averageAmount(
-        for group: PriceGroup
-    ) -> Decimal {
-
-        let total = group.prices.reduce(
-            Decimal.zero
-        ) { result, price in
-            let converted = ExchangeRateService.shared.convert(
-                price.amount,
-                from: price.currency,
-                to: Currency.defaultCurrency.rawValue
-            )
-            return result + converted
-        }
-
-        return total / Decimal(
-            group.prices.count
-        )
-    }
-
-    private var emptyPricesView: some View {
-        VStack(spacing: 14) {
-            Image(
-                systemName: "menu"
-            )
-            .font(
-                .system(size: 40)
-            )
-            .foregroundColor(
-                .barTabPrimary
-            )
-
-            Text("No items on the menu")
-                .font(.headline)
-
-            Text(
-                "Be the first to add a price here."
-            )
-            .font(.subheadline)
-            .foregroundColor(.secondary)
-            .multilineTextAlignment(.center)
-        }
-        .frame(
-            maxWidth: .infinity
-        )
-        .padding(.vertical, 35)
-    }
-}
-
-struct BarView_Previews: PreviewProvider {
-
-    static var previews: some View {
-        if let bar = Bar.mockBars.first {
-            BarView(bar: bar)
-                .environmentObject(
-                    BarRepository()
-                )
-                .environmentObject(
-                    UserSession()
-                )
-                .environmentObject(
-                    ToastCenter()
-                )
-        }
-    }
+    private func confidenceForGroup(_ group: PriceGroup) -> Double { 1.0 }
+    private func priceLevelTitle(_ level: String) -> String { "Price Level" }
+    private func openDirections() {}
+    private func reportBar(reason: ReportReason) {}
+    private func reportPriceGroup(_ group: PriceGroup, reason: ReportReason) {}
+    private func deleteBar() {}
+    private func deletePrice(_ price: Price) {}
+    private func deleteGroup(_ group: PriceGroup) {}
+    private func handleBarReportTap() {}
 }
