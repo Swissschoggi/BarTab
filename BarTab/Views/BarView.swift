@@ -684,7 +684,7 @@ struct BarView: View {
 
                         Spacer()
 
-                        Text("\(Currency.defaultCurrency.symbol)\(averageAmount(for: group).formattedAmount)")
+                        Text("\(Currency.defaultCurrency.symbol)\(Decimal(averageAmount(for: group)).formattedAmount)")
                             .font(.subheadline)
                             .fontWeight(.bold)
                             .foregroundColor(.barTabPrimary)
