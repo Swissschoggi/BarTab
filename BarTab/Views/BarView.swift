@@ -465,6 +465,7 @@ struct BarView: View {
             placement: .navigationBarTrailing
         ) {
             Button {
+                HapticEngine.impact()
                 withAnimation(
                     .easeInOut(duration: 0.2)
                 ) {
@@ -668,6 +669,7 @@ struct BarView: View {
                 Button("Cancel", role: .cancel) {}
 
                 Button {
+                    HapticEngine.impact()
                     Task {
                         await barRepository.toggleOutdoorSeating(for: currentBar)
                     }

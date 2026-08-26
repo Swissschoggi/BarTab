@@ -8,7 +8,15 @@ struct MainTabView: View {
         case profile
     }
 
+    @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var barRepository: BarRepository
+
     @State private var selectedTab: Tab = .map
+
+    private var adminBadgeCount: Int {
+        guard userSession.currentUser?.isAdmin == true else { return 0 }
+        return barRepository.pendingBrandRequestCount
+    }
 
     var body: some View {
 
@@ -49,7 +57,8 @@ struct MainTabView: View {
                 tabButton(
                     title: "Me",
                     icon: "person.fill",
-                    tab: .profile
+                    tab: .profile,
+                    badge: adminBadgeCount
                 )
             }
             .padding(6)
@@ -83,7 +92,8 @@ struct MainTabView: View {
     private func tabButton(
         title: LocalizedStringKey,
         icon: String,
-        tab: Tab
+        tab: Tab,
+        badge: Int = 0
     ) -> some View {
 
         Button {
@@ -100,6 +110,17 @@ struct MainTabView: View {
 
                 Image(systemName: icon)
                     .font(.system(size: 15, weight: .semibold))
+                    .overlay(alignment: .topTrailing) {
+                        if badge > 0 {
+                            Text("\(badge)")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 16, height: 16)
+                                .background(Color.red)
+                                .clipShape(Circle())
+                                .offset(x: 8, y: -8)
+                        }
+                    }
 
                 if selectedTab == tab {
                     Text(title)

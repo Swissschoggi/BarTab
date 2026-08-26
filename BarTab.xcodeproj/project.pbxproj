@@ -77,6 +77,7 @@
 		BRTA00013070000100000023 /* it.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000023 /* it.lproj */; };
 		BRTA00013060000100000033 /* ToastCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000030 /* ToastCenter.swift */; };
 		BRTA00013060000100000034 /* AvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000031 /* AvatarService.swift */; };
+		BRTA00013060000100000036 /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000035 /* HapticEngine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -171,6 +172,7 @@
 		BRTA0001306000010000002C /* ExchangeRateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeRateService.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000030 /* ToastCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCenter.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000031 /* AvatarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarService.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000035 /* HapticEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticEngine.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000032 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -335,6 +337,7 @@
 				BRTA0001306000010000001F /* LanguageManager.swift */,
 				BRTA00013060000100000030 /* ToastCenter.swift */,
 				BRTA00013060000100000031 /* AvatarService.swift */,
+				BRTA00013060000100000035 /* HapticEngine.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -576,6 +579,7 @@
 				BRTA0001306000010000001E /* LanguageManager.swift in Sources */,
 				BRTA00013060000100000033 /* ToastCenter.swift in Sources */,
 				BRTA00013060000100000034 /* AvatarService.swift in Sources */,
+				BRTA00013060000100000036 /* HapticEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

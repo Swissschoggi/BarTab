@@ -51,6 +51,12 @@ final class ToastCenter: ObservableObject {
     ) {
         guard !message.isEmpty else { return }
 
+        switch kind {
+        case .success: HapticEngine.success()
+        case .error:   HapticEngine.error()
+        case .info:    HapticEngine.lightTap()
+        }
+
         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
             currentToast = Toast(kind: kind, message: message)
         }
@@ -149,9 +155,13 @@ enum FriendlyError {
                 return "An account with this email already exists."
             }
 
-            return serverText.hasPrefix("{")
-                ? "The server rejected that request."
-                : serverText
+            if lowered.contains("new row violates row-level security")
+                || lowered.contains("permission denied")
+                || lowered.contains("violates foreign key") {
+                return "You don't have permission to do that."
+            }
+
+            return "The server rejected that request."
         }
 
         switch error.statusCode {
@@ -190,7 +200,11 @@ enum FriendlyError {
             return "That password is too short."
         }
 
-        return text.count < 140 ? text : "Something went wrong. Please try again."
+        if lowered.contains("signup requires") || lowered.contains("unable to exchange external") {
+            return "Sign-in failed. Please try again."
+        }
+
+        return "Something went wrong. Please try again."
     }
 }
 

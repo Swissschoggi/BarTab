@@ -34,10 +34,11 @@ final class KeychainService {
         return data
     }
 
+    @discardableResult
     func write(
         _ data: Data,
         account: String
-    ) {
+    ) -> Bool {
 
         let base: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
@@ -58,16 +59,18 @@ final class KeychainService {
         )
 
         if status == errSecSuccess {
-            SecItemUpdate(
+            let updateStatus = SecItemUpdate(
                 base as CFDictionary,
                 attributes as CFDictionary
             )
+            return updateStatus == errSecSuccess
         } else {
             var add = base
             add[kSecValueData] = data
             add[kSecAttrAccessible] =
                 kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-            SecItemAdd(add as CFDictionary, nil)
+            let addStatus = SecItemAdd(add as CFDictionary, nil)
+            return addStatus == errSecSuccess
         }
     }
 

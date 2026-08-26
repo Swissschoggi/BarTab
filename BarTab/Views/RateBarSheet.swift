@@ -103,6 +103,8 @@ struct RateBarSheet: View {
             return
         }
 
+        HapticEngine.impact()
+
         Task {
             await barRepository.submitRating(
                 for: bar,

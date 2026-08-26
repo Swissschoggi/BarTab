@@ -99,6 +99,10 @@ struct NearbyBarsView: View {
             .background(
                 Color.barTabBackground.ignoresSafeArea()
             )
+            .refreshable {
+                await barRepository.fetchAllData()
+                HapticEngine.lightTap()
+            }
             .navigationBarHidden(true)
             .onAppear {
                 locationService.requestPermission()

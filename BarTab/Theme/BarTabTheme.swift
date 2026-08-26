@@ -261,3 +261,106 @@ extension View {
         modifier(CardBorder())
     }
 }
+
+// MARK: - Input validation
+
+enum InputValidator {
+
+    static let maxDisplayNameLength = 40
+    static let maxBrandNameLength = 60
+    static let maxCommentLength = 200
+
+    static func validateDisplayName(_ name: String) -> String? {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return "Please enter a name." }
+        if trimmed.count > maxDisplayNameLength {
+            return "Name must be \(maxDisplayNameLength) characters or fewer."
+        }
+        return nil
+    }
+
+    static func validateBrandName(_ name: String) -> String? {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return "Please enter a brand name." }
+        if trimmed.count > maxBrandNameLength {
+            return "Name must be \(maxBrandNameLength) characters or fewer."
+        }
+        return nil
+    }
+
+    static func validateEmail(_ email: String) -> Bool {
+        let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.range(
+            of: #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#,
+            options: .regularExpression
+        ) != nil
+    }
+}
+
+// MARK: - Skeleton loading
+
+struct SkeletonModifier: ViewModifier {
+
+    @State private var phase: CGFloat = -1
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                LinearGradient(
+                    colors: [
+                        Color.gray.opacity(0.15),
+                        Color.gray.opacity(0.3),
+                        Color.gray.opacity(0.15)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .offset(x: phase * 400)
+                .mask(content)
+            )
+            .onAppear {
+                withAnimation(
+                    .linear(duration: 1.2)
+                    .repeatForever(autoreverses: false)
+                ) {
+                    phase = 1
+                }
+            }
+    }
+}
+
+extension View {
+
+    func skeleton() -> some View {
+        modifier(SkeletonModifier())
+    }
+}
+
+struct BarRowSkeleton: View {
+
+    var body: some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.gray.opacity(0.2))
+                .frame(width: 50, height: 50)
+
+            VStack(alignment: .leading, spacing: 6) {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(width: 140, height: 14)
+
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.15))
+                    .frame(width: 100, height: 10)
+
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.15))
+                    .frame(width: 80, height: 10)
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 4)
+        .skeleton()
+    }
+}

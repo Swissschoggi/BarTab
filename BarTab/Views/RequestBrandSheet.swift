@@ -67,7 +67,11 @@ struct RequestBrandSheet: View {
                         .textFieldStyle(.roundedBorder)
                         .autocorrectionDisabled()
 
-                    if !trimmedName.isEmpty && alreadyExists {
+                    if !trimmedName.isEmpty && trimmedName.count > InputValidator.maxBrandNameLength {
+                        Text("Name must be \(InputValidator.maxBrandNameLength) characters or fewer.")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                    } else if !trimmedName.isEmpty && alreadyExists {
                         Text("That brand is already in the list.")
                             .font(.caption)
                             .foregroundColor(.orange)
@@ -90,6 +94,7 @@ struct RequestBrandSheet: View {
                     }
                     .disabled(
                         trimmedName.isEmpty
+                        || trimmedName.count > InputValidator.maxBrandNameLength
                         || alreadyExists
                         || alreadyPending
                     )
@@ -113,6 +118,8 @@ struct RequestBrandSheet: View {
 
     private func submit() {
         guard let user = userSession.currentUser else { return }
+
+        HapticEngine.impact()
 
         Task {
             await barRepository.requestBrand(

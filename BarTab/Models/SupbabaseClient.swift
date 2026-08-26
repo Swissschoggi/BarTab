@@ -68,6 +68,11 @@ final class SupabaseClient {
 
     static let shared = SupabaseClient()
 
+    /// Serializes token-refresh attempts so concurrent 401s don't
+    /// race and invalidate the refresh token.
+    private static let refreshLock = NSLock()
+    private static var isRefreshing = false
+
     struct SupabaseError: LocalizedError {
 
         let statusCode: Int
@@ -178,14 +183,32 @@ final class SupabaseClient {
             return try await perform(request)
         } catch let error as SupabaseError {
             guard error.statusCode == 401,
-                  AuthTokenStore.shared.hasToken,
-                  let refreshed = try? await
-                      SupabaseAuthService().refreshSession(),
+                  AuthTokenStore.shared.hasToken else {
+                throw error
+            }
+
+            Self.refreshLock.lock()
+            defer { Self.refreshLock.unlock() }
+
+            guard !Self.isRefreshing else {
+                let retried = retriedRequest(request)
+                guard let retried else { throw error }
+                retried.setValue(
+                    "Bearer \(AuthTokenStore.shared.accessToken ?? "")",
+                    forHTTPHeaderField: "Authorization"
+                )
+                return try await perform(retried)
+            }
+
+            Self.isRefreshing = true
+            defer { Self.isRefreshing = false }
+
+            guard let _ = try? await
+                SupabaseAuthService().refreshSession(),
                   var retried = retriedRequest(request) else {
                 throw error
             }
 
-            _ = refreshed
             retried.setValue(
                 "Bearer \(AuthTokenStore.shared.accessToken ?? "")",
                 forHTTPHeaderField: "Authorization"

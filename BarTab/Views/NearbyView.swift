@@ -42,6 +42,7 @@ struct NearbyView: View {
     @State private var radiusKM: Double = 2
     @State private var showingLocationSearch = false
     @State private var displayMode: DisplayMode = .bars
+    @State private var isRefreshing = false
 
     // Drink search state
     @State private var searchText = ""
@@ -247,6 +248,9 @@ struct NearbyView: View {
                 .padding(.bottom, 30)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
+            .refreshable {
+                await refreshBars()
+            }
             .navigationBarHidden(true)
             .onAppear {
                 locationService.requestPermission()
@@ -958,6 +962,14 @@ struct NearbyView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
+    }
+
+    private func refreshBars() async {
+        isRefreshing = true
+        defer { isRefreshing = false }
+
+        await barRepository.fetchAllData()
+        HapticEngine.lightTap()
     }
 
     private static func formattedDistance(_ distance: CLLocationDistance) -> String {

@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var showingRestartAlert = false
     @State private var showingUsernameEditor = false
     @State private var showingPasswordEditor = false
+    @State private var showingTipJar = false
     @State private var newUsername = ""
     @State private var newPassword = ""
     @State private var confirmPassword = ""
@@ -199,6 +200,86 @@ struct SettingsView: View {
                     }
                     .barTabCard()
 
+                    // Admin section
+                    if userSession.currentUser?.isAdmin == true {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "shield.lefthalf.filled")
+                                    .font(.subheadline)
+                                    .foregroundColor(.barTabPrimary)
+                                Text("Admin")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabText)
+                            }
+
+                            VStack(spacing: 0) {
+                                NavigationLink {
+                                    AdminBrandRequestsView()
+                                } label: {
+                                    HStack {
+                                        Label("Brand Requests", systemImage: "tag.fill")
+                                            .font(.subheadline)
+                                            .foregroundColor(.barTabText)
+
+                                        Spacer()
+
+                                        if barRepository.pendingBrandRequestCount > 0 {
+                                            Text("\(barRepository.pendingBrandRequestCount)")
+                                                .font(.caption2)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.white)
+                                                .padding(.horizontal, 7)
+                                                .padding(.vertical, 2)
+                                                .background(Color.orange)
+                                                .clipShape(Capsule())
+                                        }
+
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundColor(.barTabSecondary)
+                                    }
+                                    .padding(.vertical, 10)
+                                    .padding(.horizontal, 12)
+                                }
+
+                                Divider()
+                                    .foregroundColor(.barTabCardBorder)
+                                    .padding(.leading, 44)
+
+                                NavigationLink {
+                                    AdminReportsView()
+                                } label: {
+                                    HStack {
+                                        Label("Reported Content", systemImage: "exclamationmark.shield.fill")
+                                            .font(.subheadline)
+                                            .foregroundColor(.barTabText)
+
+                                        Spacer()
+
+                                        if barRepository.unreviewedReportCount > 0 {
+                                            Text("\(barRepository.unreviewedReportCount)")
+                                                .font(.caption2)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.white)
+                                                .padding(.horizontal, 7)
+                                                .padding(.vertical, 2)
+                                                .background(Color.red)
+                                                .clipShape(Capsule())
+                                        }
+
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundColor(.barTabSecondary)
+                                    }
+                                    .padding(.vertical, 10)
+                                    .padding(.horizontal, 12)
+                                }
+                            }
+                        }
+                        .barTabCard()
+                    }
+
                     // About
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
@@ -236,6 +317,44 @@ struct SettingsView: View {
                         }
                     }
                     .barTabCard()
+
+                    // Support the Dev
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "cup.and.saucer.fill")
+                                .font(.subheadline)
+                                .foregroundColor(.barTabPrimary)
+                            Text("Support the Dev")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Buy the developer a drink!")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+
+                            Text("If BarTab helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running.")
+                                .font(.caption)
+                                .foregroundColor(.barTabSecondary)
+                        }
+
+                        Button {
+                            showingTipJar = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "cup.and.saucer.fill")
+                                Text("Buy a Drink")
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .barTabPrimaryButton()
+                        }
+                    }
+                    .barTabCard()
                 }
                 .padding(.horizontal)
                 .padding(.top, 20)
@@ -264,11 +383,8 @@ struct SettingsView: View {
             TextField("Username", text: $newUsername)
             Button("Save") {
                 let trimmed = newUsername.trimmingCharacters(in: .whitespaces)
-                guard !trimmed.isEmpty else {
-                    toastCenter.show(
-                        "Please enter a username.",
-                        kind: .error
-                    )
+                if let error = InputValidator.validateDisplayName(trimmed) {
+                    toastCenter.show(error, kind: .error)
                     return
                 }
                 Task {
@@ -325,6 +441,11 @@ struct SettingsView: View {
             }
         } message: {
             Text("Enter your new password (at least 8 characters).")
+        }
+        .alert("Coming Soon", isPresented: $showingTipJar) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Tip jar coming soon! We're setting up payments — stay tuned.")
         }
     }
 

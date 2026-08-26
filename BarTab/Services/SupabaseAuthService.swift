@@ -102,7 +102,10 @@ final class SupabaseAuthService {
             return
         }
 
-        keychain.write(data, account: sessionAccount)
+        let saved = keychain.write(data, account: sessionAccount)
+        if !saved {
+            print("[SupabaseAuthService] WARNING: keychain write failed — session may not persist")
+        }
         mirrorTokens(from: session)
     }
 

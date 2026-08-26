@@ -417,6 +417,7 @@ struct LoginView: View {
         )
 
         guard !trimmed.isEmpty,
+              InputValidator.validateEmail(trimmed),
               !password.isEmpty else {
             return false
         }

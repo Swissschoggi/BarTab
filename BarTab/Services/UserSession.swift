@@ -105,21 +105,19 @@ final class UserSession: ObservableObject {
 
     func logout() {
 
-        let accessToken = authService
-            .restoreSession()?
-            .tokens
-            .accessToken
+        let session = authService.restoreSession()
+        let accessToken = session?.tokens.accessToken
 
-        authService.clearSession()
-        currentUser = nil
-
-        if let accessToken = accessToken {
+        if let accessToken {
             Task {
                 try? await authService.logout(
                     accessToken: accessToken
                 )
             }
         }
+
+        authService.clearSession()
+        currentUser = nil
     }
 
     // MARK: - Account updates
