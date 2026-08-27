@@ -762,4 +762,302 @@ final class SupabaseClient {
             string: "\(baseURL)/storage/v1/object/public/\(path)"
         )!
     }
+
+    // MARK: - Follows
+
+    func follow(_ userID: UUID) async throws {
+        let body: [String: Any] = [
+            "follower_id": currentUserID!.uuidString,
+            "following_id": userID.uuidString
+        ]
+        var request = makeRequest(endpoint: "follows", method: "POST")
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        _ = try await performAuthorized(request)
+    }
+
+    func unfollow(_ userID: UUID) async throws {
+        let myID = currentUserID!.uuidString
+        let theirID = userID.uuidString
+        var request = makeRequest(
+            endpoint: "follows?follower_id=eq.\(myID)&following_id=eq.\(theirID)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    func fetchFollowing() async throws -> [UUID] {
+        let myID = currentUserID!.uuidString
+        let request = makeRequest(
+            endpoint: "follows?follower_id=eq.\(myID)&select=following_id"
+        )
+        let data = try await performAuthorized(request)
+        let rows = try decoder.decode([Follow].self, from: data)
+        return rows.map(\.followingID)
+    }
+
+    func fetchFollowerCount(for userID: UUID) async throws -> Int {
+        let request = makeRequest(
+            endpoint: "follows?following_id=eq.\(userID.uuidString)&select=follower_id"
+        )
+        let data = try await performAuthorized(request)
+        let rows = try decoder.decode([Follow].self, from: data)
+        return rows.count
+    }
+
+    func fetchFollowingCount(for userID: UUID) async throws -> Int {
+        let request = makeRequest(
+            endpoint: "follows?follower_id=eq.\(userID.uuidString)&select=following_id"
+        )
+        let data = try await performAuthorized(request)
+        let rows = try decoder.decode([Follow].self, from: data)
+        return rows.count
+    }
+
+    // MARK: - Activity Feed
+
+    func fetchActivityFeed(followingIDs: [UUID]) async throws -> [ActivityItem] {
+        guard !followingIDs.isEmpty else { return [] }
+
+        let ids = followingIDs.map(\.uuidString).joined(separator: ",")
+        var items: [ActivityItem] = []
+
+        // Recent prices from followed users
+        let priceReq = makeRequest(
+            endpoint: "prices?reported_by=in.(\(ids))&select=*,bars(name)&order=reported_at.desc&limit=30"
+        )
+        let priceData = try await performAuthorized(priceReq)
+        let priceRows = try decoder.decode([PriceDTO].self, from: priceData)
+        for row in priceRows {
+            items.append(.priceReport(
+                id: row.id,
+                userID: row.reported_by,
+                barName: row.bars?.name ?? "Unknown",
+                drink: row.drink,
+                amount: row.amount,
+                currency: row.currency,
+                timestamp: row.reported_at
+            ))
+        }
+
+        // Recent bar ratings from followed users
+        let ratingReq = makeRequest(
+            endpoint: "bar_ratings?rated_by=in.(\(ids))&select=*,bars(name)&order=created_at.desc&limit=20"
+        )
+        let ratingData = try await performAuthorized(ratingReq)
+        let ratingRows = try decoder.decode([BarRatingDTO].self, from: ratingData)
+        for row in ratingRows {
+            items.append(.barRating(
+                id: row.id,
+                userID: row.rated_by,
+                barName: row.bars?.name ?? "Unknown",
+                ambience: row.ambience,
+                timestamp: row.created_at
+            ))
+        }
+
+        return items.sorted { $0.timestamp > $1.timestamp }
+    }
+
+    // MARK: - Groups
+
+    func createGroup(name: String) async throws -> BarGroup {
+        let body: [String: Any] = [
+            "name": name,
+            "created_by": currentUserID!.uuidString
+        ]
+        var request = makeRequest(endpoint: "groups", method: "POST")
+        request.setValue("return=representation", forHTTPHeaderField: "Prefer")
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        let data = try await performAuthorized(request)
+        let rows = try decoder.decode([BarGroup].self, from: data)
+        guard let group = rows.first else {
+            throw SupabaseError(statusCode: 200, message: "Failed to create group")
+        }
+
+        // Auto-add creator as admin
+        let memberBody: [String: Any] = [
+            "group_id": group.id.uuidString,
+            "user_id": currentUserID!.uuidString,
+            "role": "admin"
+        ]
+        var memberReq = makeRequest(endpoint: "group_members", method: "POST")
+        memberReq.httpBody = try JSONSerialization.data(withJSONObject: memberBody)
+        _ = try await performAuthorized(memberReq)
+
+        return group
+    }
+
+    func fetchGroups() async throws -> [BarGroup] {
+        let myID = currentUserID!.uuidString
+        let request = makeRequest(
+            endpoint: "groups?id=in.(select group_id from group_members where user_id='\(myID)')&select=*"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([BarGroup].self, from: data)
+    }
+
+    func fetchGroupMembers(groupID: UUID) async throws -> [GroupMember] {
+        let request = makeRequest(
+            endpoint: "group_members?group_id=eq.\(groupID.uuidString)&select=*"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([GroupMember].self, from: data)
+    }
+
+    func inviteToGroup(groupID: UUID, userID: UUID) async throws {
+        let body: [String: Any] = [
+            "group_id": groupID.uuidString,
+            "user_id": userID.uuidString,
+            "role": "member"
+        ]
+        var request = makeRequest(endpoint: "group_members", method: "POST")
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        _ = try await performAuthorized(request)
+    }
+
+    func leaveGroup(groupID: UUID) async throws {
+        let myID = currentUserID!.uuidString
+        var request = makeRequest(
+            endpoint: "group_members?group_id=eq.\(groupID.uuidString)&user_id=eq.\(myID)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    // MARK: - Polls
+
+    func createPoll(groupID: UUID, title: String, options: [(barID: UUID?, label: String)]) async throws -> Poll {
+        let pollBody: [String: Any] = [
+            "group_id": groupID.uuidString,
+            "title": title,
+            "created_by": currentUserID!.uuidString
+        ]
+        var pollReq = makeRequest(endpoint: "group_polls", method: "POST")
+        pollReq.setValue("return=representation", forHTTPHeaderField: "Prefer")
+        pollReq.httpBody = try JSONSerialization.data(withJSONObject: pollBody)
+
+        let pollData = try await performAuthorized(pollReq)
+        let pollRows = try decoder.decode([Poll].self, from: pollData)
+        guard let poll = pollRows.first else {
+            throw SupabaseError(statusCode: 200, message: "Failed to create poll")
+        }
+
+        for option in options {
+            var optBody: [String: Any] = [
+                "poll_id": poll.id.uuidString,
+                "label": option.label,
+                "created_by": currentUserID!.uuidString
+            ]
+            if let barID = option.barID {
+                optBody["bar_id"] = barID.uuidString
+            }
+            var optReq = makeRequest(endpoint: "poll_options", method: "POST")
+            optReq.httpBody = try JSONSerialization.data(withJSONObject: optBody)
+            _ = try await performAuthorized(optReq)
+        }
+
+        return poll
+    }
+
+    func fetchPolls(groupID: UUID) async throws -> [Poll] {
+        let request = makeRequest(
+            endpoint: "group_polls?group_id=eq.\(groupID.uuidString)&select=*&order=created_at.desc"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([Poll].self, from: data)
+    }
+
+    func fetchPollOptions(pollID: UUID) async throws -> [PollOption] {
+        let request = makeRequest(
+            endpoint: "poll_options?poll_id=eq.\(pollID.uuidString)&select=*"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([PollOption].self, from: data)
+    }
+
+    func fetchPollVotes(pollID: UUID) async throws -> [PollVote] {
+        let request = makeRequest(
+            endpoint: "poll_votes?poll_id=eq.\(pollID.uuidString)&select=*"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([PollVote].self, from: data)
+    }
+
+    func votePoll(pollID: UUID, optionID: UUID) async throws {
+        let myID = currentUserID!.uuidString
+
+        // Remove existing vote for this poll
+        var deleteReq = makeRequest(
+            endpoint: "poll_votes?poll_id=eq.\(pollID.uuidString)&user_id=eq.\(myID)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(deleteReq)
+
+        // Insert new vote
+        let body: [String: Any] = [
+            "poll_id": pollID.uuidString,
+            "option_id": optionID.uuidString,
+            "user_id": myID
+        ]
+        var voteReq = makeRequest(endpoint: "poll_votes", method: "POST")
+        voteReq.httpBody = try JSONSerialization.data(withJSONObject: body)
+        _ = try await performAuthorized(voteReq)
+    }
+
+    func closePoll(pollID: UUID) async throws {
+        let body: [String: Any] = ["is_closed": true]
+        var request = makeRequest(
+            endpoint: "group_polls?id=eq.\(pollID.uuidString)",
+            method: "PATCH"
+        )
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        _ = try await performAuthorized(request)
+    }
+
+    // MARK: - Price Alerts
+
+    func createPriceAlert(
+        barID: UUID,
+        drink: String,
+        size: String,
+        brand: String?,
+        targetPrice: Double?
+    ) async throws -> PriceAlert {
+        let body: [String: Any] = [
+            "user_id": currentUserID!.uuidString,
+            "bar_id": barID.uuidString,
+            "drink": drink,
+            "size": size,
+            "brand": brand as Any,
+            "target_price": targetPrice as Any
+        ]
+        var request = makeRequest(endpoint: "price_alerts", method: "POST")
+        request.setValue("return=representation", forHTTPHeaderField: "Prefer")
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        let data = try await performAuthorized(request)
+        let rows = try decoder.decode([PriceAlert].self, from: data)
+        guard let alert = rows.first else {
+            throw SupabaseError(statusCode: 200, message: "Failed to create alert")
+        }
+        return alert
+    }
+
+    func fetchPriceAlerts() async throws -> [PriceAlert] {
+        let myID = currentUserID!.uuidString
+        let request = makeRequest(
+            endpoint: "price_alerts?user_id=eq.\(myID)&is_active=true&select=*&order=created_at.desc"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([PriceAlert].self, from: data)
+    }
+
+    func deletePriceAlert(_ alertID: UUID) async throws {
+        var request = makeRequest(
+            endpoint: "price_alerts?id=eq.\(alertID.uuidString)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
 }

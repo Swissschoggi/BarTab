@@ -32,6 +32,8 @@ struct BarView: View {
     @State private var showingOutdoorConfirmation = false
     @State private var ratingDrinkGroup: PriceGroup?
     @State private var showingDrinkRating = false
+    @State private var alertDrinkGroup: PriceGroup?
+    @State private var showingPriceAlert = false
 
     // Cached from @Published — never read barRepository directly in body
     @State private var currentBar: Bar
@@ -560,6 +562,19 @@ struct BarView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showingPriceAlert) {
+                if let group = alertDrinkGroup {
+                    SetAlertSheet(
+                        bar: currentBar,
+                        drink: group.drink,
+                        size: group.size,
+                        brand: group.brand
+                    )
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+                    .environmentObject(toastCenter)
+                }
+            }
             .confirmationDialog(
                 "Report this bar?",
                 isPresented: $showingBarReport,
@@ -744,6 +759,16 @@ struct BarView: View {
                             Image(systemName: "exclamationmark.circle")
                                 .font(.caption)
                                 .foregroundColor(isFlagged ? .orange : .barTabSecondary)
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            alertDrinkGroup = group
+                            showingPriceAlert = true
+                        } label: {
+                            Image(systemName: "bell")
+                                .font(.caption)
+                                .foregroundColor(.barTabSecondary)
                         }
                         .buttonStyle(.plain)
                     }

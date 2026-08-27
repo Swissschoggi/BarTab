@@ -1,6 +1,12 @@
 import Foundation
 import CoreLocation
 
+// MARK: - Nested bar ref (for activity feed)
+
+struct BarNameRef: Codable {
+    let name: String
+}
+
 // MARK: - Bar DTO
 
 struct BarDTO: Codable {
@@ -72,6 +78,7 @@ struct BarRatingDTO: Codable {
     let ambience: String?
     let wine_quality: Int?
     let created_at: Date
+    let bars: BarNameRef?
 
     var toDomain: BarRating {
         let styles: [AmbienceStyle] = {
@@ -96,6 +103,7 @@ struct BarRatingDTO: Codable {
         self.ambience = domain.ambience.isEmpty ? nil : domain.ambience.map(\.rawValue).joined(separator: ",")
         self.wine_quality = domain.wineQuality
         self.created_at = domain.createdAt
+        self.bars = nil
     }
 
     func encode(to encoder: Encoder) throws {
@@ -129,6 +137,7 @@ struct PriceDTO: Codable {
     let reported_by: UUID
     let style: String?
     let serving: String?
+    let bars: BarNameRef?
 
     var toDomain: Price? {
         guard let drinkEnum = Drink(rawValue: drink),
@@ -163,6 +172,7 @@ struct PriceDTO: Codable {
         self.reported_by = domain.reportedBy
         self.style = domain.style
         self.serving = domain.serving?.rawValue
+        self.bars = nil
     }
 
     /// Custom decoder that handles missing style/serving fields
@@ -180,6 +190,7 @@ struct PriceDTO: Codable {
         reported_by = try container.decode(UUID.self, forKey: .reported_by)
         style = try container.decodeIfPresent(String.self, forKey: .style)
         serving = try container.decodeIfPresent(String.self, forKey: .serving)
+        bars = try container.decodeIfPresent(BarNameRef.self, forKey: .bars)
     }
 }
 

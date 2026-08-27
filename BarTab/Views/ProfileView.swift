@@ -278,6 +278,47 @@ struct ProfileView: View {
                             }
                         }
 
+                        // Social
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Social")
+                                .font(.headline)
+
+                            VStack(spacing: 0) {
+                                navigationRow(
+                                    title: "Activity",
+                                    subtitle: "See what friends are drinking",
+                                    icon: "bolt.fill"
+                                ) {
+                                    ActivityFeedView()
+                                }
+
+                                Divider()
+                                    .foregroundColor(.barTabCardBorder)
+                                    .padding(.leading, 44)
+
+                                navigationRow(
+                                    title: "Groups",
+                                    subtitle: "Plan nights out",
+                                    icon: "person.3.fill"
+                                ) {
+                                    GroupPlanningView()
+                                }
+
+                                Divider()
+                                    .foregroundColor(.barTabCardBorder)
+                                    .padding(.leading, 44)
+
+                                navigationRow(
+                                    title: "Price Alerts",
+                                    subtitle: "Get notified on price changes",
+                                    icon: "bell.fill"
+                                ) {
+                                    PriceAlertListView()
+                                }
+                            }
+                            .barTabCard()
+                        }
+
 
                         if !barRepository.favoriteBars.isEmpty {
 
