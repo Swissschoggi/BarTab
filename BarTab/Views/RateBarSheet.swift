@@ -59,16 +59,6 @@ struct RateBarSheet: View {
                 }
                 .barTabCard()
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Drink quality")
-                        .font(.headline)
-
-                    Text("Rate the quality of specific drinks in the menu below.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                .barTabCard()
-
                 Spacer()
 
                 Button {

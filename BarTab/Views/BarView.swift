@@ -498,22 +498,25 @@ struct BarView: View {
                 .environmentObject(userSession)
             }
             .sheet(isPresented: $showingDrinkRating) {
-                if let group = ratingDrinkGroup, let user = userSession.currentUser {
-                    DrinkRatingSheet(
-                        bar: currentBar,
-                        drink: group.drink,
-                        brand: group.brand,
-                        size: group.size,
-                        initialQuality: barRepository.myDrinkRating(
-                            for: currentBar,
+                Group {
+                    if let group = ratingDrinkGroup,
+                       let user = userSession.currentUser {
+                        DrinkRatingSheet(
+                            bar: currentBar,
                             drink: group.drink,
                             brand: group.brand,
                             size: group.size,
-                            by: user
-                        )?.quality
-                    )
-                    .environmentObject(barRepository)
-                    .environmentObject(userSession)
+                            initialQuality: barRepository.myDrinkRating(
+                                for: currentBar,
+                                drink: group.drink,
+                                brand: group.brand,
+                                size: group.size,
+                                by: user
+                            )?.quality
+                        )
+                        .environmentObject(barRepository)
+                        .environmentObject(userSession)
+                    }
                 }
             }
             .confirmationDialog(
@@ -698,11 +701,32 @@ struct BarView: View {
                                 .foregroundColor(.barTabPrimary)
                         }
                         .buttonStyle(.plain)
+
+                        Button {
+                            pendingReportGroup = group
+                            showingPriceReport = true
+                        } label: {
+                            Image(systemName: "exclamationmark.circle")
+                                .font(.caption)
+                                .foregroundColor(isFlagged ? .orange : .barTabSecondary)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.vertical, 8)
             }
             .buttonStyle(.plain)
+
+            if isExpanded && group.prices.count > 1 {
+                VStack(alignment: .leading, spacing: 8) {
+                    Divider()
+                    PriceTrendChart(prices: group.prices)
+                        .frame(height: 120)
+                        .padding(.horizontal, 4)
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+                .padding(.bottom, 8)
+            }
         }
     }
 
@@ -718,7 +742,14 @@ struct BarView: View {
         "Check out \(currentBar.name) on BarTab!"
     }
 
-    private var currentUserReportedBar: Bool { false }
+    private var currentUserReportedBar: Bool {
+        guard let user = userSession.currentUser else { return false }
+        return barRepository.reports.contains {
+            $0.targetID == currentBar.id.uuidString
+            && $0.targetType == .bar
+            && $0.reportedBy == user.id
+        }
+    }
     private var canDeleteBar: Bool { false }
 
     private func averageAmount(for group: PriceGroup) -> Double {
@@ -730,13 +761,64 @@ struct BarView: View {
 
     private func confidenceForGroup(_ group: PriceGroup) -> Double { 1.0 }
     private func priceLevelTitle(_ level: String) -> String { "Price Level" }
-    private func openDirections() {}
-    private func reportBar(reason: ReportReason) {}
-    private func reportPriceGroup(_ group: PriceGroup, reason: ReportReason) {}
-    private func deleteBar() {}
-    private func deletePrice(_ price: Price) {}
-    private func deleteGroup(_ group: PriceGroup) {}
-    private func handleBarReportTap() {}
+    private func openDirections() {
+        let coordinate = currentBar.coordinate
+        let placemark = MKPlacemark(coordinate: coordinate)
+        let mapItem = MKMapItem(placemark: placemark)
+        mapItem.name = currentBar.name
+        mapItem.openInMaps(launchOptions: [
+            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking
+        ])
+    }
+    private func reportBar(reason: ReportReason) {
+        guard let user = userSession.currentUser else { return }
+        barRepository.reportBar(currentBar, reason: reason, reportedBy: user)
+        toastCenter.show("Reported — thanks for helping keep BarTab accurate.", kind: .success)
+    }
+
+    private func reportPriceGroup(_ group: PriceGroup, reason: ReportReason) {
+        guard let user = userSession.currentUser else { return }
+        barRepository.reportPriceGroup(
+            drink: group.drink,
+            size: group.size,
+            brand: group.brand,
+            reason: reason,
+            reportedBy: user
+        )
+        toastCenter.show("Reported — thanks for helping keep BarTab accurate.", kind: .success)
+    }
+
+    private func deleteBar() {
+        guard let user = userSession.currentUser else { return }
+        Task {
+            await barRepository.deleteBar(currentBar, createdBy: user)
+            dismiss()
+        }
+    }
+
+    private func deletePrice(_ price: Price) {
+        guard let user = userSession.currentUser else { return }
+        Task {
+            await barRepository.deletePrice(price, reportedBy: user)
+        }
+    }
+
+    private func deleteGroup(_ group: PriceGroup) {
+        guard let user = userSession.currentUser else { return }
+        Task {
+            await barRepository.deletePriceGroup(
+                for: currentBar,
+                drink: group.drink,
+                size: group.size,
+                brand: group.brand,
+                deletedBy: user
+            )
+        }
+    }
+
+    private func handleBarReportTap() {
+        showingBarReport = true
+    }
 
     private func myDrinkRatingIcon(for group: PriceGroup) -> String {
         guard let user = userSession.currentUser else { return "star" }

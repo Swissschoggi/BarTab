@@ -472,16 +472,6 @@ struct NearbyView: View {
             .background(Color.barTabPillFill)
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
-            HStack(spacing: 8) {
-                filterPill(
-                    icon: "sun.max.fill",
-                    label: "Outdoor",
-                    isActive: outdoorOnly
-                ) {
-                    outdoorOnly.toggle()
-                }
-            }
-
             // Active filter summary (always visible)
             if selectedDrinks.count > 1 || selectedBrand != nil || !selectedAmbience.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {

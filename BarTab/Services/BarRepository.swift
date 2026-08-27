@@ -694,12 +694,12 @@ final class BarRepository: ObservableObject {
             createdAt: bar.createdAt,
             createdBy: bar.createdBy,
             smokingFriendly: !currentValue,
-            outdoorSeating: bar.outdoorSeating
+            outdoorSeating: bars[index].outdoorSeating
         )
-        bars[index] = updated
 
         do {
             try await SupabaseClient.shared.updateBar(updated)
+            bars[index] = updated
         } catch {
             print("Failed to update smoking policy: \(error)")
             toastCenter?.showError(error)
@@ -716,13 +716,13 @@ final class BarRepository: ObservableObject {
             coordinate: bar.coordinate,
             createdAt: bar.createdAt,
             createdBy: bar.createdBy,
-            smokingFriendly: bar.smokingFriendly,
+            smokingFriendly: bars[index].smokingFriendly,
             outdoorSeating: !currentValue
         )
-        bars[index] = updated
 
         do {
             try await SupabaseClient.shared.updateBar(updated)
+            bars[index] = updated
         } catch {
             print("Failed to update outdoor seating: \(error)")
             toastCenter?.showError(error)
