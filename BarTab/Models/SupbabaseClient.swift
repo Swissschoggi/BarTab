@@ -73,6 +73,21 @@ final class SupabaseClient {
     private static let refreshLock = NSLock()
     private static var isRefreshing = false
 
+    /// Decoded user ID from the current JWT. Nil when not signed in.
+    var currentUserID: UUID? {
+        guard let token = AuthTokenStore.shared.accessToken else { return nil }
+        // JWT format: header.payload.signature
+        let parts = token.split(separator: ".")
+        guard parts.count >= 2,
+              let payloadData = Data(base64Encoded: String(parts[1])
+                  .replacingOccurrences(of: "-", with: "+")
+                  .replacingOccurrences(of: "_", with: "/")),
+              let json = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
+              let sub = json["sub"] as? String
+        else { return nil }
+        return UUID(uuidString: sub)
+    }
+
     struct SupabaseError: LocalizedError {
 
         let statusCode: Int
@@ -763,11 +778,19 @@ final class SupabaseClient {
         )!
     }
 
+    /// Throws if no user is signed in.
+    private func requireUserID() throws -> UUID {
+        guard let id = currentUserID else {
+            throw SupabaseError(statusCode: 401, message: "Not signed in")
+        }
+        return id
+    }
+
     // MARK: - Follows
 
     func follow(_ userID: UUID) async throws {
         let body: [String: Any] = [
-            "follower_id": currentUserID!.uuidString,
+            "follower_id": try requireUserID().uuidString,
             "following_id": userID.uuidString
         ]
         var request = makeRequest(endpoint: "follows", method: "POST")
@@ -776,7 +799,7 @@ final class SupabaseClient {
     }
 
     func unfollow(_ userID: UUID) async throws {
-        let myID = currentUserID!.uuidString
+        let myID = try requireUserID().uuidString
         let theirID = userID.uuidString
         var request = makeRequest(
             endpoint: "follows?follower_id=eq.\(myID)&following_id=eq.\(theirID)",
@@ -786,7 +809,7 @@ final class SupabaseClient {
     }
 
     func fetchFollowing() async throws -> [UUID] {
-        let myID = currentUserID!.uuidString
+        let myID = try requireUserID().uuidString
         let request = makeRequest(
             endpoint: "follows?follower_id=eq.\(myID)&select=following_id"
         )
@@ -863,7 +886,7 @@ final class SupabaseClient {
     func createGroup(name: String) async throws -> BarGroup {
         let body: [String: Any] = [
             "name": name,
-            "created_by": currentUserID!.uuidString
+            "created_by": try requireUserID().uuidString
         ]
         var request = makeRequest(endpoint: "groups", method: "POST")
         request.setValue("return=representation", forHTTPHeaderField: "Prefer")
@@ -878,7 +901,7 @@ final class SupabaseClient {
         // Auto-add creator as admin
         let memberBody: [String: Any] = [
             "group_id": group.id.uuidString,
-            "user_id": currentUserID!.uuidString,
+            "user_id": try requireUserID().uuidString,
             "role": "admin"
         ]
         var memberReq = makeRequest(endpoint: "group_members", method: "POST")
@@ -889,7 +912,7 @@ final class SupabaseClient {
     }
 
     func fetchGroups() async throws -> [BarGroup] {
-        let myID = currentUserID!.uuidString
+        let myID = try requireUserID().uuidString
         let request = makeRequest(
             endpoint: "groups?id=in.(select group_id from group_members where user_id='\(myID)')&select=*"
         )
@@ -917,7 +940,7 @@ final class SupabaseClient {
     }
 
     func leaveGroup(groupID: UUID) async throws {
-        let myID = currentUserID!.uuidString
+        let myID = try requireUserID().uuidString
         var request = makeRequest(
             endpoint: "group_members?group_id=eq.\(groupID.uuidString)&user_id=eq.\(myID)",
             method: "DELETE"
@@ -931,7 +954,7 @@ final class SupabaseClient {
         let pollBody: [String: Any] = [
             "group_id": groupID.uuidString,
             "title": title,
-            "created_by": currentUserID!.uuidString
+            "created_by": try requireUserID().uuidString
         ]
         var pollReq = makeRequest(endpoint: "group_polls", method: "POST")
         pollReq.setValue("return=representation", forHTTPHeaderField: "Prefer")
@@ -947,7 +970,7 @@ final class SupabaseClient {
             var optBody: [String: Any] = [
                 "poll_id": poll.id.uuidString,
                 "label": option.label,
-                "created_by": currentUserID!.uuidString
+                "created_by": try requireUserID().uuidString
             ]
             if let barID = option.barID {
                 optBody["bar_id"] = barID.uuidString
@@ -985,7 +1008,7 @@ final class SupabaseClient {
     }
 
     func votePoll(pollID: UUID, optionID: UUID) async throws {
-        let myID = currentUserID!.uuidString
+        let myID = try requireUserID().uuidString
 
         // Remove existing vote for this poll
         var deleteReq = makeRequest(
@@ -1025,7 +1048,7 @@ final class SupabaseClient {
         targetPrice: Double?
     ) async throws -> PriceAlert {
         let body: [String: Any] = [
-            "user_id": currentUserID!.uuidString,
+            "user_id": try requireUserID().uuidString,
             "bar_id": barID.uuidString,
             "drink": drink,
             "size": size,
@@ -1045,7 +1068,7 @@ final class SupabaseClient {
     }
 
     func fetchPriceAlerts() async throws -> [PriceAlert] {
-        let myID = currentUserID!.uuidString
+        let myID = try requireUserID().uuidString
         let request = makeRequest(
             endpoint: "price_alerts?user_id=eq.\(myID)&is_active=true&select=*&order=created_at.desc"
         )
