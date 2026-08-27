@@ -86,6 +86,26 @@ struct AdminReportsView: View {
         _ report: ContentReport
     ) -> some View {
 
+        let barForReport: Bar? = {
+            guard report.targetType == .bar else { return nil }
+            return barRepository.bars.first { $0.id.uuidString == report.targetID }
+        }()
+
+        return Group {
+            if let bar = barForReport {
+                NavigationLink(destination: BarView(bar: bar)) {
+                    reportCardBody(report)
+                }
+            } else {
+                reportCardBody(report)
+            }
+        }
+    }
+
+    private func reportCardBody(
+        _ report: ContentReport
+    ) -> some View {
+
         VStack(
             alignment: .leading,
             spacing: 10

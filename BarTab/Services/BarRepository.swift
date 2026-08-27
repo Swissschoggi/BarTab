@@ -753,6 +753,8 @@ final class BarRepository: ObservableObject {
         drink: Drink,
         size: DrinkSize,
         brand: String?,
+        style: String? = nil,
+        serving: ServingMethod? = nil,
         reason: ReportReason,
         reportedBy user: User
     ) {
@@ -760,9 +762,12 @@ final class BarRepository: ObservableObject {
         if let brand = brand {
             label += " (\(brand))"
         }
+        if let style {
+            label += " · \(style)"
+        }
 
         addReport(
-            targetID: priceGroupKey(drink: drink, size: size, brand: brand),
+            targetID: priceGroupKey(drink: drink, size: size, brand: brand, style: style, serving: serving),
             targetType: .price,
             targetLabel: label,
             reason: reason,
@@ -802,16 +807,16 @@ final class BarRepository: ObservableObject {
         reportCount(for: bar.id.uuidString) > 0
     }
 
-    func isPriceGroupFlagged(drink: Drink, size: DrinkSize, brand: String?) -> Bool {
-        reportCount(for: priceGroupKey(drink: drink, size: size, brand: brand)) > 0
+    func isPriceGroupFlagged(drink: Drink, size: DrinkSize, brand: String?, style: String? = nil, serving: ServingMethod? = nil) -> Bool {
+        reportCount(for: priceGroupKey(drink: drink, size: size, brand: brand, style: style, serving: serving)) > 0
     }
 
     func reportCount(for targetID: String) -> Int {
         reports.filter { $0.targetID == targetID }.count
     }
 
-    func priceGroupKey(drink: Drink, size: DrinkSize, brand: String?) -> String {
-        "\(drink)-\(size)-\(brand ?? "")"
+    func priceGroupKey(drink: Drink, size: DrinkSize, brand: String?, style: String? = nil, serving: ServingMethod? = nil) -> String {
+        "\(drink)-\(size)-\(brand ?? "")-\(style ?? "")-\(serving?.rawValue ?? "")"
     }
 
     private func addReport(

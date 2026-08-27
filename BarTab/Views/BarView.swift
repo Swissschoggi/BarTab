@@ -575,10 +575,7 @@ struct BarView: View {
             }
             .confirmationDialog(
                 "Delete this drink?",
-                isPresented: Binding(
-                    get: { pendingDeleteGroup != nil },
-                    set: { if !$0 { pendingDeleteGroup = nil } }
-                ),
+                isPresented: $showingDeleteGroupConfirmation,
                 titleVisibility: .visible
             ) {
                 Button("Delete", role: .destructive) {
@@ -632,7 +629,9 @@ struct BarView: View {
         let isFlagged = barRepository.isPriceGroupFlagged(
             drink: group.drink,
             size: group.size,
-            brand: group.brand
+            brand: group.brand,
+            style: group.style,
+            serving: group.serving
         )
 
         return VStack(alignment: .leading, spacing: 0) {
@@ -736,6 +735,7 @@ struct BarView: View {
                             Spacer()
                             Button {
                                 pendingDeleteGroup = group
+                                showingDeleteGroupConfirmation = true
                             } label: {
                                 Label("Delete all", systemImage: "trash")
                                     .font(.caption)
@@ -806,6 +806,8 @@ struct BarView: View {
             drink: group.drink,
             size: group.size,
             brand: group.brand,
+            style: group.style,
+            serving: group.serving,
             reason: reason,
             reportedBy: user
         )
