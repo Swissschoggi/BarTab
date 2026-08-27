@@ -717,12 +717,33 @@ struct BarView: View {
             }
             .buttonStyle(.plain)
 
-            if isExpanded && group.prices.count > 1 {
+            if isExpanded {
                 VStack(alignment: .leading, spacing: 8) {
                     Divider()
-                    PriceTrendChart(prices: group.prices)
-                        .frame(height: 120)
-                        .padding(.horizontal, 4)
+                    if group.prices.count > 1 {
+                        PriceTrendChart(prices: group.prices)
+                            .frame(height: 120)
+                            .padding(.horizontal, 4)
+                    } else {
+                        Text("Only one price reported — trend needs at least two.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 4)
+                    }
+
+                    if let user = userSession.currentUser, user.isAdmin {
+                        HStack {
+                            Spacer()
+                            Button {
+                                pendingDeleteGroup = group
+                            } label: {
+                                Label("Delete all", systemImage: "trash")
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                            }
+                        }
+                        .padding(.top, 4)
+                    }
                 }
                 .transition(.opacity.combined(with: .move(edge: .top)))
                 .padding(.bottom, 8)
@@ -750,7 +771,10 @@ struct BarView: View {
             && $0.reportedBy == user.id
         }
     }
-    private var canDeleteBar: Bool { false }
+    private var canDeleteBar: Bool {
+        guard let user = userSession.currentUser else { return false }
+        return user.isAdmin || currentBar.createdBy == user.id
+    }
 
     private func averageAmount(for group: PriceGroup) -> Double {
         guard !group.prices.isEmpty else { return 0.0 }

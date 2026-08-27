@@ -29,45 +29,86 @@ struct DrinkRatingSheet: View {
         _quality = State(initialValue: initialQuality ?? 3)
     }
 
+    private var averageData: (average: Double, count: Int)? {
+        barRepository.averageDrinkQuality(
+            for: bar, drink: drink, brand: brand, size: size
+        )
+    }
+
     var body: some View {
         NavigationView {
-            VStack(spacing: 24) {
+            ScrollView {
+                VStack(spacing: 24) {
 
-                VStack(spacing: 6) {
-                    Text(drink.displayName)
-                        .font(.headline)
+                    // Header
+                    VStack(spacing: 6) {
+                        Text(drink.displayName)
+                            .font(.title3.bold())
 
-                    if let brand {
-                        Text(brand)
-                            .font(.subheadline)
+                        if let brand {
+                            Text(brand)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+
+                        Text(size.displayName)
+                            .font(.caption)
                             .foregroundColor(.secondary)
                     }
+                    .padding(.top, 8)
 
-                    Text(size.displayName)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                    // Average from all users
+                    if let data = averageData {
+                        VStack(spacing: 8) {
+                            HStack(spacing: 4) {
+                                ForEach(1...5, id: \.self) { star in
+                                    Image(systemName: star <= Int(data.average.rounded()) ? "star.fill" : "star")
+                                        .foregroundColor(.yellow)
+                                }
+                            }
+                            .font(.title2)
 
-                Text("How's the quality?")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                            Text(String(format: "%.1f", data.average))
+                                .font(.headline)
+                                + Text(" from \(data.count) \(data.count == 1 ? "rating" : "ratings")")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .barTabCard()
+                    } else {
+                        Text("No ratings yet — be the first!")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .barTabCard()
+                    }
 
-                HStack(spacing: 12) {
-                    ForEach(1...5, id: \.self) { star in
-                        Button {
-                            HapticEngine.lightTap()
-                            quality = star
-                        } label: {
-                            Image(systemName: star <= quality ? "star.fill" : "star")
-                                .font(.system(size: 32))
-                                .foregroundColor(star <= quality ? .yellow : .gray)
+                    // Your rating
+                    VStack(spacing: 10) {
+                        Text("Your rating")
+                            .font(.headline)
+
+                        HStack(spacing: 16) {
+                            ForEach(1...5, id: \.self) { star in
+                                Button {
+                                    HapticEngine.lightTap()
+                                    quality = star
+                                } label: {
+                                    Image(systemName: star <= quality ? "star.fill" : "star")
+                                        .font(.system(size: 36))
+                                        .foregroundColor(star <= quality ? .yellow : .gray)
+                                }
+                            }
                         }
                     }
+                    .padding()
+                    .barTabCard()
                 }
-
-                Spacer()
+                .padding(.horizontal)
             }
-            .padding(.top, 20)
             .background(Color.barTabBackground.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
