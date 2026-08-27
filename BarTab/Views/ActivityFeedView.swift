@@ -91,7 +91,7 @@ struct ActivityFeedView: View {
                         Text("·")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text("\(Currency(rawValue: currency)?.symbol ?? currency)\(Decimal(amount).formattedAmount)")
+                        Text("\(Currency(rawValue: currency)?.symbol ?? currency)\(amount.formattedAmount)")
                             .font(.caption)
                             .fontWeight(.bold)
                             .foregroundColor(.barTabAccent)

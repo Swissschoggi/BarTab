@@ -370,7 +370,7 @@ struct SettingsView: View {
                     }
                 }
             }
-        }.
+        }
         .alert("Restart Required", isPresented: $showingRestartAlert) {
             Button("Restart Now") {
                 exit(0)
