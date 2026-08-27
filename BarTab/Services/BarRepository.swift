@@ -882,7 +882,13 @@ final class BarRepository: ObservableObject {
         let brand = price.brand ?? ""
         let style = price.style ?? ""
         let serving = price.serving?.rawValue ?? ""
-        return [price.drink.displayName, price.size.displayName, brand, style, serving].joined(separator: "|")
+        return "\(price.drink)-\(price.size)-\(brand)-\(style)-\(serving)"
+    }
+
+    /// Find a bar that has a price matching this group key.
+    func barForPriceGroupKey(_ key: String) -> Bar? {
+        prices.first { priceGroupKey($0) == key }
+            .flatMap { getBar(id: $0.barID) }
     }
 
     private func makePriceSummary(reports: [Price], barID: UUID) -> PriceSummary? {

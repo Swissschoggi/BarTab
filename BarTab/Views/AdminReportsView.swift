@@ -88,8 +88,11 @@ struct AdminReportsView: View {
     ) -> some View {
 
         let barForReport: Bar? = {
-            guard report.targetType == .bar else { return nil }
-            return barRepository.bars.first { $0.id.uuidString == report.targetID }
+            if report.targetType == .bar {
+                return barRepository.bars.first { $0.id.uuidString == report.targetID }
+            }
+            // For drink reports, find a bar that has this price group
+            return barRepository.barForPriceGroupKey(report.targetID)
         }()
 
         return VStack(alignment: .leading, spacing: 10) {
@@ -101,11 +104,11 @@ struct AdminReportsView: View {
                         .environmentObject(userSession)
                         .environmentObject(toastCenter)
                 } label: {
-                    reportCardHeader(report)
+                    reportCardHeader(report, tappable: true)
                 }
                 .buttonStyle(.plain)
             } else {
-                reportCardHeader(report)
+                reportCardHeader(report, tappable: false)
             }
 
             Text(report.reason.title)
@@ -118,7 +121,8 @@ struct AdminReportsView: View {
     }
 
     private func reportCardHeader(
-        _ report: ContentReport
+        _ report: ContentReport,
+        tappable: Bool
     ) -> some View {
         HStack(spacing: 8) {
 
@@ -136,7 +140,7 @@ struct AdminReportsView: View {
 
             Spacer()
 
-            if report.targetType == .bar {
+            if tappable {
                 Image(systemName: "chevron.right")
                     .font(.caption2)
                     .foregroundColor(.barTabSecondary)
