@@ -851,6 +851,8 @@ final class BarRepository: ObservableObject {
         Task { [weak self] in
             do {
                 try await SupabaseClient.shared.insertContentReport(report)
+                // Re-fetch to get server-assigned fields (id, timestamp)
+                await self?.refreshReports()
             } catch {
                 print("Failed to save report to Supabase: \(error)")
                 self?.toastCenter?.showError(error)

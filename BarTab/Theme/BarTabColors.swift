@@ -16,47 +16,47 @@ extension Color {
         )
     }
 
-    // MARK: - Primary (warm terracotta)
+    // MARK: - Primary (burgundy)
 
     static let barTabPrimary = barTabAdaptive(
         light: UIColor(
-            red: 0x9C / 255,
-            green: 0x6A / 255,
-            blue: 0x58 / 255,
+            red: 0x6B / 255,
+            green: 0x27 / 255,
+            blue: 0x37 / 255,
             alpha: 1
         ),
         dark: UIColor(
-            red: 0xD8 / 255,
-            green: 0xA5 / 255,
-            blue: 0x90 / 255,
+            red: 0xD4 / 255,
+            green: 0x89 / 255,
+            blue: 0x9A / 255,
             alpha: 1
         )
     )
 
-    // MARK: - Accent (warm amber)
+    // MARK: - Accent (gold)
 
     static let barTabAccent = barTabAdaptive(
         light: UIColor(
-            red: 0xC8 / 255,
-            green: 0x9A / 255,
-            blue: 0x4A / 255,
+            red: 0xC9 / 255,
+            green: 0xA2 / 255,
+            blue: 0x27 / 255,
             alpha: 1
         ),
         dark: UIColor(
             red: 0xE6 / 255,
             green: 0xC0 / 255,
-            blue: 0x75 / 255,
+            blue: 0x65 / 255,
             alpha: 1
         )
     )
 
-    // MARK: - Background (warm linen)
+    // MARK: - Background (warm cream)
 
     static let barTabBackground = barTabAdaptive(
         light: UIColor(
-            red: 0xF5 / 255,
-            green: 0xF0 / 255,
-            blue: 0xEB / 255,
+            red: 0xF7 / 255,
+            green: 0xF1 / 255,
+            blue: 0xE3 / 255,
             alpha: 1
         ),
         dark: UIColor(
@@ -106,8 +106,8 @@ extension Color {
     static let barTabCardFill = barTabAdaptive(
         light: UIColor(
             red: 0xFF / 255,
-            green: 0xFC / 255,
-            blue: 0xF7 / 255,
+            green: 0xFA / 255,
+            blue: 0xF0 / 255,
             alpha: 1
         ),
         dark: UIColor(

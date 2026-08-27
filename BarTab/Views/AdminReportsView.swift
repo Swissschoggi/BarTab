@@ -88,14 +88,8 @@ struct AdminReportsView: View {
     ) -> some View {
 
         let barForReport: Bar? = {
-            if report.targetType == .bar {
-                return barRepository.bars.first { $0.id.uuidString == report.targetID }
-            }
-            // For price reports, find the bar via the price
-            if let price = barRepository.prices.first(where: { $0.id.uuidString == report.targetID }) {
-                return barRepository.getBar(id: price.barID)
-            }
-            return nil
+            guard report.targetType == .bar else { return nil }
+            return barRepository.bars.first { $0.id.uuidString == report.targetID }
         }()
 
         return VStack(alignment: .leading, spacing: 10) {
@@ -141,6 +135,12 @@ struct AdminReportsView: View {
                 .lineLimit(1)
 
             Spacer()
+
+            if report.targetType == .bar {
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundColor(.barTabSecondary)
+            }
 
             if !report.isReviewed {
                 Text("New")
