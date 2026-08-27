@@ -35,6 +35,11 @@ struct MainTabView: View {
                     ProfileView()
                 }
             }
+            .id(selectedTab)
+            .transition(.asymmetric(
+                insertion: .move(edge: .trailing).combined(with: .opacity),
+                removal: .move(edge: .leading).combined(with: .opacity)
+            ))
             .frame(
                 maxWidth: .infinity,
                 maxHeight: .infinity
@@ -98,6 +103,7 @@ struct MainTabView: View {
 
         Button {
 
+            HapticEngine.lightTap()
             withAnimation(
                 .spring(response: 0.3, dampingFraction: 0.7)
             ) {

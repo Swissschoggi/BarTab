@@ -33,17 +33,43 @@ struct BarView: View {
     @State private var ratingDrinkGroup: PriceGroup?
     @State private var showingDrinkRating = false
 
+    // Cached from @Published — never read barRepository directly in body
+    @State private var currentBar: Bar
+    @State private var prices: [Price] = []
+    @State private var isFavorited = false
+    @State private var hasReported = false
+    @State private var ambienceStyles: [String] = []
+    @State private var ambienceCount = 0
+    @State private var priceLevelString: String?
+    @State private var cachedReports: [ContentReport] = []
+    @State private var cachedDrinkRatings: [DrinkRating] = []
+    @State private var cachedBarRatings: [BarRating] = []
+
     init(bar: Bar, allowsDismissal: Bool = false) {
         self.bar = bar
         self.allowsDismissal = allowsDismissal
+        _currentBar = State(initialValue: bar)
     }
 
-    private var currentBar: Bar {
-        barRepository.getBar(id: bar.id) ?? bar
-    }
-
-    private var prices: [Price] {
-        barRepository.getPrices(for: currentBar)
+    private func syncFromRepository() {
+        if let latest = barRepository.getBar(id: bar.id) {
+            currentBar = latest
+        }
+        prices = barRepository.getPrices(for: currentBar)
+        isFavorited = barRepository.favoriteBarIDs.contains(bar.id)
+        ambienceStyles = barRepository.ambienceStyles(for: currentBar)
+        ambienceCount = barRepository.ambienceCount(for: currentBar)
+        priceLevelString = barRepository.priceLevel(for: currentBar)
+        cachedReports = barRepository.reports
+        cachedDrinkRatings = barRepository.drinkRatings
+        cachedBarRatings = barRepository.barRatings
+        if let user = userSession.currentUser {
+            hasReported = barRepository.reports.contains {
+                $0.targetID == bar.id.uuidString
+                && $0.targetType == .bar
+                && $0.reportedBy == user.id
+            }
+        }
     }
 
     private struct PriceGroup: Identifiable {
@@ -107,6 +133,23 @@ struct BarView: View {
             }
             .onAppear {
                 locationService.requestPermission()
+                syncFromRepository()
+            }
+            .onReceive(barRepository.$bars) { _ in syncFromRepository() }
+            .onReceive(barRepository.$prices) { _ in syncFromRepository() }
+            .onReceive(barRepository.$barRatings) { _ in syncFromRepository() }
+            .onReceive(barRepository.$drinkRatings) { _ in syncFromRepository() }
+            .onReceive(barRepository.$priceLevelByBarID) { _ in syncFromRepository() }
+            .onReceive(barRepository.$favoriteBarIDs) { ids in
+                isFavorited = ids.contains(bar.id)
+            }
+            .onReceive(barRepository.$reports) { reports in
+                guard let user = userSession.currentUser else { return }
+                hasReported = reports.contains {
+                    $0.targetID == bar.id.uuidString
+                    && $0.targetType == .bar
+                    && $0.reportedBy == user.id
+                }
             }
         )
     }
@@ -257,12 +300,10 @@ struct BarView: View {
     }
 
     private var detailsSection: some View {
-        let ambienceStyles = barRepository.ambienceStyles(for: currentBar)
-        let ambienceCount = barRepository.ambienceCount(for: currentBar)
 
         return VStack(alignment: .leading, spacing: 0) {
 
-            if let priceLevel = barRepository.priceLevel(for: currentBar) {
+            if let priceLevel = priceLevelString {
                 HStack(spacing: 8) {
                     Text(priceLevel)
                         .font(.subheadline)
@@ -445,7 +486,7 @@ struct BarView: View {
                     barRepository.toggleFavorite(currentBar)
                 }
             } label: {
-                Image(systemName: barRepository.isFavorite(currentBar) ? "heart.fill" : "heart")
+                Image(systemName: isFavorited ? "heart.fill" : "heart")
                     .foregroundColor(.barTabPrimary)
             }
         }
@@ -461,7 +502,7 @@ struct BarView: View {
             Button {
                 handleBarReportTap()
             } label: {
-                Image(systemName: currentUserReportedBar ? "flag.fill" : "flag")
+                Image(systemName: hasReported ? "flag.fill" : "flag")
                     .foregroundColor(.barTabPrimary)
             }
         }
@@ -626,13 +667,8 @@ struct BarView: View {
 
     private func priceGroupRow(_ group: PriceGroup) -> some View {
         let isExpanded = expandedGroupID == group.id
-        let isFlagged = barRepository.isPriceGroupFlagged(
-            drink: group.drink,
-            size: group.size,
-            brand: group.brand,
-            style: group.style,
-            serving: group.serving
-        )
+        let groupKey = "\(group.drink)-\(group.size)-\(group.brand ?? "")-\(group.style ?? "")-\(group.serving?.rawValue ?? "")"
+        let isFlagged = cachedReports.contains { $0.targetID == groupKey }
 
         return VStack(alignment: .leading, spacing: 0) {
             Button {
@@ -763,14 +799,6 @@ struct BarView: View {
         "Check out \(currentBar.name) on BarTab!"
     }
 
-    private var currentUserReportedBar: Bool {
-        guard let user = userSession.currentUser else { return false }
-        return barRepository.reports.contains {
-            $0.targetID == currentBar.id.uuidString
-            && $0.targetType == .bar
-            && $0.reportedBy == user.id
-        }
-    }
     private var canDeleteBar: Bool {
         guard let user = userSession.currentUser else { return false }
         return user.isAdmin || currentBar.createdBy == user.id
@@ -848,15 +876,13 @@ struct BarView: View {
 
     private func myDrinkRatingIcon(for group: PriceGroup) -> String {
         guard let user = userSession.currentUser else { return "star" }
-        if barRepository.myDrinkRating(
-            for: currentBar,
-            drink: group.drink,
-            brand: group.brand,
-            size: group.size,
-            by: user
-        ) != nil {
-            return "star.fill"
+        let hasRating = cachedDrinkRatings.contains {
+            $0.barID == currentBar.id &&
+            $0.drink == group.drink &&
+            $0.brand == group.brand &&
+            $0.size == group.size &&
+            $0.ratedBy == user.id
         }
-        return "star"
+        return hasRating ? "star.fill" : "star"
     }
 }

@@ -481,6 +481,7 @@ struct LoginView: View {
                     )
                 }
 
+                HapticEngine.success()
                 presentationMode.wrappedValue.dismiss()
 
             } catch {
@@ -531,6 +532,7 @@ struct LoginView: View {
                     rawNonce: rawNonce
                 )
 
+                HapticEngine.success()
                 presentationMode.wrappedValue.dismiss()
 
             } catch {

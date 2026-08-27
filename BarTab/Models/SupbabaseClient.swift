@@ -327,14 +327,25 @@ final class SupabaseClient {
             method: "PATCH"
         )
         request.setValue(
-            "return=minimal",
+            "return=representation",
             forHTTPHeaderField: "Prefer"
         )
 
         let dto = BarPatchDTO(from: bar)
         request.httpBody = try encoder.encode(dto)
 
-        _ = try await performAuthorized(request)
+        let data = try await performAuthorized(request)
+
+        // PostgREST returns 200 even when RLS blocks the update
+        // (0 rows affected). Decode the response to verify the
+        // update actually landed.
+        let updated = try decoder.decode([BarDTO].self, from: data)
+        guard !updated.isEmpty else {
+            throw SupabaseError(
+                statusCode: 403,
+                message: "Update blocked — you may not have permission to change this bar."
+            )
+        }
     }
 
     // MARK: - Prices

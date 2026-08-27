@@ -425,6 +425,8 @@ struct AddPriceView: View {
             )
 
             if success {
+                HapticEngine.success()
+                toastCenter.show("Price saved", kind: .success)
                 presentationMode
                     .wrappedValue
                     .dismiss()

@@ -243,6 +243,8 @@ struct NearbyView: View {
                         priceResultsSection
                     }
                 }
+                .animation(.easeInOut(duration: 0.25), value: selectedDrinks)
+                .animation(.easeInOut(duration: 0.25), value: displayMode)
                 .padding(.horizontal)
                 .padding(.top, 12)
                 .padding(.bottom, 30)

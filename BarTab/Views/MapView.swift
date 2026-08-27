@@ -36,6 +36,7 @@ struct MapView: View {
             ) { bar in
                 MapAnnotation(coordinate: bar.coordinate) {
                     Button {
+                        HapticEngine.lightTap()
                         selectedBar = bar
                     } label: {
                         VStack(spacing: 2) {
