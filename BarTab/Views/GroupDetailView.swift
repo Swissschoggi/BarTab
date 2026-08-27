@@ -121,8 +121,8 @@ struct GroupDetailView: View {
 
             for member in members {
                 if userCache[member.userID] == nil,
-                   let profile = try? await SupabaseClient.shared.fetchProfile(id: member.userID) {
-                    userCache[member.userID] = profile.displayName ?? "User"
+                    let profile = try? await SupabaseClient.shared.fetchProfile(userID: member.userID) {
+                    userCache[member.userID] = profile.display_name ?? "User"
                 }
             }
         } catch {

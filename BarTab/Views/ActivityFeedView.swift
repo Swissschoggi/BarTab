@@ -91,7 +91,7 @@ struct ActivityFeedView: View {
                         Text("·")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text("\(Currency.symbol(for: currency))\(Decimal(amount).formattedAmount)")
+                        Text("\(Currency(rawValue: currency)?.symbol ?? currency)\(Decimal(amount).formattedAmount)")
                             .font(.caption)
                             .fontWeight(.bold)
                             .foregroundColor(.barTabAccent)
@@ -133,8 +133,8 @@ struct ActivityFeedView: View {
             // Pre-fetch usernames
             for item in items {
                 if userCache[item.userID] == nil {
-                    if let profile = try? await SupabaseClient.shared.fetchProfile(id: item.userID) {
-                        userCache[item.userID] = profile.displayName ?? "User"
+                     if let profile = try? await SupabaseClient.shared.fetchProfile(userID: item.userID) {
+                        userCache[item.userID] = profile.display_name ?? "User"
                     }
                 }
             }

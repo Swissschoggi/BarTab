@@ -28,7 +28,7 @@ struct GroupPlanningView: View {
                         Text("Create Group")
                             .fontWeight(.semibold)
                     }
-                    .frame(maxWidth: .infinity, height: 44)
+                    .frame(maxWidth: .infinity)
                 }
                 .barTabPrimaryButton()
 

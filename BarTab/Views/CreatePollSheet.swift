@@ -60,10 +60,10 @@ struct CreatePollSheet: View {
 
     private func createPoll() async {
         let title = pollTitle.trimmingCharacters(in: .whitespaces)
-        let options = optionTexts
+        let texts = optionTexts
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
-            .map { (barID: nil, label: $0) }
+        let options: [(barID: UUID?, label: String)] = texts.map { (nil, $0) }
 
         guard !title.isEmpty, options.count >= 2 else { return }
 

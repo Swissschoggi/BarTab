@@ -1,11 +1,9 @@
 import Foundation
 
-struct Follow: Identifiable, Codable {
-    let followerID: UUID
+struct Follow: Codable {
+    let followerID: UUID?
     let followingID: UUID
-    let createdAt: Date
-
-    var id: String { "\(followerID)-\(followingID)" }
+    let createdAt: Date?
 
     enum CodingKeys: String, CodingKey {
         case followerID  = "follower_id"

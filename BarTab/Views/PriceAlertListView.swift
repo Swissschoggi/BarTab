@@ -87,15 +87,11 @@ struct PriceAlertListView: View {
     }
 
     private func delete(at offsets: IndexSet) {
-        for index in offsets {
-            let alert = alerts[index]
+        let toDelete = offsets.map { alerts[$0] }
+        alerts.remove(atOffsets: offsets)
+        for alert in toDelete {
             Task {
-                do {
-                    try await SupabaseClient.shared.deletePriceAlert(alert.id)
-                    alerts.remove(at: index)
-                } catch {
-                    toastCenter.showError(error)
-                }
+                try? await SupabaseClient.shared.deletePriceAlert(alert.id)
             }
         }
     }

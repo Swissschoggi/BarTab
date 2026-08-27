@@ -63,8 +63,8 @@ struct InviteMemberSheet: View {
 
             for userID in following {
                 if userCache[userID] == nil,
-                   let profile = try? await SupabaseClient.shared.fetchProfile(id: userID) {
-                    userCache[userID] = profile.displayName ?? "User"
+                   let profile = try? await SupabaseClient.shared.fetchProfile(userID: userID) {
+                    userCache[userID] = profile.display_name ?? "User"
                 }
             }
         } catch {
