@@ -395,6 +395,7 @@ struct AddPriceView: View {
         }) {
 
             duplicatePrice = existing
+            HapticEngine.warning()
             showingDuplicateWarning = true
             return
         }

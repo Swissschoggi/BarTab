@@ -260,6 +260,9 @@ struct ProfileView: View {
                                     icon: "flag.fill"
                                 ) {
                                     AdminReportsView()
+                                        .environmentObject(barRepository)
+                                        .environmentObject(userSession)
+                                        .environmentObject(toastCenter)
                                 }
 
                                 navigationRow(
@@ -458,7 +461,10 @@ struct ProfileView: View {
             titleVisibility: .visible
         ) {
             Button("Log out", role: .destructive) {
-                userSession.logout()
+                HapticEngine.impact()
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    userSession.logout()
+                }
                 toastCenter.show(
                     "You've been logged out.",
                     kind: .info

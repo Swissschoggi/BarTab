@@ -249,6 +249,9 @@ struct SettingsView: View {
 
                                 NavigationLink {
                                     AdminReportsView()
+                                        .environmentObject(barRepository)
+                                        .environmentObject(userSession)
+                                        .environmentObject(toastCenter)
                                 } label: {
                                     HStack {
                                         Label("Reported Content", systemImage: "exclamationmark.shield.fill")
@@ -311,7 +314,7 @@ struct SettingsView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.barTabText)
                             Spacer()
-                            Text("1.0.0")
+                            Text("BETA")
                                 .font(.subheadline)
                                 .foregroundColor(.barTabSecondary)
                         }

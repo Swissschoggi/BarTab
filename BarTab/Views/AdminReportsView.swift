@@ -4,6 +4,7 @@ struct AdminReportsView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
 
     @State private var pendingDeleteReport: ContentReport?
     @State private var showingDeleteConfirmation = false
@@ -87,14 +88,25 @@ struct AdminReportsView: View {
     ) -> some View {
 
         let barForReport: Bar? = {
-            guard report.targetType == .bar else { return nil }
-            return barRepository.bars.first { $0.id.uuidString == report.targetID }
+            if report.targetType == .bar {
+                return barRepository.bars.first { $0.id.uuidString == report.targetID }
+            }
+            // For price reports, find the bar via the price
+            if let price = barRepository.prices.first(where: { $0.id.uuidString == report.targetID }) {
+                return barRepository.getBar(id: price.barID)
+            }
+            return nil
         }()
 
         return VStack(alignment: .leading, spacing: 10) {
 
             if let bar = barForReport {
-                NavigationLink(destination: BarView(bar: bar)) {
+                NavigationLink {
+                    BarView(bar: bar)
+                        .environmentObject(barRepository)
+                        .environmentObject(userSession)
+                        .environmentObject(toastCenter)
+                } label: {
                     reportCardHeader(report)
                 }
                 .buttonStyle(.plain)
