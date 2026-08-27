@@ -38,7 +38,7 @@ struct BarView: View {
     @State private var prices: [Price] = []
     @State private var isFavorited = false
     @State private var hasReported = false
-    @State private var ambienceStyles: [String] = []
+    @State private var ambienceStyles: [AmbienceStyle] = []
     @State private var ambienceCount = 0
     @State private var priceLevelString: String?
     @State private var cachedReports: [ContentReport] = []
