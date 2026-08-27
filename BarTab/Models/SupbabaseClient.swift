@@ -851,13 +851,15 @@ final class SupabaseClient {
         let priceData = try await performAuthorized(priceReq)
         let priceRows = try decoder.decode([PriceDTO].self, from: priceData)
         for row in priceRows {
-            items.append(.priceReport(
+            items.append(ActivityItem(
                 id: row.id,
                 userID: row.reported_by,
-                barName: row.bars?.name ?? "Unknown",
-                drink: row.drink,
-                amount: row.amount,
-                currency: row.currency,
+                kind: .priceReport(
+                    barName: row.bars?.name ?? "Unknown",
+                    drink: row.drink,
+                    amount: row.amount,
+                    currency: row.currency
+                ),
                 timestamp: row.reported_at
             ))
         }
@@ -869,11 +871,13 @@ final class SupabaseClient {
         let ratingData = try await performAuthorized(ratingReq)
         let ratingRows = try decoder.decode([BarRatingDTO].self, from: ratingData)
         for row in ratingRows {
-            items.append(.barRating(
+            items.append(ActivityItem(
                 id: row.id,
                 userID: row.rated_by,
-                barName: row.bars?.name ?? "Unknown",
-                ambience: row.ambience,
+                kind: .barRating(
+                    barName: row.bars?.name ?? "Unknown",
+                    ambience: row.ambience
+                ),
                 timestamp: row.created_at
             ))
         }

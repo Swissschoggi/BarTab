@@ -82,8 +82,8 @@ struct ActivityFeedView: View {
                         .foregroundColor(.secondary)
                 }
 
-                switch item {
-                case .priceReport(_, _, let barName, let drink, let amount, let currency, _):
+                switch item.kind {
+                case .priceReport(let barName, let drink, let amount, let currency):
                     HStack(spacing: 4) {
                         Text(barName)
                             .font(.caption)
@@ -97,7 +97,7 @@ struct ActivityFeedView: View {
                             .foregroundColor(.barTabAccent)
                     }
 
-                case .barRating(_, _, let barName, let ambience, _):
+                case .barRating(let barName, let ambience):
                     HStack(spacing: 4) {
                         Text(barName)
                             .font(.caption)
@@ -151,21 +151,7 @@ struct ActivityFeedView: View {
 
 // MARK: - ActivityItem helpers
 
-private extension ActivityItem {
-    var icon: String {
-        switch self {
-        case .priceReport: return "dollarsign.circle.fill"
-        case .barRating: return "star.fill"
-        }
-    }
-
-    var actionText: String {
-        switch self {
-        case .priceReport: return "reported a price"
-        case .barRating: return "rated a bar"
-        }
-    }
-}
+// icon and actionText are now computed properties on ActivityItem itself
 
 private extension Date {
     var relativeDescription: String {
