@@ -56,7 +56,6 @@ struct GroupDetailView: View {
                         Text("New Poll")
                             .fontWeight(.semibold)
                     }
-                    .frame(maxWidth: .infinity, height: 44)
                 }
                 .barTabPrimaryButton()
 
