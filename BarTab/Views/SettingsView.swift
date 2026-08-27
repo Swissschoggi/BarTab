@@ -249,9 +249,6 @@ struct SettingsView: View {
 
                                 NavigationLink {
                                     AdminReportsView()
-                                        .environmentObject(barRepository)
-                                        .environmentObject(userSession)
-                                        .environmentObject(toastCenter)
                                 } label: {
                                     HStack {
                                         Label("Reported Content", systemImage: "exclamationmark.shield.fill")
@@ -373,7 +370,7 @@ struct SettingsView: View {
                     }
                 }
             }
-        }
+        }.
         .alert("Restart Required", isPresented: $showingRestartAlert) {
             Button("Restart Now") {
                 exit(0)
