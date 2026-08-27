@@ -792,7 +792,7 @@ struct BarView: View {
         guard let user = userSession.currentUser else { return }
         Task {
             await barRepository.deleteBar(currentBar, createdBy: user)
-            dismiss()
+            presentationMode.wrappedValue.dismiss()
         }
     }
 
