@@ -289,7 +289,9 @@ final class SupabaseClient {
             from: data
         )
 
-        return dtos.map { $0.toDomain }
+        let bars = dtos.map { $0.toDomain }
+        print("[SupabaseClient] fetchBars: \(bars.count) bars, outdoor=\(bars.filter(\.outdoorSeating).count), smoking=\(bars.filter(\.smokingFriendly).count)")
+        return bars
     }
 
     /// Add a new bar using Bar domain model
@@ -323,6 +325,10 @@ final class SupabaseClient {
         var request = makeRequest(
             endpoint: "bars?id=eq.\(bar.id.uuidString)",
             method: "PATCH"
+        )
+        request.setValue(
+            "return=minimal",
+            forHTTPHeaderField: "Prefer"
         )
 
         let dto = BarPatchDTO(from: bar)

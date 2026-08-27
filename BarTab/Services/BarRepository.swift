@@ -697,11 +697,13 @@ final class BarRepository: ObservableObject {
             outdoorSeating: bars[index].outdoorSeating
         )
 
+        print("[BarRepository] PATCH smoking: bar=\(bar.id) \(bar.name) → \(updated.smokingFriendly)")
         do {
             try await SupabaseClient.shared.updateBar(updated)
             bars[index] = updated
+            print("[BarRepository] PATCH smoking SUCCESS")
         } catch {
-            print("Failed to update smoking policy: \(error)")
+            print("[BarRepository] PATCH smoking FAILED: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -720,11 +722,13 @@ final class BarRepository: ObservableObject {
             outdoorSeating: !currentValue
         )
 
+        print("[BarRepository] PATCH outdoor: bar=\(bar.id) \(bar.name) → \(updated.outdoorSeating)")
         do {
             try await SupabaseClient.shared.updateBar(updated)
             bars[index] = updated
+            print("[BarRepository] PATCH outdoor SUCCESS")
         } catch {
-            print("Failed to update outdoor seating: \(error)")
+            print("[BarRepository] PATCH outdoor FAILED: \(error)")
             toastCenter?.showError(error)
         }
     }

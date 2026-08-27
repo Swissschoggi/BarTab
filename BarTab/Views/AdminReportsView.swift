@@ -91,109 +91,108 @@ struct AdminReportsView: View {
             return barRepository.bars.first { $0.id.uuidString == report.targetID }
         }()
 
-        return Group {
+        return VStack(alignment: .leading, spacing: 10) {
+
             if let bar = barForReport {
                 NavigationLink(destination: BarView(bar: bar)) {
-                    reportCardBody(report)
+                    reportCardHeader(report)
                 }
+                .buttonStyle(.plain)
             } else {
-                reportCardBody(report)
-            }
-        }
-    }
-
-    private func reportCardBody(
-        _ report: ContentReport
-    ) -> some View {
-
-        VStack(
-            alignment: .leading,
-            spacing: 10
-        ) {
-
-            HStack(spacing: 8) {
-
-                Image(
-                    systemName: report.targetType == .bar
-                        ? "mappin.and.ellipse"
-                        : "dollarsign.circle"
-                )
-                .font(.subheadline)
-                .foregroundColor(.orange)
-
-                Text(report.targetLabel)
-                    .font(.headline)
-                    .lineLimit(1)
-
-                Spacer()
-
-                if !report.isReviewed {
-                    Text("New")
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.barTabAccent)
-                        .clipShape(Capsule())
-                }
+                reportCardHeader(report)
             }
 
             Text(report.reason.title)
                 .font(.subheadline)
                 .foregroundColor(.primary)
 
-            HStack(spacing: 6) {
+            reportCardActions(report)
+        }
+        .barTabCard()
+    }
 
-                Text("by \(report.reportedByName)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+    private func reportCardHeader(
+        _ report: ContentReport
+    ) -> some View {
+        HStack(spacing: 8) {
 
-                Text("\u{00B7}")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            Image(
+                systemName: report.targetType == .bar
+                    ? "mappin.and.ellipse"
+                    : "dollarsign.circle"
+            )
+            .font(.subheadline)
+            .foregroundColor(.orange)
 
-                Text(relativeDate(report.reportedAt))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            Text(report.targetLabel)
+                .font(.headline)
+                .lineLimit(1)
 
-                Spacer()
+            Spacer()
 
-                if report.isReviewed {
-                    HStack(spacing: 6) {
-                        Label(
-                            "Reviewed",
-                            systemImage: "checkmark.circle.fill"
-                        )
+            if !report.isReviewed {
+                Text("New")
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.barTabAccent)
+                    .clipShape(Capsule())
+            } else {
+                Label(
+                    "Reviewed",
+                    systemImage: "checkmark.circle.fill"
+                )
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.green)
+            }
+        }
+    }
+
+    private func reportCardActions(
+        _ report: ContentReport
+    ) -> some View {
+        HStack(spacing: 6) {
+
+            Text("by \(report.reportedByName)")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Text("\u{00B7}")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Text(relativeDate(report.reportedAt))
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Spacer()
+
+            if report.isReviewed {
+                Button {
+                    pendingDeleteReport = report
+                    showingDeleteConfirmation = true
+                } label: {
+                    Label("Remove", systemImage: "trash")
                         .font(.caption)
                         .fontWeight(.semibold)
-                        .foregroundColor(.green)
-
-                        Button {
-                            pendingDeleteReport = report
-                            showingDeleteConfirmation = true
-                        } label: {
-                            Label("Remove", systemImage: "trash")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.red)
-                        }
+                        .foregroundColor(.red)
+                }
+            } else {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        barRepository.markReportReviewed(report)
                     }
-                } else {
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            barRepository.markReportReviewed(report)
-                        }
-                    } label: {
-                        Text("Mark reviewed")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.barTabPrimary)
-                    }
+                } label: {
+                    Text("Mark reviewed")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabPrimary)
                 }
             }
         }
-        .barTabCard()
     }
 
     private func relativeDate(
