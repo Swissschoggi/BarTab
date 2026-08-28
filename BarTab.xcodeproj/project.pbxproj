@@ -643,6 +643,7 @@
 				BRTA0001400000000000005B /* InviteMemberSheet.swift in Sources */,
 				BRTA0001400000000000005C /* SetAlertSheet.swift in Sources */,
 				BRTA0001400000000000005D /* PriceAlertListView.swift in Sources */,
+				BRTA00014000000000000060 /* FindUsersView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
