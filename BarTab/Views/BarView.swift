@@ -1,6 +1,5 @@
 import SwiftUI
 import MapKit
-import Combine
 
 struct BarView: View {
 
@@ -52,6 +51,17 @@ struct BarView: View {
         self.bar = bar
         self.allowsDismissal = allowsDismissal
         _currentBar = State(initialValue: bar)
+    }
+
+    @State private var isSyncScheduled = false
+
+    private func scheduleSync() {
+        guard !isSyncScheduled else { return }
+        isSyncScheduled = true
+        DispatchQueue.main.async {
+            isSyncScheduled = false
+            syncFromRepository()
+        }
     }
 
     private func syncFromRepository() {
@@ -138,21 +148,13 @@ struct BarView: View {
                 locationService.requestPermission()
                 syncFromRepository()
             }
-            .onReceive(
-                Publishers.MergeMany(
-                    barRepository.$bars.dropFirst(),
-                    barRepository.$prices.dropFirst(),
-                    barRepository.$barRatings.dropFirst(),
-                    barRepository.$drinkRatings.dropFirst(),
-                    barRepository.$priceLevelByBarID.dropFirst(),
-                    barRepository.$favoriteBarIDs.dropFirst(),
-                    barRepository.$reports.dropFirst()
-                )
-            ) { _ in
-                DispatchQueue.main.async {
-                    syncFromRepository()
-                }
-            }
+            .onReceive(barRepository.$bars) { _ in scheduleSync() }
+            .onReceive(barRepository.$prices) { _ in scheduleSync() }
+            .onReceive(barRepository.$barRatings) { _ in scheduleSync() }
+            .onReceive(barRepository.$drinkRatings) { _ in scheduleSync() }
+            .onReceive(barRepository.$priceLevelByBarID) { _ in scheduleSync() }
+            .onReceive(barRepository.$favoriteBarIDs) { _ in scheduleSync() }
+            .onReceive(barRepository.$reports) { _ in scheduleSync() }
         )
     }
 
