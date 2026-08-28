@@ -127,11 +127,14 @@ final class SupabaseClient {
     private func makeRequest(
         endpoint: String,
         method: String = "GET"
-    ) -> URLRequest {
+    ) throws -> URLRequest {
 
         let urlString = "\(baseURL)/rest/v1/\(endpoint)"
         guard let url = URL(string: urlString) else {
-            fatalError("Invalid URL: \(urlString)")
+            throw SupabaseError(
+                statusCode: 0,
+                message: "Invalid URL: \(urlString)"
+            )
         }
 
         var request = URLRequest(url: url)
@@ -207,8 +210,20 @@ final class SupabaseClient {
                   AuthTokenStore.shared.hasToken else {
                 throw error
             }
+
+            Self.refreshLock.lock()
+            guard !Self.isRefreshing else {
+                Self.refreshLock.unlock()
+                throw error
+            }
             Self.isRefreshing = true
-            defer { Self.isRefreshing = false }
+            Self.refreshLock.unlock()
+
+            defer {
+                Self.refreshLock.lock()
+                Self.isRefreshing = false
+                Self.refreshLock.unlock()
+            }
 
             guard (try? await SupabaseAuthService().refreshSession()) != nil,
                   let baseRequest = retriedRequest(request) else {
@@ -287,7 +302,7 @@ final class SupabaseClient {
     /// Fetch all bars mapped to domain Bar models
     func fetchBars() async throws -> [Bar] {
 
-        let request = makeRequest(endpoint: "bars?select=*")
+        let request = try makeRequest(endpoint: "bars?select=*")
         let data = try await performAuthorized(request)
 
         let dtos = try decoder.decode(
@@ -296,14 +311,13 @@ final class SupabaseClient {
         )
 
         let bars = dtos.map { $0.toDomain }
-        print("[SupabaseClient] fetchBars: \(bars.count) bars, outdoor=\(bars.filter(\.outdoorSeating).count), smoking=\(bars.filter(\.smokingFriendly).count)")
         return bars
     }
 
     /// Add a new bar using Bar domain model
     func addBar(_ bar: Bar) async throws {
 
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "bars",
             method: "POST"
         )
@@ -317,7 +331,7 @@ final class SupabaseClient {
     /// Delete a bar and its prices (prices cascade)
     func deleteBar(_ bar: Bar) async throws {
 
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "bars?id=eq.\(bar.id.uuidString)",
             method: "DELETE"
         )
@@ -328,7 +342,7 @@ final class SupabaseClient {
     /// Update an existing bar
     func updateBar(_ bar: Bar) async throws {
 
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "bars?id=eq.\(bar.id.uuidString)",
             method: "PATCH"
         )
@@ -359,7 +373,7 @@ final class SupabaseClient {
     /// Fetch every price entry, mapped to domain Price models
     func fetchAllPrices() async throws -> [Price] {
 
-        let request = makeRequest(endpoint: "prices?select=*")
+        let request = try makeRequest(endpoint: "prices?select=*")
         let data = try await performAuthorized(request)
 
         let dtos = try decoder.decode(
@@ -373,7 +387,7 @@ final class SupabaseClient {
     /// Fetch prices for a specific bar mapped to domain Price models
     func fetchPrices(for barID: UUID) async throws -> [Price] {
 
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint:
                 "prices?bar_id=eq.\(barID.uuidString)&select=*"
         )
@@ -391,7 +405,7 @@ final class SupabaseClient {
     /// Add a new price entry using Price domain model
     func addPrice(_ price: Price) async throws {
 
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "prices",
             method: "POST"
         )
@@ -405,7 +419,7 @@ final class SupabaseClient {
     /// Update an existing price entry
     func updatePrice(_ price: Price) async throws {
 
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "prices?id=eq.\(price.id.uuidString)",
             method: "PATCH"
         )
@@ -419,7 +433,7 @@ final class SupabaseClient {
     /// Delete a price entry
     func deletePrice(_ price: Price) async throws {
 
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "prices?id=eq.\(price.id.uuidString)",
             method: "DELETE"
         )
@@ -432,7 +446,7 @@ final class SupabaseClient {
     /// Fetch every ambience/wine rating, mapped to domain BarRating models
     func fetchBarRatings() async throws -> [BarRating] {
 
-        let request = makeRequest(endpoint: "bar_ratings?select=*")
+        let request = try makeRequest(endpoint: "bar_ratings?select=*")
         let data = try await performAuthorized(request)
 
         let dtos = try decoder.decode(
@@ -448,7 +462,7 @@ final class SupabaseClient {
     /// unique constraint).
     func upsertBarRating(_ rating: BarRating) async throws {
 
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "bar_ratings?on_conflict=bar_id,rated_by",
             method: "POST"
         )
@@ -469,7 +483,7 @@ final class SupabaseClient {
     /// Fetch drink ratings for a specific bar.
     func fetchDrinkRatings(for barID: UUID) async throws -> [DrinkRating] {
 
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "drink_ratings?bar_id=eq.\(barID.uuidString)&select=*"
         )
 
@@ -486,7 +500,7 @@ final class SupabaseClient {
     /// Fetch all drink ratings.
     func fetchAllDrinkRatings() async throws -> [DrinkRating] {
 
-        let request = makeRequest(endpoint: "drink_ratings?select=*")
+        let request = try makeRequest(endpoint: "drink_ratings?select=*")
         let data = try await performAuthorized(request)
 
         let dtos = try decoder.decode(
@@ -501,7 +515,7 @@ final class SupabaseClient {
     /// bar_id + drink + brand + size + rated_by).
     func upsertDrinkRating(_ rating: DrinkRating) async throws {
 
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "drink_ratings?on_conflict=bar_id,drink,brand,size,rated_by",
             method: "POST"
         )
@@ -522,7 +536,7 @@ final class SupabaseClient {
     /// Fetch the shared, admin-approved brand catalog.
     func fetchBrands() async throws -> [DrinkBrand] {
 
-        let request = makeRequest(endpoint: "drink_brands?select=*")
+        let request = try makeRequest(endpoint: "drink_brands?select=*")
         let data = try await performAuthorized(request)
 
         let dtos = try decoder.decode(
@@ -537,7 +551,7 @@ final class SupabaseClient {
     /// approves a request).
     func insertBrand(drink: Drink, name: String) async throws {
 
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "drink_brands",
             method: "POST"
         )
@@ -558,7 +572,7 @@ final class SupabaseClient {
 
     func fetchBrandRequests() async throws -> [BrandRequest] {
 
-        let request = makeRequest(endpoint: "brand_requests?select=*")
+        let request = try makeRequest(endpoint: "brand_requests?select=*")
         let data = try await performAuthorized(request)
 
         let dtos = try decoder.decode(
@@ -571,7 +585,7 @@ final class SupabaseClient {
 
     func submitBrandRequest(_ request: BrandRequest) async throws {
 
-        var httpRequest = makeRequest(
+        var httpRequest = try makeRequest(
             endpoint: "brand_requests",
             method: "POST"
         )
@@ -587,7 +601,7 @@ final class SupabaseClient {
         status: BrandRequestStatus
     ) async throws {
 
-        var httpRequest = makeRequest(
+        var httpRequest = try makeRequest(
             endpoint: "brand_requests?id=eq.\(requestID.uuidString)",
             method: "PATCH"
         )
@@ -604,7 +618,7 @@ final class SupabaseClient {
     }
 
     func deleteBrandRequest(_ request: BrandRequest) async throws {
-        let httpRequest = makeRequest(
+        let httpRequest = try makeRequest(
             endpoint: "brand_requests?id=eq.\(request.id.uuidString)",
             method: "DELETE"
         )
@@ -615,7 +629,7 @@ final class SupabaseClient {
 
     func fetchContentReports() async throws -> [ContentReport] {
 
-        let request = makeRequest(endpoint: "content_reports?select=*")
+        let request = try makeRequest(endpoint: "content_reports?select=*")
         let data = try await performAuthorized(request)
 
         let dtos = try decoder.decode(
@@ -629,7 +643,7 @@ final class SupabaseClient {
 
     func insertContentReport(_ report: ContentReport) async throws {
 
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "content_reports",
             method: "POST"
         )
@@ -645,7 +659,7 @@ final class SupabaseClient {
         reviewedAt: Date
     ) async throws {
 
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "content_reports?id=eq.\(reportID.uuidString)",
             method: "PATCH"
         )
@@ -664,7 +678,7 @@ final class SupabaseClient {
 
     func deleteContentReport(_ reportID: UUID) async throws {
 
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "content_reports?id=eq.\(reportID.uuidString)",
             method: "DELETE"
         )
@@ -678,7 +692,7 @@ final class SupabaseClient {
         userID: UUID
     ) async throws -> ProfileDTO {
 
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "profiles?select=*&id=eq.\(userID.uuidString)"
         )
 
@@ -703,7 +717,7 @@ final class SupabaseClient {
         userID: UUID,
         displayName: String
     ) async throws {
-        var httpRequest = makeRequest(
+        var httpRequest = try makeRequest(
             endpoint: "profiles?id=eq.\(userID.uuidString)",
             method: "PATCH"
         )
@@ -717,7 +731,7 @@ final class SupabaseClient {
         userID: UUID,
         avatarURL: String
     ) async throws {
-        var httpRequest = makeRequest(
+        var httpRequest = try makeRequest(
             endpoint: "profiles?id=eq.\(userID.uuidString)",
             method: "PATCH"
         )
@@ -785,7 +799,7 @@ final class SupabaseClient {
             "following_id": userID.uuidString,
             "status": "pending"
         ]
-        var request = makeRequest(endpoint: "follows", method: "POST")
+        var request = try makeRequest(endpoint: "follows", method: "POST")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         _ = try await performAuthorized(request)
     }
@@ -793,7 +807,7 @@ final class SupabaseClient {
     func cancelFollowRequest(_ userID: UUID) async throws {
         let myID = try requireUserID().uuidString
         let theirID = userID.uuidString
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "follows?follower_id=eq.\(myID)&following_id=eq.\(theirID)&status=eq.pending",
             method: "DELETE"
         )
@@ -804,7 +818,7 @@ final class SupabaseClient {
         let myID = try requireUserID().uuidString
         let theirID = userID.uuidString
         let body: [String: Any] = ["status": "accepted"]
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "follows?follower_id=eq.\(theirID)&following_id=eq.\(myID)&status=eq.pending",
             method: "PATCH"
         )
@@ -816,7 +830,7 @@ final class SupabaseClient {
         let myID = try requireUserID().uuidString
         let theirID = userID.uuidString
         let body: [String: Any] = ["status": "rejected"]
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "follows?follower_id=eq.\(theirID)&following_id=eq.\(myID)&status=eq.pending",
             method: "PATCH"
         )
@@ -827,7 +841,7 @@ final class SupabaseClient {
     func removeFollow(_ userID: UUID) async throws {
         let myID = try requireUserID().uuidString
         let theirID = userID.uuidString
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "follows?follower_id=eq.\(myID)&following_id=eq.\(theirID)",
             method: "DELETE"
         )
@@ -846,7 +860,7 @@ final class SupabaseClient {
         let theirID = userID.uuidString
 
         // Check outgoing: I → them
-        let outReq = makeRequest(
+        let outReq = try makeRequest(
             endpoint: "follows?follower_id=eq.\(myID)&following_id=eq.\(theirID)&select=status"
         )
         let outData = try await performAuthorized(outReq)
@@ -856,7 +870,7 @@ final class SupabaseClient {
         }
 
         // Check incoming: them → I
-        let inReq = makeRequest(
+        let inReq = try makeRequest(
             endpoint: "follows?follower_id=eq.\(theirID)&following_id=eq.\(myID)&select=status"
         )
         let inData = try await performAuthorized(inReq)
@@ -870,7 +884,7 @@ final class SupabaseClient {
 
     func fetchIncomingFollowRequests() async throws -> [Follow] {
         let myID = try requireUserID().uuidString
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "follows?following_id=eq.\(myID)&status=eq.pending&select=*,follower_id"
         )
         let data = try await performAuthorized(request)
@@ -880,7 +894,7 @@ final class SupabaseClient {
     func fetchProfilesByIDs(_ ids: [UUID]) async throws -> [UUID: ProfileDTO] {
         guard !ids.isEmpty else { return [:] }
         let idList = ids.map(\.uuidString).joined(separator: ",")
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "profiles?id=in.(\(idList))&select=*"
         )
         let data = try await performAuthorized(request)
@@ -890,7 +904,7 @@ final class SupabaseClient {
 
     func fetchFollowing() async throws -> [UUID] {
         let myID = try requireUserID().uuidString
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "follows?follower_id=eq.\(myID)&status=eq.accepted&select=following_id"
         )
         let data = try await performAuthorized(request)
@@ -899,7 +913,7 @@ final class SupabaseClient {
     }
 
     func fetchFollowerCount(for userID: UUID) async throws -> Int {
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "follows?following_id=eq.\(userID.uuidString)&status=eq.accepted&select=follower_id"
         )
         let data = try await performAuthorized(request)
@@ -908,7 +922,7 @@ final class SupabaseClient {
     }
 
     func fetchFollowingCount(for userID: UUID) async throws -> Int {
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "follows?follower_id=eq.\(userID.uuidString)&status=eq.accepted&select=following_id"
         )
         let data = try await performAuthorized(request)
@@ -920,7 +934,7 @@ final class SupabaseClient {
         let myID = try requireUserID().uuidString
         let wildcard = "%25\(query)%25"
         let endpoint = "profiles?id=neq.\(myID)&display_name=ilike.\(wildcard)&select=*&limit=20"
-        let request = makeRequest(endpoint: endpoint)
+        let request = try makeRequest(endpoint: endpoint)
         let data = try await performAuthorized(request)
         return try decoder.decode([ProfileDTO].self, from: data)
     }
@@ -934,7 +948,7 @@ final class SupabaseClient {
         var items: [ActivityItem] = []
 
         // Recent prices from followed users
-        let priceReq = makeRequest(
+        let priceReq = try makeRequest(
             endpoint: "prices?reported_by=in.(\(ids))&select=*,bars(name)&order=reported_at.desc&limit=30"
         )
         let priceData = try await performAuthorized(priceReq)
@@ -954,7 +968,7 @@ final class SupabaseClient {
         }
 
         // Recent bar ratings from followed users
-        let ratingReq = makeRequest(
+        let ratingReq = try makeRequest(
             endpoint: "bar_ratings?rated_by=in.(\(ids))&select=*,bars(name)&order=created_at.desc&limit=20"
         )
         let ratingData = try await performAuthorized(ratingReq)
@@ -977,11 +991,12 @@ final class SupabaseClient {
     // MARK: - Groups
 
     func createGroup(name: String) async throws -> BarGroup {
+        let userID = try requireUserID()
         let body: [String: Any] = [
             "name": name,
-            "created_by": try requireUserID().uuidString
+            "created_by": userID.uuidString
         ]
-        var request = makeRequest(endpoint: "groups", method: "POST")
+        var request = try makeRequest(endpoint: "groups", method: "POST")
         request.setValue("return=representation", forHTTPHeaderField: "Prefer")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
@@ -994,10 +1009,10 @@ final class SupabaseClient {
         // Auto-add creator as admin
         let memberBody: [String: Any] = [
             "group_id": group.id.uuidString,
-            "user_id": try requireUserID().uuidString,
+            "user_id": userID.uuidString,
             "role": "admin"
         ]
-        var memberReq = makeRequest(endpoint: "group_members", method: "POST")
+        var memberReq = try makeRequest(endpoint: "group_members", method: "POST")
         memberReq.httpBody = try JSONSerialization.data(withJSONObject: memberBody)
         _ = try await performAuthorized(memberReq)
 
@@ -1006,7 +1021,7 @@ final class SupabaseClient {
 
     func fetchGroups() async throws -> [BarGroup] {
         let myID = try requireUserID().uuidString
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "group_members?user_id=eq.\(myID)&select=group_id"
         )
         let data = try await performAuthorized(request)
@@ -1014,7 +1029,7 @@ final class SupabaseClient {
         let groupIDs = memberRows.map { $0.groupID.uuidString }
         guard !groupIDs.isEmpty else { return [] }
         let idList = groupIDs.joined(separator: ",")
-        let groupsRequest = makeRequest(
+        let groupsRequest = try makeRequest(
             endpoint: "groups?id=in.(\(idList))&select=*"
         )
         let groupsData = try await performAuthorized(groupsRequest)
@@ -1022,7 +1037,7 @@ final class SupabaseClient {
     }
 
     func fetchGroupMembers(groupID: UUID) async throws -> [GroupMember] {
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "group_members?group_id=eq.\(groupID.uuidString)&select=*"
         )
         let data = try await performAuthorized(request)
@@ -1035,14 +1050,14 @@ final class SupabaseClient {
             "user_id": userID.uuidString,
             "role": "member"
         ]
-        var request = makeRequest(endpoint: "group_members", method: "POST")
+        var request = try makeRequest(endpoint: "group_members", method: "POST")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         _ = try await performAuthorized(request)
     }
 
     func leaveGroup(groupID: UUID) async throws {
         let myID = try requireUserID().uuidString
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "group_members?group_id=eq.\(groupID.uuidString)&user_id=eq.\(myID)",
             method: "DELETE"
         )
@@ -1057,7 +1072,7 @@ final class SupabaseClient {
             "title": title,
             "created_by": try requireUserID().uuidString
         ]
-        var pollReq = makeRequest(endpoint: "group_polls", method: "POST")
+        var pollReq = try makeRequest(endpoint: "group_polls", method: "POST")
         pollReq.setValue("return=representation", forHTTPHeaderField: "Prefer")
         pollReq.httpBody = try JSONSerialization.data(withJSONObject: pollBody)
 
@@ -1076,7 +1091,7 @@ final class SupabaseClient {
             if let barID = option.barID {
                 optBody["bar_id"] = barID.uuidString
             }
-            var optReq = makeRequest(endpoint: "poll_options", method: "POST")
+            var optReq = try makeRequest(endpoint: "poll_options", method: "POST")
             optReq.httpBody = try JSONSerialization.data(withJSONObject: optBody)
             _ = try await performAuthorized(optReq)
         }
@@ -1085,7 +1100,7 @@ final class SupabaseClient {
     }
 
     func fetchPolls(groupID: UUID) async throws -> [Poll] {
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "group_polls?group_id=eq.\(groupID.uuidString)&select=*&order=created_at.desc"
         )
         let data = try await performAuthorized(request)
@@ -1093,7 +1108,7 @@ final class SupabaseClient {
     }
 
     func fetchPollOptions(pollID: UUID) async throws -> [PollOption] {
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "poll_options?poll_id=eq.\(pollID.uuidString)&select=*"
         )
         let data = try await performAuthorized(request)
@@ -1101,7 +1116,7 @@ final class SupabaseClient {
     }
 
     func fetchPollVotes(pollID: UUID) async throws -> [PollVote] {
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "poll_votes?poll_id=eq.\(pollID.uuidString)&select=*"
         )
         let data = try await performAuthorized(request)
@@ -1112,7 +1127,7 @@ final class SupabaseClient {
         let myID = try requireUserID().uuidString
 
         // Remove existing vote for this poll
-        var deleteReq = makeRequest(
+        var deleteReq = try makeRequest(
             endpoint: "poll_votes?poll_id=eq.\(pollID.uuidString)&user_id=eq.\(myID)",
             method: "DELETE"
         )
@@ -1124,14 +1139,14 @@ final class SupabaseClient {
             "option_id": optionID.uuidString,
             "user_id": myID
         ]
-        var voteReq = makeRequest(endpoint: "poll_votes", method: "POST")
+        var voteReq = try makeRequest(endpoint: "poll_votes", method: "POST")
         voteReq.httpBody = try JSONSerialization.data(withJSONObject: body)
         _ = try await performAuthorized(voteReq)
     }
 
     func closePoll(pollID: UUID) async throws {
         let body: [String: Any] = ["is_closed": true]
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "group_polls?id=eq.\(pollID.uuidString)",
             method: "PATCH"
         )
@@ -1156,7 +1171,7 @@ final class SupabaseClient {
             "brand": brand as Any,
             "target_price": targetPrice as Any
         ]
-        var request = makeRequest(endpoint: "price_alerts", method: "POST")
+        var request = try makeRequest(endpoint: "price_alerts", method: "POST")
         request.setValue("return=representation", forHTTPHeaderField: "Prefer")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
@@ -1170,7 +1185,7 @@ final class SupabaseClient {
 
     func fetchPriceAlerts() async throws -> [PriceAlert] {
         let myID = try requireUserID().uuidString
-        let request = makeRequest(
+        let request = try makeRequest(
             endpoint: "price_alerts?user_id=eq.\(myID)&is_active=true&select=*&order=created_at.desc"
         )
         let data = try await performAuthorized(request)
@@ -1178,7 +1193,7 @@ final class SupabaseClient {
     }
 
     func deletePriceAlert(_ alertID: UUID) async throws {
-        var request = makeRequest(
+        var request = try makeRequest(
             endpoint: "price_alerts?id=eq.\(alertID.uuidString)",
             method: "DELETE"
         )

@@ -10,7 +10,7 @@ struct SetAlertSheet: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @State private var targetPrice = ""
     @State private var isSaving = false
@@ -52,9 +52,19 @@ struct SetAlertSheet: View {
                             .keyboardType(.decimalPad)
                     }
 
-                    Text("Leave empty to be alerted on any new price. Set a value to be notified when the price drops to or below it.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    if let price = Double(targetPrice.replacingOccurrences(of: ",", with: ".")), price < 0 {
+                        Text("Price cannot be negative.")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    } else if let price = Double(targetPrice.replacingOccurrences(of: ",", with: ".")), price == 0 {
+                        Text("Price must be greater than zero, or leave empty for any price.")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    } else {
+                        Text("Leave empty to be alerted on any new price. Set a value to be notified when the price drops to or below it.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 } header: {
                     Text("Target price")
                 }
@@ -64,7 +74,7 @@ struct SetAlertSheet: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -90,7 +100,7 @@ struct SetAlertSheet: View {
             )
             HapticEngine.success()
             toastCenter.show("Alert set", kind: .success)
-            presentationMode.wrappedValue.dismiss()
+            dismiss()
         } catch {
             toastCenter.showError(error)
         }

@@ -1,5 +1,15 @@
 import SwiftUI
 
+// MARK: - Date relative formatting
+
+extension Date {
+    var relativeFormatted: String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        return formatter.localizedString(for: self, relativeTo: Date())
+    }
+}
+
 // MARK: - Screen header
 
 struct BarTabScreenHeader: View {
@@ -333,6 +343,68 @@ extension View {
 
     func skeleton() -> some View {
         modifier(SkeletonModifier())
+    }
+}
+
+// MARK: - Empty state
+
+struct EmptyStateView: View {
+
+    let icon: String
+    let title: String
+    let message: String
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 40))
+                .foregroundColor(.barTabPrimary.opacity(0.6))
+
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.barTabText)
+
+            Text(message)
+                .font(.caption)
+                .foregroundColor(.barTabSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 20)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+    }
+}
+
+// MARK: - Search field
+
+struct BarTabSearchField: View {
+
+    @Binding var text: String
+    var placeholder: String = "Search..."
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.barTabSecondary)
+                .font(.subheadline)
+
+            TextField(placeholder, text: $text)
+                .textFieldStyle(.plain)
+                .autocorrectionDisabled()
+
+            if !text.isEmpty {
+                Button {
+                    text = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.barTabSecondary)
+                }
+            }
+        }
+        .padding(10)
+        .background(Color.barTabPillFill)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }
 

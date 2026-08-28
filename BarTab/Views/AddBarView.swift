@@ -11,7 +11,7 @@ struct AddBarView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @StateObject private var searchService = PlaceSearchService()
 
@@ -474,7 +474,7 @@ struct AddBarView: View {
             }
 
             onBarAdded?(saved)
-            presentationMode.wrappedValue.dismiss()
+            dismiss()
         }
     }
 

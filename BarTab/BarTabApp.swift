@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 @main
 struct BarTabApp: App {
@@ -27,6 +28,16 @@ struct BarTabApp: App {
                 .onOpenURL { url in
                     Task {
                         await handleDeepLink(url)
+                    }
+                }
+                .onReceive(
+                    NotificationCenter.default.publisher(
+                        for: UIApplication.willEnterForegroundNotification
+                    )
+                ) { _ in
+                    ReportNotificationService.requestPermission()
+                    Task {
+                        await PriceAlertService.checkAlerts(barRepository: barRepository)
                     }
                 }
         }

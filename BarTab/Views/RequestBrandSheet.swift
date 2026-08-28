@@ -8,7 +8,7 @@ struct RequestBrandSheet: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @State private var name = ""
     @State private var didSubmit = false
@@ -109,7 +109,7 @@ struct RequestBrandSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
             }

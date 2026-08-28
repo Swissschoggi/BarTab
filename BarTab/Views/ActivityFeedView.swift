@@ -139,7 +139,7 @@ struct ActivityFeedView: View {
                 }
             }
         } catch {
-            print("Failed to load activity feed: \(error)")
+            toastCenter.showError(error)
         }
         isLoading = false
     }

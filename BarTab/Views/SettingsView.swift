@@ -319,13 +319,13 @@ struct SettingsView: View {
                     }
                     .barTabCard()
 
-                    // Clear Cache
+                    // Cache
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "trash")
                                 .font(.subheadline)
                                 .foregroundColor(.barTabPrimary)
-                            Text("Data")
+                            Text("Cache")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)

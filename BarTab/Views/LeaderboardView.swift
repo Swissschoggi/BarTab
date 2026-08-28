@@ -7,6 +7,8 @@ struct LeaderboardView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
 
+    @State private var displayNameCache: [UUID: String] = [:]
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -83,6 +85,19 @@ struct LeaderboardView: View {
             .navigationTitle("Leaderboard")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .task {
+            await loadDisplayNames()
+        }
+    }
+
+    private func loadDisplayNames() async {
+        let allUserIDs = Set(leaderboardEntries.compactMap { UUID(uuidString: $0.id) })
+        for userID in allUserIDs {
+            if displayNameCache[userID] == nil,
+               let profile = try? await SupabaseClient.shared.fetchProfile(userID: userID) {
+                displayNameCache[userID] = profile.display_name
+            }
+        }
     }
 
     private var leaderboardEntries: [LeaderboardEntry] {
@@ -101,11 +116,19 @@ struct LeaderboardView: View {
         }
 
         return contributionsByUser.map { userId, count in
-            LeaderboardEntry(
+            let isSelf = isCurrentUser(userId)
+            let name: String = {
+                if isSelf {
+                    return userSession.currentUser?.username ?? "You"
+                }
+                if let cached = displayNameCache[userId] {
+                    return cached
+                }
+                return "Contributor"
+            }()
+            return LeaderboardEntry(
                 id: userId.uuidString,
-                username: isCurrentUser(userId)
-                    ? (userSession.currentUser?.username ?? "You")
-                    : "User \(userId.uuidString.prefix(6))",
+                username: name,
                 contributions: count,
                 level: UserLevel.current(for: count)
             )

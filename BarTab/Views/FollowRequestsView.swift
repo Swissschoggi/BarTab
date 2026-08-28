@@ -123,7 +123,7 @@ struct FollowRequestsView: View {
             let senderIDs = requests.compactMap(\.followerID)
             profiles = try await SupabaseClient.shared.fetchProfilesByIDs(senderIDs)
         } catch {
-            print("Failed to load follow requests: \(error)")
+            toastCenter.showError(error)
         }
         isLoading = false
     }

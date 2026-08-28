@@ -88,7 +88,7 @@ struct PriceAlertListView: View {
         do {
             alerts = try await SupabaseClient.shared.fetchPriceAlerts()
         } catch {
-            print("Failed to load price alerts: \(error)")
+            toastCenter.showError(error)
         }
         isLoading = false
     }

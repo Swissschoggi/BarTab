@@ -132,7 +132,7 @@ struct GroupDetailView: View {
                 }
             }
         } catch {
-            print("Failed to load group data: \(error)")
+            toastCenter.showError(error)
         }
         isLoading = false
     }
@@ -238,7 +238,7 @@ struct PollCard: View {
                 myVote = votes.first(where: { $0.userID == userID })?.optionID
             }
         } catch {
-            print("Failed to load poll data: \(error)")
+            toastCenter.showError(error)
         }
     }
 

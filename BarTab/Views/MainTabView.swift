@@ -12,6 +12,7 @@ struct MainTabView: View {
     @EnvironmentObject private var barRepository: BarRepository
 
     @State private var selectedTab: Tab = .map
+    @State private var showingOnboarding = false
 
     private var adminBadgeCount: Int {
         guard userSession.currentUser?.isAdmin == true else { return 0 }
@@ -91,6 +92,14 @@ struct MainTabView: View {
             Color.barTabBackground
                 .ignoresSafeArea()
         )
+        .onAppear {
+            if !UserDefaults.standard.bool(forKey: "hasSeenOnboarding") {
+                showingOnboarding = true
+            }
+        }
+        .sheet(isPresented: $showingOnboarding) {
+            OnboardingView()
+        }
     }
 
 

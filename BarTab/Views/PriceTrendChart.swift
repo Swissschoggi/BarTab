@@ -13,15 +13,13 @@ extension Array where Element == Price {
             $0.reportedAt < $1.reportedAt
         }
 
-        let first =
-            NSDecimalNumber(
-                decimal: sorted.first!.amount
-            ).doubleValue
+        guard let firstAmount = sorted.first?.amount,
+              let lastAmount = sorted.last?.amount else {
+            return nil
+        }
 
-        let last =
-            NSDecimalNumber(
-                decimal: sorted.last!.amount
-            ).doubleValue
+        let first = NSDecimalNumber(decimal: firstAmount).doubleValue
+        let last = NSDecimalNumber(decimal: lastAmount).doubleValue
 
         guard first > 0 else {
             return nil

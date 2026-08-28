@@ -82,6 +82,13 @@ struct ProfileView: View {
                                 ? "Sign in to manage your contributions."
                                 : "Your BarTab profile."
                         )
+
+                        if let fetchedAt = barRepository.lastFetchedAt {
+                            Text("Data updated \(fetchedAt.relativeFormatted)")
+                                .font(.caption2)
+                                .foregroundColor(.barTabSecondary)
+                                .padding(.top, 2)
+                        }
                     }
 
                     if let user = currentUser {
@@ -504,6 +511,9 @@ struct ProfileView: View {
             )
             .navigationBarHidden(true)
         }
+        .refreshable {
+            await barRepository.fetchAllData()
+        }
         .sheet(isPresented: $showingLogin) {
             LoginView()
                 .environmentObject(userSession)
@@ -693,7 +703,6 @@ struct ProfileView: View {
                 )
                 .font(.caption2)
                 .foregroundColor(.barTabSecondary)
-                .foregroundColor(.secondary)
             }
             .barTabCard()
         }

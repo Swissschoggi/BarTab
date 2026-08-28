@@ -9,8 +9,7 @@ struct LocationPickerView: View {
 
     @Binding var address: String
 
-    @Environment(\.presentationMode)
-    private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @StateObject private var locationService =
         LocationService()
@@ -143,9 +142,7 @@ struct LocationPickerView: View {
                 coordinate
         )
 
-        presentationMode
-            .wrappedValue
-            .dismiss()
+        dismiss()
     }
 
     private func reverseGeocode(

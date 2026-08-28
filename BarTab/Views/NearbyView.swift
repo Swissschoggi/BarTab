@@ -290,9 +290,22 @@ struct NearbyView: View {
                         .fontWeight(.semibold)
 
                     if case .myLocation = origin, locationService.location == nil {
-                        Text("Waiting for location...")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        HStack(spacing: 6) {
+                            Text("Waiting for location...")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+
+                            Button {
+                                UIApplication.shared.open(
+                                    URL(string: UIApplication.openSettingsURLString)!
+                                )
+                            } label: {
+                                Text("Open Settings")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabPrimary)
+                            }
+                        }
                     }
                 }
 

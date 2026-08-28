@@ -106,7 +106,7 @@ struct FollowButton: View {
         do {
             followStatus = try await SupabaseClient.shared.fetchFollowStatus(for: userID)
         } catch {
-            print("Failed to load follow status: \(error)")
+            toastCenter.showError(error)
         }
     }
 

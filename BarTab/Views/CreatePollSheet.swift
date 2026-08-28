@@ -7,7 +7,7 @@ struct CreatePollSheet: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @State private var pollTitle = ""
     @State private var optionTexts: [String] = ["", ""]
@@ -45,7 +45,7 @@ struct CreatePollSheet: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -76,7 +76,7 @@ struct CreatePollSheet: View {
             )
             HapticEngine.success()
             toastCenter.show("Poll created", kind: .success)
-            presentationMode.wrappedValue.dismiss()
+            dismiss()
         } catch {
             toastCenter.showError(error)
         }

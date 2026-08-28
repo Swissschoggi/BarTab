@@ -4,8 +4,10 @@ struct MyBarsView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
 
     @StateObject private var locationService = LocationService()
+    @State private var editingBar: Bar?
 
     private var myBars: [Bar] {
         guard let user = userSession.currentUser else {
@@ -51,10 +53,20 @@ struct MyBarsView: View {
                             .buttonStyle(PlainButtonStyle())
                             .swipeActions(
                                 edge: .trailing,
-                                allowsFullSwipe: true
+                                allowsFullSwipe: false
                             ) {
 
                                 if let user = userSession.currentUser {
+
+                                    Button {
+                                        editingBar = bar
+                                    } label: {
+                                        Label(
+                                            "Edit",
+                                            systemImage: "pencil"
+                                        )
+                                    }
+                                    .tint(.blue)
 
                                     Button(role: .destructive) {
                                         Task {
@@ -85,6 +97,12 @@ struct MyBarsView: View {
         )
         .navigationTitle("My Bars")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $editingBar) { bar in
+            EditBarView(bar: bar)
+                .environmentObject(barRepository)
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
+        }
         .onAppear {
             locationService.requestPermission()
         }

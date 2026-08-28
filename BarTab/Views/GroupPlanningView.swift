@@ -123,7 +123,7 @@ struct GroupPlanningView: View {
         do {
             groups = try await SupabaseClient.shared.fetchGroups()
         } catch {
-            print("Failed to load groups: \(error)")
+            toastCenter.showError(error)
         }
         isLoading = false
     }

@@ -6,6 +6,7 @@ struct BarHopView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var locationService = LocationService()
 
     @State private var selectedRoute: [Bar] = []
     @State private var isGenerating = false
@@ -148,6 +149,17 @@ struct BarHopView: View {
             selectedRoute = allBars
             return
         }
-        selectedRoute = Array(allBars.shuffled().prefix(3))
+
+        if let userLocation = locationService.location {
+            let sorted = allBars.sorted {
+                let d0 = DistanceService.distance(from: userLocation, to: $0)
+                let d1 = DistanceService.distance(from: userLocation, to: $1)
+                return d0 < d1
+            }
+            let nearby = sorted.prefix(10)
+            selectedRoute = Array(nearby.shuffled().prefix(3))
+        } else {
+            selectedRoute = Array(allBars.shuffled().prefix(3))
+        }
     }
 }

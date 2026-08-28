@@ -17,18 +17,38 @@ final class BarRepository: ObservableObject {
     /// average drink price across all bars. Empty when unknown.
     @Published private(set) var priceLevelByBarID: [UUID: Int] = [:]
 
+    /// When the last full fetch from Supabase completed.
+    @Published private(set) var lastFetchedAt: Date?
+
     /// Optional toast sink so background failures surface as
     /// friendly banners instead of silent prints.
     private var toastCenter: ToastCenter?
+
+    private static let favoritesKey = "com.bartab.favoriteBarIDs"
 
     func attachToastCenter(_ center: ToastCenter) {
         toastCenter = center
     }
 
     init() {
+        loadFavoritesFromDisk()
         Task {
             await fetchAllData()
         }
+    }
+
+    // MARK: - Favorites Persistence
+
+    private func loadFavoritesFromDisk() {
+        guard let data = UserDefaults.standard.data(forKey: Self.favoritesKey),
+              let ids = try? JSONDecoder().decode(Set<UUID>.self, from: data)
+        else { return }
+        favoriteBarIDs = ids
+    }
+
+    private func saveFavoritesToDisk() {
+        guard let data = try? JSONEncoder().encode(favoriteBarIDs) else { return }
+        UserDefaults.standard.set(data, forKey: Self.favoritesKey)
     }
 
     // MARK: - Supabase Fetching
@@ -61,6 +81,7 @@ final class BarRepository: ObservableObject {
             }
             self.brands = Array(merged.values)
             recomputePriceLevels()
+            self.lastFetchedAt = Date()
         } catch {
             print("Failed to fetch initial data: \(error)")
             toastCenter?.showError(error)
@@ -132,9 +153,42 @@ final class BarRepository: ObservableObject {
             self.bars.removeAll { $0.id == bar.id }
             self.prices.removeAll { $0.barID == bar.id }
             self.favoriteBarIDs.remove(bar.id)
+            saveFavoritesToDisk()
             recomputePriceLevels()
         } catch {
             print("Failed to delete bar from Supabase: \(error)")
+            toastCenter?.showError(error)
+        }
+    }
+
+    func editBar(
+        _ bar: Bar,
+        name: String,
+        address: String,
+        smokingFriendly: Bool,
+        outdoorSeating: Bool,
+        editedBy user: User
+    ) async {
+        guard user.isAdmin || bar.createdBy == user.id else { return }
+
+        let updated = Bar(
+            id: bar.id,
+            name: name,
+            address: address,
+            coordinate: bar.coordinate,
+            createdAt: bar.createdAt,
+            createdBy: bar.createdBy,
+            smokingFriendly: smokingFriendly,
+            outdoorSeating: outdoorSeating
+        )
+
+        do {
+            try await SupabaseClient.shared.updateBar(updated)
+            if let index = bars.firstIndex(where: { $0.id == bar.id }) {
+                bars[index] = updated
+            }
+        } catch {
+            print("Failed to update bar on Supabase: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -671,6 +725,7 @@ final class BarRepository: ObservableObject {
         } else {
             favoriteBarIDs.insert(bar.id)
         }
+        saveFavoritesToDisk()
     }
 
     func toggleSmokingPolicy(for bar: Bar) async {

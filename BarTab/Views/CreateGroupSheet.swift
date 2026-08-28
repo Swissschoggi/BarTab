@@ -5,7 +5,7 @@ struct CreateGroupSheet: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @State private var groupName = ""
     @State private var isSaving = false
@@ -27,7 +27,7 @@ struct CreateGroupSheet: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -49,7 +49,7 @@ struct CreateGroupSheet: View {
             _ = try await SupabaseClient.shared.createGroup(name: name)
             HapticEngine.success()
             toastCenter.show("Group created", kind: .success)
-            presentationMode.wrappedValue.dismiss()
+            dismiss()
         } catch {
             toastCenter.showError(error)
         }

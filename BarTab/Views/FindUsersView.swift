@@ -132,7 +132,6 @@ struct FindUsersView: View {
         do {
             results = try await SupabaseClient.shared.searchUsers(query: trimmed)
         } catch {
-            print("User search failed: \(error)")
             toastCenter.showError(error)
         }
         isLoading = false

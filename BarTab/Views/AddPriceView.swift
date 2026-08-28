@@ -7,7 +7,7 @@ struct AddPriceView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @State private var selectedDrink: Drink = .beer
     @State private var selectedSize: DrinkSize = .fiveDeciliters
@@ -20,6 +20,7 @@ struct AddPriceView: View {
     @State private var showingDuplicateWarning = false
     @State private var duplicatePrice: Price?
     @State private var showingRequestBrand = false
+    @State private var priceError: String?
 
     private var availableBrands: [String] {
         barRepository.brands(for: selectedDrink).map(\.name)
@@ -274,6 +275,13 @@ struct AddPriceView: View {
                         )
                         .keyboardType(.decimalPad)
                     }
+
+                    if let error = priceError {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding(.top, 4)
+                    }
                 }
 
 
@@ -371,12 +379,16 @@ struct AddPriceView: View {
         guard !isSaving else { return }
 
         guard let amount = Decimal(string: priceText) else {
+            priceError = "Please enter a valid price."
             return
         }
 
         guard amount > 0 else {
+            priceError = "Price must be greater than zero."
             return
         }
+
+        priceError = nil
 
         guard let user = userSession.currentUser else {
             return
@@ -428,9 +440,7 @@ struct AddPriceView: View {
             if success {
                 HapticEngine.success()
                 toastCenter.show("Price saved", kind: .success)
-                presentationMode
-                    .wrappedValue
-                    .dismiss()
+                dismiss()
             } else {
                 isSaving = false
                 toastCenter.show(

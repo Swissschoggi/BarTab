@@ -50,7 +50,7 @@ struct MyContributionsView: View {
                             )
                             .swipeActions(
                                 edge: .trailing,
-                                allowsFullSwipe: true
+                                allowsFullSwipe: false
                             ) {
 
                                 if let user = userSession.currentUser {

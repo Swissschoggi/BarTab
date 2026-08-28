@@ -9,7 +9,7 @@ struct BarView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @StateObject private var locationService = LocationService()
 
@@ -22,6 +22,7 @@ struct BarView: View {
     @State private var pendingReportGroup: PriceGroup?
 
     @State private var showingDeleteBarConfirmation = false
+    @State private var showingEditBar = false
     @State private var pendingDeletePrice: Price?
     @State private var showingDeletePriceConfirmation = false
     @State private var pendingDeleteGroup: PriceGroup?
@@ -208,6 +209,12 @@ struct BarView: View {
                         .foregroundColor(.secondary)
                 }
 
+                if let fetchedAt = barRepository.lastFetchedAt {
+                    Text("Updated \(fetchedAt.relativeFormatted)")
+                        .font(.caption2)
+                        .foregroundColor(.barTabSecondary)
+                }
+
                 if groupedPrices.isEmpty {
                     emptyPricesView
                 } else {
@@ -280,25 +287,50 @@ struct BarView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
 
-            Button {
-                showingAddPrice = true
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "plus")
-                        .font(.subheadline)
+            if userSession.currentUser != nil {
+                Button {
+                    showingAddPrice = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus")
+                            .font(.subheadline)
 
-                    Text("Add a drink")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
+                        Text("Add a drink")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
 
-                    Spacer()
+                        Spacer()
 
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .fontWeight(.semibold)
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                    }
+                    .padding()
+                    .barTabPrimaryButton()
                 }
-                .padding()
-                .barTabPrimaryButton()
+            } else {
+                NavigationLink {
+                    LoginView()
+                        .environmentObject(userSession)
+                        .environmentObject(toastCenter)
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus")
+                            .font(.subheadline)
+
+                        Text("Sign in to add a drink")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                    }
+                    .padding()
+                    .barTabPrimaryButton()
+                }
             }
         }
     }
@@ -476,7 +508,7 @@ struct BarView: View {
         if allowsDismissal {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 } label: {
                     Image(systemName: "xmark")
                 }
@@ -514,6 +546,15 @@ struct BarView: View {
         if canDeleteBar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
+                    showingEditBar = true
+                } label: {
+                    Image(systemName: "pencil")
+                        .foregroundColor(.barTabPrimary)
+                }
+            }
+
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
                     showingDeleteBarConfirmation = true
                 } label: {
                     Image(systemName: "trash")
@@ -527,6 +568,12 @@ struct BarView: View {
         view
             .sheet(isPresented: $showingAddPrice) {
                 AddPriceView(bar: currentBar)
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+                    .environmentObject(toastCenter)
+            }
+            .sheet(isPresented: $showingEditBar) {
+                EditBarView(bar: currentBar)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
                     .environmentObject(toastCenter)
@@ -662,9 +709,10 @@ struct BarView: View {
                         : "This bar will be marked as smoking friendly."
                 )
             }
-            .alert(
+            .confirmationDialog(
                 currentBar.outdoorSeating ? "Remove outdoor seating?" : "Mark as outdoor seating?",
-                isPresented: $showingOutdoorConfirmation
+                isPresented: $showingOutdoorConfirmation,
+                titleVisibility: .visible
             ) {
                 Button(currentBar.outdoorSeating ? "Remove" : "Confirm") {
                     HapticEngine.impact()
@@ -873,7 +921,7 @@ struct BarView: View {
         guard let user = userSession.currentUser else { return }
         Task {
             await barRepository.deleteBar(currentBar, createdBy: user)
-            presentationMode.wrappedValue.dismiss()
+            dismiss()
         }
     }
 

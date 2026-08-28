@@ -33,7 +33,7 @@ struct LoginView: View {
 
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @State private var mode: Mode = .signIn
     @State private var email = ""
@@ -267,7 +267,7 @@ struct LoginView: View {
                             )
                         )
                     }
-                    .disabled(!canSubmit || isSubmitting)
+                    .disabled(!canSubmit || isSubmitting || isGoogleSigningIn)
 
 
                     if let errorMessage {
@@ -387,7 +387,7 @@ struct LoginView: View {
                             "Signed in with Google",
                             kind: .success
                         )
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     } catch {
                         isGoogleSigningIn = false
                         if (error as? SupabaseAuthService.AuthError) != nil {
@@ -495,7 +495,7 @@ struct LoginView: View {
                 }
 
                 HapticEngine.success()
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
 
             } catch {
 
@@ -546,7 +546,7 @@ struct LoginView: View {
                 )
 
                 HapticEngine.success()
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
 
             } catch {
 

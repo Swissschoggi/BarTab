@@ -7,12 +7,13 @@ struct InviteMemberSheet: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @State private var following: [UUID] = []
     @State private var members: Set<UUID> = []
     @State private var userCache: [UUID: String] = [:]
     @State private var isLoading = true
+    @State private var searchText = ""
 
     var body: some View {
         NavigationView {
@@ -21,24 +22,51 @@ struct InviteMemberSheet: View {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    List {
-                        let notInGroup = following.filter { !members.contains($0) }
-
-                        if notInGroup.isEmpty {
-                            Text("All your friends are already in this group.")
-                                .font(.subheadline)
+                    VStack(spacing: 0) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "magnifyingglass")
                                 .foregroundColor(.secondary)
-                        } else {
-                            ForEach(notInGroup, id: \.self) { userID in
+                            TextField("Search friends...", text: $searchText)
+                                .textFieldStyle(.plain)
+                            if !searchText.isEmpty {
                                 Button {
-                                    Task { await invite(userID) }
+                                    searchText = ""
                                 } label: {
-                                    HStack {
-                                        Text(userCache[userID] ?? "User")
-                                            .foregroundColor(.barTabText)
-                                        Spacer()
-                                        Image(systemName: "plus.circle.fill")
-                                            .foregroundColor(.barTabPrimary)
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                        .padding(10)
+                        .background(Color.barTabPillFill)
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+
+                        List {
+                            let notInGroup = following.filter { !members.contains($0) }
+                            let filtered = searchText.isEmpty
+                                ? notInGroup
+                                : notInGroup.filter { userCache[$0]?.localizedCaseInsensitiveContains(searchText) == true }
+
+                            if filtered.isEmpty {
+                                Text(searchText.isEmpty
+                                    ? "All your friends are already in this group."
+                                    : "No friends match your search.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            } else {
+                                ForEach(filtered, id: \.self) { userID in
+                                    Button {
+                                        Task { await invite(userID) }
+                                    } label: {
+                                        HStack {
+                                            Text(userCache[userID] ?? "User")
+                                                .foregroundColor(.barTabText)
+                                            Spacer()
+                                            Image(systemName: "plus.circle.fill")
+                                                .foregroundColor(.barTabPrimary)
+                                        }
                                     }
                                 }
                             }
@@ -51,7 +79,7 @@ struct InviteMemberSheet: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
             }
@@ -75,7 +103,7 @@ struct InviteMemberSheet: View {
                 }
             }
         } catch {
-            print("Failed to load members: \(error)")
+            toastCenter.showError(error)
         }
         isLoading = false
     }

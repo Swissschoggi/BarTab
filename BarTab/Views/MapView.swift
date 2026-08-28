@@ -71,6 +71,7 @@ struct MapView: View {
                                 .rotationEffect(.degrees(180))
                         }
                     }
+                    .accessibilityLabel("\(bar.name), \(bar.address)")
                 }
             }
             .ignoresSafeArea()
