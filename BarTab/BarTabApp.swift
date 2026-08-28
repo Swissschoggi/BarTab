@@ -40,7 +40,7 @@ struct BarTabApp: App {
             let success = await SupabaseAuthService().handleResetPasswordCallback(url)
             if success {
                 await MainActor.run {
-                    toastCenter.showMessage("Password updated successfully!")
+                    toastCenter.show("Password updated successfully!", kind: .success)
                 }
             }
             return
@@ -48,7 +48,7 @@ struct BarTabApp: App {
 
         // Google OAuth callback: bartab://auth/callback#access_token=...
         if url.host == "auth/callback" {
-            await userSession.signInWithGoogle(callbackURL: url)
+            try? await userSession.signInWithGoogle(callbackURL: url)
         }
     }
 }
