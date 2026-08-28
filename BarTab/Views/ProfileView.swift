@@ -297,6 +297,18 @@ struct ProfileView: View {
                                     .padding(.leading, 44)
 
                                 navigationRow(
+                                    title: "Follow Requests",
+                                    subtitle: "Approve or decline requests",
+                                    icon: "person.crop.circle.badge.checkmark"
+                                ) {
+                                    FollowRequestsView()
+                                }
+
+                                Divider()
+                                    .foregroundColor(.barTabCardBorder)
+                                    .padding(.leading, 44)
+
+                                navigationRow(
                                     title: "Activity",
                                     subtitle: "See what friends are drinking",
                                     icon: "list.bullet.rectangle"

@@ -17,7 +17,7 @@ struct FindUsersView: View {
 
                 BarTabScreenHeader(
                     title: "Find Friends",
-                    subtitle: "Search by username to follow someone."
+                    subtitle: "Search by username to send a follow request."
                 )
 
                 HStack(spacing: 10) {

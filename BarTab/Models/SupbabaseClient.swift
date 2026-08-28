@@ -129,9 +129,10 @@ final class SupabaseClient {
         method: String = "GET"
     ) -> URLRequest {
 
-        let url = URL(
-            string: "\(baseURL)/rest/v1/\(endpoint)"
-        )!
+        let urlString = "\(baseURL)/rest/v1/\(endpoint)"
+        guard let url = URL(string: urlString) else {
+            fatalError("Invalid URL: \(urlString)")
+        }
 
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -776,19 +777,54 @@ final class SupabaseClient {
         return id
     }
 
-    // MARK: - Follows
+    // MARK: - Follow Requests
 
-    func follow(_ userID: UUID) async throws {
+    func sendFollowRequest(_ userID: UUID) async throws {
         let body: [String: Any] = [
             "follower_id": try requireUserID().uuidString,
-            "following_id": userID.uuidString
+            "following_id": userID.uuidString,
+            "status": "pending"
         ]
         var request = makeRequest(endpoint: "follows", method: "POST")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         _ = try await performAuthorized(request)
     }
 
-    func unfollow(_ userID: UUID) async throws {
+    func cancelFollowRequest(_ userID: UUID) async throws {
+        let myID = try requireUserID().uuidString
+        let theirID = userID.uuidString
+        var request = makeRequest(
+            endpoint: "follows?follower_id=eq.\(myID)&following_id=eq.\(theirID)&status=eq.pending",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    func approveFollowRequest(_ userID: UUID) async throws {
+        let myID = try requireUserID().uuidString
+        let theirID = userID.uuidString
+        let body: [String: Any] = ["status": "accepted"]
+        var request = makeRequest(
+            endpoint: "follows?follower_id=eq.\(theirID)&following_id=eq.\(myID)&status=eq.pending",
+            method: "PATCH"
+        )
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        _ = try await performAuthorized(request)
+    }
+
+    func rejectFollowRequest(_ userID: UUID) async throws {
+        let myID = try requireUserID().uuidString
+        let theirID = userID.uuidString
+        let body: [String: Any] = ["status": "rejected"]
+        var request = makeRequest(
+            endpoint: "follows?follower_id=eq.\(theirID)&following_id=eq.\(myID)&status=eq.pending",
+            method: "PATCH"
+        )
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        _ = try await performAuthorized(request)
+    }
+
+    func removeFollow(_ userID: UUID) async throws {
         let myID = try requireUserID().uuidString
         let theirID = userID.uuidString
         var request = makeRequest(
@@ -798,10 +834,64 @@ final class SupabaseClient {
         _ = try await performAuthorized(request)
     }
 
+    enum FollowStatus {
+        case none
+        case pendingOutgoing
+        case pendingIncoming
+        case accepted
+    }
+
+    func fetchFollowStatus(for userID: UUID) async throws -> FollowStatus {
+        let myID = try requireUserID().uuidString
+        let theirID = userID.uuidString
+
+        // Check outgoing: I → them
+        let outReq = makeRequest(
+            endpoint: "follows?follower_id=eq.\(myID)&following_id=eq.\(theirID)&select=status"
+        )
+        let outData = try await performAuthorized(outReq)
+        let outRows = try decoder.decode([Follow].self, from: outData)
+        if let first = outRows.first {
+            return first.status == "accepted" ? .accepted : .pendingOutgoing
+        }
+
+        // Check incoming: them → I
+        let inReq = makeRequest(
+            endpoint: "follows?follower_id=eq.\(theirID)&following_id=eq.\(myID)&select=status"
+        )
+        let inData = try await performAuthorized(inReq)
+        let inRows = try decoder.decode([Follow].self, from: inData)
+        if let first = inRows.first {
+            return first.status == "accepted" ? .accepted : .pendingIncoming
+        }
+
+        return .none
+    }
+
+    func fetchIncomingFollowRequests() async throws -> [Follow] {
+        let myID = try requireUserID().uuidString
+        let request = makeRequest(
+            endpoint: "follows?following_id=eq.\(myID)&status=eq.pending&select=*,follower_id"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([Follow].self, from: data)
+    }
+
+    func fetchProfilesByIDs(_ ids: [UUID]) async throws -> [UUID: ProfileDTO] {
+        guard !ids.isEmpty else { return [:] }
+        let idList = ids.map(\.uuidString).joined(separator: ",")
+        let request = makeRequest(
+            endpoint: "profiles?id=in.(\(idList))&select=*"
+        )
+        let data = try await performAuthorized(request)
+        let profiles = try decoder.decode([ProfileDTO].self, from: data)
+        return Dictionary(uniqueKeysWithValues: profiles.map { ($0.id, $0) })
+    }
+
     func fetchFollowing() async throws -> [UUID] {
         let myID = try requireUserID().uuidString
         let request = makeRequest(
-            endpoint: "follows?follower_id=eq.\(myID)&select=following_id"
+            endpoint: "follows?follower_id=eq.\(myID)&status=eq.accepted&select=following_id"
         )
         let data = try await performAuthorized(request)
         let rows = try decoder.decode([Follow].self, from: data)
@@ -810,7 +900,7 @@ final class SupabaseClient {
 
     func fetchFollowerCount(for userID: UUID) async throws -> Int {
         let request = makeRequest(
-            endpoint: "follows?following_id=eq.\(userID.uuidString)&select=follower_id"
+            endpoint: "follows?following_id=eq.\(userID.uuidString)&status=eq.accepted&select=follower_id"
         )
         let data = try await performAuthorized(request)
         let rows = try decoder.decode([Follow].self, from: data)
@@ -819,7 +909,7 @@ final class SupabaseClient {
 
     func fetchFollowingCount(for userID: UUID) async throws -> Int {
         let request = makeRequest(
-            endpoint: "follows?follower_id=eq.\(userID.uuidString)&select=following_id"
+            endpoint: "follows?follower_id=eq.\(userID.uuidString)&status=eq.accepted&select=following_id"
         )
         let data = try await performAuthorized(request)
         let rows = try decoder.decode([Follow].self, from: data)
@@ -917,10 +1007,18 @@ final class SupabaseClient {
     func fetchGroups() async throws -> [BarGroup] {
         let myID = try requireUserID().uuidString
         let request = makeRequest(
-            endpoint: "groups?id=in.(select group_id from group_members where user_id='\(myID)')&select=*"
+            endpoint: "group_members?user_id=eq.\(myID)&select=group_id"
         )
         let data = try await performAuthorized(request)
-        return try decoder.decode([BarGroup].self, from: data)
+        let memberRows = try decoder.decode([GroupMember].self, from: data)
+        let groupIDs = memberRows.map { $0.groupID.uuidString }
+        guard !groupIDs.isEmpty else { return [] }
+        let idList = groupIDs.joined(separator: ",")
+        let groupsRequest = makeRequest(
+            endpoint: "groups?id=in.(\(idList))&select=*"
+        )
+        let groupsData = try await performAuthorized(groupsRequest)
+        return try decoder.decode([BarGroup].self, from: groupsData)
     }
 
     func fetchGroupMembers(groupID: UUID) async throws -> [GroupMember] {

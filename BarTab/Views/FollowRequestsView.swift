@@ -1,0 +1,151 @@
+import SwiftUI
+
+struct FollowRequestsView: View {
+
+    @EnvironmentObject private var toastCenter: ToastCenter
+    @State private var requests: [Follow] = []
+    @State private var profiles: [UUID: ProfileDTO] = [:]
+    @State private var isLoading = true
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+
+                BarTabScreenHeader(
+                    title: "Follow Requests",
+                    subtitle: "People who want to follow you."
+                )
+
+                if isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 40)
+                } else if requests.isEmpty {
+                    VStack(spacing: 14) {
+                        Image(systemName: "person.badge.plus")
+                            .font(.system(size: 40))
+                            .foregroundColor(.barTabPrimary)
+
+                        Text("No pending requests")
+                            .font(.headline)
+
+                        Text("When someone follows you, their request will appear here.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
+                    .barTabCard()
+                } else {
+                    LazyVStack(spacing: 0) {
+                        ForEach(Array(requests.enumerated()), id: \.element.id) { index, request in
+                            requestRow(request)
+                            if index < requests.count - 1 {
+                                Divider()
+                                    .padding(.leading, 56)
+                            }
+                        }
+                    }
+                    .barTabCard()
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 20)
+        }
+        .background(Color.barTabBackground.ignoresSafeArea())
+        .navigationTitle("Follow Requests")
+        .navigationBarTitleDisplayMode(.inline)
+        .task { await loadRequests() }
+    }
+
+    private func requestRow(_ request: Follow) -> some View {
+        let senderID = request.followerID ?? UUID()
+        let profile = profiles[senderID]
+
+        return HStack(spacing: 12) {
+            Circle()
+                .fill(Color.barTabPrimary.opacity(0.12))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Text(String((profile?.display_name ?? "U").prefix(1)).uppercased())
+                        .font(.headline)
+                        .foregroundColor(.barTabPrimary)
+                )
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(profile?.display_name ?? "User")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.barTabText)
+
+                Text("wants to follow you")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            HStack(spacing: 6) {
+                Button {
+                    Task { await approve(request: request) }
+                } label: {
+                    Text("Accept")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .frame(width: 64, height: 32)
+                }
+                .buttonStyle(.plain)
+                .background(Color.barTabAccent)
+                .foregroundColor(.white)
+                .clipShape(Capsule())
+
+                Button {
+                    Task { await reject(request: request) }
+                } label: {
+                    Text("Decline")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .frame(width: 64, height: 32)
+                }
+                .buttonStyle(.plain)
+                .background(Color.barTabPrimary.opacity(0.12))
+                .foregroundColor(.barTabPrimary)
+                .clipShape(Capsule())
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+    }
+
+    private func loadRequests() async {
+        do {
+            requests = try await SupabaseClient.shared.fetchIncomingFollowRequests()
+            let senderIDs = requests.compactMap(\.followerID)
+            profiles = try await SupabaseClient.shared.fetchProfilesByIDs(senderIDs)
+        } catch {
+            print("Failed to load follow requests: \(error)")
+        }
+        isLoading = false
+    }
+
+    private func approve(request: Follow) async {
+        guard let senderID = request.followerID else { return }
+        do {
+            try await SupabaseClient.shared.approveFollowRequest(senderID)
+            requests.removeAll { $0.followerID == senderID }
+            HapticEngine.lightTap()
+        } catch {
+            toastCenter.showError(error)
+        }
+    }
+
+    private func reject(request: Follow) async {
+        guard let senderID = request.followerID else { return }
+        do {
+            try await SupabaseClient.shared.rejectFollowRequest(senderID)
+            requests.removeAll { $0.followerID == senderID }
+        } catch {
+            toastCenter.showError(error)
+        }
+    }
+}

@@ -32,7 +32,7 @@ struct ActivityFeedView: View {
                         Text("No activity yet")
                             .font(.headline)
 
-                        Text("Follow friends to see their price reports and ratings here.")
+                        Text("Accept follow requests to see their price reports and ratings here.")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
