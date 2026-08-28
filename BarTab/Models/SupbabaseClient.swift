@@ -822,21 +822,12 @@ final class SupabaseClient {
     }
 
     func searchUsers(query: String) async throws -> [ProfileDTO] {
-        let session = await SupabaseAuthService().validSession()
-        guard let token = session?.tokens.accessToken ?? AuthTokenStore.shared.accessToken else {
-            throw SupabaseError(statusCode: 401, message: "Not signed in")
-        }
-
         let myID = try requireUserID().uuidString
-        let request = makeRequest(
-            endpoint: "profiles?id=neq.\(myID)&display_name=ilike.%\(query)%&select=*&limit=20"
-        )
-        var authorizedRequest = request
-        authorizedRequest.setValue(
-            "Bearer \(token)",
-            forHTTPHeaderField: "Authorization"
-        )
-        let data = try await perform(authorizedRequest)
+        let wildcard = "%25\(query)%25"
+        let endpoint = "profiles?id=neq.\(myID)&display_name=ilike.\(wildcard)&select=*&limit=20"
+        print("[searchUsers] hasToken=\(AuthTokenStore.shared.hasToken), endpoint=\(endpoint)")
+        let request = makeRequest(endpoint: endpoint)
+        let data = try await performAuthorized(request)
         return try decoder.decode([ProfileDTO].self, from: data)
     }
 
