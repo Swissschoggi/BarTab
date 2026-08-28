@@ -34,7 +34,6 @@
 		AEF036413035160F00BDA1CC /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036403035160F00BDA1CC /* ProfileView.swift */; };
 		AEF03643303518F900BDA1CC /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF03642303518F900BDA1CC /* MainTabView.swift */; };
 		AEF0364730351C9700BDA1CC /* MyContributionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364630351C9700BDA1CC /* MyContributionsView.swift */; };
-		AEF03649303523E200BDA1CC /* PriceSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF03648303523E200BDA1CC /* PriceSearchView.swift */; };
 		AEF0364B3035260A00BDA1CC /* DistanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364A3035260A00BDA1CC /* DistanceService.swift */; };
 		AEF0364D3035B7AC00BDA1CC /* AddBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364C3035B7AC00BDA1CC /* AddBarView.swift */; };
 		AEF0364F3035B7DB00BDA1CC /* LocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0364E3035B7DB00BDA1CC /* LocationPickerView.swift */; };
@@ -54,7 +53,6 @@
 		AEF0366A3035E30000BDA1CC /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036693035E30000BDA1CC /* KeychainService.swift */; };
 		AEF036723035E40000BDA1CC /* SupabaseAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036713035E40000BDA1CC /* SupabaseAuthService.swift */; };
 		BRTA00013060000100000001 /* BarRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000002 /* BarRating.swift */; };
-		BRTA00013060000100000003 /* NearbyBarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000004 /* NearbyBarsView.swift */; };
 		BRTA00013060000100000005 /* StarRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000006 /* StarRatingView.swift */; };
 		BRTA00013060000100000007 /* RequestBrandSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000008 /* RequestBrandSheet.swift */; };
 		BRTA00013060000100000009 /* AdminBrandRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000000A /* AdminBrandRequestsView.swift */; };
@@ -96,6 +94,9 @@
 		BRTA0001400000000000005B /* InviteMemberSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001400000000000004B /* InviteMemberSheet.swift */; };
 		BRTA0001400000000000005C /* SetAlertSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001400000000000004C /* SetAlertSheet.swift */; };
 		BRTA0001400000000000005D /* PriceAlertListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001400000000000004D /* PriceAlertListView.swift */; };
+		BRTA0002A000000000000002 /* PriceAlertService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000001 /* PriceAlertService.swift */; };
+		BRTA0002A000000000000004 /* EditBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000003 /* EditBarView.swift */; };
+		BRTA0002A000000000000006 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000005 /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,7 +147,6 @@
 		AEF036403035160F00BDA1CC /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		AEF03642303518F900BDA1CC /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		AEF0364630351C9700BDA1CC /* MyContributionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyContributionsView.swift; sourceTree = "<group>"; };
-		AEF03648303523E200BDA1CC /* PriceSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceSearchView.swift; sourceTree = "<group>"; };
 		AEF0364A3035260A00BDA1CC /* DistanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceService.swift; sourceTree = "<group>"; };
 		AEF0364C3035B7AC00BDA1CC /* AddBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBarView.swift; sourceTree = "<group>"; };
 		AEF0364E3035B7DB00BDA1CC /* LocationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerView.swift; sourceTree = "<group>"; };
@@ -167,7 +167,6 @@
 		AEF036693035E30000BDA1CC /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		AEF036713035E40000BDA1CC /* SupabaseAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseAuthService.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000002 /* BarRating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarRating.swift; sourceTree = "<group>"; };
-		BRTA00013060000100000004 /* NearbyBarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyBarsView.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000006 /* StarRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarRatingView.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000008 /* RequestBrandSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestBrandSheet.swift; sourceTree = "<group>"; };
 		BRTA0001306000010000000A /* AdminBrandRequestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminBrandRequestsView.swift; sourceTree = "<group>"; };
@@ -210,6 +209,9 @@
 		BRTA0001400000000000004B /* InviteMemberSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteMemberSheet.swift; sourceTree = "<group>"; };
 		BRTA0001400000000000004C /* SetAlertSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetAlertSheet.swift; sourceTree = "<group>"; };
 		BRTA0001400000000000004D /* PriceAlertListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertListView.swift; sourceTree = "<group>"; };
+		BRTA0002A000000000000001 /* PriceAlertService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertService.swift; sourceTree = "<group>"; };
+		BRTA0002A000000000000003 /* EditBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBarView.swift; sourceTree = "<group>"; };
+		BRTA0002A000000000000005 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -340,13 +342,11 @@
 				AEF0364630351C9700BDA1CC /* MyContributionsView.swift */,
 				AEF0365E3035C80000BDA1CC /* MyBarsView.swift */,
 				AEF036613035E00000BDA1CC /* PriceTrendChart.swift */,
-				AEF03648303523E200BDA1CC /* PriceSearchView.swift */,
 				AEF0364C3035B7AC00BDA1CC /* AddBarView.swift */,
 				AEF0364E3035B7DB00BDA1CC /* LocationPickerView.swift */,
 				AEF036563035BF5100BDA1CC /* LoginView.swift */,
 				BRTA00014000000000000065 /* ForgotPasswordView.swift */,
 				AEF036653035E20000BDA1CC /* AdminReportsView.swift */,
-				BRTA00013060000100000004 /* NearbyBarsView.swift */,
 				BRTA00013060000100000008 /* RequestBrandSheet.swift */,
 				BRTA0001306000010000000A /* AdminBrandRequestsView.swift */,
 				BRTA0001306000010000000E /* RateBarSheet.swift */,
@@ -365,6 +365,8 @@
 				BRTA0001400000000000004B /* InviteMemberSheet.swift */,
 				BRTA0001400000000000004C /* SetAlertSheet.swift */,
 				BRTA0001400000000000004D /* PriceAlertListView.swift */,
+				BRTA0002A000000000000003 /* EditBarView.swift */,
+				BRTA0002A000000000000005 /* OnboardingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -387,6 +389,7 @@
 				BRTA00013060000100000030 /* ToastCenter.swift */,
 				BRTA00013060000100000031 /* AvatarService.swift */,
 				BRTA00013060000100000035 /* HapticEngine.swift */,
+				BRTA0002A000000000000001 /* PriceAlertService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -582,7 +585,6 @@
 				BRTA0001306000010000002B /* ExchangeRateService.swift in Sources */,
 				AE7839693034F16A00F1555E /* ContentView.swift in Sources */,
 				AEF036513035B9EE00BDA1CC /* PlaceSearchService.swift in Sources */,
-				AEF03649303523E200BDA1CC /* PriceSearchView.swift in Sources */,
 				AEF0363730350F6800BDA1CC /* MockPrices.swift in Sources */,
 				AEF036643035E10000BDA1CC /* ContentReport.swift in Sources */,
 				AEF036663035E20000BDA1CC /* AdminReportsView.swift in Sources */,
@@ -616,7 +618,6 @@
 				AEF0365F3035C80000BDA1CC /* MyBarsView.swift in Sources */,
 				AEF036623035E00000BDA1CC /* PriceTrendChart.swift in Sources */,
 				BRTA00013060000100000001 /* BarRating.swift in Sources */,
-				BRTA00013060000100000003 /* NearbyBarsView.swift in Sources */,
 				BRTA00013060000100000005 /* StarRatingView.swift in Sources */,
 				BRTA00013060000100000007 /* RequestBrandSheet.swift in Sources */,
 				BRTA00013060000100000009 /* AdminBrandRequestsView.swift in Sources */,
@@ -652,6 +653,9 @@
 				BRTA0001400000000000005D /* PriceAlertListView.swift in Sources */,
 				BRTA00014000000000000060 /* FindUsersView.swift in Sources */,
 				BRTA00014000000000000062 /* FollowRequestsView.swift in Sources */,
+				BRTA0002A000000000000002 /* PriceAlertService.swift in Sources */,
+				BRTA0002A000000000000004 /* EditBarView.swift in Sources */,
+				BRTA0002A000000000000006 /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
