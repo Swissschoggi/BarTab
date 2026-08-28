@@ -822,24 +822,43 @@ final class SupabaseClient {
     }
 
     func searchUsers(query: String) async throws -> [ProfileDTO] {
-        print("[searchUsers] START - hasToken=\(AuthTokenStore.shared.hasToken), userID=\(currentUserID?.uuidString ?? "nil")")
+        let token = AuthTokenStore.shared.accessToken ?? ""
 
-        let myID: UUID
-        if let uid = currentUserID {
-            myID = uid
-        } else {
-            // Try restoring session to populate token
-            _ = await SupabaseAuthService().validSession()
-            guard let uid = currentUserID else {
-                print("[searchUsers] No user ID even after session restore")
-                throw SupabaseError(statusCode: 401, message: "Not signed in")
-            }
-            myID = uid
+        // Decode JWT payload to check what kind of token this is
+        let parts = token.split(separator: ".")
+        var payloadDict: [String: Any] = [:]
+        if parts.count >= 2,
+           let payloadData = Data(base64Encoded: String(parts[1])
+               .replacingOccurrences(of: "-", with: "+")
+               .replacingOccurrences(of: "_", with: "/")),
+           let json = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any] {
+            payloadDict = json
         }
 
+        let sub = payloadDict["sub"] as? String ?? "none"
+        let role = payloadDict["role"] as? String ?? "none"
+        print("[searchUsers] tokenLength=\(token.count), sub=\(sub), role=\(role)")
+
+        // If sub is not a UUID, the token is the API key, not a user token
+        if UUID(uuidString: sub) == nil {
+            print("[searchUsers] Token has no valid user ID — trying to refresh session...")
+            _ = await SupabaseAuthService().refreshSession()
+
+            // Re-check
+            guard let uid = currentUserID else {
+                throw SupabaseError(statusCode: 401, message: "Not signed in — token has no user ID")
+            }
+            let myID = uid
+            let wildcard = "%25\(query)%25"
+            let endpoint = "profiles?id=neq.\(myID)&display_name=ilike.\(wildcard)&select=*&limit=20"
+            let request = makeRequest(endpoint: endpoint)
+            let data = try await performAuthorized(request)
+            return try decoder.decode([ProfileDTO].self, from: data)
+        }
+
+        let myID = UUID(uuidString: sub)!
         let wildcard = "%25\(query)%25"
         let endpoint = "profiles?id=neq.\(myID)&display_name=ilike.\(wildcard)&select=*&limit=20"
-        print("[searchUsers] endpoint=\(endpoint), token=\(AuthTokenStore.shared.accessToken?.prefix(20) ?? "nil")...")
         let request = makeRequest(endpoint: endpoint)
         let data = try await performAuthorized(request)
         return try decoder.decode([ProfileDTO].self, from: data)
