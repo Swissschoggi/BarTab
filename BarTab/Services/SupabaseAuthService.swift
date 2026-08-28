@@ -167,7 +167,8 @@ final class SupabaseAuthService {
         AuthTokenStore.shared.update(
             accessToken: session.tokens.accessToken,
             refreshToken: session.tokens.refreshToken,
-            expiresAt: session.tokens.expiresAt
+            expiresAt: session.tokens.expiresAt,
+            userID: session.user.id
         )
     }
 

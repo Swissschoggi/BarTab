@@ -29,6 +29,7 @@ final class AuthTokenStore {
     private(set) var accessToken: String?
     private(set) var refreshToken: String?
     private(set) var expiresAt: Date?
+    private(set) var userID: UUID?
 
     private init() {}
 
@@ -41,13 +42,15 @@ final class AuthTokenStore {
     func update(
         accessToken: String,
         refreshToken: String,
-        expiresAt: Date?
+        expiresAt: Date?,
+        userID: UUID? = nil
     ) {
         lock.lock()
         defer { lock.unlock() }
         self.accessToken = accessToken
         self.refreshToken = refreshToken
         self.expiresAt = expiresAt
+        if let userID { self.userID = userID }
     }
 
     func clear() {
@@ -56,6 +59,7 @@ final class AuthTokenStore {
         accessToken = nil
         refreshToken = nil
         expiresAt = nil
+        userID = nil
     }
 }
 
@@ -75,6 +79,7 @@ final class SupabaseClient {
 
     /// Decoded user ID from the current JWT. Nil when not signed in.
     var currentUserID: UUID? {
+        if let id = AuthTokenStore.shared.userID { return id }
         guard let token = AuthTokenStore.shared.accessToken else { return nil }
         // JWT format: header.payload.signature
         let parts = token.split(separator: ".")
@@ -822,41 +827,7 @@ final class SupabaseClient {
     }
 
     func searchUsers(query: String) async throws -> [ProfileDTO] {
-        let token = AuthTokenStore.shared.accessToken ?? ""
-
-        // Decode JWT payload to check what kind of token this is
-        let parts = token.split(separator: ".")
-        var payloadDict: [String: Any] = [:]
-        if parts.count >= 2,
-           let payloadData = Data(base64Encoded: String(parts[1])
-               .replacingOccurrences(of: "-", with: "+")
-               .replacingOccurrences(of: "_", with: "/")),
-           let json = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any] {
-            payloadDict = json
-        }
-
-        let sub = payloadDict["sub"] as? String ?? "none"
-        let role = payloadDict["role"] as? String ?? "none"
-        print("[searchUsers] tokenLength=\(token.count), sub=\(sub), role=\(role)")
-
-        // If sub is not a UUID, the token is the API key, not a user token
-        if UUID(uuidString: sub) == nil {
-            print("[searchUsers] Token has no valid user ID — trying to refresh session...")
-            _ = await SupabaseAuthService().refreshSession()
-
-            // Re-check
-            guard let uid = currentUserID else {
-                throw SupabaseError(statusCode: 401, message: "Not signed in — token has no user ID")
-            }
-            let myID = uid
-            let wildcard = "%25\(query)%25"
-            let endpoint = "profiles?id=neq.\(myID)&display_name=ilike.\(wildcard)&select=*&limit=20"
-            let request = makeRequest(endpoint: endpoint)
-            let data = try await performAuthorized(request)
-            return try decoder.decode([ProfileDTO].self, from: data)
-        }
-
-        let myID = UUID(uuidString: sub)!
+        let myID = try requireUserID().uuidString
         let wildcard = "%25\(query)%25"
         let endpoint = "profiles?id=neq.\(myID)&display_name=ilike.\(wildcard)&select=*&limit=20"
         let request = makeRequest(endpoint: endpoint)
