@@ -57,7 +57,7 @@ struct FindUsersView: View {
                         .padding(.vertical, 40)
                 } else if hasSearched && results.isEmpty {
                     VStack(spacing: 14) {
-                        Image(systemName: "person.slash")
+                        Image(systemName: "person.crop.circle.badge.questionmark")
                             .font(.system(size: 40))
                             .foregroundColor(.barTabPrimary)
 

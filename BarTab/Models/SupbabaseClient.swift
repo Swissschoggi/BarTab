@@ -822,10 +822,18 @@ final class SupabaseClient {
     }
 
     func searchUsers(query: String) async throws -> [ProfileDTO] {
+        let session = try await SupabaseAuthService().validSession()
+        let token = session?.tokens.accessToken ?? AuthTokenStore.shared.accessToken ?? ""
+
         let myID = try requireUserID().uuidString
-        let request = makeRequest(
-            endpoint: "profiles?id=neq.\(myID)&display_name=ilike.%\(query)%&select=*&limit=20"
-        )
+        let url = URL(
+            string: "\(baseURL)/rest/v1/profiles?id=neq.\(myID)&display_name=ilike.%\(query)%&select=*&limit=20"
+        )!
+        var request = URLRequest(url: url)
+        request.setValue(apiKey, forHTTPHeaderField: "apikey")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
         let data = try await performAuthorized(request)
         return try decoder.decode([ProfileDTO].self, from: data)
     }
