@@ -81,6 +81,23 @@ final class ExchangeRateService {
         }
         self.lastFetched = UserDefaults.standard.object(forKey: cacheDateKey) as? Date
     }
+
+    func clearCache() {
+        UserDefaults.standard.removeObject(forKey: cacheKey)
+        UserDefaults.standard.removeObject(forKey: cacheDateKey)
+        self.rates = [
+            "CHF": 1.0,
+            "EUR": 0.94,
+            "USD": 1.12,
+            "GBP": 0.80,
+            "SEK": 11.45,
+            "NOK": 11.80,
+            "DKK": 7.02,
+            "PLN": 4.55,
+            "CZK": 25.30
+        ]
+        self.lastFetched = nil
+    }
 }
 
 private struct ExchangeRateResponse: Codable {

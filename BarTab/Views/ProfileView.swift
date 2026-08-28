@@ -285,9 +285,21 @@ struct ProfileView: View {
 
                             VStack(spacing: 0) {
                                 navigationRow(
+                                    title: "Find Friends",
+                                    subtitle: "Search and follow people",
+                                    icon: "person.badge.plus"
+                                ) {
+                                    FindUsersView()
+                                }
+
+                                Divider()
+                                    .foregroundColor(.barTabCardBorder)
+                                    .padding(.leading, 44)
+
+                                navigationRow(
                                     title: "Activity",
                                     subtitle: "See what friends are drinking",
-                                    icon: "bolt.fill"
+                                    icon: "list.bullet.rectangle"
                                 ) {
                                     ActivityFeedView()
                                 }

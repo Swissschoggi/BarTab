@@ -16,24 +16,31 @@ struct InviteMemberSheet: View {
 
     var body: some View {
         NavigationView {
-            List {
-                let notInGroup = following.filter { !members.contains($0) }
-
-                if notInGroup.isEmpty {
-                    Text("All your friends are already in this group.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+            Group {
+                if isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    ForEach(notInGroup, id: \.self) { userID in
-                        Button {
-                            Task { await invite(userID) }
-                        } label: {
-                            HStack {
-                                Text(userCache[userID] ?? "User")
-                                    .foregroundColor(.barTabText)
-                                Spacer()
-                                Image(systemName: "plus.circle.fill")
-                                    .foregroundColor(.barTabPrimary)
+                    List {
+                        let notInGroup = following.filter { !members.contains($0) }
+
+                        if notInGroup.isEmpty {
+                            Text("All your friends are already in this group.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        } else {
+                            ForEach(notInGroup, id: \.self) { userID in
+                                Button {
+                                    Task { await invite(userID) }
+                                } label: {
+                                    HStack {
+                                        Text(userCache[userID] ?? "User")
+                                            .foregroundColor(.barTabText)
+                                        Spacer()
+                                        Image(systemName: "plus.circle.fill")
+                                            .foregroundColor(.barTabPrimary)
+                                    }
+                                }
                             }
                         }
                     }

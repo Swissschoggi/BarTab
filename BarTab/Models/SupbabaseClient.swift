@@ -215,21 +215,6 @@ final class SupabaseClient {
                 forHTTPHeaderField: "Authorization"
             )
             return try await perform(retried)
-
-            Self.isRefreshing = true
-            defer { Self.isRefreshing = false }
-
-            guard let _ = try? await
-                SupabaseAuthService().refreshSession(),
-                  var retried = retriedRequest(request) else {
-                throw error
-            }
-
-            retried.setValue(
-                "Bearer \(AuthTokenStore.shared.accessToken ?? "")",
-                forHTTPHeaderField: "Authorization"
-            )
-            return try await perform(retried)
         }
     }
 
@@ -834,6 +819,15 @@ final class SupabaseClient {
         let data = try await performAuthorized(request)
         let rows = try decoder.decode([Follow].self, from: data)
         return rows.count
+    }
+
+    func searchUsers(query: String) async throws -> [ProfileDTO] {
+        let myID = try requireUserID().uuidString
+        let request = makeRequest(
+            endpoint: "profiles?id=neq.\(myID)&display_name=ilike.*\(query)*&select=*&limit=20"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([ProfileDTO].self, from: data)
     }
 
     // MARK: - Activity Feed

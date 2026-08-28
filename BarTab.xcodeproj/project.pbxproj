@@ -86,6 +86,7 @@
 		BRTA00014000000000000054 /* ActivityItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000044 /* ActivityItem.swift */; };
 		BRTA00014000000000000055 /* FollowButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000045 /* FollowButton.swift */; };
 		BRTA00014000000000000056 /* ActivityFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000046 /* ActivityFeedView.swift */; };
+		BRTA00014000000000000060 /* FindUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000061 /* FindUsersView.swift */; };
 		BRTA00014000000000000057 /* GroupPlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000047 /* GroupPlanningView.swift */; };
 		BRTA00014000000000000058 /* CreateGroupSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000048 /* CreateGroupSheet.swift */; };
 		BRTA00014000000000000059 /* GroupDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000049 /* GroupDetailView.swift */; };
@@ -197,6 +198,7 @@
 		BRTA00014000000000000044 /* ActivityItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityItem.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000045 /* FollowButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowButton.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000046 /* ActivityFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityFeedView.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000061 /* FindUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindUsersView.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000047 /* GroupPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupPlanningView.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000048 /* CreateGroupSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupSheet.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000049 /* GroupDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupDetailView.swift; sourceTree = "<group>"; };
@@ -349,6 +351,7 @@
 				BRTA00013060000100000025 /* LeaderboardView.swift */,
 				BRTA00014000000000000045 /* FollowButton.swift */,
 				BRTA00014000000000000046 /* ActivityFeedView.swift */,
+				BRTA00014000000000000061 /* FindUsersView.swift */,
 				BRTA00014000000000000047 /* GroupPlanningView.swift */,
 				BRTA00014000000000000048 /* CreateGroupSheet.swift */,
 				BRTA00014000000000000049 /* GroupDetailView.swift */,

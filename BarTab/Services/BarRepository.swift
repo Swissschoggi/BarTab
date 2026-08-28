@@ -127,12 +127,11 @@ final class BarRepository: ObservableObject {
     ) async {
         guard user.isAdmin || bar.createdBy == user.id else { return }
 
-        self.bars.removeAll { $0.id == bar.id }
-        self.prices.removeAll { $0.barID == bar.id }
-        self.favoriteBarIDs.remove(bar.id)
-
         do {
             try await SupabaseClient.shared.deleteBar(bar)
+            self.bars.removeAll { $0.id == bar.id }
+            self.prices.removeAll { $0.barID == bar.id }
+            self.favoriteBarIDs.remove(bar.id)
             recomputePriceLevels()
         } catch {
             print("Failed to delete bar from Supabase: \(error)")
@@ -185,10 +184,10 @@ final class BarRepository: ObservableObject {
         reportedBy user: User
     ) async {
         guard user.isAdmin || price.reportedBy == user.id else { return }
-        self.prices.removeAll { $0.id == price.id }
 
         do {
             try await SupabaseClient.shared.deletePrice(price)
+            self.prices.removeAll { $0.id == price.id }
             recomputePriceLevels()
         } catch {
             print("Failed to delete price from Supabase: \(error)")
@@ -218,13 +217,12 @@ final class BarRepository: ObservableObject {
             return
         }
 
-        self.prices.removeAll { price in
-            groupPrices.contains { $0.id == price.id }
-        }
-
         do {
             for price in groupPrices {
                 try await SupabaseClient.shared.deletePrice(price)
+            }
+            self.prices.removeAll { price in
+                groupPrices.contains { $0.id == price.id }
             }
             recomputePriceLevels()
         } catch {
@@ -256,10 +254,9 @@ final class BarRepository: ObservableObject {
             reportedBy: price.reportedBy
         )
 
-        self.prices[index] = updatedPrice
-
         do {
             try await SupabaseClient.shared.updatePrice(updatedPrice)
+            self.prices[index] = updatedPrice
             recomputePriceLevels()
         } catch {
             print("Failed to update price on Supabase: \(error)")
@@ -404,14 +401,13 @@ final class BarRepository: ObservableObject {
             createdAt: Date()
         )
 
-        if let index = barRatings.firstIndex(where: { $0.id == rating.id }) {
-            barRatings[index] = rating
-        } else {
-            barRatings.append(rating)
-        }
-
         do {
             try await SupabaseClient.shared.upsertBarRating(rating)
+            if let index = barRatings.firstIndex(where: { $0.id == rating.id }) {
+                barRatings[index] = rating
+            } else {
+                barRatings.append(rating)
+            }
         } catch {
             print("Failed to submit bar rating: \(error)")
             toastCenter?.showError(error)
@@ -480,14 +476,13 @@ final class BarRepository: ObservableObject {
             createdAt: Date()
         )
 
-        if let index = drinkRatings.firstIndex(where: { $0.id == rating.id }) {
-            drinkRatings[index] = rating
-        } else {
-            drinkRatings.append(rating)
-        }
-
         do {
             try await SupabaseClient.shared.upsertDrinkRating(rating)
+            if let index = drinkRatings.firstIndex(where: { $0.id == rating.id }) {
+                drinkRatings[index] = rating
+            } else {
+                drinkRatings.append(rating)
+            }
         } catch {
             print("Failed to submit drink rating: \(error)")
             toastCenter?.showError(error)
@@ -568,15 +563,6 @@ final class BarRepository: ObservableObject {
             return
         }
 
-        brandRequests[index].status = .approved
-
-        let newBrand = DrinkBrand(
-            id: UUID().uuidString,
-            name: request.name,
-            drink: request.drink
-        )
-        brands.append(newBrand)
-
         do {
             try await SupabaseClient.shared.insertBrand(
                 drink: request.drink,
@@ -586,6 +572,13 @@ final class BarRepository: ObservableObject {
                 request.id,
                 status: .approved
             )
+            brandRequests[index].status = .approved
+            let newBrand = DrinkBrand(
+                id: UUID().uuidString,
+                name: request.name,
+                drink: request.drink
+            )
+            brands.append(newBrand)
         } catch {
             print("Failed to approve brand request: \(error)")
             toastCenter?.showError(error)
@@ -599,13 +592,12 @@ final class BarRepository: ObservableObject {
             return
         }
 
-        brandRequests[index].status = .rejected
-
         do {
             try await SupabaseClient.shared.updateBrandRequestStatus(
                 request.id,
                 status: .rejected
             )
+            brandRequests[index].status = .rejected
         } catch {
             print("Failed to reject brand request: \(error)")
             toastCenter?.showError(error)
@@ -613,10 +605,9 @@ final class BarRepository: ObservableObject {
     }
 
     func deleteBrandRequest(_ request: BrandRequest) async {
-        brandRequests.removeAll { $0.id == request.id }
-
         do {
             try await SupabaseClient.shared.deleteBrandRequest(request)
+            brandRequests.removeAll { $0.id == request.id }
         } catch {
             print("Failed to delete brand request from Supabase: \(error)")
             toastCenter?.showError(error)
@@ -624,10 +615,9 @@ final class BarRepository: ObservableObject {
     }
 
     func deleteReport(_ report: ContentReport) async {
-        reports.removeAll { $0.id == report.id }
-
         do {
             try await SupabaseClient.shared.deleteContentReport(report.id)
+            reports.removeAll { $0.id == report.id }
         } catch {
             print("Failed to delete report from Supabase: \(error)")
             toastCenter?.showError(error)
@@ -779,23 +769,20 @@ final class BarRepository: ObservableObject {
         )
     }
 
-    func markReportReviewed(_ report: ContentReport) {
+    func markReportReviewed(_ report: ContentReport) async {
         guard let index = reports.firstIndex(where: { $0.id == report.id }) else { return }
 
         let now = Date()
-        reports[index].isReviewed = true
-        reports[index].reviewedAt = now
-
-        Task { [weak self] in
-            do {
-                try await SupabaseClient.shared.markContentReportReviewed(
-                    report.id,
-                    reviewedAt: now
-                )
-            } catch {
-                print("Failed to mark report reviewed on Supabase: \(error)")
-                self?.toastCenter?.showError(error)
-            }
+        do {
+            try await SupabaseClient.shared.markContentReportReviewed(
+                report.id,
+                reviewedAt: now
+            )
+            reports[index].isReviewed = true
+            reports[index].reviewedAt = now
+        } catch {
+            print("Failed to mark report reviewed on Supabase: \(error)")
+            toastCenter?.showError(error)
         }
     }
 

@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var confirmPassword = ""
     @State private var currencyExpanded = false
     @State private var selectedCurrency: Currency = Currency.defaultCurrency
+    @State private var showingClearCacheConfirm = false
 
     private let languages: [(code: String, name: String, flag: String)] = [
         ("en", "English", "🇬🇧"),
@@ -318,6 +319,33 @@ struct SettingsView: View {
                     }
                     .barTabCard()
 
+                    // Clear Cache
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "trash")
+                                .font(.subheadline)
+                                .foregroundColor(.barTabPrimary)
+                            Text("Data")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+                        }
+
+                        VStack(spacing: 0) {
+                            Button {
+                                showingClearCacheConfirm = true
+                            } label: {
+                                settingsRow(
+                                    icon: "xmark.circle",
+                                    iconColor: .red,
+                                    title: "Clear Cache",
+                                    value: ""
+                                )
+                            }
+                        }
+                    }
+                    .barTabCard()
+
                     // Support the Dev
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
@@ -370,6 +398,15 @@ struct SettingsView: View {
                     }
                 }
             }
+        }
+        .alert("Clear Cache", isPresented: $showingClearCacheConfirm) {
+            Button("Clear", role: .destructive) {
+                ExchangeRateService.shared.clearCache()
+                toastCenter.show("Cache cleared", kind: .success)
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will reset exchange rates to default values.")
         }
         .alert("Restart Required", isPresented: $showingRestartAlert) {
             Button("Restart Now") {

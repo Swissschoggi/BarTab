@@ -133,6 +133,9 @@ final class UserSession: ObservableObject {
             accessToken: session.tokens.accessToken
         )
 
+        // Also sync the profiles table display_name
+        try? await SupabaseClient.shared.updateProfileDisplayName(newUsername)
+
         if let user = currentUser {
             currentUser = User(
                 id: user.id,

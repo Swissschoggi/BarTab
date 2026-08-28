@@ -10,32 +10,39 @@ struct PriceAlertListView: View {
     @State private var isLoading = true
 
     var body: some View {
-        List {
-            if alerts.isEmpty {
-                VStack(spacing: 14) {
-                    Image(systemName: "bell.slash")
-                        .font(.system(size: 44))
-                        .foregroundColor(.barTabPrimary)
-
-                    Text("No alerts")
-                        .font(.headline)
-
-                    Text("Set a price alert on any drink to be notified when the price changes.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 40)
-                .listRowSeparator(.hidden)
+        Group {
+            if isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ForEach(alerts) { alert in
-                    alertRow(alert)
+                List {
+                    if alerts.isEmpty {
+                        VStack(spacing: 14) {
+                            Image(systemName: "bell.slash")
+                                .font(.system(size: 44))
+                                .foregroundColor(.barTabPrimary)
+
+                            Text("No alerts")
+                                .font(.headline)
+
+                            Text("Set a price alert on any drink to be notified when the price changes.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 40)
+                        .listRowSeparator(.hidden)
+                    } else {
+                        ForEach(alerts) { alert in
+                            alertRow(alert)
+                        }
+                        .onDelete(perform: delete)
+                    }
                 }
-                .onDelete(perform: delete)
+                .listStyle(.plain)
             }
         }
-        .listStyle(.plain)
         .navigationTitle("Price Alerts")
         .navigationBarTitleDisplayMode(.inline)
         .task {
