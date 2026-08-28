@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import Combine
 
 struct BarView: View {
 
@@ -137,20 +138,19 @@ struct BarView: View {
                 locationService.requestPermission()
                 syncFromRepository()
             }
-            .onReceive(barRepository.$bars) { _ in syncFromRepository() }
-            .onReceive(barRepository.$prices) { _ in syncFromRepository() }
-            .onReceive(barRepository.$barRatings) { _ in syncFromRepository() }
-            .onReceive(barRepository.$drinkRatings) { _ in syncFromRepository() }
-            .onReceive(barRepository.$priceLevelByBarID) { _ in syncFromRepository() }
-            .onReceive(barRepository.$favoriteBarIDs) { ids in
-                isFavorited = ids.contains(bar.id)
-            }
-            .onReceive(barRepository.$reports) { reports in
-                guard let user = userSession.currentUser else { return }
-                hasReported = reports.contains {
-                    $0.targetID == bar.id.uuidString
-                    && $0.targetType == .bar
-                    && $0.reportedBy == user.id
+            .onReceive(
+                Publishers.MergeMany(
+                    barRepository.$bars.dropFirst(),
+                    barRepository.$prices.dropFirst(),
+                    barRepository.$barRatings.dropFirst(),
+                    barRepository.$drinkRatings.dropFirst(),
+                    barRepository.$priceLevelByBarID.dropFirst(),
+                    barRepository.$favoriteBarIDs.dropFirst(),
+                    barRepository.$reports.dropFirst()
+                )
+            ) { _ in
+                DispatchQueue.main.async {
+                    syncFromRepository()
                 }
             }
         )
