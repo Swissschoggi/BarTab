@@ -134,7 +134,12 @@ final class UserSession: ObservableObject {
         )
 
         // Also sync the profiles table display_name
-        try? await SupabaseClient.shared.updateProfileDisplayName(newUsername)
+        if let userID = currentUser?.id {
+            try? await SupabaseClient.shared.updateProfileDisplayName(
+                userID: userID,
+                displayName: newUsername
+            )
+        }
 
         if let user = currentUser {
             currentUser = User(
