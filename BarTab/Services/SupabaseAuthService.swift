@@ -254,6 +254,46 @@ final class SupabaseAuthService {
         return session
     }
 
+    func resetPassword(email: String) async throws {
+        let body = ["email": email]
+        _ = try await performAuth(endpoint: "recover", body: body)
+    }
+
+    /// Handles the deep link redirect after a password reset.
+    /// Parses access_token and refresh_token from the URL fragment
+    /// and saves the new session.
+    func handleResetPasswordCallback(_ url: URL) async -> Bool {
+        guard url.host == "reset-password",
+              let fragment = url.fragment else { return false }
+
+        var params: [String: String] = [:]
+        for pair in fragment.split(separator: "&") {
+            let keyValue = pair.split(separator: "=", maxSplits: 1)
+            guard keyValue.count == 2 else { continue }
+            params[String(keyValue[0])] =
+                String(keyValue[1]).removingPercentEncoding ?? String(keyValue[1])
+        }
+
+        guard let accessToken = params["access_token"],
+              let refreshToken = params["refresh_token"] else { return false }
+
+        do {
+            let userData = try await fetchGoTrueUser(accessToken: accessToken)
+            let expiresIn = Int(params["expires_in"] ?? "")
+            let session = Self.makeSession(
+                user: userData,
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                expiresIn: expiresIn
+            )
+            saveSession(session)
+            return true
+        } catch {
+            print("Reset password callback failed: \(error)")
+            return false
+        }
+    }
+
     // MARK: - Google OAuth
 
     /// The Supabase authorize URL that starts the Google OAuth flow.

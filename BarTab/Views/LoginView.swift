@@ -196,6 +196,19 @@ struct LoginView: View {
                             )
                         }
 
+                        if mode == .signIn {
+                            HStack {
+                                Spacer()
+                                NavigationLink {
+                                    ForgotPasswordView()
+                                } label: {
+                                    Text("Forgot Password?")
+                                        .font(.subheadline)
+                                        .foregroundColor(.barTabAccent)
+                                }
+                            }
+                        }
+
                         if mode == .createAccount {
 
                             VStack(

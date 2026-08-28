@@ -23,6 +23,32 @@ struct BarTabApp: App {
                 .environmentObject(languageManager)
                 .environmentObject(toastCenter)
                 .environment(\.locale, languageManager.currentLocale)
-            .barTabToast(center: toastCenter)        }
+                .barTabToast(center: toastCenter)
+                .onOpenURL { url in
+                    Task {
+                        await handleDeepLink(url)
+                    }
+                }
+        }
+    }
+
+    private func handleDeepLink(_ url: URL) async {
+        guard url.scheme == SupabaseConfig.oauthCallbackScheme else { return }
+
+        // Password reset callback: bartab://reset-password#access_token=...&refresh_token=...
+        if url.host == "reset-password" {
+            let success = await SupabaseAuthService().handleResetPasswordCallback(url)
+            if success {
+                await MainActor.run {
+                    toastCenter.showMessage("Password updated successfully!")
+                }
+            }
+            return
+        }
+
+        // Google OAuth callback: bartab://auth/callback#access_token=...
+        if url.host == "auth/callback" {
+            await userSession.signInWithGoogle(callbackURL: url)
+        }
     }
 }

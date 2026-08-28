@@ -42,6 +42,7 @@
 		AEF036533035BB2A00BDA1CC /* DrinkBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */; };
 		AEF036553035BB3F00BDA1CC /* DrinkBrands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */; };
 		AEF036573035BF5100BDA1CC /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036563035BF5100BDA1CC /* LoginView.swift */; };
+		BRTA00014000000000000064 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000065 /* ForgotPasswordView.swift */; };
 		AEF036593035C62000BDA1CC /* PriceConfidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036583035C62000BDA1CC /* PriceConfidence.swift */; };
 		AEF0365B3035C7FA00BDA1CC /* PriceSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */; };
 		AEF0365D3035C80000BDA1CC /* BarTabTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */; };
@@ -153,6 +154,7 @@
 		AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkBrand.swift; sourceTree = "<group>"; };
 		AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkBrands.swift; sourceTree = "<group>"; };
 		AEF036563035BF5100BDA1CC /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000065 /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
 		AEF036583035C62000BDA1CC /* PriceConfidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceConfidence.swift; sourceTree = "<group>"; };
 		AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceSummary.swift; sourceTree = "<group>"; };
 		AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabTheme.swift; sourceTree = "<group>"; };
@@ -342,6 +344,7 @@
 				AEF0364C3035B7AC00BDA1CC /* AddBarView.swift */,
 				AEF0364E3035B7DB00BDA1CC /* LocationPickerView.swift */,
 				AEF036563035BF5100BDA1CC /* LoginView.swift */,
+				BRTA00014000000000000065 /* ForgotPasswordView.swift */,
 				AEF036653035E20000BDA1CC /* AdminReportsView.swift */,
 				BRTA00013060000100000004 /* NearbyBarsView.swift */,
 				BRTA00013060000100000008 /* RequestBrandSheet.swift */,
@@ -602,6 +605,7 @@
 				AEF036223034FC6100BDA1CC /* LocationService.swift in Sources */,
 				AE7839673034F16A00F1555E /* BarTabApp.swift in Sources */,
 				AEF036573035BF5100BDA1CC /* LoginView.swift in Sources */,
+				BRTA00014000000000000064 /* ForgotPasswordView.swift in Sources */,
 				AEF0363330350F0000BDA1CC /* Drink.swift in Sources */,
 				AEF0362A303509E500BDA1CC /* MockBar.swift in Sources */,
 				AEF0363B3035140B00BDA1CC /* BarRepository.swift in Sources */,
