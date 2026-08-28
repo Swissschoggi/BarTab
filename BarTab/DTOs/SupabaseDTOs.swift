@@ -355,7 +355,7 @@ struct ContentReportDTO: Codable {
 
 // MARK: - Profile DTO
 
-struct ProfileDTO: Codable {
+struct ProfileDTO: Codable, Identifiable {
     let id: UUID
     let display_name: String?
     let is_admin: Bool
