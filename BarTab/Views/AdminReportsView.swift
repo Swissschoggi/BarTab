@@ -199,9 +199,7 @@ struct AdminReportsView: View {
             } else {
                 Button {
                     Task {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            await barRepository.markReportReviewed(report)
-                        }
+                        await barRepository.markReportReviewed(report)
                     }
                 } label: {
                     Text("Mark reviewed")
