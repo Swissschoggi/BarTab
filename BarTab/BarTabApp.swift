@@ -35,15 +35,18 @@ struct BarTabApp: App {
     private func handleDeepLink(_ url: URL) async {
         guard url.scheme == SupabaseConfig.oauthCallbackScheme else { return }
 
-        // Password reset callback: bartab://reset-password#access_token=...&refresh_token=...
-        if url.host == "reset-password" {
-            let success = await SupabaseAuthService().handleResetPasswordCallback(url)
-            if success {
-                await MainActor.run {
-                    toastCenter.show("Password updated successfully!", kind: .success)
+        // Password reset callback: bartab://reset-password#access_token=...
+        // or bartab://#access_token=... (when redirect_to is just the site URL)
+        if url.host == "reset-password" || url.host == nil || url.host == "" {
+            if url.fragment?.contains("access_token") == true {
+                let success = await SupabaseAuthService().handleResetPasswordCallback(url)
+                if success {
+                    await MainActor.run {
+                        toastCenter.show("Password updated successfully!", kind: .success)
+                    }
                 }
+                return
             }
-            return
         }
 
         // Google OAuth callback: bartab://auth/callback#access_token=...

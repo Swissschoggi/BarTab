@@ -255,7 +255,10 @@ final class SupabaseAuthService {
     }
 
     func resetPassword(email: String) async throws {
-        let body = ["email": email]
+        let body: [String: String] = [
+            "email": email,
+            "redirect_to": "bartab://reset-password"
+        ]
         _ = try await performAuth(endpoint: "recover", body: body)
     }
 
