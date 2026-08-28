@@ -822,10 +822,24 @@ final class SupabaseClient {
     }
 
     func searchUsers(query: String) async throws -> [ProfileDTO] {
-        let myID = try requireUserID().uuidString
+        print("[searchUsers] START - hasToken=\(AuthTokenStore.shared.hasToken), userID=\(currentUserID?.uuidString ?? "nil")")
+
+        let myID: UUID
+        if let uid = currentUserID {
+            myID = uid
+        } else {
+            // Try restoring session to populate token
+            _ = await SupabaseAuthService().validSession()
+            guard let uid = currentUserID else {
+                print("[searchUsers] No user ID even after session restore")
+                throw SupabaseError(statusCode: 401, message: "Not signed in")
+            }
+            myID = uid
+        }
+
         let wildcard = "%25\(query)%25"
         let endpoint = "profiles?id=neq.\(myID)&display_name=ilike.\(wildcard)&select=*&limit=20"
-        print("[searchUsers] hasToken=\(AuthTokenStore.shared.hasToken), endpoint=\(endpoint)")
+        print("[searchUsers] endpoint=\(endpoint), token=\(AuthTokenStore.shared.accessToken?.prefix(20) ?? "nil")...")
         let request = makeRequest(endpoint: endpoint)
         let data = try await performAuthorized(request)
         return try decoder.decode([ProfileDTO].self, from: data)
