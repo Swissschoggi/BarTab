@@ -1,6 +1,7 @@
 import Foundation
 
-struct Follow: Codable {
+struct Follow: Codable, Identifiable {
+    var id: UUID? { followerID }
     let followerID: UUID?
     let followingID: UUID
     let createdAt: Date?
