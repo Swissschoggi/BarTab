@@ -173,9 +173,11 @@ struct ActivityFeedView: View {
             let following = try await SupabaseClient.shared.fetchFollowing()
             items = try await SupabaseClient.shared.fetchActivityFeed(followingIDs: following)
 
-            // Batch-fetch all unique usernames
+            // Batch-fetch all unique usernames — non-fatal if it fails
             let userIDs = Set(items.map(\.userID))
-            userCache = try await SupabaseClient.shared.fetchProfileNamesByIDs(Array(userIDs))
+            if let names = try? await SupabaseClient.shared.fetchProfileNamesByIDs(Array(userIDs)) {
+                userCache = names
+            }
         } catch {
             toastCenter.showError(error)
         }

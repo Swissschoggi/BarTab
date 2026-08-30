@@ -34,7 +34,7 @@ struct AddBarView: View {
                 HStack(spacing: 10) {
 
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.barTabPrimary)
 
                     TextField(
                         "Search for a bar or place",
@@ -60,12 +60,19 @@ struct AddBarView: View {
                     }
                 }
                 .padding(14)
-                .background(Color.barTabBackground)
+                .background(Color.barTabCardFill)
                 .clipShape(
                     RoundedRectangle(
                         cornerRadius: 14,
                         style: .continuous
                     )
+                )
+                .overlay(
+                    RoundedRectangle(
+                        cornerRadius: 14,
+                        style: .continuous
+                    )
+                    .stroke(Color.barTabPrimary.opacity(0.25), lineWidth: 1)
                 )
                 .padding(.horizontal)
                 .padding(.top)

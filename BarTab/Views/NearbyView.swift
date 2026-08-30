@@ -1002,7 +1002,7 @@ private struct LocationSearchSheet: View {
             VStack(spacing: 0) {
                 HStack(spacing: 10) {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.barTabPrimary)
 
                     TextField(
                         "Search a city or place",
@@ -1024,8 +1024,12 @@ private struct LocationSearchSheet: View {
                     }
                 }
                 .padding(14)
-                .background(Color.barTabBackground)
+                .background(Color.barTabCardFill)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.barTabPrimary.opacity(0.25), lineWidth: 1)
+                )
                 .padding()
 
                 List(searchService.results, id: \.self) { result in

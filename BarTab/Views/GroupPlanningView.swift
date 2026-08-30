@@ -78,6 +78,11 @@ struct GroupPlanningView: View {
                 .environmentObject(userSession)
                 .environmentObject(toastCenter)
         }
+        .onChange(of: showingCreateGroup) { showing in
+            if !showing {
+                Task { await loadGroups() }
+            }
+        }
         .refreshable {
             await loadGroups()
         }
