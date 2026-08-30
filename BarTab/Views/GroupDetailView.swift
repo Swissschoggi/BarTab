@@ -343,10 +343,10 @@ struct PollCard: View {
                     .padding(10)
                     .background(
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(isSelected ? Color.barTabPrimary.opacity(0.08) : Color.clear)
+                            .fill(myVote == option.id ? Color.barTabPrimary.opacity(0.08) : Color.clear)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .stroke(isSelected ? Color.barTabPrimary.opacity(0.3) : Color.barTabCardBorder, lineWidth: 1)
+                                    .stroke(myVote == option.id ? Color.barTabPrimary.opacity(0.3) : Color.barTabCardBorder, lineWidth: 1)
                             )
                     )
                 }
