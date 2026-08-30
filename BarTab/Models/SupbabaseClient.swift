@@ -17,6 +17,20 @@ enum SupabaseConfig {
     static let oauthCallbackScheme = "bartab"
 }
 
+/// Builds shareable deep links that open BarTab to a specific screen.
+enum DeepLink {
+
+    static let scheme = SupabaseConfig.oauthCallbackScheme
+
+    static func bar(_ id: UUID) -> URL {
+        URL(string: "\(scheme)://bar/\(id.uuidString)")!
+    }
+
+    static func group(_ id: UUID) -> URL {
+        URL(string: "\(scheme)://group/\(id.uuidString)")!
+    }
+}
+
 /// Holds the signed-in user's access token so every REST call runs
 /// with the caller's identity (required once Row Level Security is
 /// enabled — the anon key alone fails every `auth.uid()` check).
@@ -1091,6 +1105,14 @@ final class SupabaseClient {
         )
         let groupsData = try await performAuthorized(groupsRequest)
         return try decoder.decode([BarGroup].self, from: groupsData)
+    }
+
+    func fetchGroup(id: UUID) async throws -> BarGroup? {
+        let request = try makeRequest(
+            endpoint: "groups?id=eq.\(id.uuidString)&select=*"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([BarGroup].self, from: data).first
     }
 
     func fetchGroupMembers(groupID: UUID) async throws -> [GroupMember] {

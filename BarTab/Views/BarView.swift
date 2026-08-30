@@ -225,18 +225,6 @@ struct BarView: View {
 
                         DisclosureGroup {
                             VStack(alignment: .leading, spacing: 4) {
-                                let drinkPrices = groupedPrices
-                                    .filter { $0.drink == drink }
-                                    .flatMap(\.prices)
-
-                                if drinkPrices.count > 1 {
-                                    PriceTrendChart(
-                                        prices: drinkPrices,
-                                        normalizeBySize: true
-                                    )
-                                    .padding(.bottom, 8)
-                                }
-
                                 ForEach(groupedPrices.filter { $0.drink == drink }) { group in
                                     priceGroupRow(group)
                                 }
@@ -363,7 +351,7 @@ struct BarView: View {
                             .fontWeight(.medium)
                             .foregroundColor(.barTabText)
 
-                        Text("Average drink price, size-normalized")
+                        Text("Compared with other bars for the same drinks")
                             .font(.caption2)
                             .foregroundColor(.barTabSecondary)
                     }
@@ -541,7 +529,11 @@ struct BarView: View {
         }
 
         ToolbarItem(placement: .navigationBarTrailing) {
-            ShareLink(item: shareText) {
+            ShareLink(
+                item: DeepLink.bar(currentBar.id),
+                subject: Text(currentBar.name),
+                message: Text(shareText)
+            ) {
                 Image(systemName: "square.and.arrow.up")
                     .foregroundColor(.barTabPrimary)
             }

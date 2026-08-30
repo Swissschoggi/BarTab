@@ -324,8 +324,8 @@ final class BarRepository: ObservableObject {
         return Decimal(amounts.reduce(0, +) / Double(amounts.count))
     }
 
-    /// Dollar-sign level 1…4 for the bar, relative to the average
-    /// drink price across every bar. Nil when there's no data yet.
+    /// Dollar-sign level 1…4 for the bar, comparing each drink against the
+    /// market average for that same drink and size. Nil when there's no data.
     func priceLevel(for bar: Bar) -> String? {
         guard let level = priceLevelByBarID[bar.id] else { return nil }
         return String(repeating: "$", count: level)
@@ -333,44 +333,60 @@ final class BarRepository: ObservableObject {
 
     private func recomputePriceLevels() {
 
-        var averagesPerBar: [UUID: Double] = [:]
+        // Market average converted price per (drink, size), so a wine
+        // glass is only ever compared against other wine glasses — never
+        // against a pint of beer or a bottle.
+        var sumsPerKey: [String: Double] = [:]
+        var countsPerKey: [String: Int] = [:]
+
+        for bar in bars {
+            for summary in getPriceSummaries(for: bar) {
+                let key = "\(summary.drink.rawValue)|\(summary.size.rawValue)"
+                let amount = NSDecimalNumber(decimal: summary.convertedAmount).doubleValue
+                sumsPerKey[key, default: 0] += amount
+                countsPerKey[key, default: 0] += 1
+            }
+        }
+
+        var ratiosPerBar: [UUID: Double] = [:]
 
         for bar in bars {
             let summaries = getPriceSummaries(for: bar)
             guard !summaries.isEmpty else { continue }
 
-            // Prefer size-normalized prices (price per 10 cl) so a bottle
-            // isn't rated as pricier than a glass. Fall back to raw
-            // amounts for sizes without an estimable volume.
-            let normalized = summaries.compactMap(\.normalizedAmountPer10cl)
-            let values: [Double] = normalized.isEmpty
-                ? summaries.map { NSDecimalNumber(decimal: $0.convertedAmount).doubleValue }
-                : normalized
+            var totalRatio = 0.0
+            var count = 0
 
-            guard !values.isEmpty else { continue }
+            for summary in summaries {
+                let key = "\(summary.drink.rawValue)|\(summary.size.rawValue)"
+                guard let n = countsPerKey[key], n > 0,
+                      let sum = sumsPerKey[key], sum > 0 else { continue }
 
-            averagesPerBar[bar.id] = values.reduce(0, +) / Double(values.count)
+                let marketAverage = sum / Double(n)
+                let amount = NSDecimalNumber(decimal: summary.convertedAmount).doubleValue
+                totalRatio += amount / marketAverage
+                count += 1
+            }
+
+            guard count > 0 else { continue }
+            ratiosPerBar[bar.id] = totalRatio / Double(count)
         }
 
-        guard !averagesPerBar.isEmpty else {
+        guard !ratiosPerBar.isEmpty else {
             priceLevelByBarID = [:]
             return
         }
 
-        let globalAverage =
-            averagesPerBar.values.reduce(0, +)
-            / Double(averagesPerBar.count)
-
+        // Ratios are already relative to the market (1.0 = average), so use
+        // fixed bands around 1.0.
         var levels: [UUID: Int] = [:]
-        for (barID, average) in averagesPerBar {
-            let ratio = average / globalAverage
-
+        for (barID, ratio) in ratiosPerBar {
             switch ratio {
-            case ..<0.8:
+            case ..<0.85:
                 levels[barID] = 1
-            case ..<1.1:
+            case ..<1.05:
                 levels[barID] = 2
-            case ..<1.4:
+            case ..<1.25:
                 levels[barID] = 3
             default:
                 levels[barID] = 4

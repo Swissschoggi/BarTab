@@ -12,9 +12,6 @@ struct SettingsView: View {
     @State private var showingUsernameEditor = false
     @State private var showingPasswordEditor = false
     @State private var showingTipJar = false
-    @State private var newUsername = ""
-    @State private var newPassword = ""
-    @State private var confirmPassword = ""
     @State private var currencyExpanded = false
     @State private var selectedCurrency: Currency = Currency.defaultCurrency
     @State private var showingClearCacheConfirm = false
@@ -46,7 +43,6 @@ struct SettingsView: View {
 
                             VStack(spacing: 0) {
                                 Button {
-                                    newUsername = userSession.currentUser?.username ?? ""
                                     showingUsernameEditor = true
                                 } label: {
                                     settingsRow(
@@ -62,8 +58,6 @@ struct SettingsView: View {
                                     .padding(.leading, 44)
 
                                 Button {
-                                    newPassword = ""
-                                    confirmPassword = ""
                                     showingPasswordEditor = true
                                 } label: {
                                     settingsRow(
@@ -413,68 +407,15 @@ struct SettingsView: View {
         } message: {
             Text("Please close and reopen the app to apply the language change.")
         }
-        .alert("Edit Username", isPresented: $showingUsernameEditor) {
-            TextField("Username", text: $newUsername)
-            Button("Save") {
-                let trimmed = newUsername.trimmingCharacters(in: .whitespaces)
-                if let error = InputValidator.validateDisplayName(trimmed) {
-                    toastCenter.show(error, kind: .error)
-                    return
-                }
-                Task {
-                    do {
-                        try await userSession.updateUsername(trimmed)
-                        toastCenter.show(
-                            "Username updated",
-                            kind: .success
-                        )
-                    } catch {
-                        toastCenter.showError(error)
-                    }
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Enter your new display name.")
+        .sheet(isPresented: $showingUsernameEditor) {
+            EditUsernameSheet(currentUsername: userSession.currentUser?.username ?? "")
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
         }
-        .alert("Change Password", isPresented: $showingPasswordEditor) {
-            SecureField("New password", text: $newPassword)
-            SecureField("Confirm password", text: $confirmPassword)
-            Button("Update") {
-                guard newPassword.count >= 8 else {
-                    toastCenter.show(
-                        "Password must be at least 8 characters.",
-                        kind: .error
-                    )
-                    return
-                }
-                guard newPassword == confirmPassword else {
-                    toastCenter.show(
-                        "Passwords do not match.",
-                        kind: .error
-                    )
-                    return
-                }
-                Task {
-                    do {
-                        try await userSession.updatePassword(newPassword)
-                        toastCenter.show(
-                            "Password updated",
-                            kind: .success
-                        )
-                        newPassword = ""
-                        confirmPassword = ""
-                    } catch {
-                        toastCenter.showError(error)
-                    }
-                }
-            }
-            Button("Cancel", role: .cancel) {
-                newPassword = ""
-                confirmPassword = ""
-            }
-        } message: {
-            Text("Enter your new password (at least 8 characters).")
+        .sheet(isPresented: $showingPasswordEditor) {
+            ChangePasswordSheet()
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
         }
         .alert("Coming Soon", isPresented: $showingTipJar) {
             Button("OK", role: .cancel) {}
@@ -521,5 +462,350 @@ struct SettingsView_Previews: PreviewProvider {
             .environmentObject(BarRepository())
             .environmentObject(LanguageManager.shared)
             .environmentObject(ToastCenter())
+    }
+}
+
+// MARK: - Edit Username Sheet
+
+private struct EditUsernameSheet: View {
+
+    let currentUsername: String
+
+    @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var username = ""
+    @State private var isSaving = false
+    @FocusState private var isFocused: Bool
+
+    private var trimmed: String {
+        username.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var hasChanged: Bool {
+        !trimmed.isEmpty && trimmed != currentUsername
+    }
+
+    private var validationError: String? {
+        guard !trimmed.isEmpty else { return nil }
+        return InputValidator.validateDisplayName(trimmed)
+    }
+
+    private var canSave: Bool {
+        hasChanged && validationError == nil && !isSaving
+    }
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section {
+                    HStack(spacing: 14) {
+                        avatarPreview
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("This is how others see you")
+                                .font(.caption)
+                                .foregroundColor(.barTabSecondary)
+
+                            Text(trimmed.isEmpty ? "No name yet" : trimmed)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+                                .lineLimit(1)
+                        }
+                    }
+                    .padding(.vertical, 6)
+                } header: {
+                    Text("Preview")
+                }
+
+                Section {
+                    TextField("Username", text: $username)
+                        .focused($isFocused)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                } header: {
+                    Text("New username")
+                } footer: {
+                    HStack(alignment: .top) {
+                        if let error = validationError {
+                            Label(error, systemImage: "exclamationmark.circle.fill")
+                                .foregroundColor(.red)
+                        } else {
+                            Text("Pick a name your friends will recognize.")
+                        }
+
+                        Spacer()
+
+                        Text("\(username.count)/\(InputValidator.maxDisplayNameLength)")
+                            .foregroundColor(
+                                username.count > InputValidator.maxDisplayNameLength
+                                    ? .red
+                                    : .barTabSecondary
+                            )
+                    }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(Color.barTabBackground.ignoresSafeArea())
+            .navigationTitle("Edit Username")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        Task { await save() }
+                    }
+                    .fontWeight(.semibold)
+                    .disabled(!canSave)
+                }
+            }
+            .onAppear {
+                username = currentUsername
+                isFocused = true
+            }
+        }
+    }
+
+    private var avatarPreview: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [Color.barTabGradientStart, Color.barTabGradientEnd],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 44, height: 44)
+
+            Text(String(trimmed.prefix(1)).uppercased())
+                .font(.headline)
+                .foregroundColor(.white)
+        }
+    }
+
+    private func save() async {
+        isSaving = true
+        do {
+            try await userSession.updateUsername(trimmed)
+            toastCenter.show("Username updated", kind: .success)
+            dismiss()
+        } catch {
+            toastCenter.showError(error)
+        }
+        isSaving = false
+    }
+}
+
+// MARK: - Change Password Sheet
+
+private struct ChangePasswordSheet: View {
+
+    @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var newPassword = ""
+    @State private var confirmPassword = ""
+    @State private var showNew = false
+    @State private var showConfirm = false
+    @State private var isSaving = false
+    @FocusState private var focusedField: Field?
+
+    private enum Field {
+        case newPassword
+        case confirmPassword
+    }
+
+    private var strength: PasswordStrength {
+        PasswordStrength.evaluate(newPassword)
+    }
+
+    private var validationError: String? {
+        if newPassword.isEmpty { return nil }
+        if newPassword.count < 8 {
+            return "Password must be at least 8 characters."
+        }
+        if !confirmPassword.isEmpty && newPassword != confirmPassword {
+            return "Passwords don't match."
+        }
+        return nil
+    }
+
+    private var canSave: Bool {
+        !newPassword.isEmpty
+            && newPassword.count >= 8
+            && newPassword == confirmPassword
+            && !isSaving
+    }
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            SecureField("New password", text: $newPassword)
+                                .focused($focusedField, equals: .newPassword)
+                                .textContentType(.newPassword)
+
+                            Button {
+                                showNew.toggle()
+                            } label: {
+                                Image(systemName: showNew ? "eye.slash.fill" : "eye.fill")
+                                    .foregroundColor(.barTabSecondary)
+                            }
+                        }
+
+                        if !newPassword.isEmpty {
+                            strengthMeter
+                        }
+                    }
+                } header: {
+                    Text("New password")
+                } footer: {
+                    if let error = validationError {
+                        Label(error, systemImage: "exclamationmark.circle.fill")
+                            .foregroundColor(.red)
+                    } else if !newPassword.isEmpty {
+                        Text(strength.hint)
+                    }
+                }
+
+                Section {
+                    HStack {
+                        SecureField("Confirm password", text: $confirmPassword)
+                            .focused($focusedField, equals: .confirmPassword)
+                            .textContentType(.newPassword)
+
+                        Button {
+                            showConfirm.toggle()
+                        } label: {
+                            Image(systemName: showConfirm ? "eye.slash.fill" : "eye.fill")
+                                .foregroundColor(.barTabSecondary)
+                        }
+                    }
+                } header: {
+                    Text("Confirm")
+                } footer: {
+                    if !confirmPassword.isEmpty && newPassword != confirmPassword {
+                        Text("Passwords don't match.")
+                            .foregroundColor(.red)
+                    }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(Color.barTabBackground.ignoresSafeArea())
+            .navigationTitle("Change Password")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Update") {
+                        Task { await save() }
+                    }
+                    .fontWeight(.semibold)
+                    .disabled(!canSave)
+                }
+            }
+        }
+    }
+
+    private var strengthMeter: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 4) {
+                ForEach(0..<3, id: \.self) { index in
+                    Capsule()
+                        .fill(index < strength.filledSegments ? strength.color : Color.barTabPrimary.opacity(0.12))
+                        .frame(height: 4)
+                }
+            }
+
+            Text(strength.label)
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(strength.color)
+        }
+    }
+
+    private func save() async {
+        isSaving = true
+        do {
+            try await userSession.updatePassword(newPassword)
+            toastCenter.show("Password updated", kind: .success)
+            dismiss()
+        } catch {
+            toastCenter.showError(error)
+        }
+        isSaving = false
+    }
+}
+
+// MARK: - Password strength
+
+private enum PasswordStrength {
+    case weak
+    case medium
+    case strong
+
+    var label: String {
+        switch self {
+        case .weak: return "Weak password"
+        case .medium: return "Fair password"
+        case .strong: return "Strong password"
+        }
+    }
+
+    var hint: String {
+        switch self {
+        case .weak: return "Add numbers, symbols or uppercase letters."
+        case .medium: return "Good — add more variety for extra strength."
+        case .strong: return "Nice, that's a strong password."
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .weak: return .red
+        case .medium: return .orange
+        case .strong: return .green
+        }
+    }
+
+    var filledSegments: Int {
+        switch self {
+        case .weak: return 1
+        case .medium: return 2
+        case .strong: return 3
+        }
+    }
+
+    static func evaluate(_ password: String) -> PasswordStrength {
+        guard !password.isEmpty else { return .weak }
+
+        var score = 0
+        if password.count >= 8 { score += 1 }
+        if password.count >= 12 { score += 1 }
+
+        let hasUpper = password.range(of: "[A-Z]", options: .regularExpression) != nil
+        let hasLower = password.range(of: "[a-z]", options: .regularExpression) != nil
+        let hasDigit = password.range(of: "[0-9]", options: .regularExpression) != nil
+        let hasSymbol = password.range(of: "[^A-Za-z0-9]", options: .regularExpression) != nil
+
+        let variety = [hasUpper, hasLower, hasDigit, hasSymbol].filter { $0 }.count
+        if variety >= 3 { score += 1 }
+        if variety >= 4 { score += 1 }
+
+        switch score {
+        case 0...1: return .weak
+        case 2...3: return .medium
+        default: return .strong
+        }
     }
 }

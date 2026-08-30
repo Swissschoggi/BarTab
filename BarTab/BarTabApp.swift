@@ -9,6 +9,7 @@ struct BarTabApp: App {
     @StateObject private var languageManager = LanguageManager.shared
     @StateObject private var toastCenter = ToastCenter()
     @StateObject private var locationService = LocationService.shared
+    @StateObject private var deepLinkRouter = DeepLinkRouter()
 
     init() {
         LanguageManager.shared.applyOnLaunch()
@@ -26,6 +27,7 @@ struct BarTabApp: App {
                 .environmentObject(languageManager)
                 .environmentObject(toastCenter)
                 .environmentObject(locationService)
+                .environmentObject(deepLinkRouter)
                 .environment(\.locale, languageManager.currentLocale)
                 .barTabToast(center: toastCenter)
                 .task {
@@ -74,6 +76,43 @@ struct BarTabApp: App {
         // Google OAuth callback: bartab://auth/callback#access_token=...
         if url.host == "auth/callback" {
             try? await userSession.signInWithGoogle(callbackURL: url)
+            return
+        }
+
+        // Share deep links: bartab://bar/<id> and bartab://group/<id>
+        if url.host == "bar", let idString = url.pathComponents.last,
+           let id = UUID(uuidString: idString) {
+            await MainActor.run {
+                deepLinkRouter.destination = .bar(id)
+            }
+            return
+        }
+
+        if url.host == "group", let idString = url.pathComponents.last,
+           let id = UUID(uuidString: idString) {
+            await MainActor.run {
+                deepLinkRouter.destination = .group(id)
+            }
+            return
         }
     }
+}
+
+/// Routes share deep links to the relevant screen.
+@MainActor
+final class DeepLinkRouter: ObservableObject {
+
+    enum Destination: Identifiable, Equatable {
+        case bar(UUID)
+        case group(UUID)
+
+        var id: String {
+            switch self {
+            case .bar(let id): return "bar-\(id.uuidString)"
+            case .group(let id): return "group-\(id.uuidString)"
+            }
+        }
+    }
+
+    @Published var destination: Destination?
 }

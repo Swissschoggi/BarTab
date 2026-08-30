@@ -284,7 +284,7 @@ struct GroupDetailView: View {
 
     private func shareGroup() {
         let shareText = "Join my group \"\(group.name)\" on BarTab! 🍺"
-        shareItems = [shareText]
+        shareItems = [shareText, DeepLink.group(group.id)]
     }
 }
 
