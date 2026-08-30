@@ -11,7 +11,20 @@ struct CreatePollSheet: View {
 
     @State private var pollTitle = ""
     @State private var optionTexts: [String] = ["", ""]
+    @State private var optionBarIDs: [UUID?] = [nil, nil]
+    @State private var showingBarPicker = false
+    @State private var barPickerIndex: Int = 0
+    @State private var barSearchQuery = ""
     @State private var isSaving = false
+
+    private var filteredBars: [Bar] {
+        let query = barSearchQuery.trimmingCharacters(in: .whitespaces).lowercased()
+        guard !query.isEmpty else { return Array(barRepository.bars.prefix(20)) }
+        return barRepository.bars.filter {
+            $0.name.lowercased().contains(query) ||
+            $0.address.lowercased().contains(query)
+        }
+    }
 
     var body: some View {
         NavigationView {
@@ -25,19 +38,52 @@ struct CreatePollSheet: View {
 
                 Section {
                     ForEach(0..<optionTexts.count, id: \.self) { index in
-                        TextField("Option \(index + 1)", text: $optionTexts[index])
-                            .textInputAutocapitalization(.words)
+                        VStack(alignment: .leading, spacing: 6) {
+                            TextField("Option \(index + 1)", text: $optionTexts[index])
+                                .textInputAutocapitalization(.words)
+
+                            if let barID = optionBarIDs[index],
+                               let bar = barRepository.getBar(id: barID) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "mappin.circle.fill")
+                                        .font(.caption2)
+                                        .foregroundColor(.barTabPrimary)
+                                    Text(bar.name)
+                                        .font(.caption)
+                                        .foregroundColor(.barTabPrimary)
+                                    Spacer()
+                                    Button {
+                                        optionBarIDs[index] = nil
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.caption)
+                                            .foregroundColor(.barTabSecondary)
+                                    }
+                                }
+                                .padding(.horizontal, 4)
+                            } else {
+                                Button {
+                                    barPickerIndex = index
+                                    showingBarPicker = true
+                                } label: {
+                                    Label("Link a bar", systemImage: "mappin.and.ellipse")
+                                        .font(.caption)
+                                        .foregroundColor(.barTabSecondary)
+                                }
+                            }
+                        }
                     }
 
                     Button {
                         optionTexts.append("")
+                        optionBarIDs.append(nil)
                     } label: {
                         Label("Add option", systemImage: "plus")
                     }
                 } header: {
                     Text("Options")
                 } footer: {
-                    Text("Add bars, drinks, or whatever you're deciding on.")
+                    Text("Add bars, drinks, or whatever you're deciding on. Link bars to show their location in the poll.")
                 }
             }
             .navigationTitle("New Poll")
@@ -55,6 +101,42 @@ struct CreatePollSheet: View {
                     .disabled(pollTitle.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
                 }
             }
+            .sheet(isPresented: $showingBarPicker) {
+                NavigationView {
+                    List {
+                        TextField("Search bars...", text: $barSearchQuery)
+                            .textInputAutocapitalization(.never)
+                            .listRowSeparator(.hidden)
+
+                        ForEach(filteredBars) { bar in
+                            Button {
+                                optionBarIDs[barPickerIndex] = bar.id
+                                showingBarPicker = false
+                                barSearchQuery = ""
+                            } label: {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(bar.name)
+                                        .font(.subheadline)
+                                        .foregroundColor(.barTabText)
+                                    Text(bar.address)
+                                        .font(.caption2)
+                                        .foregroundColor(.barTabSecondary)
+                                }
+                            }
+                        }
+                    }
+                    .navigationTitle("Select Bar")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Cancel") {
+                                showingBarPicker = false
+                                barSearchQuery = ""
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -63,7 +145,7 @@ struct CreatePollSheet: View {
         let texts = optionTexts
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
-        let options: [(barID: UUID?, label: String)] = texts.map { (nil, $0) }
+        let options: [(barID: UUID?, label: String)] = zip(texts, Array(optionBarIDs.prefix(texts.count))).map { (barID: $1, label: $0) }
 
         guard !title.isEmpty, options.count >= 2 else { return }
 

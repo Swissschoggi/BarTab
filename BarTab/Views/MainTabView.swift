@@ -5,11 +5,13 @@ struct MainTabView: View {
     enum Tab {
         case map
         case nearby
+        case groups
         case profile
     }
 
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var barRepository: BarRepository
+    @EnvironmentObject private var toastCenter: ToastCenter
 
     @State private var selectedTab: Tab = .map
     @State private var showingOnboarding = false
@@ -32,6 +34,11 @@ struct MainTabView: View {
                 case .nearby:
                     NearbyView()
 
+                case .groups:
+                    NavigationView {
+                        GroupPlanningView()
+                    }
+
                 case .profile:
                     ProfileView()
                 }
@@ -46,7 +53,7 @@ struct MainTabView: View {
                 maxHeight: .infinity
             )
 
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
 
                 tabButton(
                     title: "Map",
@@ -58,6 +65,12 @@ struct MainTabView: View {
                     title: "Discover",
                     icon: "safari.fill",
                     tab: .nearby
+                )
+
+                tabButton(
+                    title: "Groups",
+                    icon: "person.3.fill",
+                    tab: .groups
                 )
 
                 tabButton(
@@ -168,6 +181,7 @@ struct MainTabView: View {
                 x: 0,
                 y: 3
             )
+            .accessibilityLabel(Text(title))
         }
     }
 }

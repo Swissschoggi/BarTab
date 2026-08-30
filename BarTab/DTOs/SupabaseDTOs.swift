@@ -256,6 +256,7 @@ struct DrinkRatingDTO: Codable {
     let quality: Int
     let rated_by: UUID
     let created_at: Date
+    let bars: BarNameRef?
 
     var toDomain: DrinkRating? {
         guard let drinkEnum = Drink(rawValue: drink),

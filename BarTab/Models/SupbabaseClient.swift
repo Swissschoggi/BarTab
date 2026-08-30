@@ -751,9 +751,11 @@ final class SupabaseClient {
     ) async throws -> URL {
 
         let path = "avatars/\(userID.uuidString)/avatar.jpg"
-        let url = URL(
+        guard let url = URL(
             string: "\(baseURL)/storage/v1/object/\(path)"
-        )!
+        ) else {
+            throw SupabaseError(statusCode: 0, message: "Invalid avatar URL")
+        }
 
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
@@ -778,9 +780,12 @@ final class SupabaseClient {
 
         _ = try await performAuthorized(request)
 
-        return URL(
+        guard let publicURL = URL(
             string: "\(baseURL)/storage/v1/object/public/\(path)"
-        )!
+        ) else {
+            throw SupabaseError(statusCode: 0, message: "Invalid avatar public URL")
+        }
+        return publicURL
     }
 
     /// Throws if no user is signed in.
@@ -963,7 +968,8 @@ final class SupabaseClient {
                     amount: row.amount,
                     currency: row.currency
                 ),
-                timestamp: row.reported_at
+                timestamp: row.reported_at,
+                barID: row.bar_id
             ))
         }
 
@@ -981,7 +987,45 @@ final class SupabaseClient {
                     barName: row.bars?.name ?? "Unknown",
                     ambience: row.ambience
                 ),
-                timestamp: row.created_at
+                timestamp: row.created_at,
+                barID: row.bar_id
+            ))
+        }
+
+        // Recent drink ratings from followed users
+        let drinkRatingReq = try makeRequest(
+            endpoint: "drink_ratings?rated_by=in.(\(ids))&select=*,bars(name)&order=created_at.desc&limit=20"
+        )
+        let drinkRatingData = try await performAuthorized(drinkRatingReq)
+        let drinkRatingRows = try decoder.decode([DrinkRatingDTO].self, from: drinkRatingData)
+        for row in drinkRatingRows {
+            items.append(ActivityItem(
+                id: row.id,
+                userID: row.rated_by,
+                kind: .drinkRating(
+                    barName: row.bars?.name ?? "Unknown",
+                    drink: row.drink,
+                    quality: row.quality
+                ),
+                timestamp: row.created_at,
+                barID: row.bar_id
+            ))
+        }
+
+        // Bars created by followed users
+        let barReq = try makeRequest(
+            endpoint: "bars?created_by=in.(\(ids))&select=*&order=created_at.desc&limit=10"
+        )
+        let barData = try await performAuthorized(barReq)
+        let barRows = try decoder.decode([BarDTO].self, from: barData)
+        for row in barRows {
+            let bar = row.toDomain
+            items.append(ActivityItem(
+                id: UUID(),
+                userID: row.created_by,
+                kind: .barCreated(barName: bar.name),
+                timestamp: row.created_at,
+                barID: bar.id
             ))
         }
 
@@ -1152,6 +1196,47 @@ final class SupabaseClient {
         )
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         _ = try await performAuthorized(request)
+    }
+
+    func deleteGroup(groupID: UUID) async throws {
+        let myID = try requireUserID().uuidString
+        // Verify the user is admin of this group
+        let memberReq = try makeRequest(
+            endpoint: "group_members?group_id=eq.\(groupID.uuidString)&user_id=eq.\(myID)&role=eq.admin&select=*"
+        )
+        let memberData = try await performAuthorized(memberReq)
+        let members = try decoder.decode([GroupMember].self, from: memberData)
+        guard !members.isEmpty else {
+            throw SupabaseError(statusCode: 403, message: "Only group admins can delete a group")
+        }
+        var request = try makeRequest(
+            endpoint: "groups?id=eq.\(groupID.uuidString)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    func removeMember(groupID: UUID, userID: UUID) async throws {
+        var request = try makeRequest(
+            endpoint: "group_members?group_id=eq.\(groupID.uuidString)&user_id=eq.\(userID.uuidString)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    func fetchProfilesByIDs(_ ids: [UUID]) async throws -> [UUID: String] {
+        guard !ids.isEmpty else { return [:] }
+        let idList = ids.map(\.uuidString).joined(separator: ",")
+        let request = try makeRequest(
+            endpoint: "profiles?id=in.(\(idList))&select=id,display_name"
+        )
+        let data = try await performAuthorized(request)
+        let dtos = try decoder.decode([ProfileDTO].self, from: data)
+        var result: [UUID: String] = [:]
+        for dto in dtos {
+            result[dto.id] = dto.display_name ?? "User"
+        }
+        return result
     }
 
     // MARK: - Price Alerts

@@ -50,7 +50,8 @@ enum PriceAlertService {
                 triggered += 1
             }
         } catch {
-            print("Failed to check price alerts: \(error)")
+            // Background check — silently ignore; alerts will be
+            // checked again on next foreground transition.
         }
     }
 }

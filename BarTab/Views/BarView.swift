@@ -11,7 +11,7 @@ struct BarView: View {
     @EnvironmentObject private var toastCenter: ToastCenter
     @Environment(\.dismiss) private var dismiss
 
-    @StateObject private var locationService = LocationService()
+    @EnvironmentObject private var locationService: LocationService
 
     @State private var showingAddPrice = false
     @State private var expandedGroupID: String?
@@ -35,6 +35,7 @@ struct BarView: View {
     @State private var showingDrinkRating = false
     @State private var alertDrinkGroup: PriceGroup?
     @State private var showingPriceAlert = false
+    @State private var comparisonGroup: PriceGroup?
 
     // Cached from @Published — never read barRepository directly in body
     @State private var currentBar: Bar
@@ -512,6 +513,7 @@ struct BarView: View {
                 } label: {
                     Image(systemName: "xmark")
                 }
+                .accessibilityLabel("Close")
             }
         }
 
@@ -525,6 +527,7 @@ struct BarView: View {
                 Image(systemName: isFavorited ? "heart.fill" : "heart")
                     .foregroundColor(.barTabPrimary)
             }
+            .accessibilityLabel(isFavorited ? "Remove from favorites" : "Add to favorites")
         }
 
         ToolbarItem(placement: .navigationBarTrailing) {
@@ -532,6 +535,7 @@ struct BarView: View {
                 Image(systemName: "square.and.arrow.up")
                     .foregroundColor(.barTabPrimary)
             }
+            .accessibilityLabel("Share bar")
         }
 
         ToolbarItem(placement: .navigationBarTrailing) {
@@ -541,6 +545,7 @@ struct BarView: View {
                 Image(systemName: hasReported ? "flag.fill" : "flag")
                     .foregroundColor(.barTabPrimary)
             }
+            .accessibilityLabel("Report bar")
         }
 
         if canDeleteBar {
@@ -551,6 +556,7 @@ struct BarView: View {
                     Image(systemName: "pencil")
                         .foregroundColor(.barTabPrimary)
                 }
+                .accessibilityLabel("Edit bar")
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -560,6 +566,7 @@ struct BarView: View {
                     Image(systemName: "trash")
                         .foregroundColor(.red)
                 }
+                .accessibilityLabel("Delete bar")
             }
         }
     }
@@ -590,25 +597,23 @@ struct BarView: View {
                 .environmentObject(userSession)
             }
             .sheet(isPresented: $showingDrinkRating) {
-                Group {
-                    if let group = ratingDrinkGroup,
-                       let user = userSession.currentUser {
-                        DrinkRatingSheet(
-                            bar: currentBar,
+                if let group = ratingDrinkGroup,
+                   let user = userSession.currentUser {
+                    DrinkRatingSheet(
+                        bar: currentBar,
+                        drink: group.drink,
+                        brand: group.brand,
+                        size: group.size,
+                        initialQuality: barRepository.myDrinkRating(
+                            for: currentBar,
                             drink: group.drink,
                             brand: group.brand,
                             size: group.size,
-                            initialQuality: barRepository.myDrinkRating(
-                                for: currentBar,
-                                drink: group.drink,
-                                brand: group.brand,
-                                size: group.size,
-                                by: user
-                            )?.quality
-                        )
-                        .environmentObject(barRepository)
-                        .environmentObject(userSession)
-                    }
+                            by: user
+                        )?.quality
+                    )
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
                 }
             }
             .sheet(isPresented: $showingPriceAlert) {
@@ -623,6 +628,18 @@ struct BarView: View {
                     .environmentObject(userSession)
                     .environmentObject(toastCenter)
                 }
+            }
+            .sheet(item: $comparisonGroup) { group in
+                DrinkComparisonView(
+                    drink: group.drink,
+                    brand: group.brand,
+                    size: group.size,
+                    style: group.style,
+                    serving: group.serving
+                )
+                .environmentObject(barRepository)
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
             }
             .confirmationDialog(
                 "Report this bar?",
@@ -698,7 +715,11 @@ struct BarView: View {
             ) {
                 Button(currentBar.smokingFriendly ? "Remove" : "Confirm") {
                     Task {
-                        await barRepository.toggleSmokingPolicy(for: currentBar)
+                        let barToUpdate = currentBar
+                        await barRepository.toggleSmokingPolicy(for: barToUpdate)
+                        if let latest = barRepository.getBar(id: bar.id) {
+                            currentBar = latest
+                        }
                     }
                 }
                 Button("Cancel", role: .cancel) {}
@@ -717,7 +738,11 @@ struct BarView: View {
                 Button(currentBar.outdoorSeating ? "Remove" : "Confirm") {
                     HapticEngine.impact()
                     Task {
-                        await barRepository.toggleOutdoorSeating(for: currentBar)
+                        let barToUpdate = currentBar
+                        await barRepository.toggleOutdoorSeating(for: barToUpdate)
+                        if let latest = barRepository.getBar(id: bar.id) {
+                            currentBar = latest
+                        }
                     }
                 }
                 Button("Cancel", role: .cancel) {}
@@ -801,6 +826,7 @@ struct BarView: View {
                                 .foregroundColor(.barTabPrimary)
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Rate drink")
 
                         Button {
                             pendingReportGroup = group
@@ -811,6 +837,7 @@ struct BarView: View {
                                 .foregroundColor(isFlagged ? .orange : .barTabSecondary)
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Report drink price")
 
                         Button {
                             alertDrinkGroup = group
@@ -821,6 +848,7 @@ struct BarView: View {
                                 .foregroundColor(.barTabSecondary)
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Set price alert")
                     }
                 }
                 .padding(.vertical, 8)
@@ -860,6 +888,13 @@ struct BarView: View {
                 .padding(.bottom, 8)
             }
         }
+        .contextMenu {
+            Button {
+                comparisonGroup = group
+            } label: {
+                Label("Compare prices", systemImage: "barchart.xaxis.2")
+            }
+        }
     }
 
     // MARK: - Helper Methods / Properties Placeholder
@@ -886,7 +921,6 @@ struct BarView: View {
         return NSDecimalNumber(decimal: total / count).doubleValue
     }
 
-    private func confidenceForGroup(_ group: PriceGroup) -> Double { 1.0 }
     private func priceLevelTitle(_ level: String) -> String { "Price Level" }
     private func openDirections() {
         let coordinate = currentBar.coordinate

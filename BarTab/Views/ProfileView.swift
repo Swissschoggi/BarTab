@@ -328,6 +328,22 @@ struct ProfileView: View {
                                     .padding(.leading, 44)
 
                                 navigationRow(
+                                    title: "Badges",
+                                    subtitle: "Your achievements",
+                                    icon: "rosette"
+                                ) {
+                                    BadgeGridView(
+                                        earnedBadges: BadgeService.shared.earnedBadges(),
+                                        allBadges: BadgeService.shared.allBadges(),
+                                        streak: BadgeService.shared.currentStreak
+                                    )
+                                }
+
+                                Divider()
+                                    .foregroundColor(.barTabCardBorder)
+                                    .padding(.leading, 44)
+
+                                navigationRow(
                                     title: "Groups",
                                     subtitle: "Plan nights out",
                                     icon: "person.3.fill"
@@ -509,7 +525,7 @@ struct ProfileView: View {
                 Color.barTabBackground
                     .ignoresSafeArea()
             )
-            .navigationBarHidden(true)
+            .toolbar(.hidden, for: .navigationBar)
         }
         .refreshable {
             await barRepository.fetchAllData()

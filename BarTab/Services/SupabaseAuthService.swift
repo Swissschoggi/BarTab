@@ -102,10 +102,7 @@ final class SupabaseAuthService {
             return
         }
 
-        let saved = keychain.write(data, account: sessionAccount)
-        if !saved {
-            print("[SupabaseAuthService] WARNING: keychain write failed — session may not persist")
-        }
+        _ = keychain.write(data, account: sessionAccount)
         mirrorTokens(from: session)
     }
 
@@ -292,7 +289,6 @@ final class SupabaseAuthService {
             saveSession(session)
             return true
         } catch {
-            print("Reset password callback failed: \(error)")
             return false
         }
     }
@@ -511,9 +507,11 @@ final class SupabaseAuthService {
         body: [String: String]
     ) async throws -> Data {
 
-        let url = URL(
+        guard let url = URL(
             string: "\(baseURL.absoluteString)/auth/v1/\(endpoint)"
-        )!
+        ) else {
+            throw AuthError.invalidResponse
+        }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

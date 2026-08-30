@@ -11,8 +11,7 @@ struct LocationPickerView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @StateObject private var locationService =
-        LocationService()
+    @EnvironmentObject private var locationService: LocationService
 
     @State private var region =
         MKCoordinateRegion(

@@ -1,0 +1,114 @@
+import SwiftUI
+
+struct BadgeGridView: View {
+
+    let earnedBadges: [Badge]
+    let allBadges: [Badge]
+    let streak: Int
+
+    private let columns = [
+        GridItem(.adaptive(minimum: 90), spacing: 12)
+    ]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+
+                // Streak card
+                if streak > 0 {
+                    HStack(spacing: 12) {
+                        Image(systemName: "flame.fill")
+                            .font(.title2)
+                            .foregroundColor(.orange)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(streak)-day streak")
+                                .font(.headline)
+                                .foregroundColor(.barTabText)
+                            Text("Keep it going!")
+                                .font(.caption)
+                                .foregroundColor(.barTabSecondary)
+                        }
+
+                        Spacer()
+                    }
+                    .padding(16)
+                    .barTabCard()
+                }
+
+                // Earned badges
+                if !earnedBadges.isEmpty {
+                    Text("Earned")
+                        .font(.headline)
+                        .foregroundColor(.barTabText)
+
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(earnedBadges) { badge in
+                            badgeCard(badge, earned: true)
+                        }
+                    }
+                }
+
+                // Unearned badges
+                let unearned = allBadges.filter { badge in
+                    !earnedBadges.contains { $0.id == badge.id }
+                }
+                if !unearned.isEmpty {
+                    Text("Locked")
+                        .font(.headline)
+                        .foregroundColor(.barTabText)
+
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(unearned) { badge in
+                            badgeCard(badge, earned: false)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 20)
+        }
+        .background(Color.barTabBackground.ignoresSafeArea())
+        .navigationTitle("Badges")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func badgeCard(_ badge: Badge, earned: Bool) -> some View {
+        VStack(spacing: 6) {
+            Image(systemName: badge.icon)
+                .font(.title2)
+                .foregroundColor(earned ? .barTabPrimary : .barTabSecondary)
+                .frame(width: 44, height: 44)
+                .background(
+                    earned
+                        ? Color.barTabPrimary.opacity(0.1)
+                        : Color.gray.opacity(0.1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+            Text(badge.name)
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(earned ? .barTabText : .barTabSecondary)
+                .lineLimit(1)
+
+            Text(badge.description)
+                .font(.caption2)
+                .foregroundColor(.barTabSecondary)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(earned ? Color.barTabCardFill : Color.barTabCardFill.opacity(0.5))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(earned ? Color.barTabPrimary.opacity(0.2) : Color.clear, lineWidth: 1)
+        )
+        .opacity(earned ? 1.0 : 0.6)
+    }
+}

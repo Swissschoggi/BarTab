@@ -409,12 +409,9 @@ struct SettingsView: View {
             Text("This will reset exchange rates to default values.")
         }
         .alert("Restart Required", isPresented: $showingRestartAlert) {
-            Button("Restart Now") {
-                exit(0)
-            }
-            Button("Later", role: .cancel) {}
+            Button("OK", role: .cancel) {}
         } message: {
-            Text("Please restart the app to apply the language change.")
+            Text("Please close and reopen the app to apply the language change.")
         }
         .alert("Edit Username", isPresented: $showingUsernameEditor) {
             TextField("Username", text: $newUsername)

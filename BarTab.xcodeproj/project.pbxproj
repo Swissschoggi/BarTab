@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		AE7839673034F16A00F1555E /* BarTabApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7839663034F16A00F1555E /* BarTabApp.swift */; };
-		AE7839693034F16A00F1555E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7839683034F16A00F1555E /* ContentView.swift */; };
 		AE78396B3034F16B00F1555E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AE78396A3034F16B00F1555E /* Assets.xcassets */; };
 		AE78396E3034F16B00F1555E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AE78396D3034F16B00F1555E /* Preview Assets.xcassets */; };
 		AE7839783034F16B00F1555E /* BarTabTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7839773034F16B00F1555E /* BarTabTests.swift */; };
@@ -97,6 +96,10 @@
 		BRTA0002A000000000000002 /* PriceAlertService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000001 /* PriceAlertService.swift */; };
 		BRTA0002A000000000000004 /* EditBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000003 /* EditBarView.swift */; };
 		BRTA0002A000000000000006 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000005 /* OnboardingView.swift */; };
+		BRTA0002A000000000000008 /* Badge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000007 /* Badge.swift */; };
+		BRTA0002A00000000000000A /* BadgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000009 /* BadgeService.swift */; };
+		BRTA0002A00000000000000C /* BadgeGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000B /* BadgeGridView.swift */; };
+		BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000D /* DrinkComparisonView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -119,7 +122,6 @@
 /* Begin PBXFileReference section */
 		AE7839633034F16A00F1555E /* BarTab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarTab.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE7839663034F16A00F1555E /* BarTabApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabApp.swift; sourceTree = "<group>"; };
-		AE7839683034F16A00F1555E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AE78396A3034F16B00F1555E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AE78396D3034F16B00F1555E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		AE7839733034F16B00F1555E /* BarTabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarTabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -212,6 +214,10 @@
 		BRTA0002A000000000000001 /* PriceAlertService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertService.swift; sourceTree = "<group>"; };
 		BRTA0002A000000000000003 /* EditBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBarView.swift; sourceTree = "<group>"; };
 		BRTA0002A000000000000005 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		BRTA0002A000000000000007 /* Badge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Badge.swift; sourceTree = "<group>"; };
+		BRTA0002A000000000000009 /* BadgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeService.swift; sourceTree = "<group>"; };
+		BRTA0002A00000000000000B /* BadgeGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeGridView.swift; sourceTree = "<group>"; };
+		BRTA0002A00000000000000D /* DrinkComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkComparisonView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -270,7 +276,6 @@
 				AEF036203034FC4E00BDA1CC /* Services */,
 				AEF036183034F91400BDA1CC /* Views */,
 				AE7839663034F16A00F1555E /* BarTabApp.swift */,
-				AE7839683034F16A00F1555E /* ContentView.swift */,
 				AE78396A3034F16B00F1555E /* Assets.xcassets */,
 				BRTA00013060000100000024 /* Resources */,
 				BRTA00013060000100000020 /* en.lproj */,
@@ -367,6 +372,8 @@
 				BRTA0001400000000000004D /* PriceAlertListView.swift */,
 				BRTA0002A000000000000003 /* EditBarView.swift */,
 				BRTA0002A000000000000005 /* OnboardingView.swift */,
+				BRTA0002A00000000000000B /* BadgeGridView.swift */,
+				BRTA0002A00000000000000D /* DrinkComparisonView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -390,6 +397,7 @@
 				BRTA00013060000100000031 /* AvatarService.swift */,
 				BRTA00013060000100000035 /* HapticEngine.swift */,
 				BRTA0002A000000000000001 /* PriceAlertService.swift */,
+				BRTA0002A000000000000009 /* BadgeService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -421,6 +429,7 @@
 				BRTA00014000000000000042 /* Poll.swift */,
 				BRTA00014000000000000043 /* PriceAlert.swift */,
 				BRTA00014000000000000044 /* ActivityItem.swift */,
+				BRTA0002A000000000000007 /* Badge.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -583,7 +592,6 @@
 				AEF036553035BB3F00BDA1CC /* DrinkBrands.swift in Sources */,
 				AEF0365B3035C7FA00BDA1CC /* PriceSummary.swift in Sources */,
 				BRTA0001306000010000002B /* ExchangeRateService.swift in Sources */,
-				AE7839693034F16A00F1555E /* ContentView.swift in Sources */,
 				AEF036513035B9EE00BDA1CC /* PlaceSearchService.swift in Sources */,
 				AEF0363730350F6800BDA1CC /* MockPrices.swift in Sources */,
 				AEF036643035E10000BDA1CC /* ContentReport.swift in Sources */,
@@ -656,6 +664,10 @@
 				BRTA0002A000000000000002 /* PriceAlertService.swift in Sources */,
 				BRTA0002A000000000000004 /* EditBarView.swift in Sources */,
 				BRTA0002A000000000000006 /* OnboardingView.swift in Sources */,
+				BRTA0002A000000000000008 /* Badge.swift in Sources */,
+				BRTA0002A00000000000000A /* BadgeService.swift in Sources */,
+				BRTA0002A00000000000000C /* BadgeGridView.swift in Sources */,
+				BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

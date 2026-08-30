@@ -8,6 +8,7 @@ struct BarTabApp: App {
     @StateObject private var userSession = UserSession()
     @StateObject private var languageManager = LanguageManager.shared
     @StateObject private var toastCenter = ToastCenter()
+    @StateObject private var locationService = LocationService.shared
 
     init() {
         LanguageManager.shared.applyOnLaunch()
@@ -23,6 +24,7 @@ struct BarTabApp: App {
                 .environmentObject(userSession)
                 .environmentObject(languageManager)
                 .environmentObject(toastCenter)
+                .environmentObject(locationService)
                 .environment(\.locale, languageManager.currentLocale)
                 .barTabToast(center: toastCenter)
                 .onOpenURL { url in

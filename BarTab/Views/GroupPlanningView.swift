@@ -9,7 +9,6 @@ struct GroupPlanningView: View {
     @State private var groups: [BarGroup] = []
     @State private var isLoading = true
     @State private var showingCreateGroup = false
-    @State private var selectedGroup: BarGroup?
 
     var body: some View {
         ScrollView {
@@ -78,6 +77,9 @@ struct GroupPlanningView: View {
                 .environmentObject(barRepository)
                 .environmentObject(userSession)
                 .environmentObject(toastCenter)
+        }
+        .refreshable {
+            await loadGroups()
         }
         .task {
             await loadGroups()

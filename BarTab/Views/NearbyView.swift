@@ -8,7 +8,7 @@ struct NearbyView: View {
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
 
-    @StateObject private var locationService = LocationService()
+    @EnvironmentObject private var locationService: LocationService
 
     private enum Origin {
         case myLocation
@@ -253,7 +253,7 @@ struct NearbyView: View {
             .refreshable {
                 await refreshBars()
             }
-            .navigationBarHidden(true)
+            .toolbar(.hidden, for: .navigationBar)
             .onAppear {
                 locationService.requestPermission()
             }
@@ -1064,6 +1064,9 @@ private struct LocationSearchSheet: View {
 
         search.start { response, error in
             guard error == nil, let item = response?.mapItems.first else {
+                DispatchQueue.main.async {
+                    toastCenter.show("Could not find location", kind: .error)
+                }
                 return
             }
 

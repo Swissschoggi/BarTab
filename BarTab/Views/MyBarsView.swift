@@ -6,7 +6,7 @@ struct MyBarsView: View {
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
 
-    @StateObject private var locationService = LocationService()
+    @EnvironmentObject private var locationService: LocationService
     @State private var editingBar: Bar?
 
     private var myBars: [Bar] {

@@ -6,7 +6,7 @@ struct BarHopView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var locationService = LocationService()
+    @EnvironmentObject private var locationService: LocationService
 
     @State private var selectedRoute: [Bar] = []
     @State private var isGenerating = false

@@ -2,6 +2,7 @@ import Foundation
 
 /// Fetches and caches exchange rates for currency conversion.
 /// Uses hardcoded fallback rates so the app works offline.
+@MainActor
 final class ExchangeRateService {
 
     static let shared = ExchangeRateService()

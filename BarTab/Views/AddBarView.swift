@@ -348,6 +348,9 @@ struct AddBarView: View {
                 error == nil,
                 let item = response?.mapItems.first
             else {
+                DispatchQueue.main.async {
+                    toastCenter.show("Could not find location", kind: .error)
+                }
                 return
             }
 

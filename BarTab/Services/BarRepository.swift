@@ -83,7 +83,6 @@ final class BarRepository: ObservableObject {
             recomputePriceLevels()
             self.lastFetchedAt = Date()
         } catch {
-            print("Failed to fetch initial data: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -91,9 +90,7 @@ final class BarRepository: ObservableObject {
     func refreshReports() async {
         do {
             self.reports = try await SupabaseClient.shared.fetchContentReports()
-        } catch {
-            print("Failed to fetch reports: \(error)")
-        }
+        } catch { }
     }
 
     func fetchPrices(for bar: Bar) async {
@@ -104,9 +101,7 @@ final class BarRepository: ObservableObject {
             self.prices.removeAll { $0.barID == bar.id }
             self.prices.append(contentsOf: fetchedPrices)
             recomputePriceLevels()
-        } catch {
-            print("Failed to fetch prices for bar \(bar.id): \(error)")
-        }
+        } catch { }
     }
 
     // MARK: - Bar Actions
@@ -134,9 +129,9 @@ final class BarRepository: ObservableObject {
         do {
             try await SupabaseClient.shared.addBar(bar)
             self.bars.append(bar)
+            checkBadgesAfterContribution()
             return bar
         } catch {
-            print("Failed to save bar to Supabase: \(error)")
             toastCenter?.showError(error)
             return nil
         }
@@ -156,7 +151,6 @@ final class BarRepository: ObservableObject {
             saveFavoritesToDisk()
             recomputePriceLevels()
         } catch {
-            print("Failed to delete bar from Supabase: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -188,7 +182,6 @@ final class BarRepository: ObservableObject {
                 bars[index] = updated
             }
         } catch {
-            print("Failed to update bar on Supabase: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -225,9 +218,9 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.addPrice(price)
             self.prices.append(price)
             recomputePriceLevels()
+            checkBadgesAfterContribution()
             return true
         } catch {
-            print("Failed to add price to Supabase: \(error)")
             toastCenter?.showError(error)
             return false
         }
@@ -244,7 +237,6 @@ final class BarRepository: ObservableObject {
             self.prices.removeAll { $0.id == price.id }
             recomputePriceLevels()
         } catch {
-            print("Failed to delete price from Supabase: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -280,7 +272,6 @@ final class BarRepository: ObservableObject {
             }
             recomputePriceLevels()
         } catch {
-            print("Failed to delete price group from Supabase: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -313,7 +304,6 @@ final class BarRepository: ObservableObject {
             self.prices[index] = updatedPrice
             recomputePriceLevels()
         } catch {
-            print("Failed to update price on Supabase: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -462,8 +452,8 @@ final class BarRepository: ObservableObject {
             } else {
                 barRatings.append(rating)
             }
+            checkBadgesAfterContribution()
         } catch {
-            print("Failed to submit bar rating: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -537,8 +527,8 @@ final class BarRepository: ObservableObject {
             } else {
                 drinkRatings.append(rating)
             }
+            checkBadgesAfterContribution()
         } catch {
-            print("Failed to submit drink rating: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -602,7 +592,6 @@ final class BarRepository: ObservableObject {
         do {
             try await SupabaseClient.shared.submitBrandRequest(request)
         } catch {
-            print("Failed to submit brand request: \(error)")
             toastCenter?.showError(error)
             brandRequests.removeAll { $0.id == request.id }
         }
@@ -634,7 +623,6 @@ final class BarRepository: ObservableObject {
             )
             brands.append(newBrand)
         } catch {
-            print("Failed to approve brand request: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -653,7 +641,6 @@ final class BarRepository: ObservableObject {
             )
             brandRequests[index].status = .rejected
         } catch {
-            print("Failed to reject brand request: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -663,7 +650,6 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.deleteBrandRequest(request)
             brandRequests.removeAll { $0.id == request.id }
         } catch {
-            print("Failed to delete brand request from Supabase: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -673,7 +659,6 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.deleteContentReport(report.id)
             reports.removeAll { $0.id == report.id }
         } catch {
-            print("Failed to delete report from Supabase: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -711,6 +696,41 @@ final class BarRepository: ObservableObject {
         prices.filter { $0.barID == bar.id }
     }
 
+    /// Compare prices for the same drink product across all bars.
+    /// Returns bars sorted by price (cheapest first).
+    func compareDrink(
+        drink: Drink,
+        brand: String?,
+        size: DrinkSize,
+        style: String?,
+        serving: ServingMethod?
+    ) -> [(bar: Bar, summary: PriceSummary)] {
+
+        let filtered = prices.filter {
+            $0.drink == drink &&
+            $0.size == size &&
+            $0.brand == brand &&
+            $0.style == style &&
+            $0.serving == serving
+        }
+
+        let grouped = Dictionary(grouping: filtered, by: \.barID)
+        var results: [(bar: Bar, summary: PriceSummary)] = []
+
+        for (barID, groupPrices) in grouped {
+            guard let bar = getBar(id: barID),
+                  let summary = makePriceSummary(reports: groupPrices, barID: barID) else {
+                continue
+            }
+            results.append((bar: bar, summary: summary))
+        }
+
+        return results.sorted {
+            NSDecimalNumber(decimal: $0.summary.convertedAmount).doubleValue <
+            NSDecimalNumber(decimal: $1.summary.convertedAmount).doubleValue
+        }
+    }
+
     var favoriteBars: [Bar] {
         bars.filter { favoriteBarIDs.contains($0.id) }
     }
@@ -742,13 +762,10 @@ final class BarRepository: ObservableObject {
             outdoorSeating: bars[index].outdoorSeating
         )
 
-        print("[BarRepository] PATCH smoking: bar=\(bar.id) \(bar.name) → \(updated.smokingFriendly)")
         do {
             try await SupabaseClient.shared.updateBar(updated)
             bars[index] = updated
-            print("[BarRepository] PATCH smoking SUCCESS")
         } catch {
-            print("[BarRepository] PATCH smoking FAILED: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -767,13 +784,10 @@ final class BarRepository: ObservableObject {
             outdoorSeating: !currentValue
         )
 
-        print("[BarRepository] PATCH outdoor: bar=\(bar.id) \(bar.name) → \(updated.outdoorSeating)")
         do {
             try await SupabaseClient.shared.updateBar(updated)
             bars[index] = updated
-            print("[BarRepository] PATCH outdoor SUCCESS")
         } catch {
-            print("[BarRepository] PATCH outdoor FAILED: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -836,7 +850,6 @@ final class BarRepository: ObservableObject {
             reports[index].isReviewed = true
             reports[index].reviewedAt = now
         } catch {
-            print("Failed to mark report reviewed on Supabase: \(error)")
             toastCenter?.showError(error)
         }
     }
@@ -896,7 +909,6 @@ final class BarRepository: ObservableObject {
                 // Re-fetch to get server-assigned fields (id, timestamp)
                 await self?.refreshReports()
             } catch {
-                print("Failed to save report to Supabase: \(error)")
                 self?.toastCenter?.showError(error)
                 self?.reports.removeAll { $0.id == report.id }
             }
@@ -986,5 +998,33 @@ final class BarRepository: ObservableObject {
 
         let score = reportScore * 0.45 + recencyScore * 0.30 + agreementScore * 0.25
         return Int((score * 100).rounded())
+    }
+
+    // MARK: - Badges
+
+    private func checkBadgesAfterContribution() {
+        guard let user = currentUser else { return }
+
+        BadgeService.shared.updateStreak()
+
+        let myPriceCount = prices.filter { $0.reportedBy == user.id }.count
+        let myBarCount = bars.filter { $0.createdBy == user.id }.count
+        let myDrinkRatingCount = drinkRatings.filter { $0.ratedBy == user.id }.count
+        let myBarRatingCount = barRatings.filter { $0.ratedBy == user.id }.count
+
+        // Follow count is expensive to fetch; use 0 for now (will be checked on profile view)
+        let followCount = 0
+
+        let newBadges = BadgeService.shared.checkBadges(
+            priceCount: myPriceCount,
+            barCount: myBarCount,
+            followCount: followCount,
+            drinkRatingCount: myDrinkRatingCount,
+            barRatingCount: myBarRatingCount
+        )
+
+        for badge in newBadges {
+            toastCenter?.show("Badge earned: \(badge.name)", kind: .success)
+        }
     }
 }

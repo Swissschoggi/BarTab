@@ -4,6 +4,8 @@ import Combine
 
 final class LocationService: NSObject, ObservableObject {
 
+    static let shared = LocationService()
+
     private let locationManager = CLLocationManager()
 
     @Published private(set) var location: CLLocation?

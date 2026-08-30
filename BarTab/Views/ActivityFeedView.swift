@@ -9,6 +9,7 @@ struct ActivityFeedView: View {
     @State private var items: [ActivityItem] = []
     @State private var isLoading = true
     @State private var userCache: [UUID: String] = [:]
+    @State private var selectedBar: Bar?
 
     var body: some View {
         ScrollView {
@@ -58,70 +59,112 @@ struct ActivityFeedView: View {
         .task {
             await loadFeed()
         }
+        .sheet(item: $selectedBar) { bar in
+            NavigationView {
+                BarView(bar: bar, allowsDismissal: true)
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+                    .environmentObject(toastCenter)
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
     }
 
     private func activityRow(_ item: ActivityItem) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Circle()
-                .fill(Color.barTabPrimary.opacity(0.12))
-                .frame(width: 36, height: 36)
-                .overlay(
-                    Image(systemName: item.icon)
-                        .font(.caption)
-                        .foregroundColor(.barTabPrimary)
-                )
+        Button {
+            if let barID = item.barID, let bar = barRepository.getBar(id: barID) {
+                selectedBar = bar
+            }
+        } label: {
+            HStack(alignment: .top, spacing: 12) {
+                Circle()
+                    .fill(Color.barTabPrimary.opacity(0.12))
+                    .frame(width: 36, height: 36)
+                    .overlay(
+                        Image(systemName: item.icon)
+                            .font(.caption)
+                            .foregroundColor(.barTabPrimary)
+                    )
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 4) {
-                    Text(username(for: item.userID))
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-
-                    Text(item.actionText)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-
-                switch item.kind {
-                case .priceReport(let barName, let drink, let amount, let currency):
+                VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 4) {
-                        Text(barName)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                        Text("·")
-                            .font(.caption)
+                        Text(username(for: item.userID))
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+
+                        Text(item.actionText)
+                            .font(.subheadline)
                             .foregroundColor(.secondary)
-                        Text("\(Currency(rawValue: currency)?.symbol ?? currency)\(amount.formattedAmount)")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundColor(.barTabAccent)
                     }
 
-                case .barRating(let barName, let ambience):
-                    HStack(spacing: 4) {
-                        Text(barName)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                        if let ambience {
+                    switch item.kind {
+                    case .priceReport(let barName, let drink, let amount, let currency):
+                        HStack(spacing: 4) {
+                            Text(barName)
+                                .font(.caption)
+                                .fontWeight(.medium)
                             Text("·")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            Text(ambience)
+                            Text("\(Currency(rawValue: currency)?.symbol ?? currency)\(amount.formattedAmount)")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(.barTabAccent)
+                        }
+
+                    case .barRating(let barName, let ambience):
+                        HStack(spacing: 4) {
+                            Text(barName)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                            if let ambience {
+                                Text("·")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Text(ambience)
+                                    .font(.caption)
+                                    .foregroundColor(.barTabSecondary)
+                            }
+                        }
+
+                    case .drinkRating(let barName, let drink, let quality):
+                        HStack(spacing: 4) {
+                            Text(barName)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                            Text("·")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text("\(drink) · \(quality)/5")
                                 .font(.caption)
                                 .foregroundColor(.barTabSecondary)
                         }
+
+                    case .barCreated(let barName):
+                        Text(barName)
+                            .font(.caption)
+                            .fontWeight(.medium)
                     }
+
+                    Text(item.timestamp.relativeDescription)
+                        .font(.caption2)
+                        .foregroundColor(.barTabSecondary)
                 }
 
-                Text(item.timestamp.relativeDescription)
-                    .font(.caption2)
-                    .foregroundColor(.barTabSecondary)
-            }
+                Spacer()
 
-            Spacer()
+                if item.barID != nil {
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
+                        .foregroundColor(.barTabSecondary)
+                        .padding(.top, 4)
+                }
+            }
+            .padding(12)
+            .barTabCard()
         }
-        .padding(12)
-        .barTabCard()
+        .buttonStyle(.plain)
     }
 
     private func loadFeed() async {
@@ -130,14 +173,9 @@ struct ActivityFeedView: View {
             let following = try await SupabaseClient.shared.fetchFollowing()
             items = try await SupabaseClient.shared.fetchActivityFeed(followingIDs: following)
 
-            // Pre-fetch usernames
-            for item in items {
-                if userCache[item.userID] == nil {
-                     if let profile = try? await SupabaseClient.shared.fetchProfile(userID: item.userID) {
-                        userCache[item.userID] = profile.display_name ?? "User"
-                    }
-                }
-            }
+            // Batch-fetch all unique usernames
+            let userIDs = Set(items.map(\.userID))
+            userCache = try await SupabaseClient.shared.fetchProfilesByIDs(Array(userIDs))
         } catch {
             toastCenter.showError(error)
         }
