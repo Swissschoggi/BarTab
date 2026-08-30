@@ -182,10 +182,10 @@ struct GroupDetailView: View {
                 .refreshable {
                     await loadData()
                 }
-                .task {
-                    await loadData()
-                }
             }
+        }
+        .task {
+            await loadData()
         }
     }
 
