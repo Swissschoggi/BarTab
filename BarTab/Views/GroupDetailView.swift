@@ -204,7 +204,7 @@ struct GroupDetailView: View {
             polls = try await p
 
             let userIDs = members.map(\.userID)
-            userCache = try await SupabaseClient.shared.fetchProfilesByIDs(userIDs)
+            userCache = try await SupabaseClient.shared.fetchProfileNamesByIDs(userIDs)
         } catch {
             toastCenter.showError(error)
         }

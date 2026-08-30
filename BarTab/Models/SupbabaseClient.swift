@@ -1224,7 +1224,7 @@ final class SupabaseClient {
         _ = try await performAuthorized(request)
     }
 
-    func fetchProfilesByIDs(_ ids: [UUID]) async throws -> [UUID: String] {
+    func fetchProfileNamesByIDs(_ ids: [UUID]) async throws -> [UUID: String] {
         guard !ids.isEmpty else { return [:] }
         let idList = ids.map(\.uuidString).joined(separator: ",")
         let request = try makeRequest(
