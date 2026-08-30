@@ -994,6 +994,7 @@ private struct LocationSearchSheet: View {
     let onSelect: (String, CLLocationCoordinate2D) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var toastCenter: ToastCenter
     @StateObject private var searchService = PlaceSearchService()
 
     var body: some View {
