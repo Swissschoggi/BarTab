@@ -306,51 +306,7 @@ struct PollCard: View {
             }
 
             ForEach(options) { option in
-
-                Button {
-                    guard isOpen else { return }
-                    Task { await vote(option) }
-                } label: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 10) {
-                            Image(systemName: myVote == option.id ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(myVote == option.id ? .barTabPrimary : .barTabSecondary)
-
-                            Text(option.label)
-                                .font(.subheadline)
-                                .foregroundColor(.barTabText)
-
-                            Spacer()
-
-                            Text("\(votes.filter { $0.optionID == option.id }.count)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.barTabAccent)
-                        }
-
-                        if let barID = option.barID,
-                           let bar = barRepository.getBar(id: barID) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "mappin.circle.fill")
-                                    .font(.caption2)
-                                Text(bar.name)
-                                    .font(.caption2)
-                                    .foregroundColor(.barTabSecondary)
-                            }
-                            .padding(.leading, 26)
-                        }
-                    }
-                    .padding(10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(myVote == option.id ? Color.barTabPrimary.opacity(0.08) : Color.clear)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .stroke(myVote == option.id ? Color.barTabPrimary.opacity(0.3) : Color.barTabCardBorder, lineWidth: 1)
-                            )
-                    )
-                }
-                .buttonStyle(.plain)
+                optionRow(option)
             }
 
             if isOpen && isPollCreator {
@@ -400,5 +356,56 @@ struct PollCard: View {
         } catch {
             toastCenter.showError(error)
         }
+    }
+
+    @ViewBuilder
+    private func optionRow(_ option: PollOption) -> some View {
+        let selected = myVote == option.id
+        let voteCount = votes.filter { $0.optionID == option.id }.count
+
+        Button {
+            guard isOpen else { return }
+            Task { await vote(option) }
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 10) {
+                    Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(selected ? .barTabPrimary : .barTabSecondary)
+
+                    Text(option.label)
+                        .font(.subheadline)
+                        .foregroundColor(.barTabText)
+
+                    Spacer()
+
+                    Text("\(voteCount)")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(.barTabAccent)
+                }
+
+                if let barID = option.barID,
+                   let bar = barRepository.getBar(id: barID) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "mappin.circle.fill")
+                            .font(.caption2)
+                        Text(bar.name)
+                            .font(.caption2)
+                            .foregroundColor(.barTabSecondary)
+                    }
+                    .padding(.leading, 26)
+                }
+            }
+            .padding(10)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(selected ? Color.barTabPrimary.opacity(0.08) : Color.clear)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(selected ? Color.barTabPrimary.opacity(0.3) : Color.barTabCardBorder, lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
