@@ -223,11 +223,9 @@ struct BarView: View {
                         groupedPrices.contains { $0.drink == drink }
                     }) { drink in
 
-                        let drinkGroups = groupedPrices.filter { $0.drink == drink }
-
                         DisclosureGroup {
                             VStack(alignment: .leading, spacing: 4) {
-                                ForEach(drinkGroups) { group in
+                                ForEach(groupedPrices.filter { $0.drink == drink }) { group in
                                     priceGroupRow(group)
                                 }
                             }
@@ -245,7 +243,7 @@ struct BarView: View {
 
                                 Spacer()
 
-                                Text("\(drinkGroups.count)")
+                                Text("\(groupedPrices.filter { $0.drink == drink }.count)")
                                     .font(.caption2)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
@@ -586,12 +584,11 @@ struct BarView: View {
                     .environmentObject(toastCenter)
             }
             .sheet(isPresented: $showingRateBar) {
-                let mine = userSession.currentUser.flatMap {
-                    barRepository.myRating(for: currentBar, by: $0)
-                }
                 RateBarSheet(
                     bar: currentBar,
-                    initialAmbience: mine?.ambience ?? []
+                    initialAmbience: userSession.currentUser.flatMap {
+                        barRepository.myRating(for: currentBar, by: $0)
+                    }?.ambience ?? []
                 )
                 .environmentObject(barRepository)
                 .environmentObject(userSession)

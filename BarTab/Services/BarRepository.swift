@@ -129,7 +129,7 @@ final class BarRepository: ObservableObject {
         do {
             try await SupabaseClient.shared.addBar(bar)
             self.bars.append(bar)
-            checkBadgesAfterContribution()
+            checkBadgesAfterContribution(for: user)
             return bar
         } catch {
             toastCenter?.showError(error)
@@ -218,7 +218,7 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.addPrice(price)
             self.prices.append(price)
             recomputePriceLevels()
-            checkBadgesAfterContribution()
+            checkBadgesAfterContribution(for: user)
             return true
         } catch {
             toastCenter?.showError(error)
@@ -452,7 +452,7 @@ final class BarRepository: ObservableObject {
             } else {
                 barRatings.append(rating)
             }
-            checkBadgesAfterContribution()
+            checkBadgesAfterContribution(for: user)
         } catch {
             toastCenter?.showError(error)
         }
@@ -527,7 +527,7 @@ final class BarRepository: ObservableObject {
             } else {
                 drinkRatings.append(rating)
             }
-            checkBadgesAfterContribution()
+            checkBadgesAfterContribution(for: user)
         } catch {
             toastCenter?.showError(error)
         }
@@ -1002,9 +1002,7 @@ final class BarRepository: ObservableObject {
 
     // MARK: - Badges
 
-    private func checkBadgesAfterContribution() {
-        guard let user = currentUser else { return }
-
+    private func checkBadgesAfterContribution(for user: User) {
         BadgeService.shared.updateStreak()
 
         let myPriceCount = prices.filter { $0.reportedBy == user.id }.count

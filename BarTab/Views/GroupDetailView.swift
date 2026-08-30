@@ -306,8 +306,6 @@ struct PollCard: View {
             }
 
             ForEach(options) { option in
-                let voteCount = votes.filter { $0.optionID == option.id }.count
-                let isSelected = myVote == option.id
 
                 Button {
                     guard isOpen else { return }
@@ -315,8 +313,8 @@ struct PollCard: View {
                 } label: {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 10) {
-                            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(isSelected ? .barTabPrimary : .barTabSecondary)
+                            Image(systemName: myVote == option.id ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(myVote == option.id ? .barTabPrimary : .barTabSecondary)
 
                             Text(option.label)
                                 .font(.subheadline)
@@ -324,7 +322,7 @@ struct PollCard: View {
 
                             Spacer()
 
-                            Text("\(voteCount)")
+                            Text("\(votes.filter { $0.optionID == option.id }.count)")
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .foregroundColor(.barTabAccent)
