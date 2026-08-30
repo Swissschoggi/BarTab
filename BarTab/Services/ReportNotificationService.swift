@@ -3,6 +3,14 @@ import UserNotifications
 
 enum ReportNotificationService {
 
+    private static let delegate = NotificationDelegate()
+
+    /// Must be called once at app launch so notifications are shown even
+    /// while the app is in the foreground.
+    static func configure() {
+        UNUserNotificationCenter.current().delegate = delegate
+    }
+
     static func requestPermission() {
         UNUserNotificationCenter.current()
             .requestAuthorization(
@@ -27,5 +35,18 @@ enum ReportNotificationService {
 
         UNUserNotificationCenter.current()
             .add(request)
+    }
+
+    private final class NotificationDelegate: NSObject,
+        UNUserNotificationCenterDelegate {
+
+        func userNotificationCenter(
+            _ center: UNUserNotificationCenter,
+            willPresent notification: UNNotification,
+            withCompletionHandler completionHandler:
+                @escaping (UNNotificationPresentationOptions) -> Void
+        ) {
+            completionHandler([.banner, .sound])
+        }
     }
 }

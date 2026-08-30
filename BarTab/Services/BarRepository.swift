@@ -279,6 +279,9 @@ final class BarRepository: ObservableObject {
         brand: String?,
         size: DrinkSize,
         amount: Decimal,
+        currency: String? = nil,
+        style: String? = nil,
+        serving: ServingMethod? = nil,
         reportedBy user: User
     ) async {
         guard price.reportedBy == user.id else { return }
@@ -291,9 +294,11 @@ final class BarRepository: ObservableObject {
             brand: brand,
             size: size,
             amount: amount,
-            currency: price.currency,
+            currency: currency ?? price.currency,
             reportedAt: price.reportedAt,
-            reportedBy: price.reportedBy
+            reportedBy: price.reportedBy,
+            style: style,
+            serving: serving
         )
 
         do {
@@ -328,37 +333,37 @@ final class BarRepository: ObservableObject {
 
     private func recomputePriceLevels() {
 
-        var totalsPerBar: [UUID: Double] = [:]
-        var countsPerBar: [UUID: Int] = [:]
-
-        var grandTotal = 0.0
-        var grandCount = 0
+        var averagesPerBar: [UUID: Double] = [:]
 
         for bar in bars {
             let summaries = getPriceSummaries(for: bar)
             guard !summaries.isEmpty else { continue }
 
-            let total = summaries.reduce(0.0) { partial, summary in
-                partial + NSDecimalNumber(decimal: summary.convertedAmount).doubleValue
-            }
+            // Prefer size-normalized prices (price per 10 cl) so a bottle
+            // isn't rated as pricier than a glass. Fall back to raw
+            // amounts for sizes without an estimable volume.
+            let normalized = summaries.compactMap(\.normalizedAmountPer10cl)
+            let values: [Double] = normalized.isEmpty
+                ? summaries.map { NSDecimalNumber(decimal: $0.convertedAmount).doubleValue }
+                : normalized
 
-            totalsPerBar[bar.id] = total
-            countsPerBar[bar.id] = summaries.count
-            grandTotal += total
-            grandCount += summaries.count
+            guard !values.isEmpty else { continue }
+
+            averagesPerBar[bar.id] = values.reduce(0, +) / Double(values.count)
         }
 
-        guard grandCount > 0 else {
+        guard !averagesPerBar.isEmpty else {
             priceLevelByBarID = [:]
             return
         }
 
-        let globalAverage = grandTotal / Double(grandCount)
+        let globalAverage =
+            averagesPerBar.values.reduce(0, +)
+            / Double(averagesPerBar.count)
 
         var levels: [UUID: Int] = [:]
-        for (barID, total) in totalsPerBar {
-            let count = countsPerBar[barID] ?? 1
-            let ratio = (total / Double(count)) / globalAverage
+        for (barID, average) in averagesPerBar {
+            let ratio = average / globalAverage
 
             switch ratio {
             case ..<0.8:

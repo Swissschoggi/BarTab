@@ -12,6 +12,7 @@ struct BarTabApp: App {
 
     init() {
         LanguageManager.shared.applyOnLaunch()
+        ReportNotificationService.configure()
         Task {
             await ExchangeRateService.shared.fetchRates()
         }

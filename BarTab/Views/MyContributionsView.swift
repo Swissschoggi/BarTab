@@ -4,6 +4,8 @@ struct MyContributionsView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
+    @State private var editingPrice: Price?
 
     private var myPrices: [Price] {
         guard let user = userSession.currentUser else {
@@ -68,6 +70,16 @@ struct MyContributionsView: View {
                                             systemImage: "trash"
                                         )
                                     }
+
+                                    Button {
+                                        editingPrice = price
+                                    } label: {
+                                        Label(
+                                            "Edit",
+                                            systemImage: "pencil"
+                                        )
+                                    }
+                                    .tint(.barTabPrimary)
                                 }
                             }
                         }
@@ -84,6 +96,17 @@ struct MyContributionsView: View {
         )
         .navigationTitle("My Contributions")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $editingPrice) { price in
+            if let bar = barRepository.getBar(id: price.barID) {
+                AddPriceView(
+                    bar: bar,
+                    editingPrice: price
+                )
+                .environmentObject(barRepository)
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
+            }
+        }
     }
 
     private var emptyState: some View {
@@ -271,6 +294,9 @@ struct MyContributionsView_Previews: PreviewProvider {
                 )
                 .environmentObject(
                     UserSession()
+                )
+                .environmentObject(
+                    ToastCenter()
                 )
         }
     }

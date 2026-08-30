@@ -383,6 +383,18 @@ struct ProfileView: View {
                 .padding(.leading, 44)
 
             navigationRow(
+                title: "Following",
+                subtitle: "Manage who you follow",
+                icon: "person.2.fill"
+            ) {
+                FollowingListView()
+            }
+
+            Divider()
+                .foregroundColor(.barTabCardBorder)
+                .padding(.leading, 44)
+
+            navigationRow(
                 title: "Activity",
                 subtitle: "See what friends are drinking",
                 icon: "list.bullet.rectangle"

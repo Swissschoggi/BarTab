@@ -26,6 +26,16 @@ struct CreatePollSheet: View {
         }
     }
 
+    private var filledOptionCount: Int {
+        optionTexts.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count
+    }
+
+    private var canCreate: Bool {
+        !pollTitle.trimmingCharacters(in: .whitespaces).isEmpty
+        && filledOptionCount >= 2
+        && !isSaving
+    }
+
     var body: some View {
         NavigationView {
             Form {
@@ -83,7 +93,12 @@ struct CreatePollSheet: View {
                 } header: {
                     Text("Options")
                 } footer: {
-                    Text("Add bars, drinks, or whatever you're deciding on. Link bars to show their location in the poll.")
+                    if filledOptionCount < 2 {
+                        Text("Add at least 2 options to create a poll.")
+                            .foregroundColor(.red)
+                    } else {
+                        Text("Add bars, drinks, or whatever you're deciding on. Link bars to show their location in the poll.")
+                    }
                 }
             }
             .navigationTitle("New Poll")
@@ -98,7 +113,7 @@ struct CreatePollSheet: View {
                     Button("Create") {
                         Task { await createPoll() }
                     }
-                    .disabled(pollTitle.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
+                    .disabled(!canCreate)
                 }
             }
             .sheet(isPresented: $showingBarPicker) {
@@ -147,7 +162,10 @@ struct CreatePollSheet: View {
             .filter { !$0.isEmpty }
         let options: [(barID: UUID?, label: String)] = zip(texts, Array(optionBarIDs.prefix(texts.count))).map { (barID: $1, label: $0) }
 
-        guard !title.isEmpty, options.count >= 2 else { return }
+        guard !title.isEmpty, options.count >= 2 else {
+            toastCenter.show("Add at least 2 options to create a poll.", kind: .error)
+            return
+        }
 
         isSaving = true
         do {

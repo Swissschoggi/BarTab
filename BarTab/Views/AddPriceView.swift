@@ -3,6 +3,7 @@ import SwiftUI
 struct AddPriceView: View {
 
     let bar: Bar
+    let editingPrice: Price?
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
@@ -21,6 +22,26 @@ struct AddPriceView: View {
     @State private var duplicatePrice: Price?
     @State private var showingRequestBrand = false
     @State private var priceError: String?
+
+    init(
+        bar: Bar,
+        editingPrice: Price? = nil
+    ) {
+        self.bar = bar
+        self.editingPrice = editingPrice
+
+        if let price = editingPrice {
+            _selectedDrink = State(initialValue: price.drink)
+            _selectedSize = State(initialValue: price.size)
+            _selectedBrand = State(initialValue: price.brand)
+            _selectedStyle = State(initialValue: price.style.flatMap { DrinkStyle(rawValue: $0) })
+            _selectedServing = State(initialValue: price.serving)
+            _selectedCurrency = State(initialValue: Currency(rawValue: price.currency) ?? .defaultCurrency)
+            _priceText = State(initialValue: price.formattedAmount)
+        }
+    }
+
+    private var isEditing: Bool { editingPrice != nil }
 
     private var availableBrands: [String] {
         barRepository.brands(for: selectedDrink).map(\.name)
@@ -293,7 +314,7 @@ struct AddPriceView: View {
 
                     } label: {
 
-                        Text("Add Drink")
+                        Text(isEditing ? "Save Changes" : "Add Drink")
                             .frame(maxWidth: .infinity)
                             .foregroundColor(.white)
                     }
@@ -303,7 +324,7 @@ struct AddPriceView: View {
                     .disabled(isSaving)
                 }
             }
-            .navigationTitle("Add Drink")
+            .navigationTitle(isEditing ? "Edit Drink" : "Add Drink")
             .navigationBarTitleDisplayMode(.inline)
             .scrollContentBackground(.hidden)
             .background(
@@ -394,6 +415,16 @@ struct AddPriceView: View {
             return
         }
 
+        if let editingPrice {
+            isSaving = true
+            actuallyUpdatePrice(
+                editingPrice,
+                amount: amount,
+                user: user
+            )
+            return
+        }
+
         let existingPrices = barRepository.getPrices(for: bar)
 
         if let existing = existingPrices.first(where: { price in
@@ -418,6 +449,7 @@ struct AddPriceView: View {
             user: user
         )
     }
+
     private func actuallySavePrice(
         amount: Decimal,
         user: User
@@ -448,6 +480,32 @@ struct AddPriceView: View {
                     kind: .error
                 )
             }
+        }
+    }
+
+    private func actuallyUpdatePrice(
+        _ price: Price,
+        amount: Decimal,
+        user: User
+    ) {
+
+        Task {
+
+            await barRepository.updatePrice(
+                price,
+                drink: selectedDrink,
+                brand: selectedBrand,
+                size: selectedSize,
+                amount: amount,
+                currency: selectedCurrency.rawValue,
+                style: selectedStyle?.rawValue,
+                serving: selectedServing,
+                reportedBy: user
+            )
+
+            HapticEngine.success()
+            toastCenter.show("Price updated", kind: .success)
+            dismiss()
         }
     }
 

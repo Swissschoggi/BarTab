@@ -225,6 +225,18 @@ struct BarView: View {
 
                         DisclosureGroup {
                             VStack(alignment: .leading, spacing: 4) {
+                                let drinkPrices = groupedPrices
+                                    .filter { $0.drink == drink }
+                                    .flatMap(\.prices)
+
+                                if drinkPrices.count > 1 {
+                                    PriceTrendChart(
+                                        prices: drinkPrices,
+                                        normalizeBySize: true
+                                    )
+                                    .padding(.bottom, 8)
+                                }
+
                                 ForEach(groupedPrices.filter { $0.drink == drink }) { group in
                                     priceGroupRow(group)
                                 }
@@ -351,7 +363,7 @@ struct BarView: View {
                             .fontWeight(.medium)
                             .foregroundColor(.barTabText)
 
-                        Text("Average drink price at this bar")
+                        Text("Average drink price, size-normalized")
                             .font(.caption2)
                             .foregroundColor(.barTabSecondary)
                     }
@@ -979,7 +991,14 @@ struct BarView: View {
         return NSDecimalNumber(decimal: total / count).doubleValue
     }
 
-    private func priceLevelTitle(_ level: String) -> String { "Price Level" }
+    private func priceLevelTitle(_ level: String) -> String {
+        switch level.count {
+        case 1: return String(localized: "Budget-friendly")
+        case 2: return String(localized: "Moderate")
+        case 3: return String(localized: "Pricey")
+        default: return String(localized: "Premium")
+        }
+    }
     private func openDirections() {
         let coordinate = currentBar.coordinate
         let placemark = MKPlacemark(coordinate: coordinate)

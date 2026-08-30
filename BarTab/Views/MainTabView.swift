@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
 
-    enum Tab {
+    enum Tab: CaseIterable {
         case map
         case nearby
         case groups
@@ -15,6 +15,11 @@ struct MainTabView: View {
 
     @State private var selectedTab: Tab = .map
     @State private var showingOnboarding = false
+
+    // Swipeable tab bar state
+    @State private var tabBarWidth: CGFloat = 0
+    @State private var tabDragBaseline: CGFloat = 0
+    @State private var isTabDragging = false
 
     private var adminBadgeCount: Int {
         guard userSession.currentUser?.isAdmin == true else { return 0 }
@@ -100,6 +105,16 @@ struct MainTabView: View {
             )
             .padding(.horizontal, 24)
             .padding(.bottom, 20)
+            .background(
+                GeometryReader { proxy in
+                    Color.clear
+                        .onAppear { tabBarWidth = proxy.size.width }
+                        .onChange(of: proxy.size.width) { width in
+                            tabBarWidth = width
+                        }
+                }
+            )
+            .simultaneousGesture(tabBarSwipeGesture)
         }
         .background(
             Color.barTabBackground
@@ -115,6 +130,37 @@ struct MainTabView: View {
         }
     }
 
+
+    private var tabBarSwipeGesture: some Gesture {
+        DragGesture(minimumDistance: 12, coordinateSpace: .global)
+            .onChanged { value in
+                guard tabBarWidth > 0 else { return }
+
+                if !isTabDragging {
+                    isTabDragging = true
+                    tabDragBaseline = value.location.x
+                }
+
+                let delta = value.location.x - tabDragBaseline
+                let step = tabBarWidth / CGFloat(Tab.allCases.count)
+                let steps = Int((delta / step).rounded())
+                guard steps != 0 else { return }
+
+                let tabs = Tab.allCases
+                guard let current = tabs.firstIndex(of: selectedTab) else { return }
+                let target = min(max(current + steps, 0), tabs.count - 1)
+
+                if tabs[target] != selectedTab {
+                    HapticEngine.selection()
+                    selectedTab = tabs[target]
+                }
+
+                tabDragBaseline = value.location.x
+            }
+            .onEnded { _ in
+                isTabDragging = false
+            }
+    }
 
     private func tabButton(
         title: LocalizedStringKey,

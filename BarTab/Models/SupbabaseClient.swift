@@ -758,7 +758,7 @@ final class SupabaseClient {
         }
 
         var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
+        request.httpMethod = "POST"
         request.setValue(apiKey, forHTTPHeaderField: "apikey")
 
         if let token = AuthTokenStore.shared.accessToken {
@@ -1050,8 +1050,7 @@ final class SupabaseClient {
             throw SupabaseError(statusCode: 200, message: "Failed to create group")
         }
 
-        // Auto-add creator as admin — non-fatal if RLS blocks it;
-        // fetchGroups() has a fallback for group creators.
+        // Add creator as admin member
         let memberBody: [String: Any] = [
             "group_id": group.id.uuidString,
             "user_id": userID.uuidString,
@@ -1059,7 +1058,7 @@ final class SupabaseClient {
         ]
         var memberReq = try makeRequest(endpoint: "group_members", method: "POST")
         memberReq.httpBody = try JSONSerialization.data(withJSONObject: memberBody)
-        _ = try? await performAuthorized(memberReq)
+        _ = try await performAuthorized(memberReq)
 
         return group
     }
@@ -1262,14 +1261,18 @@ final class SupabaseClient {
         brand: String?,
         targetPrice: Double?
     ) async throws -> PriceAlert {
-        let body: [String: Any] = [
+        var body: [String: Any] = [
             "user_id": try requireUserID().uuidString,
             "bar_id": barID.uuidString,
             "drink": drink,
-            "size": size,
-            "brand": brand as Any,
-            "target_price": targetPrice as Any
+            "size": size
         ]
+        if let brand {
+            body["brand"] = brand
+        }
+        if let targetPrice {
+            body["target_price"] = targetPrice
+        }
         var request = try makeRequest(endpoint: "price_alerts", method: "POST")
         request.setValue("return=representation", forHTTPHeaderField: "Prefer")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)

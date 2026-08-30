@@ -88,6 +88,7 @@ struct SetAlertSheet: View {
     }
 
     private func createAlert() async {
+        ReportNotificationService.requestPermission()
         isSaving = true
         let price = Double(targetPrice.replacingOccurrences(of: ",", with: "."))
         do {

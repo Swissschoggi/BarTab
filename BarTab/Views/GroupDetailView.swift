@@ -14,6 +14,7 @@ struct GroupDetailView: View {
     @State private var showingNewPoll = false
     @State private var showingInvite = false
     @State private var isLoading = true
+    @State private var shareItems: [Any] = []
 
     @State private var showingLeaveConfirmation = false
     @State private var showingDeleteConfirmation = false
@@ -43,6 +44,13 @@ struct GroupDetailView: View {
                                     showingInvite = true
                                 } label: {
                                     Image(systemName: "person.badge.plus")
+                                        .font(.subheadline)
+                                        .foregroundColor(.barTabPrimary)
+                                }
+                                Button {
+                                    shareGroup()
+                                } label: {
+                                    Image(systemName: "square.and.arrow.up")
                                         .font(.subheadline)
                                         .foregroundColor(.barTabPrimary)
                                 }
@@ -144,11 +152,22 @@ struct GroupDetailView: View {
                         .environmentObject(userSession)
                         .environmentObject(toastCenter)
                 }
+                .onChange(of: showingNewPoll) { isPresented in
+                    if !isPresented {
+                        Task { await loadPolls() }
+                    }
+                }
                 .sheet(isPresented: $showingInvite) {
                     InviteMemberSheet(group: group)
                         .environmentObject(barRepository)
                         .environmentObject(userSession)
                         .environmentObject(toastCenter)
+                }
+                .sheet(isPresented: Binding(
+                    get: { !shareItems.isEmpty },
+                    set: { if !$0 { shareItems = [] } }
+                )) {
+                    ShareSheet(items: shareItems)
                 }
                 .confirmationDialog("Leave this group?", isPresented: $showingLeaveConfirmation, titleVisibility: .visible) {
                     Button("Leave", role: .destructive) {
@@ -200,12 +219,11 @@ struct GroupDetailView: View {
         do {
             let fetchedMembers = try await SupabaseClient.shared.fetchGroupMembers(groupID: group.id)
             members = fetchedMembers
-
-            let fetchedPolls = try await SupabaseClient.shared.fetchPolls(groupID: group.id)
-            polls = fetchedPolls
         } catch {
             toastCenter.showError(error)
         }
+
+        await loadPolls()
 
         let userIDs = members.map(\.userID)
         if !userIDs.isEmpty {
@@ -213,6 +231,14 @@ struct GroupDetailView: View {
         }
 
         isLoading = false
+    }
+
+    private func loadPolls() async {
+        do {
+            polls = try await SupabaseClient.shared.fetchPolls(groupID: group.id)
+        } catch {
+            toastCenter.showError(error)
+        }
     }
 
     private func leaveGroup() async {
@@ -255,6 +281,23 @@ struct GroupDetailView: View {
             toastCenter.showError(error)
         }
     }
+
+    private func shareGroup() {
+        let shareText = "Join my group \"\(group.name)\" on BarTab! 🍺"
+        shareItems = [shareText]
+    }
+}
+
+// MARK: - Share Sheet
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: - Poll Card

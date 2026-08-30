@@ -35,6 +35,25 @@ struct PriceSummary: Identifiable {
         amount.formattedAmount
     }
 
+    /// Price normalized to a standard 10 cl serving (in the default
+    /// currency). Used for fair "price level" comparisons where a bottle
+    /// should not be compared directly against a glass. Nil when the size
+    /// has no estimable volume.
+    var normalizedAmountPer10cl: Double? {
+        guard let volume = size.volumeInCentiliters(for: drink),
+              volume > 0 else { return nil }
+
+        let amount = NSDecimalNumber(decimal: convertedAmount).doubleValue
+        return amount / (volume / 10)
+    }
+
+    /// Human-readable "per 10 cl" value, e.g. "4.50". Nil when the size
+    /// has no estimable volume.
+    var formattedNormalizedAmountPer10cl: String? {
+        guard let normalized = normalizedAmountPer10cl else { return nil }
+        return Decimal(normalized).formattedAmount
+    }
+
     var formattedConvertedAmount: String {
         convertedAmount.formattedAmount
     }

@@ -77,4 +77,58 @@ enum DrinkSize: String, Codable, CaseIterable, Hashable {
             return false
         }
     }
+
+    /// Approximate volume in centiliters. Used to normalize prices so a
+    /// bottle isn't compared one-to-one against a glass. Returns nil for
+    /// sizes where a meaningful volume can't be estimated.
+    func volumeInCentiliters(for drink: Drink) -> Double? {
+        switch self {
+        case .oneDeciliter:
+            return 10
+        case .twoDeciliters:
+            return 20
+        case .threeDeciliters:
+            return 30
+        case .fiveDeciliters:
+            return 50
+        case .twentyCentiliters:
+            return 20
+        case .twentyFiveCentiliters:
+            return 25
+        case .thirtyThreeCentiliters:
+            return 33
+        case .fiftyCentiliters:
+            return 50
+        case .shot:
+            return 4
+        case .bottle:
+            switch drink {
+            case .wine:
+                return 75
+            case .beer:
+                return 33
+            case .softDrink:
+                return 50
+            default:
+                return 70
+            }
+        case .glass:
+            switch drink {
+            case .wine:
+                return 15
+            case .beer:
+                return 30
+            case .cocktail:
+                return 20
+            case .softDrink:
+                return 25
+            case .coffee:
+                return 25
+            default:
+                return 15
+            }
+        case .other:
+            return nil
+        }
+    }
 }

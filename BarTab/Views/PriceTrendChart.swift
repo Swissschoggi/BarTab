@@ -34,6 +34,10 @@ struct PriceTrendChart: View {
 
     let prices: [Price]
 
+    /// When true, each price is normalized to "per 10 cl" using the
+    /// drink's serving size so bottles and glasses are comparable.
+    var normalizeBySize: Bool = false
+
     private struct ReportPoint: Identifiable {
         let id = UUID()
         let date: Date
@@ -43,38 +47,63 @@ struct PriceTrendChart: View {
     private var reports: [ReportPoint] {
         prices
             .sorted { $0.reportedAt < $1.reportedAt }
-            .map {
-                ReportPoint(
-                    date: $0.reportedAt,
-                    amount: NSDecimalNumber(
-                        decimal: $0.amount
-                    ).doubleValue
+            .map { price in
+                let raw = NSDecimalNumber(
+                    decimal: price.amount
+                ).doubleValue
+
+                let value: Double
+                if normalizeBySize,
+                   let volume = price.size.volumeInCentiliters(for: price.drink),
+                   volume > 0 {
+                    value = raw / (volume / 10)
+                } else {
+                    value = raw
+                }
+
+                return ReportPoint(
+                    date: price.reportedAt,
+                    amount: value
                 )
             }
+    }
+
+    private var chartCaption: String {
+        normalizeBySize
+            ? "Price per 10 cl over time"
+            : "Price over time"
     }
 
     var body: some View {
 
         let points = reports
 
-        Group {
+        VStack(alignment: .leading, spacing: 6) {
+            Group {
 
-            if points.isEmpty {
+                if points.isEmpty {
 
-                placeholder(
-                    "No reports to chart."
-                )
+                    placeholder(
+                        "No reports to chart."
+                    )
 
-            } else if points.count == 1 {
+                } else if points.count == 1 {
 
-                singlePoint(points[0])
+                    singlePoint(points[0])
 
-            } else {
+                } else {
 
-                chart(points)
+                    chart(points)
+                }
+            }
+            .frame(height: 90)
+
+            if points.count > 1 {
+                Text(chartCaption)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
             }
         }
-        .frame(height: 90)
     }
 
     private func chart(

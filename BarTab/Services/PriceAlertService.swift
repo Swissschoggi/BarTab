@@ -12,7 +12,11 @@ enum PriceAlertService {
             guard !alerts.isEmpty else { return }
 
             let allPrices = barRepository.prices
-            var triggered = 0
+            let defaults = UserDefaults.standard
+            let key = "notifiedPriceAlerts"
+
+            var notified =
+                defaults.dictionary(forKey: key) as? [String: Double] ?? [:]
 
             for alert in alerts {
                 guard alert.isActive else { continue }
@@ -28,11 +32,16 @@ enum PriceAlertService {
                     continue
                 }
 
+                let amount = NSDecimalNumber(decimal: latestPrice.amount).doubleValue
+
                 if let target = alert.targetPrice {
-                    guard NSDecimalNumber(decimal: latestPrice.amount).doubleValue <= target else {
-                        continue
-                    }
+                    guard amount <= target else { continue }
                 }
+
+                // Only notify once per price; skip if we already told the
+                // user about this exact amount for this alert.
+                let alertKey = alert.id.uuidString
+                if notified[alertKey] == amount { continue }
 
                 let barName = barRepository.getBar(id: alert.barID)?.name ?? "Unknown bar"
 
@@ -48,8 +57,10 @@ enum PriceAlertService {
                 )
 
                 try await UNUserNotificationCenter.current().add(request)
-                triggered += 1
+                notified[alertKey] = amount
             }
+
+            defaults.set(notified, forKey: key)
         } catch {
             // Background check — silently ignore; alerts will be
             // checked again on next foreground transition.

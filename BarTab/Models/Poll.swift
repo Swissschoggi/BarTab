@@ -18,6 +18,35 @@ struct Poll: Identifiable, Codable {
         case expiresAt = "expires_at"
         case isClosed  = "is_closed"
     }
+
+    init(
+        id: UUID,
+        groupID: UUID,
+        title: String,
+        createdBy: UUID,
+        createdAt: Date,
+        expiresAt: Date?,
+        isClosed: Bool
+    ) {
+        self.id = id
+        self.groupID = groupID
+        self.title = title
+        self.createdBy = createdBy
+        self.createdAt = createdAt
+        self.expiresAt = expiresAt
+        self.isClosed = isClosed
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        groupID = try container.decode(UUID.self, forKey: .groupID)
+        title = try container.decode(String.self, forKey: .title)
+        createdBy = try container.decode(UUID.self, forKey: .createdBy)
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        expiresAt = try container.decodeIfPresent(Date.self, forKey: .expiresAt)
+        isClosed = try container.decodeIfPresent(Bool.self, forKey: .isClosed) ?? false
+    }
 }
 
 struct PollOption: Identifiable, Codable {

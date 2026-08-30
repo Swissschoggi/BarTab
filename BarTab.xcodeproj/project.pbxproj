@@ -100,6 +100,7 @@
 		BRTA0002A00000000000000A /* BadgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000009 /* BadgeService.swift */; };
 		BRTA0002A00000000000000C /* BadgeGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000B /* BadgeGridView.swift */; };
 		BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000D /* DrinkComparisonView.swift */; };
+		BRTA0002A000000000000010 /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000011 /* FollowingListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -218,6 +219,7 @@
 		BRTA0002A000000000000009 /* BadgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeService.swift; sourceTree = "<group>"; };
 		BRTA0002A00000000000000B /* BadgeGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeGridView.swift; sourceTree = "<group>"; };
 		BRTA0002A00000000000000D /* DrinkComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkComparisonView.swift; sourceTree = "<group>"; };
+		BRTA0002A000000000000011 /* FollowingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -363,6 +365,7 @@
 				BRTA00014000000000000046 /* ActivityFeedView.swift */,
 				BRTA00014000000000000061 /* FindUsersView.swift */,
 				BRTA00014000000000000063 /* FollowRequestsView.swift */,
+				BRTA0002A000000000000011 /* FollowingListView.swift */,
 				BRTA00014000000000000047 /* GroupPlanningView.swift */,
 				BRTA00014000000000000048 /* CreateGroupSheet.swift */,
 				BRTA00014000000000000049 /* GroupDetailView.swift */,
@@ -661,6 +664,7 @@
 				BRTA0001400000000000005D /* PriceAlertListView.swift in Sources */,
 				BRTA00014000000000000060 /* FindUsersView.swift in Sources */,
 				BRTA00014000000000000062 /* FollowRequestsView.swift in Sources */,
+				BRTA0002A000000000000010 /* FollowingListView.swift in Sources */,
 				BRTA0002A000000000000002 /* PriceAlertService.swift in Sources */,
 				BRTA0002A000000000000004 /* EditBarView.swift in Sources */,
 				BRTA0002A000000000000006 /* OnboardingView.swift in Sources */,

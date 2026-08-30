@@ -191,12 +191,12 @@ struct NearbyView: View {
         }
 
         guard let userLocation = locationService.location else {
-            return results.sorted { $0.summary.convertedAmount < $1.summary.convertedAmount }
+            return results.sorted { comparisonValue($0.summary) < comparisonValue($1.summary) }
         }
 
         switch sortOption {
         case .cheapest:
-            return results.sorted { $0.summary.convertedAmount < $1.summary.convertedAmount }
+            return results.sorted { comparisonValue($0.summary) < comparisonValue($1.summary) }
         case .brand:
             return results
         case .closest:
@@ -208,7 +208,15 @@ struct NearbyView: View {
     }
 
     private var bestDealSummaryID: UUID? {
-        priceResults.min { $0.summary.amount < $1.summary.amount }?.summary.id
+        priceResults.min { comparisonValue($0.summary) < comparisonValue($1.summary) }?.summary.id
+    }
+
+    /// Comparison value for "cheapest"/"best deal": size-normalized price
+    /// per 10 cl in the default currency, falling back to the raw
+    /// converted amount when a size has no estimable volume.
+    private func comparisonValue(_ summary: PriceSummary) -> Double {
+        summary.normalizedAmountPer10cl
+            ?? NSDecimalNumber(decimal: summary.convertedAmount).doubleValue
     }
 
     // MARK: - Body
@@ -886,6 +894,12 @@ struct NearbyView: View {
                         .font(.subheadline)
                         .fontWeight(.bold)
                         .foregroundColor(.barTabPrimary)
+
+                    if let normalized = summary.formattedNormalizedAmountPer10cl {
+                        Text("≈ \(Currency.defaultCurrency.symbol)\(normalized) / 10 cl")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
 
                     Text(summary.reportCount == 1 ? "1 report" : "\(summary.reportCount) reports")
                         .font(.caption2)
