@@ -351,84 +351,88 @@ struct ProfileView: View {
             Text("Social")
                 .font(.headline)
 
-            VStack(spacing: 0) {
-                navigationRow(
-                    title: "Find Friends",
-                    subtitle: "Search and follow people",
-                    icon: "person.badge.plus"
-                ) {
-                    FindUsersView()
-                }
-
-                Divider()
-                    .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, 44)
-
-                navigationRow(
-                    title: "Follow Requests",
-                    subtitle: "Approve or decline requests",
-                    icon: "person.crop.circle.badge.checkmark"
-                ) {
-                    FollowRequestsView()
-                }
-
-                Divider()
-                    .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, 44)
-
-                navigationRow(
-                    title: "Activity",
-                    subtitle: "See what friends are drinking",
-                    icon: "list.bullet.rectangle"
-                ) {
-                    ActivityFeedView()
-                }
-
-                Divider()
-                    .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, 44)
-
-                navigationRow(
-                    title: "Badges",
-                    subtitle: "Your achievements",
-                    icon: "rosette"
-                ) {
-                    BadgeGridView(
-                        earnedBadges: BadgeService.shared.earnedBadges(),
-                        allBadges: BadgeService.shared.allBadges(),
-                        streak: BadgeService.shared.currentStreak
-                    )
-                }
-
-                Divider()
-                    .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, 44)
-
-                navigationRow(
-                    title: "Groups",
-                    subtitle: "Plan nights out",
-                    icon: "person.3.fill"
-                ) {
-                    GroupPlanningView()
-                }
-
-                Divider()
-                    .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, 44)
-
-                navigationRow(
-                    title: "Price Alerts",
-                    subtitle: "Get notified on price changes",
-                    icon: "bell.fill"
-                ) {
-                    PriceAlertListView()
-                        .environmentObject(barRepository)
-                        .environmentObject(userSession)
-                        .environmentObject(toastCenter)
-                }
-            }
-            .barTabCard()
+            socialRows
         }
+    }
+
+    @ViewBuilder
+    private var socialRows: some View {
+        VStack(spacing: 0) {
+            navigationRow(
+                title: "Find Friends",
+                subtitle: "Search and follow people",
+                icon: "person.badge.plus"
+            ) {
+                FindUsersView()
+            }
+
+            Divider()
+                .foregroundColor(.barTabCardBorder)
+                .padding(.leading, 44)
+
+            navigationRow(
+                title: "Follow Requests",
+                subtitle: "Approve or decline requests",
+                icon: "person.crop.circle.badge.checkmark"
+            ) {
+                FollowRequestsView()
+            }
+
+            Divider()
+                .foregroundColor(.barTabCardBorder)
+                .padding(.leading, 44)
+
+            navigationRow(
+                title: "Activity",
+                subtitle: "See what friends are drinking",
+                icon: "list.bullet.rectangle"
+            ) {
+                ActivityFeedView()
+            }
+        }
+        .barTabCard()
+
+        VStack(spacing: 0) {
+            navigationRow(
+                title: "Badges",
+                subtitle: "Your achievements",
+                icon: "rosette"
+            ) {
+                BadgeGridView(
+                    earnedBadges: BadgeService.shared.earnedBadges(),
+                    allBadges: BadgeService.shared.allBadges(),
+                    streak: BadgeService.shared.currentStreak
+                )
+            }
+
+            Divider()
+                .foregroundColor(.barTabCardBorder)
+                .padding(.leading, 44)
+
+            navigationRow(
+                title: "Groups",
+                subtitle: "Plan nights out",
+                icon: "person.3.fill"
+            ) {
+                GroupPlanningView()
+            }
+
+            Divider()
+                .foregroundColor(.barTabCardBorder)
+                .padding(.leading, 44)
+
+            navigationRow(
+                title: "Price Alerts",
+                subtitle: "Get notified on price changes",
+                icon: "bell.fill"
+            ) {
+                PriceAlertListView()
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+                    .environmentObject(toastCenter)
+            }
+        }
+        .barTabCard()
     }
 
     @ViewBuilder
