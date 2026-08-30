@@ -363,3 +363,13 @@ struct ProfileDTO: Codable, Identifiable {
     let is_admin: Bool
     let avatar_url: String?
 }
+
+struct ProfileNameRow: Codable {
+    let id: UUID
+    let displayName: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case displayName = "display_name"
+    }
+}

@@ -484,8 +484,12 @@ struct NearbyView: View {
                 }
             }
             .padding(10)
-            .background(Color.barTabPillFill)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(Color.barTabCardFill)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color.barTabPrimary.opacity(0.25), lineWidth: 1)
+            )
 
             // Active filter summary (always visible)
             if selectedDrinks.count > 1 || selectedBrand != nil || !selectedAmbience.isEmpty {

@@ -866,6 +866,10 @@ struct BarView: View {
                             .padding(.horizontal, 4)
                     }
 
+                    ForEach(group.prices) { price in
+                        individualPriceRow(price)
+                    }
+
                     if let user = userSession.currentUser, user.isAdmin {
                         HStack {
                             Spacer()
@@ -894,12 +898,69 @@ struct BarView: View {
         }
     }
 
+    private func individualPriceRow(_ price: Price) -> some View {
+        let isMine = userSession.currentUser?.id == price.reportedBy
+
+        return HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(Currency.defaultCurrency.symbol)\(price.formattedAmount)")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                Text(price.reportedAt.relativeFormatted)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            if isMine {
+                Button {
+                    pendingDeletePrice = price
+                    showingDeletePriceConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Delete price")
+            }
+        }
+        .padding(.vertical, 4)
+        .padding(.horizontal, 8)
+        .background(Color.barTabBackground.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .contextMenu {
+            if isMine {
+                Button(role: .destructive) {
+                    pendingDeletePrice = price
+                    showingDeletePriceConfirmation = true
+                } label: {
+                    Label("Delete my price", systemImage: "trash")
+                }
+            }
+        }
+    }
+
     // MARK: - Helper Methods / Properties Placeholder
     private var emptyPricesView: some View {
-        Text("No drink prices added yet.")
-            .font(.caption)
-            .foregroundColor(.barTabSecondary)
-            .padding()
+        VStack(spacing: 12) {
+            Image(systemName: "cup.and.saucer")
+                .font(.system(size: 36))
+                .foregroundColor(.barTabPrimary)
+
+            Text("No drink prices added yet")
+                .font(.subheadline)
+                .fontWeight(.medium)
+
+            Text("Be the first to add a price for this bar.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+        .barTabCard()
     }
 
     private var shareText: String {

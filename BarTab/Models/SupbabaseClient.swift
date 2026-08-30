@@ -1245,10 +1245,10 @@ final class SupabaseClient {
             endpoint: "profiles?id=in.(\(idList))&select=id,display_name"
         )
         let data = try await performAuthorized(request)
-        let dtos = try decoder.decode([ProfileDTO].self, from: data)
+        let names = try decoder.decode([ProfileNameRow].self, from: data)
         var result: [UUID: String] = [:]
-        for dto in dtos {
-            result[dto.id] = dto.display_name ?? "User"
+        for row in names {
+            result[row.id] = row.displayName ?? "User"
         }
         return result
     }
@@ -1285,7 +1285,7 @@ final class SupabaseClient {
     func fetchPriceAlerts() async throws -> [PriceAlert] {
         let myID = try requireUserID().uuidString
         let request = try makeRequest(
-            endpoint: "price_alerts?user_id=eq.\(myID)&is_active=true&select=*&order=created_at.desc"
+            endpoint: "price_alerts?user_id=eq.\(myID)&is_active=eq.true&select=*&order=created_at.desc"
         )
         let data = try await performAuthorized(request)
         return try decoder.decode([PriceAlert].self, from: data)

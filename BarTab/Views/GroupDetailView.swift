@@ -198,16 +198,20 @@ struct GroupDetailView: View {
 
     private func loadData() async {
         do {
-            async let m = SupabaseClient.shared.fetchGroupMembers(groupID: group.id)
-            async let p = SupabaseClient.shared.fetchPolls(groupID: group.id)
-            members = try await m
-            polls = try await p
+            let fetchedMembers = try await SupabaseClient.shared.fetchGroupMembers(groupID: group.id)
+            members = fetchedMembers
 
-            let userIDs = members.map(\.userID)
-            userCache = try await SupabaseClient.shared.fetchProfileNamesByIDs(userIDs)
+            let fetchedPolls = try await SupabaseClient.shared.fetchPolls(groupID: group.id)
+            polls = fetchedPolls
         } catch {
             toastCenter.showError(error)
         }
+
+        let userIDs = members.map(\.userID)
+        if !userIDs.isEmpty {
+            userCache = (try? await SupabaseClient.shared.fetchProfileNamesByIDs(userIDs)) ?? [:]
+        }
+
         isLoading = false
     }
 
