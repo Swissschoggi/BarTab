@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 final class BadgeService {
 
     static let shared = BadgeService()
