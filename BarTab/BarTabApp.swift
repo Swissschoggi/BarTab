@@ -27,6 +27,14 @@ struct BarTabApp: App {
                 .environmentObject(locationService)
                 .environment(\.locale, languageManager.currentLocale)
                 .barTabToast(center: toastCenter)
+                .task {
+                    guard userSession.isLoggedIn else { return }
+                    await barRepository.fetchAllData()
+                }
+                .onReceive(userSession.$currentUser) { user in
+                    guard user != nil else { return }
+                    Task { await barRepository.fetchAllData() }
+                }
                 .onOpenURL { url in
                     Task {
                         await handleDeepLink(url)

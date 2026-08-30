@@ -68,7 +68,7 @@ struct MainTabView: View {
                 )
 
                 tabButton(
-                    title: "Groups",
+                    title: "Group",
                     icon: "person.3.fill",
                     tab: .groups
                 )

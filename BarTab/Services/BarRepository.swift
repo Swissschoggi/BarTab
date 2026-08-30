@@ -32,9 +32,6 @@ final class BarRepository: ObservableObject {
 
     init() {
         loadFavoritesFromDisk()
-        Task {
-            await fetchAllData()
-        }
     }
 
     // MARK: - Favorites Persistence
