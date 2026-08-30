@@ -31,7 +31,7 @@ struct MapView: View {
 
             Map(coordinateRegion: $region, showsUserLocation: true) {
                 ForEach(barRepository.bars) { bar in
-                    Annotation(bar.name, coordinate: bar.coordinate) {
+                    MapAnnotation(coordinate: bar.coordinate) {
                         Button {
                             HapticEngine.lightTap()
                             selectedBar = bar
