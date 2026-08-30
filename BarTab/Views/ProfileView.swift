@@ -73,448 +73,20 @@ struct ProfileView: View {
 
                 VStack(alignment: .leading, spacing: 20) {
 
-
-                    VStack(alignment: .leading, spacing: 6) {
-
-                        BarTabScreenHeader(
-                            title: "Me",
-                            subtitle: currentUser == nil
-                                ? "Sign in to manage your contributions."
-                                : "Your BarTab profile."
-                        )
-
-                        if let fetchedAt = barRepository.lastFetchedAt {
-                            Text("Data updated \(fetchedAt.relativeFormatted)")
-                                .font(.caption2)
-                                .foregroundColor(.barTabSecondary)
-                                .padding(.top, 2)
-                        }
-                    }
+                    headerSection
 
                     if let user = currentUser {
 
-
-                        VStack(alignment: .leading, spacing: 12) {
-
-                            HStack(spacing: 14) {
-
-                                avatarView(user: user)
-
-                                VStack(
-                                    alignment: .leading,
-                                    spacing: 2
-                                ) {
-
-                                    Text(user.username)
-                                        .font(.headline)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.barTabText)
-
-                                    Text(
-                                        "Member since \(user.createdAt.formatted(date: .abbreviated, time: .omitted))"
-                                    )
-                                    .font(.caption)
-                                    .foregroundColor(
-                                        .barTabSecondary
-                                    )
-
-                                    PhotosPicker(
-                                        selection: $selectedAvatarItem,
-                                        matching: .images
-                                    ) {
-                                        Text(
-                                            isUploadingAvatar
-                                                ? "Uploading…"
-                                                : "Change photo"
-                                        )
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.barTabPrimary)
-                                    }
-                                    .disabled(isUploadingAvatar)
-                                }
-
-                                Spacer()
-                            }
-                        }
-                        .barTabCard()
-
-                        // Level card
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack(spacing: 12) {
-                                Image(systemName: currentLevel.icon)
-                                    .font(.body)
-                                    .foregroundColor(.white)
-                                    .frame(width: 32, height: 32)
-                                    .background(Color.barTabAccent)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-
-                                VStack(alignment: .leading, spacing: 1) {
-                                    Text(currentLevel.name)
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.barTabText)
-
-                                    if let remaining = UserLevel.remaining(for: totalContributions) {
-                                        Text("\(remaining) more to next level")
-                                            .font(.caption2)
-                                            .foregroundColor(.barTabSecondary)
-                                    } else {
-                                        Text("Max level reached!")
-                                            .font(.caption2)
-                                            .foregroundColor(.barTabAccent)
-                                    }
-                                }
-
-                                Spacer()
-
-                                Text("\(totalContributions)")
-                                    .font(.title3)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.barTabAccent)
-                            }
-
-                            GeometryReader { geometry in
-                                ZStack(alignment: .leading) {
-                                    Capsule()
-                                        .fill(Color.barTabPillFill)
-
-                                    Capsule()
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [.barTabAccent, .barTabAccent.opacity(0.7)],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .frame(width: geometry.size.width * CGFloat(UserLevel.progress(for: totalContributions)))
-                                }
-                            }
-                            .frame(height: 5)
-                        }
-                        .barTabCard()
-
-                        VStack(
-                            alignment: .leading,
-                            spacing: 10
-                        ) {
-
-                            Text("Your activity")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
-
-                            HStack(spacing: 10) {
-
-                                statisticCard(
-                                    value: myPrices.count,
-                                    title: "Drinks",
-                                    icon: "mug.fill"
-                                )
-
-                                statisticCard(
-                                    value: myBars.count,
-                                    title: "Bars",
-                                    icon: "building.2.fill"
-                                )
-                            }
-                        }
-
-
-                        VStack(
-                            alignment: .leading,
-                            spacing: 10
-                        ) {
-
-                            Text("Contributions")
-                                .font(.headline)
-
-                            navigationRow(
-                                title: String(localized: "My drinks"),
-                                subtitle: "\(myPrices.count) contributions",
-                                icon: "tag.fill"
-                            ) {
-                                MyContributionsView()
-                            }
-
-                            navigationRow(
-                                title: String(localized: "My bars"),
-                                subtitle: "\(myBars.count) bars added",
-                                icon: "building.2.fill"
-                            ) {
-                                MyBarsView()
-                            }
-                        }
-
-
-                        if let user = currentUser,
-                            user.isAdmin {
-
-                            VStack(
-                                alignment: .leading,
-                                spacing: 10
-                            ) {
-
-                                Text("Admin")
-                                    .font(.headline)
-
-                                navigationRow(
-                                    title: String(localized: "Reported content"),
-                                    subtitle: unreviewedReportCount == 0
-                                        ? String(localized: "Nothing to review")
-                                        : "\(unreviewedReportCount) "
-                                        + "\(unreviewedReportCount == 1 ? "report" : "reports") to review",
-                                    icon: "flag.fill"
-                                ) {
-                                    AdminReportsView()
-                                        .environmentObject(barRepository)
-                                        .environmentObject(userSession)
-                                        .environmentObject(toastCenter)
-                                }
-
-                                navigationRow(
-                                    title: String(localized: "Brand requests"),
-                                    subtitle: barRepository.pendingBrandRequestCount == 0
-                                        ? String(localized: "Nothing to review")
-                                        : "\(barRepository.pendingBrandRequestCount) "
-                                        + "\(barRepository.pendingBrandRequestCount == 1 ? "request" : "requests") to review",
-                                    icon: "tag.fill"
-                                ) {
-                                    AdminBrandRequestsView()
-                                }
-                            }
-                        }
-
-                        // Social
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Social")
-                                .font(.headline)
-
-                            VStack(spacing: 0) {
-                                navigationRow(
-                                    title: "Find Friends",
-                                    subtitle: "Search and follow people",
-                                    icon: "person.badge.plus"
-                                ) {
-                                    FindUsersView()
-                                }
-
-                                Divider()
-                                    .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, 44)
-
-                                navigationRow(
-                                    title: "Follow Requests",
-                                    subtitle: "Approve or decline requests",
-                                    icon: "person.crop.circle.badge.checkmark"
-                                ) {
-                                    FollowRequestsView()
-                                }
-
-                                Divider()
-                                    .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, 44)
-
-                                navigationRow(
-                                    title: "Activity",
-                                    subtitle: "See what friends are drinking",
-                                    icon: "list.bullet.rectangle"
-                                ) {
-                                    ActivityFeedView()
-                                }
-
-                                Divider()
-                                    .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, 44)
-
-                                navigationRow(
-                                    title: "Badges",
-                                    subtitle: "Your achievements",
-                                    icon: "rosette"
-                                ) {
-                                    BadgeGridView(
-                                        earnedBadges: BadgeService.shared.earnedBadges(),
-                                        allBadges: BadgeService.shared.allBadges(),
-                                        streak: BadgeService.shared.currentStreak
-                                    )
-                                }
-
-                                Divider()
-                                    .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, 44)
-
-                                navigationRow(
-                                    title: "Groups",
-                                    subtitle: "Plan nights out",
-                                    icon: "person.3.fill"
-                                ) {
-                                    GroupPlanningView()
-                                }
-
-                                Divider()
-                                    .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, 44)
-
-                                navigationRow(
-                                    title: "Price Alerts",
-                                    subtitle: "Get notified on price changes",
-                                    icon: "bell.fill"
-                                ) {
-                                    PriceAlertListView()
-                                }
-                            }
-                            .barTabCard()
-                        }
-
-
-                        if !barRepository.favoriteBars.isEmpty {
-
-                            VStack(
-                                alignment: .leading,
-                                spacing: 10
-                            ) {
-
-                                Text("Favorites")
-                                    .font(.headline)
-
-                                ForEach(
-                                    barRepository.favoriteBars
-                                ) { bar in
-
-                                    navigationRow(
-                                        title: bar.name,
-                                        subtitle: bar.address,
-                                        icon: "heart.fill"
-                                    ) {
-                                        BarView(bar: bar)
-                                            .environmentObject(
-                                                barRepository
-                                            )
-                                            .environmentObject(
-                                                userSession
-                                            )
-                                    }
-                                }
-                            }
-                        }
-
-
-                        VStack(
-                            alignment: .leading,
-                            spacing: 10
-                        ) {
-
-                            Text("Account")
-                                .font(.headline)
-
-                            Button {
-                                showingSettings = true
-                            } label: {
-
-                                HStack(spacing: 12) {
-
-                                    Image(
-                                        systemName: "gearshape.fill"
-                                    )
-                                    .foregroundColor(.barTabPrimary)
-
-                                    Text("Settings")
-                                        .foregroundColor(.primary)
-
-                                    Spacer()
-
-                                    Image(
-                                        systemName: "chevron.right"
-                                    )
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                }
-                                .barTabCard()
-                            }
-
-                            Button {
-                                showingLeaderboard = true
-                            } label: {
-
-                                HStack(spacing: 12) {
-
-                                    Image(
-                                        systemName: "trophy.fill"
-                                    )
-                                    .foregroundColor(.barTabAccent)
-
-                                    Text("Leaderboard")
-                                        .foregroundColor(.primary)
-
-                                    Spacer()
-
-                                    Image(
-                                        systemName: "chevron.right"
-                                    )
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                }
-                                .barTabCard()
-                            }
-
-                            Button {
-                                showingLogoutConfirmation = true
-                            } label: {
-
-                                HStack(spacing: 12) {
-
-                                    Image(
-                                        systemName: "rectangle.portrait.and.arrow.right"
-                                    )
-                                    .foregroundColor(.red)
-
-                                    Text("Log out")
-                                        .foregroundColor(.red)
-
-                                    Spacer()
-                                }
-                                .barTabCard()
-                            }
-                        }
+                        profileCard(user: user)
+                        levelCard
+                        contributionsSection
+                        adminSection
+                        socialSection
+                        favoritesSection
+                        accountSection
 
                     } else {
-
-
-                        VStack(spacing: 16) {
-
-                            Image(
-                                systemName: "person.crop.circle"
-                            )
-                            .font(
-                                .system(size: 55)
-                            )
-                            .foregroundColor(
-                                .barTabPrimary
-                            )
-
-                            Text("You're not signed in")
-                                .font(.title3)
-                                .fontWeight(.semibold)
-
-                            Text(
-                                "Sign in to add bars, report drinks and keep track of your contributions."
-                            )
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.secondary)
-
-                            Button {
-                                showingLogin = true
-                            } label: {
-                                Text("Sign In")
-                                    .font(.headline)
-                                    .frame(
-                                        maxWidth: .infinity
-                                    )
-                                    .padding()
-                                    .barTabPrimaryButton()
-                            }
-                        }
-                        .padding(.vertical, 40)
+                        signedOutSection
                     }
                 }
                 .padding(.horizontal)
@@ -573,6 +145,409 @@ struct ProfileView: View {
         }
     }
 
+    // MARK: - Sections
+
+    @ViewBuilder
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+
+            BarTabScreenHeader(
+                title: "Me",
+                subtitle: currentUser == nil
+                    ? "Sign in to manage your contributions."
+                    : "Your BarTab profile."
+            )
+
+            if let fetchedAt = barRepository.lastFetchedAt {
+                Text("Data updated \(fetchedAt.relativeFormatted)")
+                    .font(.caption2)
+                    .foregroundColor(.barTabSecondary)
+                    .padding(.top, 2)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func profileCard(user: User) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+
+            HStack(spacing: 14) {
+
+                avatarView(user: user)
+
+                VStack(alignment: .leading, spacing: 2) {
+
+                    Text(user.username)
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.barTabText)
+
+                    Text("Member since \(user.createdAt.formatted(date: .abbreviated, time: .omitted))")
+                        .font(.caption)
+                        .foregroundColor(.barTabSecondary)
+
+                    PhotosPicker(
+                        selection: $selectedAvatarItem,
+                        matching: .images
+                    ) {
+                        Text(isUploadingAvatar ? "Uploading…" : "Change photo")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.barTabPrimary)
+                    }
+                    .disabled(isUploadingAvatar)
+                }
+
+                Spacer()
+            }
+        }
+        .barTabCard()
+    }
+
+    @ViewBuilder
+    private var levelCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                Image(systemName: currentLevel.icon)
+                    .font(.body)
+                    .foregroundColor(.white)
+                    .frame(width: 32, height: 32)
+                    .background(Color.barTabAccent)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(currentLevel.name)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabText)
+
+                    if let remaining = UserLevel.remaining(for: totalContributions) {
+                        Text("\(remaining) more to next level")
+                            .font(.caption2)
+                            .foregroundColor(.barTabSecondary)
+                    } else {
+                        Text("Max level reached!")
+                            .font(.caption2)
+                            .foregroundColor(.barTabAccent)
+                    }
+                }
+
+                Spacer()
+
+                Text("\(totalContributions)")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.barTabAccent)
+            }
+
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.barTabPillFill)
+
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [.barTabAccent, .barTabAccent.opacity(0.7)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: geometry.size.width * CGFloat(UserLevel.progress(for: totalContributions)))
+                }
+            }
+            .frame(height: 5)
+        }
+        .barTabCard()
+    }
+
+    @ViewBuilder
+    private var contributionsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+
+            Text("Your activity")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.barTabText)
+
+            HStack(spacing: 10) {
+                statisticCard(
+                    value: myPrices.count,
+                    title: "Drinks",
+                    icon: "mug.fill"
+                )
+
+                statisticCard(
+                    value: myBars.count,
+                    title: "Bars",
+                    icon: "building.2.fill"
+                )
+            }
+        }
+
+        VStack(alignment: .leading, spacing: 10) {
+
+            Text("Contributions")
+                .font(.headline)
+
+            navigationRow(
+                title: String(localized: "My drinks"),
+                subtitle: "\(myPrices.count) contributions",
+                icon: "tag.fill"
+            ) {
+                MyContributionsView()
+            }
+
+            navigationRow(
+                title: String(localized: "My bars"),
+                subtitle: "\(myBars.count) bars added",
+                icon: "building.2.fill"
+            ) {
+                MyBarsView()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var adminSection: some View {
+        if let user = currentUser, user.isAdmin {
+
+            VStack(alignment: .leading, spacing: 10) {
+
+                Text("Admin")
+                    .font(.headline)
+
+                navigationRow(
+                    title: String(localized: "Reported content"),
+                    subtitle: unreviewedReportCount == 0
+                        ? String(localized: "Nothing to review")
+                        : "\(unreviewedReportCount) "
+                        + "\(unreviewedReportCount == 1 ? "report" : "reports") to review",
+                    icon: "flag.fill"
+                ) {
+                    AdminReportsView()
+                        .environmentObject(barRepository)
+                        .environmentObject(userSession)
+                        .environmentObject(toastCenter)
+                }
+
+                navigationRow(
+                    title: String(localized: "Brand requests"),
+                    subtitle: barRepository.pendingBrandRequestCount == 0
+                        ? String(localized: "Nothing to review")
+                        : "\(barRepository.pendingBrandRequestCount) "
+                        + "\(barRepository.pendingBrandRequestCount == 1 ? "request" : "requests") to review",
+                    icon: "tag.fill"
+                ) {
+                    AdminBrandRequestsView()
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var socialSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Social")
+                .font(.headline)
+
+            VStack(spacing: 0) {
+                navigationRow(
+                    title: "Find Friends",
+                    subtitle: "Search and follow people",
+                    icon: "person.badge.plus"
+                ) {
+                    FindUsersView()
+                }
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
+                    .padding(.leading, 44)
+
+                navigationRow(
+                    title: "Follow Requests",
+                    subtitle: "Approve or decline requests",
+                    icon: "person.crop.circle.badge.checkmark"
+                ) {
+                    FollowRequestsView()
+                }
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
+                    .padding(.leading, 44)
+
+                navigationRow(
+                    title: "Activity",
+                    subtitle: "See what friends are drinking",
+                    icon: "list.bullet.rectangle"
+                ) {
+                    ActivityFeedView()
+                }
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
+                    .padding(.leading, 44)
+
+                navigationRow(
+                    title: "Badges",
+                    subtitle: "Your achievements",
+                    icon: "rosette"
+                ) {
+                    BadgeGridView(
+                        earnedBadges: BadgeService.shared.earnedBadges(),
+                        allBadges: BadgeService.shared.allBadges(),
+                        streak: BadgeService.shared.currentStreak
+                    )
+                }
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
+                    .padding(.leading, 44)
+
+                navigationRow(
+                    title: "Groups",
+                    subtitle: "Plan nights out",
+                    icon: "person.3.fill"
+                ) {
+                    GroupPlanningView()
+                }
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
+                    .padding(.leading, 44)
+
+                navigationRow(
+                    title: "Price Alerts",
+                    subtitle: "Get notified on price changes",
+                    icon: "bell.fill"
+                ) {
+                    PriceAlertListView()
+                        .environmentObject(barRepository)
+                        .environmentObject(userSession)
+                        .environmentObject(toastCenter)
+                }
+            }
+            .barTabCard()
+        }
+    }
+
+    @ViewBuilder
+    private var favoritesSection: some View {
+        if !barRepository.favoriteBars.isEmpty {
+
+            VStack(alignment: .leading, spacing: 10) {
+
+                Text("Favorites")
+                    .font(.headline)
+
+                ForEach(barRepository.favoriteBars) { bar in
+                    navigationRow(
+                        title: bar.name,
+                        subtitle: bar.address,
+                        icon: "heart.fill"
+                    ) {
+                        BarView(bar: bar)
+                            .environmentObject(barRepository)
+                            .environmentObject(userSession)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var accountSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+
+            Text("Account")
+                .font(.headline)
+
+            Button {
+                showingSettings = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "gearshape.fill")
+                        .foregroundColor(.barTabPrimary)
+
+                    Text("Settings")
+                        .foregroundColor(.primary)
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .barTabCard()
+            }
+
+            Button {
+                showingLeaderboard = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "trophy.fill")
+                        .foregroundColor(.barTabAccent)
+
+                    Text("Leaderboard")
+                        .foregroundColor(.primary)
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .barTabCard()
+            }
+
+            Button {
+                showingLogoutConfirmation = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .foregroundColor(.red)
+
+                    Text("Log out")
+                        .foregroundColor(.red)
+
+                    Spacer()
+                }
+                .barTabCard()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var signedOutSection: some View {
+        VStack(spacing: 16) {
+
+            Image(systemName: "person.crop.circle")
+                .font(.system(size: 55))
+                .foregroundColor(.barTabPrimary)
+
+            Text("You're not signed in")
+                .font(.title3)
+                .fontWeight(.semibold)
+
+            Text("Sign in to add bars, report drinks and keep track of your contributions.")
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+
+            Button {
+                showingLogin = true
+            } label: {
+                Text("Sign In")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .barTabPrimaryButton()
+            }
+        }
+        .padding(.vertical, 40)
+    }
+
+    // MARK: - Helpers
+
     @ViewBuilder
     private func avatarView(user: User) -> some View {
 
@@ -628,7 +603,7 @@ struct ProfileView: View {
     private func uploadAvatar(from item: PhotosPickerItem) {
         Task { @MainActor in
             isUploadingAvatar = true
-            
+
             do {
                 guard let data = try await item.loadTransferable(type: Data.self),
                       let image = UIImage(data: data) else {
@@ -646,7 +621,6 @@ struct ProfileView: View {
             }
         }
     }
-
 
     private func statisticCard(
         value: Int,
@@ -676,7 +650,6 @@ struct ProfileView: View {
         .barTabCard()
     }
 
-
     private func navigationRow<Destination: View>(
         title: String,
         subtitle: String,
@@ -697,10 +670,7 @@ struct ProfileView: View {
                     .background(Color.barTabPrimary.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
 
-                VStack(
-                    alignment: .leading,
-                    spacing: 1
-                ) {
+                VStack(alignment: .leading, spacing: 1) {
 
                     Text(title)
                         .font(.subheadline)
@@ -714,11 +684,9 @@ struct ProfileView: View {
 
                 Spacer()
 
-                Image(
-                    systemName: "chevron.right"
-                )
-                .font(.caption2)
-                .foregroundColor(.barTabSecondary)
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundColor(.barTabSecondary)
             }
             .barTabCard()
         }
