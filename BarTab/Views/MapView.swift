@@ -29,47 +29,45 @@ struct MapView: View {
         ZStack(alignment: .bottomTrailing) {
 
 
-            Map(coordinateRegion: $region, showsUserLocation: true) {
-                ForEach(barRepository.bars) { bar in
-                    MapAnnotation(coordinate: bar.coordinate) {
-                        Button {
-                            HapticEngine.lightTap()
-                            selectedBar = bar
-                        } label: {
-                            VStack(spacing: 2) {
+            Map(coordinateRegion: $region, annotationItems: barRepository.bars) { bar in
+                MapAnnotation(coordinate: bar.coordinate) {
+                    Button {
+                        HapticEngine.lightTap()
+                        selectedBar = bar
+                    } label: {
+                        VStack(spacing: 2) {
 
-                                if let level = barRepository.priceLevel(for: bar) {
-                                    Text(level)
-                                        .font(.system(size: 8, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 4)
-                                        .padding(.vertical, 1)
-                                        .background(Color.barTabAccent)
-                                        .clipShape(Capsule())
-                                }
-
-                                Image(systemName: "wineglass.fill")
-                                    .font(.system(size: 14, weight: .medium))
+                            if let level = barRepository.priceLevel(for: bar) {
+                                Text(level)
+                                    .font(.system(size: 8, weight: .bold))
                                     .foregroundColor(.white)
-                                    .frame(width: 32, height: 32)
-                                    .background(
-                                        LinearGradient(
-                                            colors: [Color.barTabPrimary, Color.barTabPrimary.opacity(0.8)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                                    .shadow(color: Color.barTabPrimary.opacity(0.3), radius: 4, x: 0, y: 2)
-
-                                Image(systemName: "triangle.fill")
-                                    .font(.system(size: 6))
-                                    .foregroundColor(.barTabPrimary)
-                                    .rotationEffect(.degrees(180))
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 1)
+                                    .background(Color.barTabAccent)
+                                    .clipShape(Capsule())
                             }
+
+                            Image(systemName: "wineglass.fill")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color.barTabPrimary, Color.barTabPrimary.opacity(0.8)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .shadow(color: Color.barTabPrimary.opacity(0.3), radius: 4, x: 0, y: 2)
+
+                            Image(systemName: "triangle.fill")
+                                .font(.system(size: 6))
+                                .foregroundColor(.barTabPrimary)
+                                .rotationEffect(.degrees(180))
                         }
-                        .accessibilityLabel("\(bar.name), \(bar.address)")
                     }
+                    .accessibilityLabel("\(bar.name), \(bar.address)")
                 }
             }
             .ignoresSafeArea()

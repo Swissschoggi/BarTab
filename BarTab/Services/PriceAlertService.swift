@@ -2,7 +2,7 @@ import Foundation
 import UserNotifications
 
 enum PriceAlertService {
-@MainActor
+
     @MainActor
     static func checkAlerts(
         barRepository: BarRepository
@@ -47,7 +47,7 @@ enum PriceAlertService {
                     trigger: nil
                 )
 
-                try await                 try await UNUserNotificationCenter.current().add(request)
+                try await UNUserNotificationCenter.current().add(request)
                 triggered += 1
             }
         } catch {
