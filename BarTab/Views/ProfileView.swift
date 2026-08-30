@@ -23,7 +23,7 @@ struct ProfileView: View {
     }
 
     private var totalContributions: Int {
-        guard let user = currentUser else { return 0 }
+        guard currentUser != nil else { return 0 }
         let prices = myPrices.count
         let bars = myBars.count
         return prices + bars
