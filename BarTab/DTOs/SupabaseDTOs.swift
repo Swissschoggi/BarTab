@@ -285,6 +285,7 @@ struct DrinkRatingDTO: Codable {
         self.quality = domain.quality
         self.rated_by = domain.ratedBy
         self.created_at = domain.createdAt
+        self.bars = nil
     }
 }
 
