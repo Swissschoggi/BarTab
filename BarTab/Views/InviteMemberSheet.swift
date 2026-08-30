@@ -15,6 +15,13 @@ struct InviteMemberSheet: View {
     @State private var isLoading = true
     @State private var searchText = ""
 
+    private var filteredFriends: [UUID] {
+        let notInGroup = following.filter { !members.contains($0) }
+        return searchText.isEmpty
+            ? notInGroup
+            : notInGroup.filter { userCache[$0]?.localizedCaseInsensitiveContains(searchText) == true }
+    }
+
     var body: some View {
         NavigationView {
             Group {
@@ -44,19 +51,14 @@ struct InviteMemberSheet: View {
                         .padding(.top, 8)
 
                         List {
-                            let notInGroup = following.filter { !members.contains($0) }
-                            let filtered = searchText.isEmpty
-                                ? notInGroup
-                                : notInGroup.filter { userCache[$0]?.localizedCaseInsensitiveContains(searchText) == true }
-
-                            if filtered.isEmpty {
+                            if filteredFriends.isEmpty {
                                 Text(searchText.isEmpty
                                     ? "All your friends are already in this group."
                                     : "No friends match your search.")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                             } else {
-                                ForEach(filtered, id: \.self) { userID in
+                                ForEach(filteredFriends, id: \.self) { userID in
                                     Button {
                                         Task { await invite(userID) }
                                     } label: {
