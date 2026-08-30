@@ -72,7 +72,7 @@ struct PriceAlertListView: View {
             Spacer()
 
             if let target = alert.targetPrice {
-                Text("\(Currency.defaultCurrency.symbol)\(target, specifier: "%.2f")")
+                Text("\(Currency.defaultCurrency.symbol)\(String(format: "%.2f", target))")
                     .font(.subheadline)
                     .fontWeight(.bold)
                     .foregroundColor(.barTabAccent)
