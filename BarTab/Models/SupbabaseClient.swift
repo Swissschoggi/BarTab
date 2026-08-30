@@ -1072,7 +1072,7 @@ final class SupabaseClient {
             endpoint: "group_members?user_id=eq.\(myID)&select=group_id"
         )
         let memberData = try await performAuthorized(memberRequest)
-        let memberRows = try decoder.decode([GroupMember].self, from: memberData)
+        let memberRows = try decoder.decode([GroupMemberID].self, from: memberData)
         var groupIDs = Set(memberRows.map { $0.groupID.uuidString })
 
         // Also fetch groups the user created (fallback for RLS edge cases)
@@ -1080,7 +1080,7 @@ final class SupabaseClient {
             endpoint: "groups?created_by=eq.\(myID)&select=id"
         )
         let createdData = try await performAuthorized(createdRequest)
-        let createdRows = try decoder.decode([BarGroup].self, from: createdData)
+        let createdRows = try decoder.decode([GroupIDOnly].self, from: createdData)
         for row in createdRows {
             groupIDs.insert(row.id.uuidString)
         }

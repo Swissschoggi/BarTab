@@ -29,3 +29,14 @@ struct GroupMember: Identifiable, Codable {
         case joinedAt = "joined_at"
     }
 }
+
+struct GroupMemberID: Codable {
+    let groupID: UUID
+    enum CodingKeys: String, CodingKey {
+        case groupID = "group_id"
+    }
+}
+
+struct GroupIDOnly: Codable {
+    let id: UUID
+}
