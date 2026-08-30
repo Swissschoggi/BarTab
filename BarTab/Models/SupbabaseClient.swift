@@ -1050,7 +1050,8 @@ final class SupabaseClient {
             throw SupabaseError(statusCode: 200, message: "Failed to create group")
         }
 
-        // Auto-add creator as admin
+        // Auto-add creator as admin — non-fatal if RLS blocks it;
+        // fetchGroups() has a fallback for group creators.
         let memberBody: [String: Any] = [
             "group_id": group.id.uuidString,
             "user_id": userID.uuidString,
@@ -1058,19 +1059,32 @@ final class SupabaseClient {
         ]
         var memberReq = try makeRequest(endpoint: "group_members", method: "POST")
         memberReq.httpBody = try JSONSerialization.data(withJSONObject: memberBody)
-        _ = try await performAuthorized(memberReq)
+        _ = try? await performAuthorized(memberReq)
 
         return group
     }
 
     func fetchGroups() async throws -> [BarGroup] {
         let myID = try requireUserID().uuidString
-        let request = try makeRequest(
+
+        // Fetch groups where user is a member
+        let memberRequest = try makeRequest(
             endpoint: "group_members?user_id=eq.\(myID)&select=group_id"
         )
-        let data = try await performAuthorized(request)
-        let memberRows = try decoder.decode([GroupMember].self, from: data)
-        let groupIDs = memberRows.map { $0.groupID.uuidString }
+        let memberData = try await performAuthorized(memberRequest)
+        let memberRows = try decoder.decode([GroupMember].self, from: memberData)
+        var groupIDs = Set(memberRows.map { $0.groupID.uuidString })
+
+        // Also fetch groups the user created (fallback for RLS edge cases)
+        let createdRequest = try makeRequest(
+            endpoint: "groups?created_by=eq.\(myID)&select=id"
+        )
+        let createdData = try await performAuthorized(createdRequest)
+        let createdRows = try decoder.decode([BarGroup].self, from: createdData)
+        for row in createdRows {
+            groupIDs.insert(row.id.uuidString)
+        }
+
         guard !groupIDs.isEmpty else { return [] }
         let idList = groupIDs.joined(separator: ",")
         let groupsRequest = try makeRequest(
