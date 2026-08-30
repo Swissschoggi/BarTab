@@ -20,7 +20,6 @@ struct MainTabView: View {
     // Swipeable tab bar state
     @State private var tabBarWidth: CGFloat = 0
     @State private var dragOffset: CGFloat = 0
-    @State private var isTabDragging = false
 
     private var adminBadgeCount: Int {
         guard userSession.currentUser?.isAdmin == true else { return 0 }
@@ -167,7 +166,7 @@ struct MainTabView: View {
                     }
             }
         )
-        .gesture(tabBarSwipeGesture)
+        .simultaneousGesture(tabBarSwipeGesture)
         .padding(6)
         .background(
             Color.barTabCardFill
@@ -191,29 +190,14 @@ struct MainTabView: View {
     }
 
     private var tabBarSwipeGesture: some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .local)
+        DragGesture(minimumDistance: 10)
             .onChanged { value in
-                guard tabBarWidth > 0 else { return }
-                if !isTabDragging {
-                    isTabDragging = true
-                }
                 dragOffset = value.translation.width
             }
             .onEnded { value in
-                isTabDragging = false
                 guard tabBarWidth > 0 else { return }
 
-                // A tap (little movement) selects the tab under the finger.
-                if abs(value.translation.width) < 8 {
-                    let tappedIndex = min(
-                        max(Int(value.startLocation.x / tabWidth), 0),
-                        tabCount - 1
-                    )
-                    selectTab(Tab.allCases[tappedIndex], haptic: .lightTap)
-                    return
-                }
-
-                // Otherwise snap, using velocity to carry the pill forward.
+                // Snap, using velocity to carry the pill forward.
                 let rawPosition = CGFloat(selectedIndex) * tabWidth + dragOffset
                 var targetIndex = Int((rawPosition / tabWidth).rounded())
                 if abs(value.predictedEndTranslation.width) > tabWidth * 0.5 {
@@ -252,41 +236,42 @@ struct MainTabView: View {
 
         let isSelected = selectedTab == tab
 
-        return HStack(spacing: 6) {
-
-            Image(systemName: icon)
-                .font(.system(size: 15, weight: .semibold))
-                .overlay(alignment: .topTrailing) {
-                    if badge > 0 {
-                        Text("\(badge)")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundColor(.white)
-                            .frame(width: 16, height: 16)
-                            .background(Color.red)
-                            .clipShape(Circle())
-                            .offset(x: 8, y: -8)
-                    }
-                }
-
-            if isSelected {
-                Text(title)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .transition(.scale.combined(with: .opacity))
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .foregroundColor(
-            isSelected
-                ? .white
-                : .barTabSecondary
-        )
-        .contentShape(Rectangle())
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text(title))
-        .accessibilityAddTraits(.isButton)
-        .accessibilityAction {
+        return Button {
             selectTab(tab, haptic: .lightTap)
+        } label: {
+
+            HStack(spacing: 6) {
+
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .semibold))
+                    .overlay(alignment: .topTrailing) {
+                        if badge > 0 {
+                            Text("\(badge)")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 16, height: 16)
+                                .background(Color.red)
+                                .clipShape(Circle())
+                                .offset(x: 8, y: -8)
+                        }
+                    }
+
+                if isSelected {
+                    Text(title)
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .foregroundColor(
+                isSelected
+                    ? .white
+                    : .barTabSecondary
+            )
+            .contentShape(Rectangle())
+            .accessibilityLabel(Text(title))
         }
+        .buttonStyle(.plain)
     }
 }
 
