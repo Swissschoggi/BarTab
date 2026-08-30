@@ -10,6 +10,12 @@ struct BadgeGridView: View {
         GridItem(.adaptive(minimum: 90), spacing: 12)
     ]
 
+    private var unearnedBadges: [Badge] {
+        allBadges.filter { badge in
+            !earnedBadges.contains { $0.id == badge.id }
+        }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -50,16 +56,13 @@ struct BadgeGridView: View {
                 }
 
                 // Unearned badges
-                let unearned = allBadges.filter { badge in
-                    !earnedBadges.contains { $0.id == badge.id }
-                }
-                if !unearned.isEmpty {
+                if !unearnedBadges.isEmpty {
                     Text("Locked")
                         .font(.headline)
                         .foregroundColor(.barTabText)
 
                     LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(unearned) { badge in
+                        ForEach(unearnedBadges) { badge in
                             badgeCard(badge, earned: false)
                         }
                     }
