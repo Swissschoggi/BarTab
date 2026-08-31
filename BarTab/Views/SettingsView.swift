@@ -15,6 +15,7 @@ struct SettingsView: View {
     @State private var currencyExpanded = false
     @State private var selectedCurrency: Currency = Currency.defaultCurrency
     @State private var showingClearCacheConfirm = false
+    @State private var showingDeleteAccount = false
 
     private let languages: [(code: String, name: String, flag: String)] = [
         ("en", "English", "🇬🇧"),
@@ -377,6 +378,36 @@ struct SettingsView: View {
                         }
                     }
                     .barTabCard()
+
+                    // Danger zone
+                    if userSession.isLoggedIn {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.subheadline)
+                                    .foregroundColor(.red)
+                                Text("Danger Zone")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabText)
+                            }
+
+                            VStack(spacing: 0) {
+                                Button {
+                                    showingDeleteAccount = true
+                                } label: {
+                                    settingsRow(
+                                        icon: "trash",
+                                        iconColor: .red,
+                                        title: "Delete Account",
+                                        value: ""
+                                    )
+                                    .foregroundColor(.red)
+                                }
+                            }
+                        }
+                        .barTabCard()
+                    }
                 }
                 .padding(.horizontal)
                 .padding(.top, 20)
@@ -414,6 +445,11 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showingPasswordEditor) {
             ChangePasswordSheet()
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
+        }
+        .sheet(isPresented: $showingDeleteAccount) {
+            DeleteAccountSheet()
                 .environmentObject(userSession)
                 .environmentObject(toastCenter)
         }
@@ -744,6 +780,110 @@ private struct ChangePasswordSheet: View {
             toastCenter.showError(error)
         }
         isSaving = false
+    }
+}
+
+// MARK: - Delete Account Sheet
+
+private struct DeleteAccountSheet: View {
+
+    @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var confirmationText = ""
+    @State private var isDeleting = false
+
+    private var isConfirmed: Bool {
+        confirmationText == "DELETE"
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 22) {
+
+                ZStack {
+                    Circle()
+                        .fill(Color.red.opacity(0.12))
+                        .frame(width: 72, height: 72)
+
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 30))
+                        .foregroundColor(.red)
+                }
+                .padding(.top, 24)
+
+                VStack(spacing: 8) {
+                    Text("Delete your account?")
+                        .font(.title3)
+                        .fontWeight(.bold)
+
+                    Text("This permanently deletes your profile, prices, bars, ratings, and everything else you've contributed. This can't be undone.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Type DELETE to confirm")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    TextField("DELETE", text: $confirmationText)
+                        .textFieldStyle(.roundedBorder)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
+                }
+
+                Button {
+                    Task { await delete() }
+                } label: {
+                    HStack(spacing: 8) {
+                        if isDeleting {
+                            ProgressView()
+                                .tint(.white)
+                        }
+                        Text("Delete Account")
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(
+                        isConfirmed && !isDeleting
+                            ? Color.red
+                            : Color.gray
+                    )
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    )
+                }
+                .disabled(!isConfirmed || isDeleting)
+
+                Spacer()
+            }
+            .padding(.horizontal, 24)
+            .background(Color.barTabBackground.ignoresSafeArea())
+            .navigationTitle("Delete Account")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+    }
+
+    private func delete() async {
+        isDeleting = true
+        do {
+            try await userSession.deleteAccount()
+            toastCenter.show("Account deleted", kind: .success)
+            dismiss()
+        } catch {
+            toastCenter.showError(error)
+        }
+        isDeleting = false
     }
 }
 

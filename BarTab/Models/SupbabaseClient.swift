@@ -22,12 +22,16 @@ enum DeepLink {
 
     static let scheme = SupabaseConfig.oauthCallbackScheme
 
+    /// Universal Link host — must match the app's associated-domains
+    /// entitlement and the `apple-app-site-association` file.
+    static let host = "bartap.info"
+
     static func bar(_ id: UUID) -> URL {
-        URL(string: "\(scheme)://bar/\(id.uuidString)")!
+        URL(string: "https://\(host)/bar/\(id.uuidString)")!
     }
 
     static func group(_ id: UUID) -> URL {
-        URL(string: "\(scheme)://group/\(id.uuidString)")!
+        URL(string: "https://\(host)/group/\(id.uuidString)")!
     }
 }
 

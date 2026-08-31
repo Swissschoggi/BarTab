@@ -120,6 +120,20 @@ final class UserSession: ObservableObject {
         currentUser = nil
     }
 
+    /// Permanently deletes the signed-in user's account and all their data.
+    func deleteAccount() async throws {
+        // Ensure a valid (refreshed if needed) session so the delete call
+        // is authenticated.
+        guard await authService.validSession() != nil else {
+            return
+        }
+
+        try await SupabaseClient.shared.deleteAccount()
+
+        authService.clearSession()
+        currentUser = nil
+    }
+
     // MARK: - Account updates
 
     func updateUsername(_ newUsername: String) async throws {

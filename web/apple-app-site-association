@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "LUHP6G9833.com.example.BarTab",
+        "paths": ["/bar/*", "/group/*"]
+      }
+    ]
+  }
+}
