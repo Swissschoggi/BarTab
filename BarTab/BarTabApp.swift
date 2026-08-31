@@ -31,7 +31,6 @@ struct BarTabApp: App {
                 .environment(\.locale, languageManager.currentLocale)
                 .barTabToast(center: toastCenter)
                 .task {
-                    guard userSession.isLoggedIn else { return }
                     await barRepository.fetchAllData()
                 }
                 .onReceive(userSession.$currentUser) { user in

@@ -51,37 +51,50 @@ final class BarRepository: ObservableObject {
     // MARK: - Supabase Fetching
 
     func fetchAllData() async {
-        do {
-            async let fetchedBars = SupabaseClient.shared.fetchBars()
-            async let fetchedPrices = SupabaseClient.shared.fetchAllPrices()
-            async let fetchedRatings = SupabaseClient.shared.fetchBarRatings()
-            async let fetchedDrinkRatings = SupabaseClient.shared.fetchAllDrinkRatings()
-            async let fetchedBrands = SupabaseClient.shared.fetchBrands()
-            async let fetchedBrandRequests = SupabaseClient.shared.fetchBrandRequests()
-            async let fetchedReports = SupabaseClient.shared.fetchContentReports()
+        // Fetch each table independently so a single failure (e.g. an
+        // admin-only table for a non-admin user) never blanks the whole
+        // app. Public data still loads even when signed out.
+        async let fetchedBars = SupabaseClient.shared.fetchBars()
+        async let fetchedPrices = SupabaseClient.shared.fetchAllPrices()
+        async let fetchedRatings = SupabaseClient.shared.fetchBarRatings()
+        async let fetchedDrinkRatings = SupabaseClient.shared.fetchAllDrinkRatings()
+        async let fetchedBrands = SupabaseClient.shared.fetchBrands()
+        async let fetchedBrandRequests = SupabaseClient.shared.fetchBrandRequests()
+        async let fetchedReports = SupabaseClient.shared.fetchContentReports()
 
-            self.bars = try await fetchedBars
-            self.prices = try await fetchedPrices
-            self.barRatings = try await fetchedRatings
-            self.drinkRatings = try await fetchedDrinkRatings
-            self.brandRequests = try await fetchedBrandRequests
-            self.reports = try await fetchedReports
+        if let bars = try? await fetchedBars {
+            self.bars = bars
+        }
+        if let prices = try? await fetchedPrices {
+            self.prices = prices
+        }
+        if let ratings = try? await fetchedRatings {
+            self.barRatings = ratings
+        }
+        if let drinkRatings = try? await fetchedDrinkRatings {
+            self.drinkRatings = drinkRatings
+        }
+        if let brandRequests = try? await fetchedBrandRequests {
+            self.brandRequests = brandRequests
+        }
+        if let reports = try? await fetchedReports {
+            self.reports = reports
+        }
 
-            // Merge the server-approved catalog with the bundled
-            // defaults, so the app still has sensible brands to
-            // offer even before the backend is seeded.
-            let serverBrands = try await fetchedBrands
+        // Merge the server-approved catalog with the bundled defaults,
+        // so the app still has sensible brands to offer even before the
+        // backend is seeded.
+        if let serverBrands = try? await fetchedBrands {
             var merged: [String: DrinkBrand] = [:]
             for brand in DrinkBrand.all + serverBrands {
                 let key = "\(brand.drink.rawValue)|\(brand.name.lowercased())"
                 merged[key] = brand
             }
             self.brands = Array(merged.values)
-            recomputePriceLevels()
-            self.lastFetchedAt = Date()
-        } catch {
-            toastCenter?.showError(error)
         }
+
+        recomputePriceLevels()
+        self.lastFetchedAt = Date()
     }
 
     func refreshReports() async {
