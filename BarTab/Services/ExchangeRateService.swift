@@ -51,7 +51,7 @@ final class ExchangeRateService: @unchecked Sendable {
         }
 
         guard let url = URL(
-            string: "https://api.exchangerate-api.com/v4/latest/CHF"
+            string: "https://open.er-api.com/v6/latest/CHF"
         ) else { return }
 
         do {

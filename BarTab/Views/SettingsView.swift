@@ -80,7 +80,7 @@ struct SettingsView: View {
                                 ForEach(Currency.allCases) { currency in
                                     Button {
                                         selectedCurrency = currency
-                                        Currency.defaultCurrency = currency
+                                        barRepository.setDefaultCurrency(currency)
                                     } label: {
                                         HStack {
                                             Text(currency.symbol)

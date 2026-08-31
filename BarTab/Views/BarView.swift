@@ -904,12 +904,24 @@ struct BarView: View {
         let isMine = userID == price.reportedBy
         let hasVerified = userID.map { barRepository.hasUserVerified(priceID: price.id, userID: $0) } ?? false
         let verifyCount = barRepository.verificationCount(for: price.id)
+        let converted = ExchangeRateService.shared.convert(
+            price.amount,
+            from: price.currency,
+            to: Currency.defaultCurrency.rawValue
+        )
+        let showOriginal = price.currency != Currency.defaultCurrency.rawValue
 
         return HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(Currency.defaultCurrency.symbol)\(price.formattedAmount)")
+                Text("\(Currency.defaultCurrency.symbol)\(converted.formattedAmount)")
                     .font(.subheadline)
                     .fontWeight(.medium)
+
+                if showOriginal {
+                    Text("\(price.formattedAmount) \(price.currency)")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
 
                 HStack(spacing: 4) {
                     Text(price.reportedAt.relativeFormatted)
@@ -1039,7 +1051,17 @@ struct BarView: View {
 
     private func averageAmount(for group: PriceGroup) -> Double {
         guard !group.prices.isEmpty else { return 0.0 }
-        let total = group.prices.reduce(Decimal(0)) { $0 + $1.amount }
+
+        // Convert each report to the user's default currency first, so
+        // prices entered in different currencies average correctly.
+        let target = Currency.defaultCurrency.rawValue
+        let total = group.prices.reduce(Decimal(0)) { partial, price in
+            partial + ExchangeRateService.shared.convert(
+                price.amount,
+                from: price.currency,
+                to: target
+            )
+        }
         let count = Decimal(group.prices.count)
         return NSDecimalNumber(decimal: total / count).doubleValue
     }

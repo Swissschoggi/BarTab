@@ -13,6 +13,7 @@ final class BarRepository: ObservableObject {
     @Published private(set) var brands: [DrinkBrand] = DrinkBrand.all
     @Published private(set) var brandRequests: [BrandRequest] = []
     @Published private(set) var priceVerifications: [PriceVerification] = []
+    @Published private(set) var defaultCurrency: Currency = Currency.defaultCurrency
 
     private var latestVerificationByPriceID: [UUID: Date] = [:]
     private var verificationCountByPriceID: [UUID: Int] = [:]
@@ -32,6 +33,19 @@ final class BarRepository: ObservableObject {
 
     func attachToastCenter(_ center: ToastCenter) {
         toastCenter = center
+    }
+
+    /// Updates the user's default currency, refreshes exchange rates and
+    /// republishes so every screen recomputes prices in the new currency.
+    func setDefaultCurrency(_ currency: Currency) {
+        Currency.defaultCurrency = currency
+        defaultCurrency = currency
+        recomputePriceLevels()
+
+        Task {
+            await ExchangeRateService.shared.fetchRates()
+            recomputePriceLevels()
+        }
     }
 
     init() {
