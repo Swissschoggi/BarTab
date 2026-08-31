@@ -44,41 +44,12 @@
 
       <div class="phone reveal">
         <div class="notch"></div>
-        <div class="app-title">Nearby bars · 500 m</div>
+        <div class="app-title">Live prices · from the community</div>
 
-        <div class="pcard">
-          <div class="ic">🍺</div>
-          <div>
-            <div class="name">The Corner Tap</div>
-            <div class="sub">Beer · 5 dl · <span class="verified">✓ 12</span></div>
-          </div>
-          <div class="price">
-            <div class="amt">CHF 5.50</div>
-            <div class="lvl">$$</div>
-          </div>
-        </div>
-
-        <div class="pcard">
-          <div class="ic">🍷</div>
-          <div>
-            <div class="name">Vinoteca</div>
-            <div class="sub">Wine · glass · <span class="verified">✓ 8</span></div>
-          </div>
-          <div class="price">
-            <div class="amt">CHF 8.00</div>
-            <div class="lvl">$$$</div>
-          </div>
-        </div>
-
-        <div class="pcard">
-          <div class="ic">🍸</div>
-          <div>
-            <div class="name">The Hideaway</div>
-            <div class="sub">Cocktail · <span class="verified">✓ 21</span></div>
-          </div>
-          <div class="price">
-            <div class="amt">CHF 14.00</div>
-            <div class="lvl">$$$$</div>
+        <div id="bar-cards">
+          <div class="pcard">
+            <div class="ic">🍺</div>
+            <div><div class="name">Loading bars…</div></div>
           </div>
         </div>
       </div>
@@ -303,6 +274,70 @@
     }
 
     loadStats();
+
+    // Fill the phone mockup with real bars + prices.
+    const DRINK_META = {
+      beer:      { icon: '🍺', label: 'Beer' },
+      wine:      { icon: '🍷', label: 'Wine' },
+      cocktail:  { icon: '🍸', label: 'Cocktail' },
+      shot:      { icon: '🥃', label: 'Shot' },
+      softDrink: { icon: '🥤', label: 'Soft drink' },
+      coffee:    { icon: '☕', label: 'Coffee' },
+      other:     { icon: '🥂', label: 'Drink' }
+    };
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    async function loadBars() {
+      const container = document.getElementById('bar-cards');
+      if (!container) return;
+
+      try {
+        const res = await fetch(
+          SUPABASE_URL + '/rest/v1/prices?select=amount,currency,drink,bars(name)&order=reported_at.desc&limit=24',
+          { headers: HEADERS }
+        );
+        if (!res.ok) return;
+
+        const rows = await res.json();
+        const seen = new Set();
+        const picks = [];
+        for (const r of rows) {
+          const name = r.bars && r.bars.name;
+          if (!name || seen.has(name)) continue;
+          seen.add(name);
+          picks.push(r);
+          if (picks.length === 3) break;
+        }
+
+        if (!picks.length) return;
+
+        container.innerHTML = picks.map((p) => {
+          const meta = DRINK_META[p.drink] || DRINK_META.other;
+          const amt = Number(p.amount).toFixed(2);
+          return (
+            '<div class="pcard">' +
+              '<div class="ic">' + meta.icon + '</div>' +
+              '<div>' +
+                '<div class="name">' + esc(p.bars.name) + '</div>' +
+                '<div class="sub">' + meta.label + '</div>' +
+              '</div>' +
+              '<div class="price">' +
+                '<div class="amt">' + esc(p.currency) + ' ' + amt + '</div>' +
+              '</div>' +
+            '</div>'
+          );
+        }).join('');
+      } catch (e) {
+        // leave the "Loading bars…" placeholder
+      }
+    }
+
+    loadBars();
   </script>
 
 </body>
