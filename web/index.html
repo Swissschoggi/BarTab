@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="BarTab — Know what you're paying" />
+  <meta property="og:title" content="BarTab  Know what you're paying" />
   <meta property="og:description" content="Find bars, compare drink prices and discover the best deals around you." />
   <meta property="og:image" content="https://bartap.info/og.png" />
   <meta property="og:url" content="https://bartap.info/" />
@@ -14,7 +14,7 @@
   <meta name="apple-itunes-app" content="app-id=0000000000" />
 
   <link rel="stylesheet" href="style.css" />
-  <title>BarTab — Know what you're paying</title>
+  <title>BarTab  Know what you're paying</title>
 </head>
 <body>
 
@@ -35,7 +35,7 @@
       <div>
         <span class="eyebrow">🥂 Crowdsourced drink prices</span>
         <h1>Know what you're <span class="grad">paying</span> before you go.</h1>
-        <p>BarTab shows real drink prices at bars near you — reported by people who were actually there. Compare, save, and never overpay for a pint again.</p>
+        <p>BarTab shows real drink prices at bars near you  reported by people who were actually there. Compare, save, and never overpay for a pint again.</p>
         <div class="hero-actions">
           <a class="button" href="#how">See how it works</a>
           <a class="button secondary" href="privacy.html">We respect your data</a>
@@ -87,16 +87,16 @@
 
   <section class="container stats">
     <div class="stat reveal">
-      <div class="num">120+</div>
+      <div class="num" id="stat-bars">—</div>
       <div class="label">Bars mapped</div>
     </div>
     <div class="stat reveal">
-      <div class="num">4,500+</div>
+      <div class="num" id="stat-prices">—</div>
       <div class="label">Prices reported</div>
     </div>
     <div class="stat reveal">
-      <div class="num">100%</div>
-      <div class="label">Community-driven</div>
+      <div class="num" id="stat-contributors">—</div>
+      <div class="label">Contributors</div>
     </div>
   </section>
 
@@ -115,7 +115,7 @@
       <div class="feature reveal">
         <div class="icon">💰</div>
         <h3>Compare drink prices</h3>
-        <p>See what a beer, wine or cocktail actually costs — reported by real people.</p>
+        <p>See what a beer, wine or cocktail actually costs reported by real people.</p>
       </div>
       <div class="feature reveal">
         <div class="icon">👯</div>
@@ -159,7 +159,7 @@
       <div class="step reveal">
         <div class="n">3</div>
         <h3>Report what you paid</h3>
-        <p>Add the price you saw — keep the map fresh for everyone.</p>
+        <p>Add the price you saw keep the map fresh for everyone.</p>
       </div>
     </div>
   </section>
@@ -211,11 +211,11 @@
     <div class="faq reveal">
       <details>
         <summary>Is BarTab free?</summary>
-        <p>Yes. BarTab is free to use and will stay free for everyone who contributes prices.</p>
+        <p>Yes. BarTab is free to use and will stay free for everyone.</p>
       </details>
       <details>
         <summary>Where do the prices come from?</summary>
-        <p>Prices are added by users like you. The community "still accurate" check keeps them fresh.</p>
+        <p>Prices are added by users like you. The community keeps them fresh.</p>
       </details>
       <details>
         <summary>Do you track my location?</summary>
@@ -255,6 +255,54 @@
 
       document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     });
+  </script>
+
+  <script>
+    // Live stats pulled straight from Supabase (public anon access).
+    const SUPABASE_URL = 'https://xdyewakhzjnmpzhzhehl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkeWV3YWtoempubXB6aHpoZWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwODc2MjksImV4cCI6MjEwMjY2MzYyOX0.nAZASYlhS3OBFc-mBSUVenGUTuzfMZgcbt9eBhc4Dm4';
+
+    const HEADERS = {
+      apikey: SUPABASE_KEY,
+      Authorization: 'Bearer ' + SUPABASE_KEY
+    };
+
+    function fmt(n) {
+      return n.toLocaleString('en-US');
+    }
+
+    async function fetchCount(table, column) {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/' + table + '?select=' + column, { headers: HEADERS });
+      if (!res.ok) return null;
+      const rows = await res.json();
+      return rows.length;
+    }
+
+    function setStat(id, value) {
+      if (value == null) return;
+      document.getElementById(id).textContent = fmt(value);
+    }
+
+    async function loadStats() {
+      try {
+        const bars = await fetchCount('bars', 'id');
+        setStat('stat-bars', bars);
+
+        const prices = await fetchCount('prices', 'id');
+        setStat('stat-prices', prices);
+
+        const res = await fetch(SUPABASE_URL + '/rest/v1/prices?select=reported_by', { headers: HEADERS });
+        if (res.ok) {
+          const rows = await res.json();
+          const contributors = new Set(rows.map(r => r.reported_by)).size;
+          setStat('stat-contributors', contributors);
+        }
+      } catch (e) {
+        // keep the "—" placeholders on failure
+      }
+    }
+
+    loadStats();
   </script>
 
 </body>
