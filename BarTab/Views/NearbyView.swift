@@ -211,12 +211,10 @@ struct NearbyView: View {
         priceResults.min { comparisonValue($0.summary) < comparisonValue($1.summary) }?.summary.id
     }
 
-    /// Comparison value for "cheapest"/"best deal": size-normalized price
-    /// per 10 cl in the default currency, falling back to the raw
-    /// converted amount when a size has no estimable volume.
+    /// Comparison value for "cheapest"/"best deal": the raw price in the
+    /// default currency, so results reflect what you'd actually pay.
     private func comparisonValue(_ summary: PriceSummary) -> Double {
-        summary.normalizedAmountPer10cl
-            ?? NSDecimalNumber(decimal: summary.convertedAmount).doubleValue
+        NSDecimalNumber(decimal: summary.convertedAmount).doubleValue
     }
 
     // MARK: - Body
@@ -894,12 +892,6 @@ struct NearbyView: View {
                         .font(.subheadline)
                         .fontWeight(.bold)
                         .foregroundColor(.barTabPrimary)
-
-                    if let normalized = summary.formattedNormalizedAmountPer10cl {
-                        Text("≈ \(Currency.defaultCurrency.symbol)\(normalized) / 10 cl")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
 
                     Text(summary.reportCount == 1 ? "1 report" : "\(summary.reportCount) reports")
                         .font(.caption2)

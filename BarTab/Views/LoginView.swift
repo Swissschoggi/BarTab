@@ -39,6 +39,8 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
+    @State private var showPassword = false
+    @State private var showConfirmPassword = false
     @State private var currentNonce: String?
     @State private var errorMessage: String?
     @State private var isSubmitting = false
@@ -177,12 +179,32 @@ struct LoginView: View {
                             Text("Password")
                                 .font(.headline)
 
-                            SecureField(
-                                mode == .createAccount
-                                ? "At least 8 characters"
-                                : "Your password",
-                                text: $password
-                            )
+                            HStack {
+                                if showPassword {
+                                    TextField(
+                                        mode == .createAccount
+                                        ? "At least 8 characters"
+                                        : "Your password",
+                                        text: $password
+                                    )
+                                    .textInputAutocapitalization(.never)
+                                    .autocorrectionDisabled()
+                                } else {
+                                    SecureField(
+                                        mode == .createAccount
+                                        ? "At least 8 characters"
+                                        : "Your password",
+                                        text: $password
+                                    )
+                                }
+
+                                Button {
+                                    showPassword.toggle()
+                                } label: {
+                                    Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
+                                        .foregroundColor(.secondary)
+                                }
+                            }
                             .padding()
                             .background(
                                 Color.barTabPrimary
@@ -219,10 +241,28 @@ struct LoginView: View {
                                 Text("Confirm password")
                                     .font(.headline)
 
-                                SecureField(
-                                    "Repeat your password",
-                                    text: $confirmPassword
-                                )
+                                HStack {
+                                    if showConfirmPassword {
+                                        TextField(
+                                            "Repeat your password",
+                                            text: $confirmPassword
+                                        )
+                                        .textInputAutocapitalization(.never)
+                                        .autocorrectionDisabled()
+                                    } else {
+                                        SecureField(
+                                            "Repeat your password",
+                                            text: $confirmPassword
+                                        )
+                                    }
+
+                                    Button {
+                                        showConfirmPassword.toggle()
+                                    } label: {
+                                        Image(systemName: showConfirmPassword ? "eye.slash.fill" : "eye.fill")
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
                                 .padding()
                                 .background(
                                     Color.barTabPrimary
@@ -496,6 +536,24 @@ struct LoginView: View {
 
                 HapticEngine.success()
                 dismiss()
+
+            } catch let authError as SupabaseAuthService.AuthError {
+
+                isSubmitting = false
+
+                if case .emailConfirmationRequired = authError {
+                    // Account was created; the user just needs to confirm.
+                    toastCenter.show(
+                        "Account created! Check your inbox to confirm your email, then sign in.",
+                        kind: .success,
+                        duration: 6
+                    )
+                    mode = .signIn
+                    password = ""
+                    confirmPassword = ""
+                } else {
+                    errorMessage = FriendlyError.message(for: authError)
+                }
 
             } catch {
 

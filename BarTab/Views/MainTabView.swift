@@ -7,6 +7,24 @@ struct MainTabView: View {
         case nearby
         case groups
         case profile
+
+        var icon: String {
+            switch self {
+            case .map: return "map.fill"
+            case .nearby: return "safari.fill"
+            case .groups: return "person.3.fill"
+            case .profile: return "person.fill"
+            }
+        }
+
+        var title: LocalizedStringKey {
+            switch self {
+            case .map: return "Map"
+            case .nearby: return "Discover"
+            case .groups: return "Group"
+            case .profile: return "Me"
+            }
+        }
     }
 
     @EnvironmentObject private var userSession: UserSession
@@ -20,6 +38,8 @@ struct MainTabView: View {
     // Swipeable tab bar state
     @State private var tabBarWidth: CGFloat = 0
     @State private var dragOffset: CGFloat = 0
+    @State private var dragStartIndex: Int = 0
+    @State private var isTabDragging = false
 
     private var adminBadgeCount: Int {
         guard userSession.currentUser?.isAdmin == true else { return 0 }
@@ -37,10 +57,17 @@ struct MainTabView: View {
         return tabBarWidth / CGFloat(tabCount)
     }
 
+    /// The tab the pill is anchored to while dragging vs. the committed
+    /// selection at rest.
+    private var activeBaseIndex: Int {
+        isTabDragging ? dragStartIndex : selectedIndex
+    }
+
     /// Rubber-banded drag offset so the pill resists at the edges.
     private var clampedDragOffset: CGFloat {
-        let minX = -CGFloat(selectedIndex) * tabWidth
-        let maxX = CGFloat(tabCount - 1 - selectedIndex) * tabWidth
+        let base = activeBaseIndex
+        let minX = -CGFloat(base) * tabWidth
+        let maxX = CGFloat(tabCount - 1 - base) * tabWidth
 
         var value = dragOffset
         if value < minX {
@@ -53,7 +80,7 @@ struct MainTabView: View {
 
     /// Horizontal position of the pill's leading edge (plus inner inset).
     private var pillOffsetX: CGFloat {
-        CGFloat(selectedIndex) * tabWidth + 4 + clampedDragOffset
+        CGFloat(activeBaseIndex) * tabWidth + 4 + clampedDragOffset
     }
 
     /// The pill stretches slightly while dragging, like a pulled droplet.
@@ -130,7 +157,19 @@ struct MainTabView: View {
     private var tabBar: some View {
         ZStack(alignment: .topLeading) {
 
-            // Fluid selection pill
+            // Layer 1: unselected labels (gray) + tap targets
+            HStack(spacing: 0) {
+                ForEach(Tab.allCases, id: \.self) { tab in
+                    Button {
+                        selectTab(tab, haptic: .lightTap)
+                    } label: {
+                        tabLabel(tab: tab, isSelected: false)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            // Layer 2: fluid selection pill (slides above the gray labels)
             Capsule()
                 .fill(
                     LinearGradient(
@@ -149,12 +188,18 @@ struct MainTabView: View {
                     y: 3
                 )
 
+            // Layer 3: selected label (white), drawn above the pill
             HStack(spacing: 0) {
-                tabButton(tab: .map, title: "Map", icon: "map.fill")
-                tabButton(tab: .nearby, title: "Discover", icon: "safari.fill")
-                tabButton(tab: .groups, title: "Group", icon: "person.3.fill")
-                tabButton(tab: .profile, title: "Me", icon: "person.fill", badge: adminBadgeCount)
+                ForEach(Tab.allCases, id: \.self) { tab in
+                    if tab == selectedTab {
+                        tabLabel(tab: tab, isSelected: true)
+                    } else {
+                        Color.clear
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                }
             }
+            .allowsHitTesting(false)
         }
         .frame(height: 40)
         .background(
@@ -190,20 +235,30 @@ struct MainTabView: View {
     }
 
     private var tabBarSwipeGesture: some Gesture {
-        DragGesture(minimumDistance: 10)
+        DragGesture(minimumDistance: 10, coordinateSpace: .local)
             .onChanged { value in
+                guard tabBarWidth > 0 else { return }
+
+                if !isTabDragging {
+                    isTabDragging = true
+                    dragStartIndex = min(
+                        max(Int(value.startLocation.x / tabWidth), 0),
+                        tabCount - 1
+                    )
+                }
                 dragOffset = value.translation.width
             }
             .onEnded { value in
+                isTabDragging = false
                 guard tabBarWidth > 0 else { return }
 
-                // Snap, using velocity to carry the pill forward.
-                let rawPosition = CGFloat(selectedIndex) * tabWidth + dragOffset
-                var targetIndex = Int((rawPosition / tabWidth).rounded())
-                if abs(value.predictedEndTranslation.width) > tabWidth * 0.5 {
-                    targetIndex += value.predictedEndTranslation.width > 0 ? 1 : -1
-                }
-                targetIndex = min(max(targetIndex, 0), tabCount - 1)
+                // Snap to the tab under the finger, anchored to where the
+                // press started.
+                let rawPosition = CGFloat(dragStartIndex) * tabWidth + dragOffset
+                let targetIndex = min(
+                    max(Int((rawPosition / tabWidth).rounded()), 0),
+                    tabCount - 1
+                )
 
                 selectTab(Tab.allCases[targetIndex], haptic: .selection)
             }
@@ -227,51 +282,43 @@ struct MainTabView: View {
         case selection
     }
 
-    private func tabButton(
+    private func tabLabel(
         tab: Tab,
-        title: LocalizedStringKey,
-        icon: String,
-        badge: Int = 0
+        isSelected: Bool
     ) -> some View {
 
-        let isSelected = selectedTab == tab
+        let badge = (tab == .profile) ? adminBadgeCount : 0
 
-        return Button {
-            selectTab(tab, haptic: .lightTap)
-        } label: {
+        return HStack(spacing: 6) {
 
-            HStack(spacing: 6) {
-
-                Image(systemName: icon)
-                    .font(.system(size: 15, weight: .semibold))
-                    .overlay(alignment: .topTrailing) {
-                        if badge > 0 {
-                            Text("\(badge)")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.white)
-                                .frame(width: 16, height: 16)
-                                .background(Color.red)
-                                .clipShape(Circle())
-                                .offset(x: 8, y: -8)
-                        }
+            Image(systemName: tab.icon)
+                .font(.system(size: 15, weight: .semibold))
+                .overlay(alignment: .topTrailing) {
+                    if badge > 0 {
+                        Text("\(badge)")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 16, height: 16)
+                            .background(Color.red)
+                            .clipShape(Circle())
+                            .offset(x: 8, y: -8)
                     }
-
-                if isSelected {
-                    Text(title)
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .transition(.scale.combined(with: .opacity))
                 }
+
+            if isSelected {
+                Text(tab.title)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .transition(.scale.combined(with: .opacity))
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .foregroundColor(
-                isSelected
-                    ? .white
-                    : .barTabSecondary
-            )
-            .contentShape(Rectangle())
-            .accessibilityLabel(Text(title))
         }
-        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .foregroundColor(
+            isSelected
+                ? .white
+                : .barTabSecondary
+        )
+        .contentShape(Rectangle())
+        .accessibilityLabel(Text(tab.title))
     }
 }
 
