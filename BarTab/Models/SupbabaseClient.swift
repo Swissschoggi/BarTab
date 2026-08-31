@@ -497,6 +497,16 @@ final class SupabaseClient {
         _ = try await performAuthorized(request)
     }
 
+    /// Remove the current user's verification for a price.
+    func unverifyPrice(priceID: UUID) async throws {
+        let myID = try requireUserID().uuidString
+        var request = try makeRequest(
+            endpoint: "price_verifications?price_id=eq.\(priceID.uuidString)&user_id=eq.\(myID)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
     // MARK: - Bar Ratings
 
     /// Fetch every ambience/wine rating, mapped to domain BarRating models

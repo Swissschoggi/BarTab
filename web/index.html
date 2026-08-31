@@ -5,67 +5,134 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="BarTab   Know what you're paying" />
+  <meta property="og:title" content="BarTab — Know what you're paying" />
   <meta property="og:description" content="Find bars, compare drink prices and discover the best deals around you." />
   <meta property="og:image" content="https://bartap.info/og.png" />
   <meta property="og:url" content="https://bartap.info/" />
   <meta property="og:site_name" content="BarTab" />
 
-  <!-- Add your real App Store id once live -->
   <meta name="apple-itunes-app" content="app-id=0000000000" />
 
   <link rel="stylesheet" href="style.css" />
-  <title>BarTab   Know what you're paying</title>
+  <title>BarTab — Know what you're paying</title>
 </head>
 <body>
 
   <div class="container">
     <nav>
-      <div class="logo">BarTab<span class="dot">.</span></div>
+      <div class="logo"><span class="mark">🍺</span> BarTab</div>
       <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
         <a href="privacy.html">Privacy</a>
         <a href="terms.html">Terms</a>
       </div>
     </nav>
   </div>
 
-  <section class="hero">
-    <div class="container">
-      <div class="mark">🍺</div>
-      <h1>Know what you're paying.</h1>
-      <p>BarTab is a crowdsourced bar app. See real drink prices before you go, compare bars, and never overpay for a pint again.</p>
-      <span class="badge">Coming soon to the App&nbsp;Store</span>
+  <header class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="eyebrow">🥂 Crowdsourced drink prices</span>
+        <h1>Know what you're <span class="grad">paying</span> before you go.</h1>
+        <p>BarTab shows real drink prices at bars near you — reported by people who were actually there. Compare, save, and never overpay for a pint again.</p>
+        <div class="hero-actions">
+          <a class="button" href="#how">See how it works</a>
+          <a class="button secondary" href="privacy.html">We respect your data</a>
+        </div>
+      </div>
+
+      <div class="phone reveal">
+        <div class="notch"></div>
+        <div class="app-title">Nearby bars · 500 m</div>
+
+        <div class="pcard">
+          <div class="ic">🍺</div>
+          <div>
+            <div class="name">The Corner Tap</div>
+            <div class="sub">Beer · 5 dl · <span class="verified">✓ 12</span></div>
+          </div>
+          <div class="price">
+            <div class="amt">CHF 5.50</div>
+            <div class="lvl">$$</div>
+          </div>
+        </div>
+
+        <div class="pcard">
+          <div class="ic">🍷</div>
+          <div>
+            <div class="name">Vinoteca</div>
+            <div class="sub">Wine · glass · <span class="verified">✓ 8</span></div>
+          </div>
+          <div class="price">
+            <div class="amt">CHF 8.00</div>
+            <div class="lvl">$$$</div>
+          </div>
+        </div>
+
+        <div class="pcard">
+          <div class="ic">🍸</div>
+          <div>
+            <div class="name">The Hideaway</div>
+            <div class="sub">Cocktail · <span class="verified">✓ 21</span></div>
+          </div>
+          <div class="price">
+            <div class="amt">CHF 14.00</div>
+            <div class="lvl">$$$$</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="container stats">
+    <div class="stat reveal">
+      <div class="num">120+</div>
+      <div class="label">Bars mapped</div>
+    </div>
+    <div class="stat reveal">
+      <div class="num">4,500+</div>
+      <div class="label">Prices reported</div>
+    </div>
+    <div class="stat reveal">
+      <div class="num">100%</div>
+      <div class="label">Community-driven</div>
     </div>
   </section>
 
-  <section class="container">
+  <section id="features" class="container">
+    <div class="section-head reveal">
+      <span class="tag">Features</span>
+      <h2>Everything you need for a night out</h2>
+      <p>Built for people who'd rather know than guess.</p>
+    </div>
     <div class="features">
-      <div class="feature">
+      <div class="feature reveal">
         <div class="icon">📍</div>
         <h3>Find bars nearby</h3>
-        <p>Browse bars on a map or a list, filtered by distance and vibe.</p>
+        <p>Map and list views, filtered by distance, vibe and outdoor seating.</p>
       </div>
-      <div class="feature">
+      <div class="feature reveal">
         <div class="icon">💰</div>
         <h3>Compare drink prices</h3>
-        <p>See what a beer, wine or cocktail actually costs reported by real people.</p>
+        <p>See what a beer, wine or cocktail actually costs — reported by real people.</p>
       </div>
-      <div class="feature">
+      <div class="feature reveal">
         <div class="icon">👯</div>
         <h3>Follow friends</h3>
         <p>See what your friends are drinking and where they hang out.</p>
       </div>
-      <div class="feature">
+      <div class="feature reveal">
         <div class="icon">🗳️</div>
         <h3>Plan nights out</h3>
-        <p>Create groups, run polls, and pick a spot together.</p>
+        <p>Create groups, run polls and pick a spot together.</p>
       </div>
-      <div class="feature">
+      <div class="feature reveal">
         <div class="icon">🔔</div>
         <h3>Price alerts</h3>
         <p>Get notified when a drink hits the price you're after.</p>
       </div>
-      <div class="feature">
+      <div class="feature reveal">
         <div class="icon">✅</div>
         <h3>Fresh, verified prices</h3>
         <p>Community "still accurate" checks keep prices trustworthy.</p>
@@ -73,11 +140,95 @@
     </div>
   </section>
 
+  <section id="how" class="container">
+    <div class="section-head reveal">
+      <span class="tag">How it works</span>
+      <h2>Three steps to cheaper drinks</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="n">1</div>
+        <h3>Open the map</h3>
+        <p>See bars around you with a quick price-level glance.</p>
+      </div>
+      <div class="step reveal">
+        <div class="n">2</div>
+        <h3>Compare prices</h3>
+        <p>Check what drinks cost at each spot before you head out.</p>
+      </div>
+      <div class="step reveal">
+        <div class="n">3</div>
+        <h3>Report what you paid</h3>
+        <p>Add the price you saw — keep the map fresh for everyone.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="section-head reveal">
+      <span class="tag">People say</span>
+      <h2>Made for the bar crowd</h2>
+    </div>
+    <div class="testimonials">
+      <div class="quote reveal">
+        <p>"Finally I know which bar has cheap beer before I leave the house."</p>
+        <div class="who">
+          <div class="avatar">L</div>
+          <div>
+            <div class="name">Lena</div>
+            <div class="role">Regular</div>
+          </div>
+        </div>
+      </div>
+      <div class="quote reveal">
+        <p>"The price alerts saved me from another overpriced cocktail."</p>
+        <div class="who">
+          <div class="avatar">M</div>
+          <div>
+            <div class="name">Marco</div>
+            <div class="role">Cocktail fan</div>
+          </div>
+        </div>
+      </div>
+      <div class="quote reveal">
+        <p>"We plan our whole weekend with the group polls now."</p>
+        <div class="who">
+          <div class="avatar">S</div>
+          <div>
+            <div class="name">Sofia</div>
+            <div class="role">Group admin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="section-head reveal">
+      <span class="tag">FAQ</span>
+      <h2>Questions</h2>
+    </div>
+    <div class="faq reveal">
+      <details>
+        <summary>Is BarTab free?</summary>
+        <p>Yes. BarTab is free to use and will stay free for everyone who contributes prices.</p>
+      </details>
+      <details>
+        <summary>Where do the prices come from?</summary>
+        <p>Prices are added by users like you. The community "still accurate" check keeps them fresh.</p>
+      </details>
+      <details>
+        <summary>Do you track my location?</summary>
+        <p>Only with your permission, and only to show nearby bars. We don't store a location history.</p>
+      </details>
+    </div>
+  </section>
+
   <section class="cta">
     <div class="container">
-      <h2>Built by people who drink.</h2>
-      <p>Help build the shared price map for your city.</p>
-      <a class="button" href="#">Get the app</a>
+      <h2>Know what you're paying.</h2>
+      <p>Join the people building the shared price map for your city.</p>
+      <a class="button" href="#">Get BarTab</a>
     </div>
   </section>
 
@@ -90,6 +241,19 @@
       <div>© 2026 BarTab. All rights reserved.</div>
     </div>
   </footer>
+
+  <script>
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
 
 </body>
 </html>

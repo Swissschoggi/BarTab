@@ -933,12 +933,23 @@ struct BarView: View {
                 Button {
                     guard let user = userSession.currentUser else { return }
                     Task {
-                        let ok = await barRepository.verifyPrice(price, user: user)
-                        if ok {
-                            HapticEngine.lightTap()
-                            toastCenter.show("Thanks for confirming this price!", kind: .success)
+                        let ok: Bool
+                        if hasVerified {
+                            ok = await barRepository.unverifyPrice(price, user: user)
+                            if ok {
+                                HapticEngine.lightTap()
+                                toastCenter.show("Verification removed", kind: .info)
+                            }
                         } else {
-                            toastCenter.show("Couldn't verify right now", kind: .error)
+                            ok = await barRepository.verifyPrice(price, user: user)
+                            if ok {
+                                HapticEngine.lightTap()
+                                toastCenter.show("Thanks for confirming this price!", kind: .success)
+                            }
+                        }
+
+                        if !ok {
+                            toastCenter.show("Couldn't update right now", kind: .error)
                         }
                     }
                 } label: {
@@ -947,7 +958,7 @@ struct BarView: View {
                         .foregroundColor(hasVerified ? .green : .barTabSecondary)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Confirm this price is still accurate")
+                .accessibilityLabel(hasVerified ? "Remove your verification" : "Confirm this price is still accurate")
             }
 
             if isMine {
@@ -969,11 +980,20 @@ struct BarView: View {
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .contextMenu {
             if !isMine {
-                Button {
-                    guard let user = userSession.currentUser else { return }
-                    Task { await barRepository.verifyPrice(price, user: user) }
-                } label: {
-                    Label("Confirm this price", systemImage: "checkmark.circle")
+                if hasVerified {
+                    Button {
+                        guard let user = userSession.currentUser else { return }
+                        Task { await barRepository.unverifyPrice(price, user: user) }
+                    } label: {
+                        Label("Remove my verification", systemImage: "xmark.circle")
+                    }
+                } else {
+                    Button {
+                        guard let user = userSession.currentUser else { return }
+                        Task { await barRepository.verifyPrice(price, user: user) }
+                    } label: {
+                        Label("Confirm this price", systemImage: "checkmark.circle")
+                    }
                 }
             }
 

@@ -1050,10 +1050,20 @@ final class BarRepository: ObservableObject {
         return max(price.reportedAt, verifiedAt)
     }
 
+    /// How long a "still accurate" confirmation stays valid. After this
+    /// window it no longer counts toward freshness or the verified badge.
+    private static let verificationLifetime: TimeInterval = 90 * 24 * 60 * 60
+
+    /// Verifications still within the lifetime window.
+    private var activeVerifications: [PriceVerification] {
+        let cutoff = Date().addingTimeInterval(-Self.verificationLifetime)
+        return priceVerifications.filter { $0.createdAt >= cutoff }
+    }
+
     private func recomputeVerificationIndex() {
         var latest: [UUID: Date] = [:]
         var counts: [UUID: Int] = [:]
-        for verification in priceVerifications {
+        for verification in activeVerifications {
             if let existing = latest[verification.priceID] {
                 if verification.createdAt > existing {
                     latest[verification.priceID] = verification.createdAt
@@ -1072,7 +1082,7 @@ final class BarRepository: ObservableObject {
     }
 
     func hasUserVerified(priceID: UUID, userID: UUID) -> Bool {
-        priceVerifications.contains { $0.priceID == priceID && $0.userID == userID }
+        activeVerifications.contains { $0.priceID == priceID && $0.userID == userID }
     }
 
     /// Records the user's "still accurate" confirmation and refreshes the
@@ -1097,6 +1107,20 @@ final class BarRepository: ObservableObject {
         } else {
             priceVerifications.append(verification)
         }
+        recomputeVerificationIndex()
+        return true
+    }
+
+    /// Removes the user's "still accurate" confirmation. Returns true on
+    /// success.
+    func unverifyPrice(_ price: Price, user: User) async -> Bool {
+        do {
+            try await SupabaseClient.shared.unverifyPrice(priceID: price.id)
+        } catch {
+            return false
+        }
+
+        priceVerifications.removeAll { $0.priceID == price.id && $0.userID == user.id }
         recomputeVerificationIndex()
         return true
     }
