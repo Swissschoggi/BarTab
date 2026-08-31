@@ -184,6 +184,12 @@ final class UserSession: ObservableObject {
 
         guard let user = currentUser else { return }
 
+        // Refresh the session if needed so the upload is authenticated
+        // with a valid token (RLS on storage rejects anon uploads).
+        guard await authService.validSession() != nil else {
+            return
+        }
+
         guard let jpegData = AvatarService.processedJPEGData(
             from: image
         ) else {
