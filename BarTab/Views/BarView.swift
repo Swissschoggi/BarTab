@@ -900,7 +900,10 @@ struct BarView: View {
     }
 
     private func individualPriceRow(_ price: Price) -> some View {
-        let isMine = userSession.currentUser?.id == price.reportedBy
+        let userID = userSession.currentUser?.id
+        let isMine = userID == price.reportedBy
+        let hasVerified = userID.map { barRepository.hasUserVerified(priceID: price.id, userID: $0) } ?? false
+        let verifyCount = barRepository.verificationCount(for: price.id)
 
         return HStack {
             VStack(alignment: .leading, spacing: 2) {
@@ -908,12 +911,44 @@ struct BarView: View {
                     .font(.subheadline)
                     .fontWeight(.medium)
 
-                Text(price.reportedAt.relativeFormatted)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                HStack(spacing: 4) {
+                    Text(price.reportedAt.relativeFormatted)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+
+                    if verifyCount > 0 {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.caption2)
+                            .foregroundColor(.green)
+                        Text("\(verifyCount)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
 
             Spacer()
+
+            if !isMine {
+                Button {
+                    guard let user = userSession.currentUser else { return }
+                    Task {
+                        let ok = await barRepository.verifyPrice(price, user: user)
+                        if ok {
+                            HapticEngine.lightTap()
+                            toastCenter.show("Thanks for confirming this price!", kind: .success)
+                        } else {
+                            toastCenter.show("Couldn't verify right now", kind: .error)
+                        }
+                    }
+                } label: {
+                    Image(systemName: hasVerified ? "checkmark.circle.fill" : "checkmark.circle")
+                        .font(.subheadline)
+                        .foregroundColor(hasVerified ? .green : .barTabSecondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Confirm this price is still accurate")
+            }
 
             if isMine {
                 Button {
@@ -933,6 +968,15 @@ struct BarView: View {
         .background(Color.barTabBackground.opacity(0.5))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .contextMenu {
+            if !isMine {
+                Button {
+                    guard let user = userSession.currentUser else { return }
+                    Task { await barRepository.verifyPrice(price, user: user) }
+                } label: {
+                    Label("Confirm this price", systemImage: "checkmark.circle")
+                }
+            }
+
             if isMine {
                 Button(role: .destructive) {
                     pendingDeletePrice = price

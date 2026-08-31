@@ -12,6 +12,10 @@ final class BarRepository: ObservableObject {
     @Published private(set) var barRatings: [BarRating] = []
     @Published private(set) var brands: [DrinkBrand] = DrinkBrand.all
     @Published private(set) var brandRequests: [BrandRequest] = []
+    @Published private(set) var priceVerifications: [PriceVerification] = []
+
+    private var latestVerificationByPriceID: [UUID: Date] = [:]
+    private var verificationCountByPriceID: [UUID: Int] = [:]
 
     /// 1…4 dollar-sign level per bar, relative to the overall
     /// average drink price across all bars. Empty when unknown.
@@ -61,6 +65,7 @@ final class BarRepository: ObservableObject {
         async let fetchedBrands = SupabaseClient.shared.fetchBrands()
         async let fetchedBrandRequests = SupabaseClient.shared.fetchBrandRequests()
         async let fetchedReports = SupabaseClient.shared.fetchContentReports()
+        async let fetchedVerifications = SupabaseClient.shared.fetchPriceVerifications()
 
         if let bars = try? await fetchedBars {
             self.bars = bars
@@ -79,6 +84,10 @@ final class BarRepository: ObservableObject {
         }
         if let reports = try? await fetchedReports {
             self.reports = reports
+        }
+        if let verifications = try? await fetchedVerifications {
+            self.priceVerifications = verifications
+            recomputeVerificationIndex()
         }
 
         // Merge the server-approved catalog with the bundled defaults,
@@ -1009,12 +1018,12 @@ final class BarRepository: ObservableObject {
     private func calculateConfidence(reports: [Price]) -> Int {
         guard !reports.isEmpty else { return 0 }
         let now = Date()
-        let recentReports = reports.filter { now.timeIntervalSince($0.reportedAt) <= 365 * 24 * 60 * 60 }
+        let recentReports = reports.filter { now.timeIntervalSince(effectiveFreshnessDate(for: $0)) <= 365 * 24 * 60 * 60 }
         guard !recentReports.isEmpty else { return 15 }
 
         let reportScore = min(Double(recentReports.count) / 8.0, 1.0)
         let recencyScore = recentReports.reduce(0.0) { total, report in
-            let age = max(0, now.timeIntervalSince(report.reportedAt))
+            let age = max(0, now.timeIntervalSince(effectiveFreshnessDate(for: report)))
             let days = age / (24 * 60 * 60)
             let freshness = max(0.0, 1.0 - days / 365.0)
             return total + freshness
@@ -1030,6 +1039,66 @@ final class BarRepository: ObservableObject {
 
         let score = reportScore * 0.45 + recencyScore * 0.30 + agreementScore * 0.25
         return Int((score * 100).rounded())
+    }
+
+    // MARK: - Price Verification
+
+    /// The date used to measure a price's freshness: the most recent of its
+    /// original report and any "still accurate" confirmations.
+    private func effectiveFreshnessDate(for price: Price) -> Date {
+        let verifiedAt = latestVerificationByPriceID[price.id] ?? .distantPast
+        return max(price.reportedAt, verifiedAt)
+    }
+
+    private func recomputeVerificationIndex() {
+        var latest: [UUID: Date] = [:]
+        var counts: [UUID: Int] = [:]
+        for verification in priceVerifications {
+            if let existing = latest[verification.priceID] {
+                if verification.createdAt > existing {
+                    latest[verification.priceID] = verification.createdAt
+                }
+            } else {
+                latest[verification.priceID] = verification.createdAt
+            }
+            counts[verification.priceID, default: 0] += 1
+        }
+        latestVerificationByPriceID = latest
+        verificationCountByPriceID = counts
+    }
+
+    func verificationCount(for priceID: UUID) -> Int {
+        verificationCountByPriceID[priceID] ?? 0
+    }
+
+    func hasUserVerified(priceID: UUID, userID: UUID) -> Bool {
+        priceVerifications.contains { $0.priceID == priceID && $0.userID == userID }
+    }
+
+    /// Records the user's "still accurate" confirmation and refreshes the
+    /// local verification state. Returns true on success.
+    func verifyPrice(_ price: Price, user: User) async -> Bool {
+        do {
+            try await SupabaseClient.shared.verifyPrice(priceID: price.id)
+        } catch {
+            return false
+        }
+
+        let verification = PriceVerification(
+            id: UUID(),
+            priceID: price.id,
+            userID: user.id,
+            createdAt: Date()
+        )
+        if let index = priceVerifications.firstIndex(where: {
+            $0.priceID == price.id && $0.userID == user.id
+        }) {
+            priceVerifications[index] = verification
+        } else {
+            priceVerifications.append(verification)
+        }
+        recomputeVerificationIndex()
+        return true
     }
 
     // MARK: - Badges

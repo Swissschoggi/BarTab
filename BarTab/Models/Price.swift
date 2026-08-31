@@ -45,3 +45,18 @@ struct Price: Identifiable {
         amount.formattedAmount
     }
 }
+
+/// A user's "still accurate" confirmation for a price.
+struct PriceVerification: Identifiable, Codable {
+    let id: UUID
+    let priceID: UUID
+    let userID: UUID
+    let createdAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case priceID = "price_id"
+        case userID = "user_id"
+        case createdAt = "created_at"
+    }
+}

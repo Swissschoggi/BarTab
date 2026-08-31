@@ -460,6 +460,43 @@ final class SupabaseClient {
         _ = try await performAuthorized(request)
     }
 
+    // MARK: - Price Verification
+
+    /// Fetch every "still accurate" confirmation.
+    func fetchPriceVerifications() async throws -> [PriceVerification] {
+        let request = try makeRequest(endpoint: "price_verifications?select=*")
+        let data = try await performAuthorized(request)
+        return try decoder.decode([PriceVerification].self, from: data)
+    }
+
+    /// Record (or re-record) the current user's verification for a price.
+    /// Upserts on `price_id + user_id` and bumps `created_at`, so the
+    /// freshness date refreshes on each tap.
+    func verifyPrice(priceID: UUID) async throws {
+        struct VerifyBody: Codable {
+            let price_id: UUID
+            let user_id: UUID
+            let created_at: Date
+        }
+
+        let body = VerifyBody(
+            price_id: priceID,
+            user_id: try requireUserID(),
+            created_at: Date()
+        )
+
+        var request = try makeRequest(
+            endpoint: "price_verifications?on_conflict=price_id,user_id",
+            method: "POST"
+        )
+        request.setValue(
+            "resolution=merge-duplicates,return=representation",
+            forHTTPHeaderField: "Prefer"
+        )
+        request.httpBody = try encoder.encode(body)
+        _ = try await performAuthorized(request)
+    }
+
     // MARK: - Bar Ratings
 
     /// Fetch every ambience/wine rating, mapped to domain BarRating models
