@@ -40,7 +40,6 @@
 		AEF036533035BB2A00BDA1CC /* DrinkBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */; };
 		AEF036553035BB3F00BDA1CC /* DrinkBrands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */; };
 		AEF036573035BF5100BDA1CC /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036563035BF5100BDA1CC /* LoginView.swift */; };
-		BRTA00014000000000000064 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000065 /* ForgotPasswordView.swift */; };
 		AEF036593035C62000BDA1CC /* PriceConfidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036583035C62000BDA1CC /* PriceConfidence.swift */; };
 		AEF0365B3035C7FA00BDA1CC /* PriceSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */; };
 		AEF0365D3035C80000BDA1CC /* BarTabTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */; };
@@ -69,14 +68,14 @@
 		BRTA00013060000100000027 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000028 /* FlowLayout.swift */; };
 		BRTA00013060000100000029 /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000002A /* Currency.swift */; };
 		BRTA0001306000010000002B /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000002C /* ExchangeRateService.swift */; };
-		BRTA00013070000100000020 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000020 /* en.lproj */; };
-		BRTA00013070000100000021 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000021 /* de.lproj */; };
-		BRTA00013070000100000022 /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000022 /* fr.lproj */; };
-		BRTA00013070000100000023 /* it.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000023 /* it.lproj */; };
 		BRTA00013060000100000033 /* ToastCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000030 /* ToastCenter.swift */; };
 		BRTA00013060000100000034 /* AvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000031 /* AvatarService.swift */; };
 		BRTA00013060000100000036 /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000035 /* HapticEngine.swift */; };
 		BRTA00013060000100000038 /* DrinkRatingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000037 /* DrinkRatingSheet.swift */; };
+		BRTA00013070000100000020 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000020 /* en.lproj */; };
+		BRTA00013070000100000021 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000021 /* de.lproj */; };
+		BRTA00013070000100000022 /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000022 /* fr.lproj */; };
+		BRTA00013070000100000023 /* it.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000023 /* it.lproj */; };
 		BRTA00014000000000000050 /* Follow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000040 /* Follow.swift */; };
 		BRTA00014000000000000051 /* BarGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000041 /* BarGroup.swift */; };
 		BRTA00014000000000000052 /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000042 /* Poll.swift */; };
@@ -84,8 +83,6 @@
 		BRTA00014000000000000054 /* ActivityItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000044 /* ActivityItem.swift */; };
 		BRTA00014000000000000055 /* FollowButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000045 /* FollowButton.swift */; };
 		BRTA00014000000000000056 /* ActivityFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000046 /* ActivityFeedView.swift */; };
-		BRTA00014000000000000060 /* FindUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000061 /* FindUsersView.swift */; };
-		BRTA00014000000000000062 /* FollowRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000063 /* FollowRequestsView.swift */; };
 		BRTA00014000000000000057 /* GroupPlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000047 /* GroupPlanningView.swift */; };
 		BRTA00014000000000000058 /* CreateGroupSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000048 /* CreateGroupSheet.swift */; };
 		BRTA00014000000000000059 /* GroupDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000049 /* GroupDetailView.swift */; };
@@ -93,6 +90,9 @@
 		BRTA0001400000000000005B /* InviteMemberSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001400000000000004B /* InviteMemberSheet.swift */; };
 		BRTA0001400000000000005C /* SetAlertSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001400000000000004C /* SetAlertSheet.swift */; };
 		BRTA0001400000000000005D /* PriceAlertListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001400000000000004D /* PriceAlertListView.swift */; };
+		BRTA00014000000000000060 /* FindUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000061 /* FindUsersView.swift */; };
+		BRTA00014000000000000062 /* FollowRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000063 /* FollowRequestsView.swift */; };
+		BRTA00014000000000000064 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000065 /* ForgotPasswordView.swift */; };
 		BRTA0002A000000000000002 /* PriceAlertService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000001 /* PriceAlertService.swift */; };
 		BRTA0002A000000000000004 /* EditBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000003 /* EditBarView.swift */; };
 		BRTA0002A000000000000006 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000005 /* OnboardingView.swift */; };
@@ -157,7 +157,6 @@
 		AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkBrand.swift; sourceTree = "<group>"; };
 		AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkBrands.swift; sourceTree = "<group>"; };
 		AEF036563035BF5100BDA1CC /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		BRTA00014000000000000065 /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
 		AEF036583035C62000BDA1CC /* PriceConfidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceConfidence.swift; sourceTree = "<group>"; };
 		AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceSummary.swift; sourceTree = "<group>"; };
 		AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabTheme.swift; sourceTree = "<group>"; };
@@ -193,9 +192,9 @@
 		BRTA0001306000010000002C /* ExchangeRateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeRateService.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000030 /* ToastCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCenter.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000031 /* AvatarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarService.swift; sourceTree = "<group>"; };
+		BRTA00013060000100000032 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BRTA00013060000100000035 /* HapticEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticEngine.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000037 /* DrinkRatingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkRatingSheet.swift; sourceTree = "<group>"; };
-		BRTA00013060000100000032 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BRTA00014000000000000040 /* Follow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Follow.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000041 /* BarGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarGroup.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000042 /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
@@ -203,8 +202,6 @@
 		BRTA00014000000000000044 /* ActivityItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityItem.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000045 /* FollowButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowButton.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000046 /* ActivityFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityFeedView.swift; sourceTree = "<group>"; };
-		BRTA00014000000000000061 /* FindUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindUsersView.swift; sourceTree = "<group>"; };
-		BRTA00014000000000000063 /* FollowRequestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowRequestsView.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000047 /* GroupPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupPlanningView.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000048 /* CreateGroupSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupSheet.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000049 /* GroupDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupDetailView.swift; sourceTree = "<group>"; };
@@ -212,6 +209,9 @@
 		BRTA0001400000000000004B /* InviteMemberSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteMemberSheet.swift; sourceTree = "<group>"; };
 		BRTA0001400000000000004C /* SetAlertSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetAlertSheet.swift; sourceTree = "<group>"; };
 		BRTA0001400000000000004D /* PriceAlertListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertListView.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000061 /* FindUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindUsersView.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000063 /* FollowRequestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowRequestsView.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000065 /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
 		BRTA0002A000000000000001 /* PriceAlertService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertService.swift; sourceTree = "<group>"; };
 		BRTA0002A000000000000003 /* EditBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBarView.swift; sourceTree = "<group>"; };
 		BRTA0002A000000000000005 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -297,13 +297,6 @@
 				AE78396D3034F16B00F1555E /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		BRTA00013060000100000024 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 		AE7839763034F16B00F1555E /* BarTabTests */ = {
@@ -446,6 +439,13 @@
 				BRTA00013060000100000006 /* StarRatingView.swift */,
 			);
 			path = Theme;
+			sourceTree = "<group>";
+		};
+		BRTA00013060000100000024 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -828,6 +828,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = BarTab/BarTab.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BarTab/Preview Content\"";
@@ -846,8 +847,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.BarTab;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.BarTap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -860,6 +862,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = BarTab/BarTab.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BarTab/Preview Content\"";
@@ -878,8 +881,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.BarTab;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.BarTap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
