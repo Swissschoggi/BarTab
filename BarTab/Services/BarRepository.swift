@@ -390,16 +390,17 @@ final class BarRepository: ObservableObject {
             return
         }
 
-        // Ratios are already relative to the market (1.0 = average), so use
-        // fixed bands around 1.0.
+        // Ratios are relative to the market (1.0 = average). Use generous
+        // bands so a bar only gets $$$ / $$$$ when it's clearly above the
+        // going rate for the same drinks.
         var levels: [UUID: Int] = [:]
         for (barID, ratio) in ratiosPerBar {
             switch ratio {
-            case ..<0.85:
+            case ..<0.75:
                 levels[barID] = 1
-            case ..<1.05:
-                levels[barID] = 2
             case ..<1.25:
+                levels[barID] = 2
+            case ..<1.6:
                 levels[barID] = 3
             default:
                 levels[barID] = 4

@@ -78,11 +78,10 @@ struct ProfileView: View {
                     if let user = currentUser {
 
                         profileCard(user: user)
-                        levelCard
-                        contributionsSection
-                        adminSection
+                        activitySection
+                        savedSection
                         socialSection
-                        favoritesSection
+                        adminSection
                         accountSection
 
                     } else {
@@ -169,7 +168,7 @@ struct ProfileView: View {
 
     @ViewBuilder
     private func profileCard(user: User) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
 
             HStack(spacing: 14) {
 
@@ -200,13 +199,11 @@ struct ProfileView: View {
 
                 Spacer()
             }
-        }
-        .barTabCard()
-    }
 
-    @ViewBuilder
-    private var levelCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+            Divider()
+                .foregroundColor(.barTabCardBorder)
+
+            // Level + progress
             HStack(spacing: 12) {
                 Image(systemName: currentLevel.icon)
                     .font(.body)
@@ -262,13 +259,11 @@ struct ProfileView: View {
     }
 
     @ViewBuilder
-    private var contributionsSection: some View {
+    private var activitySection: some View {
         VStack(alignment: .leading, spacing: 10) {
 
             Text("Your activity")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundColor(.barTabText)
+                .font(.headline)
 
             HStack(spacing: 10) {
                 statisticCard(
@@ -283,28 +278,85 @@ struct ProfileView: View {
                     icon: "building.2.fill"
                 )
             }
+
+            VStack(spacing: 0) {
+                navigationRow(
+                    title: String(localized: "My drinks"),
+                    subtitle: "\(myPrices.count) contributions",
+                    icon: "tag.fill"
+                ) {
+                    MyContributionsView()
+                }
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
+                    .padding(.leading, 44)
+
+                navigationRow(
+                    title: String(localized: "My bars"),
+                    subtitle: "\(myBars.count) bars added",
+                    icon: "building.2.fill"
+                ) {
+                    MyBarsView()
+                }
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
+                    .padding(.leading, 44)
+
+                navigationRow(
+                    title: "Badges",
+                    subtitle: "Your achievements",
+                    icon: "rosette"
+                ) {
+                    BadgeGridView(
+                        earnedBadges: BadgeService.shared.earnedBadges(),
+                        allBadges: BadgeService.shared.allBadges(),
+                        streak: BadgeService.shared.currentStreak
+                    )
+                }
+            }
+            .barTabCard()
         }
+    }
 
+    @ViewBuilder
+    private var savedSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-
-            Text("Contributions")
+            Text("Saved")
                 .font(.headline)
 
-            navigationRow(
-                title: String(localized: "My drinks"),
-                subtitle: "\(myPrices.count) contributions",
-                icon: "tag.fill"
-            ) {
-                MyContributionsView()
-            }
+            VStack(spacing: 0) {
+                if !barRepository.favoriteBars.isEmpty {
+                    ForEach(barRepository.favoriteBars) { bar in
+                        navigationRow(
+                            title: bar.name,
+                            subtitle: bar.address,
+                            icon: "heart.fill"
+                        ) {
+                            BarView(bar: bar)
+                                .environmentObject(barRepository)
+                                .environmentObject(userSession)
+                        }
 
-            navigationRow(
-                title: String(localized: "My bars"),
-                subtitle: "\(myBars.count) bars added",
-                icon: "building.2.fill"
-            ) {
-                MyBarsView()
+                        Divider()
+                            .foregroundColor(.barTabCardBorder)
+                            .padding(.leading, 44)
+                    }
+                }
+
+                navigationRow(
+                    title: "Price Alerts",
+                    subtitle: "Get notified on price changes",
+                    icon: "bell.fill"
+                ) {
+                    PriceAlertListView()
+                        .environmentObject(barRepository)
+                        .environmentObject(userSession)
+                        .environmentObject(toastCenter)
+                }
             }
+            .barTabCard()
         }
     }
 
@@ -401,21 +453,6 @@ struct ProfileView: View {
             ) {
                 ActivityFeedView()
             }
-        }
-        .barTabCard()
-
-        VStack(spacing: 0) {
-            navigationRow(
-                title: "Badges",
-                subtitle: "Your achievements",
-                icon: "rosette"
-            ) {
-                BadgeGridView(
-                    earnedBadges: BadgeService.shared.earnedBadges(),
-                    allBadges: BadgeService.shared.allBadges(),
-                    streak: BadgeService.shared.currentStreak
-                )
-            }
 
             Divider()
                 .foregroundColor(.barTabCardBorder)
@@ -428,47 +465,8 @@ struct ProfileView: View {
             ) {
                 GroupPlanningView()
             }
-
-            Divider()
-                .foregroundColor(.barTabCardBorder)
-                .padding(.leading, 44)
-
-            navigationRow(
-                title: "Price Alerts",
-                subtitle: "Get notified on price changes",
-                icon: "bell.fill"
-            ) {
-                PriceAlertListView()
-                    .environmentObject(barRepository)
-                    .environmentObject(userSession)
-                    .environmentObject(toastCenter)
-            }
         }
         .barTabCard()
-    }
-
-    @ViewBuilder
-    private var favoritesSection: some View {
-        if !barRepository.favoriteBars.isEmpty {
-
-            VStack(alignment: .leading, spacing: 10) {
-
-                Text("Favorites")
-                    .font(.headline)
-
-                ForEach(barRepository.favoriteBars) { bar in
-                    navigationRow(
-                        title: bar.name,
-                        subtitle: bar.address,
-                        icon: "heart.fill"
-                    ) {
-                        BarView(bar: bar)
-                            .environmentObject(barRepository)
-                            .environmentObject(userSession)
-                    }
-                }
-            }
-        }
     }
 
     @ViewBuilder

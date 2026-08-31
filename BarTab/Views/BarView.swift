@@ -516,6 +516,47 @@ struct BarView: View {
         }
 
         ToolbarItem(placement: .navigationBarTrailing) {
+            Menu {
+                ShareLink(
+                    item: DeepLink.bar(currentBar.id),
+                    subject: Text(currentBar.name),
+                    message: Text(shareText)
+                ) {
+                    Label("Share Bar", systemImage: "square.and.arrow.up")
+                }
+
+                Button {
+                    handleBarReportTap()
+                } label: {
+                    Label(
+                        hasReported ? "Bar Reported" : "Report Bar",
+                        systemImage: hasReported ? "flag.fill" : "flag"
+                    )
+                }
+
+                if canDeleteBar {
+                    Divider()
+
+                    Button {
+                        showingEditBar = true
+                    } label: {
+                        Label("Edit Bar", systemImage: "pencil")
+                    }
+
+                    Button(role: .destructive) {
+                        showingDeleteBarConfirmation = true
+                    } label: {
+                        Label("Delete Bar", systemImage: "trash")
+                    }
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .foregroundColor(.barTabPrimary)
+            }
+            .accessibilityLabel("More options")
+        }
+
+        ToolbarItem(placement: .navigationBarTrailing) {
             Button {
                 HapticEngine.impact()
                 withAnimation(.easeInOut(duration: 0.2)) {
@@ -526,50 +567,6 @@ struct BarView: View {
                     .foregroundColor(.barTabPrimary)
             }
             .accessibilityLabel(isFavorited ? "Remove from favorites" : "Add to favorites")
-        }
-
-        ToolbarItem(placement: .navigationBarTrailing) {
-            ShareLink(
-                item: DeepLink.bar(currentBar.id),
-                subject: Text(currentBar.name),
-                message: Text(shareText)
-            ) {
-                Image(systemName: "square.and.arrow.up")
-                    .foregroundColor(.barTabPrimary)
-            }
-            .accessibilityLabel("Share bar")
-        }
-
-        ToolbarItem(placement: .navigationBarTrailing) {
-            Button {
-                handleBarReportTap()
-            } label: {
-                Image(systemName: hasReported ? "flag.fill" : "flag")
-                    .foregroundColor(.barTabPrimary)
-            }
-            .accessibilityLabel("Report bar")
-        }
-
-        if canDeleteBar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    showingEditBar = true
-                } label: {
-                    Image(systemName: "pencil")
-                        .foregroundColor(.barTabPrimary)
-                }
-                .accessibilityLabel("Edit bar")
-            }
-
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    showingDeleteBarConfirmation = true
-                } label: {
-                    Image(systemName: "trash")
-                        .foregroundColor(.red)
-                }
-                .accessibilityLabel("Delete bar")
-            }
         }
     }
 

@@ -80,7 +80,7 @@ struct MainTabView: View {
 
     /// Horizontal position of the pill's leading edge (plus inner inset).
     private var pillOffsetX: CGFloat {
-        CGFloat(activeBaseIndex) * tabWidth + 4 + clampedDragOffset
+        CGFloat(activeBaseIndex) * tabWidth + 2 + clampedDragOffset
     }
 
     /// The pill stretches slightly while dragging, like a pulled droplet.
@@ -178,7 +178,7 @@ struct MainTabView: View {
                         endPoint: .trailing
                     )
                 )
-                .frame(width: max(tabWidth - 8, 0), height: 40)
+                .frame(width: max(tabWidth - 4, 0), height: 40)
                 .offset(x: pillOffsetX)
                 .scaleEffect(x: pillStretch, y: 1, anchor: .center)
                 .shadow(
@@ -289,10 +289,10 @@ struct MainTabView: View {
 
         let badge = (tab == .profile) ? adminBadgeCount : 0
 
-        return HStack(spacing: 6) {
+        return HStack(spacing: 4) {
 
             Image(systemName: tab.icon)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.system(size: 13, weight: .semibold))
                 .overlay(alignment: .topTrailing) {
                     if badge > 0 {
                         Text("\(badge)")
@@ -307,7 +307,9 @@ struct MainTabView: View {
 
             if isSelected {
                 Text(tab.title)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     .transition(.scale.combined(with: .opacity))
             }
         }
