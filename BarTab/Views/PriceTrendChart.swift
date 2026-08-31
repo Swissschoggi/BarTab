@@ -208,7 +208,7 @@ struct PriceTrendChart: View {
                 .fill(Color.barTabAccent)
                 .frame(width: 10, height: 10)
 
-            Text("Only one report so far — add another to see a trend.")
+            Text("Only one report so far   add another to see a trend.")
                 .font(.caption)
                 .foregroundColor(.secondary)
         }

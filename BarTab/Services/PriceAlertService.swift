@@ -47,7 +47,7 @@ enum PriceAlertService {
 
                 let content = UNMutableNotificationContent()
                 content.title = "Price alert"
-                content.body = "\(barName) — \(latestPrice.formattedAmount) \(latestPrice.currency)"
+                content.body = "\(barName)   \(latestPrice.formattedAmount) \(latestPrice.currency)"
                 content.sound = .default
 
                 let request = UNNotificationRequest(
@@ -62,7 +62,7 @@ enum PriceAlertService {
 
             defaults.set(notified, forKey: key)
         } catch {
-            // Background check — silently ignore; alerts will be
+            // Background check   silently ignore; alerts will be
             // checked again on next foreground transition.
         }
     }

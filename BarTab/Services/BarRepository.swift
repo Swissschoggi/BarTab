@@ -356,7 +356,7 @@ final class BarRepository: ObservableObject {
     private func recomputePriceLevels() {
 
         // Market average converted price per (drink, size), so a wine
-        // glass is only ever compared against other wine glasses — never
+        // glass is only ever compared against other wine glasses   never
         // against a pint of beer or a bottle.
         var sumsPerKey: [String: Double] = [:]
         var countsPerKey: [String: Int] = [:]

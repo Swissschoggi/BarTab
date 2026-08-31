@@ -1,7 +1,7 @@
 import Foundation
 
 /// A single user's rating of a bar. A user may rate ambience
-/// and wine quality — one row per (bar, user) pair, which
+/// and wine quality   one row per (bar, user) pair, which
 /// is upserted whenever they change their rating.
 struct BarRating: Identifiable {
 

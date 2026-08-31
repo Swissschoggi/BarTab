@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A lightweight toast message shown at the top of the screen —
+/// A lightweight toast message shown at the top of the screen  
 /// a friendlier replacement for raw system alerts.
 struct Toast: Identifiable, Equatable {
 
@@ -189,7 +189,7 @@ enum FriendlyError {
         }
 
         if lowered.contains("email not confirmed") {
-            return "Please confirm your email first — check your inbox."
+            return "Please confirm your email first   check your inbox."
         }
 
         if lowered.contains("rate limit") {

@@ -78,7 +78,7 @@ struct DrinkRatingSheet: View {
                         .padding()
                         .barTabCard()
                     } else {
-                        Text("No ratings yet — be the first!")
+                        Text("No ratings yet   be the first!")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .frame(maxWidth: .infinity)

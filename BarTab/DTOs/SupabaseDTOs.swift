@@ -49,7 +49,7 @@ struct BarDTO: Codable {
     }
 }
 
-/// Minimal DTO for PATCH — only mutable fields, avoids sending
+/// Minimal DTO for PATCH   only mutable fields, avoids sending
 /// immutable columns that PostgREST may reject.
 struct BarPatchDTO: Codable {
     let name: String

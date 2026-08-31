@@ -38,7 +38,7 @@ enum DeepLink {
 
 /// Holds the signed-in user's access token so every REST call runs
 /// with the caller's identity (required once Row Level Security is
-/// enabled — the anon key alone fails every `auth.uid()` check).
+/// enabled   the anon key alone fails every `auth.uid()` check).
 final class AuthTokenStore {
 
     static let shared = AuthTokenStore()
@@ -85,7 +85,7 @@ final class AuthTokenStore {
 /// Thin Supabase REST (PostgREST + Auth + Storage) client.
 ///
 /// The URL and anon key come from Supabase Dashboard -> Settings -> API.
-/// The anon key is safe to ship in the app by design — it only unlocks
+/// The anon key is safe to ship in the app by design   it only unlocks
 /// whatever your Row Level Security policies allow.
 final class SupabaseClient {
 
@@ -382,7 +382,7 @@ final class SupabaseClient {
         guard !updated.isEmpty else {
             throw SupabaseError(
                 statusCode: 403,
-                message: "Update blocked — you may not have permission to change this bar."
+                message: "Update blocked   you may not have permission to change this bar."
             )
         }
     }

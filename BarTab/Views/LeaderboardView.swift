@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Public leaderboard showing usernames and levels only.
-/// No bars, locations, or drink history — just contribution levels.
+/// No bars, locations, or drink history   just contribution levels.
 struct LeaderboardView: View {
 
     @EnvironmentObject private var barRepository: BarRepository

@@ -851,12 +851,12 @@
         }
       }
     },
-    "Only one report so far — add another to see a trend.": {
+    "Only one report so far   add another to see a trend.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bisher nur eine Meldung — füge eine weitere hinzu, um einen Trend zu sehen."
+            "value": "Bisher nur eine Meldung   füge eine weitere hinzu, um einen Trend zu sehen."
           }
         }
       }

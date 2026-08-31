@@ -37,7 +37,7 @@ struct BarView: View {
     @State private var showingPriceAlert = false
     @State private var comparisonGroup: PriceGroup?
 
-    // Cached from @Published — never read barRepository directly in body
+    // Cached from @Published   never read barRepository directly in body
     @State private var currentBar: Bar
     @State private var prices: [Price] = []
     @State private var isFavorited = false
@@ -861,7 +861,7 @@ struct BarView: View {
                             .frame(height: 120)
                             .padding(.horizontal, 4)
                     } else {
-                        Text("Only one price reported — trend needs at least two.")
+                        Text("Only one price reported   trend needs at least two.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .padding(.horizontal, 4)
@@ -1044,7 +1044,7 @@ struct BarView: View {
     private func reportBar(reason: ReportReason) {
         guard let user = userSession.currentUser else { return }
         barRepository.reportBar(currentBar, reason: reason, reportedBy: user)
-        toastCenter.show("Reported — thanks for helping keep BarTab accurate.", kind: .success)
+        toastCenter.show("Reported   thanks for helping keep BarTab accurate.", kind: .success)
     }
 
     private func reportPriceGroup(_ group: PriceGroup, reason: ReportReason) {
@@ -1058,7 +1058,7 @@ struct BarView: View {
             reason: reason,
             reportedBy: user
         )
-        toastCenter.show("Reported — thanks for helping keep BarTab accurate.", kind: .success)
+        toastCenter.show("Reported   thanks for helping keep BarTab accurate.", kind: .success)
     }
 
     private func deleteBar() {

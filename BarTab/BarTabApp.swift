@@ -56,7 +56,7 @@ struct BarTabApp: App {
     }
 
     private func handleDeepLink(_ url: URL) async {
-        // App scheme (bartab://) — OAuth callbacks only.
+        // App scheme (bartab://)   OAuth callbacks only.
         if url.scheme == SupabaseConfig.oauthCallbackScheme {
 
             // Password reset callback: bartab://reset-password#access_token=...
@@ -80,7 +80,7 @@ struct BarTabApp: App {
             }
         }
 
-        // Share links — both `bartab://bar/<id>` and
+        // Share links   both `bartab://bar/<id>` and
         // `https://bartap.info/bar/<id>` (and group equivalents).
         guard let destination = parseShareLink(url) else { return }
 

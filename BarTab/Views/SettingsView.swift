@@ -456,7 +456,7 @@ struct SettingsView: View {
         .alert("Coming Soon", isPresented: $showingTipJar) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("Tip jar coming soon! We're setting up payments — stay tuned.")
+            Text("Tip jar coming soon! We're setting up payments   stay tuned.")
         }
     }
 
@@ -905,7 +905,7 @@ private enum PasswordStrength {
     var hint: String {
         switch self {
         case .weak: return "Add numbers, symbols or uppercase letters."
-        case .medium: return "Good — add more variety for extra strength."
+        case .medium: return "Good   add more variety for extra strength."
         case .strong: return "Nice, that's a strong password."
         }
     }
