@@ -1323,4 +1323,29 @@ final class SupabaseClient {
         )
         _ = try await performAuthorized(request)
     }
+
+    // MARK: - Account deletion
+
+    /// Calls the `delete-account` Edge Function, which deletes the caller's
+    /// auth user (and cascades their data) using the service role key.
+    func deleteAccount() async throws {
+        guard let url = URL(
+            string: "\(baseURL)/functions/v1/delete-account"
+        ) else {
+            throw SupabaseError(statusCode: 0, message: "Invalid delete-account URL")
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue(apiKey, forHTTPHeaderField: "apikey")
+
+        if let token = AuthTokenStore.shared.accessToken {
+            request.setValue(
+                "Bearer \(token)",
+                forHTTPHeaderField: "Authorization"
+            )
+        }
+
+        _ = try await performAuthorized(request)
+    }
 }
