@@ -311,7 +311,7 @@ struct BarView: View {
                             ok = await barRepository.checkIn(bar: currentBar, user: user)
                             if ok {
                                 HapticEngine.success()
-                                toastCenter.show("You're here — have fun! 🍻", kind: .success)
+                                toastCenter.show("You're here have fun! 🍻", kind: .success)
                             }
                         }
                         if !ok {
