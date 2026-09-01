@@ -207,6 +207,15 @@ final class SupabaseClient {
                 encoding: .utf8
             ) ?? "No response body"
 
+            #if DEBUG
+            print(
+                "⚠️ BarTab request failed "
+                + "\(request.httpMethod ?? "GET") "
+                + "\(request.url?.absoluteString ?? "") "
+                + "→ \(http.statusCode): \(message)"
+            )
+            #endif
+
             throw SupabaseError(
                 statusCode: http.statusCode,
                 message: message
@@ -816,7 +825,7 @@ final class SupabaseClient {
         jpegData: Data
     ) async throws -> URL {
 
-        let path = "avatars/\(userID.uuidString)/avatar.jpg"
+        let path = "avatars/\(userID.uuidString.lowecased())/avatar.jpg"
         guard let url = URL(
             string: "\(baseURL)/storage/v1/object/\(path)"
         ) else {
