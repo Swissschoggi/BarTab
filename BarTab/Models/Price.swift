@@ -60,3 +60,18 @@ struct PriceVerification: Identifiable, Codable {
         case createdAt = "created_at"
     }
 }
+
+/// A user's "I'm here now" check-in at a bar.
+struct BarCheckin: Identifiable, Codable {
+    let id: UUID
+    let barID: UUID
+    let userID: UUID
+    let createdAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case barID = "bar_id"
+        case userID = "user_id"
+        case createdAt = "created_at"
+    }
+}

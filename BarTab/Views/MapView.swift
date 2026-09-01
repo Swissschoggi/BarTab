@@ -25,11 +25,15 @@ struct MapView: View {
 
     @State private var hasCenteredOnUser = false
 
+    private var visibleBars: [Bar] {
+        barRepository.bars.filter { !barRepository.isBarAutoHidden($0) }
+    }
+
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
 
 
-            Map(coordinateRegion: $region, annotationItems: barRepository.bars) { bar in
+            Map(coordinateRegion: $region, annotationItems: visibleBars) { bar in
                 MapAnnotation(coordinate: bar.coordinate) {
                     Button {
                         HapticEngine.lightTap()

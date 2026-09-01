@@ -13,6 +13,7 @@ final class BarRepository: ObservableObject {
     @Published private(set) var brands: [DrinkBrand] = DrinkBrand.all
     @Published private(set) var brandRequests: [BrandRequest] = []
     @Published private(set) var priceVerifications: [PriceVerification] = []
+    @Published private(set) var barCheckins: [BarCheckin] = []
     @Published private(set) var defaultCurrency: Currency = Currency.defaultCurrency
 
     private var latestVerificationByPriceID: [UUID: Date] = [:]
@@ -80,6 +81,7 @@ final class BarRepository: ObservableObject {
         async let fetchedBrandRequests = SupabaseClient.shared.fetchBrandRequests()
         async let fetchedReports = SupabaseClient.shared.fetchContentReports()
         async let fetchedVerifications = SupabaseClient.shared.fetchPriceVerifications()
+        async let fetchedCheckins = SupabaseClient.shared.fetchBarCheckins()
 
         if let bars = try? await fetchedBars {
             self.bars = bars
@@ -102,6 +104,9 @@ final class BarRepository: ObservableObject {
         if let verifications = try? await fetchedVerifications {
             self.priceVerifications = verifications
             recomputeVerificationIndex()
+        }
+        if let checkins = try? await fetchedCheckins {
+            self.barCheckins = checkins
         }
 
         // Merge the server-approved catalog with the bundled defaults,
@@ -929,6 +934,21 @@ final class BarRepository: ObservableObject {
         reports.filter { $0.targetID == targetID }.count
     }
 
+    /// Number of *unreviewed* reports needed before content is auto-hidden
+    /// pending admin review.
+    static let autoHideReportThreshold = 3
+
+    /// True when a target has enough unreviewed reports that it should be
+    /// hidden from the public UI pending admin review.
+    func isAutoHidden(targetID: String) -> Bool {
+        let unreviewed = reports.filter { $0.targetID == targetID && !$0.isReviewed }.count
+        return unreviewed >= Self.autoHideReportThreshold
+    }
+
+    func isBarAutoHidden(_ bar: Bar) -> Bool {
+        isAutoHidden(targetID: bar.id.uuidString)
+    }
+
     func priceGroupKey(drink: Drink, size: DrinkSize, brand: String?, style: String? = nil, serving: ServingMethod? = nil) -> String {
         "\(drink)-\(size)-\(brand ?? "")-\(style ?? "")-\(serving?.rawValue ?? "")"
     }
@@ -1136,6 +1156,58 @@ final class BarRepository: ObservableObject {
 
         priceVerifications.removeAll { $0.priceID == price.id && $0.userID == user.id }
         recomputeVerificationIndex()
+        return true
+    }
+
+    // MARK: - Bar Check-ins
+
+    /// A check-in counts as "here now" for this long.
+    private static let checkinLifetime: TimeInterval = 2 * 60 * 60
+
+    private var activeCheckins: [BarCheckin] {
+        let cutoff = Date().addingTimeInterval(-Self.checkinLifetime)
+        return barCheckins.filter { $0.createdAt >= cutoff }
+    }
+
+    func busyCount(for barID: UUID) -> Int {
+        activeCheckins.filter { $0.barID == barID }.count
+    }
+
+    func hasUserCheckedIn(barID: UUID, userID: UUID) -> Bool {
+        activeCheckins.contains { $0.barID == barID && $0.userID == userID }
+    }
+
+    func checkIn(bar: Bar, user: User) async -> Bool {
+        do {
+            try await SupabaseClient.shared.checkIn(barID: bar.id)
+        } catch {
+            return false
+        }
+
+        let checkin = BarCheckin(
+            id: UUID(),
+            barID: bar.id,
+            userID: user.id,
+            createdAt: Date()
+        )
+        if let index = barCheckins.firstIndex(where: {
+            $0.barID == bar.id && $0.userID == user.id
+        }) {
+            barCheckins[index] = checkin
+        } else {
+            barCheckins.append(checkin)
+        }
+        return true
+    }
+
+    func uncheckIn(bar: Bar, user: User) async -> Bool {
+        do {
+            try await SupabaseClient.shared.uncheckIn(barID: bar.id)
+        } catch {
+            return false
+        }
+
+        barCheckins.removeAll { $0.barID == bar.id && $0.userID == user.id }
         return true
     }
 

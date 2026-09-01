@@ -66,6 +66,16 @@ struct NearbyView: View {
 
     private static let radiusRange: ClosedRange<Double> = 0.25...25
 
+    /// Curated cities for quick exploration without location permission.
+    private static let exploreCities: [(name: String, coordinate: CLLocationCoordinate2D)] = [
+        ("Zürich", CLLocationCoordinate2D(latitude: 47.3769, longitude: 8.5417)),
+        ("Berlin", CLLocationCoordinate2D(latitude: 52.5200, longitude: 13.4050)),
+        ("Vienna", CLLocationCoordinate2D(latitude: 48.2082, longitude: 16.3738)),
+        ("London", CLLocationCoordinate2D(latitude: 51.5074, longitude: -0.1278)),
+        ("Paris", CLLocationCoordinate2D(latitude: 48.8566, longitude: 2.3522)),
+        ("Amsterdam", CLLocationCoordinate2D(latitude: 52.3676, longitude: 4.9041))
+    ]
+
     private var originCoordinate: CLLocationCoordinate2D? {
         switch origin {
         case .myLocation:
@@ -101,6 +111,9 @@ struct NearbyView: View {
             .nearbyBars(coordinate: coordinate, radius: radiusMeters)
             .filter { bar in
                 !outdoorOnly || bar.outdoorSeating
+            }
+            .filter { bar in
+                !barRepository.isBarAutoHidden(bar)
             }
             .map { bar in
                 (bar: bar, distance: DistanceService.distance(from: originLocation, to: bar))
@@ -159,6 +172,7 @@ struct NearbyView: View {
 
         for bar in barsInRadius {
             if outdoorOnly && !bar.outdoorSeating { continue }
+            if barRepository.isBarAutoHidden(bar) { continue }
             let summaries = barRepository.getPriceSummaries(for: bar)
             for summary in summaries {
                 guard selectedDrinks.contains(summary.drink) else { continue }
@@ -230,6 +244,8 @@ struct NearbyView: View {
                 )
 
                 originCard
+
+                cityExplorer
 
                 radiusCard
 
@@ -345,6 +361,48 @@ struct NearbyView: View {
             return "location.fill"
         }
         return "mappin.circle.fill"
+    }
+
+    // MARK: - City explorer
+
+    private var cityExplorer: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Explore a city")
+                    .font(.headline)
+                Spacer()
+                Image(systemName: "globe.europe.africa.fill")
+                    .foregroundColor(.barTabPrimary)
+                    .font(.subheadline)
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(Self.exploreCities, id: \.name) { city in
+                        Button {
+                            origin = .custom(name: city.name, coordinate: city.coordinate)
+                        } label: {
+                            Text(city.name)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .foregroundColor(isCitySelected(city.name) ? .white : .barTabPrimary)
+                                .background(isCitySelected(city.name) ? Color.barTabPrimary : Color.barTabPillFill)
+                                .clipShape(Capsule())
+                        }
+                    }
+                }
+            }
+        }
+        .barTabCard()
+    }
+
+    private func isCitySelected(_ name: String) -> Bool {
+        if case .custom(let selected, _) = origin {
+            return selected == name
+        }
+        return false
     }
 
     // MARK: - Radius card

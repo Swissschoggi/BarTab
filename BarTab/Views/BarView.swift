@@ -126,7 +126,19 @@ struct BarView: View {
             }
         }
 
-        return groups.sorted {
+        // Auto-hide groups with enough unreviewed reports (pending admin review).
+        let visibleGroups = groups.filter { group in
+            let key = barRepository.priceGroupKey(
+                drink: group.drink,
+                size: group.size,
+                brand: group.brand,
+                style: group.style,
+                serving: group.serving
+            )
+            return !barRepository.isAutoHidden(targetID: key)
+        }
+
+        return visibleGroups.sorted {
             averageAmount(for: $0) < averageAmount(for: $1)
         }
     }
@@ -284,6 +296,58 @@ struct BarView: View {
                 .frame(maxWidth: .infinity)
                 .background(Color.barTabPrimary.opacity(0.06))
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
+
+            if let user = userSession.currentUser {
+                let busyCount = barRepository.busyCount(for: currentBar.id)
+                let hasCheckedIn = barRepository.hasUserCheckedIn(barID: currentBar.id, userID: user.id)
+
+                Button {
+                    Task {
+                        let ok: Bool
+                        if hasCheckedIn {
+                            ok = await barRepository.uncheckIn(bar: currentBar, user: user)
+                        } else {
+                            ok = await barRepository.checkIn(bar: currentBar, user: user)
+                            if ok {
+                                HapticEngine.success()
+                                toastCenter.show("You're here — have fun! 🍻", kind: .success)
+                            }
+                        }
+                        if !ok {
+                            toastCenter.show("Couldn't update right now", kind: .error)
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: hasCheckedIn ? "checkmark.circle.fill" : "flame.fill")
+                            .font(.subheadline)
+
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(hasCheckedIn ? "You're here" : "I'm here now")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                            Text(hasCheckedIn ? "Tap to leave" : "Busy right now?")
+                                .font(.caption2)
+                                .opacity(0.8)
+                        }
+
+                        Spacer()
+
+                        Text(busyCount > 0 ? "\(busyCount) here now" : "Be the first")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                    }
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(
+                        hasCheckedIn
+                            ? LinearGradient(colors: [Color.barTabSuccess, Color.barTabSuccess.opacity(0.8)], startPoint: .leading, endPoint: .trailing)
+                            : LinearGradient(colors: [Color.barTabAccent, Color.barTabPrimary], startPoint: .leading, endPoint: .trailing)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                }
+                .buttonStyle(.plain)
             }
 
             if userSession.currentUser != nil {
@@ -932,9 +996,13 @@ struct BarView: View {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.caption2)
                             .foregroundColor(.green)
-                        Text("\(verifyCount)")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
+                        Text(
+                            verifyCount == 1
+                                ? String(localized: "Confirmed by 1 person")
+                                : String(localized: "Confirmed by \(verifyCount) people")
+                        )
+                        .font(.caption2)
+                        .foregroundColor(.green)
                     }
                 }
             }

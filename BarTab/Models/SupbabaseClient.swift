@@ -516,6 +516,50 @@ final class SupabaseClient {
         _ = try await performAuthorized(request)
     }
 
+    // MARK: - Bar Check-ins
+
+    func fetchBarCheckins() async throws -> [BarCheckin] {
+        let request = try makeRequest(endpoint: "bar_checkins?select=*")
+        let data = try await performAuthorized(request)
+        return try decoder.decode([BarCheckin].self, from: data)
+    }
+
+    /// Record (or refresh) the current user's check-in at a bar.
+    func checkIn(barID: UUID) async throws {
+        struct CheckinBody: Codable {
+            let bar_id: UUID
+            let user_id: UUID
+            let created_at: Date
+        }
+
+        let body = CheckinBody(
+            bar_id: barID,
+            user_id: try requireUserID(),
+            created_at: Date()
+        )
+
+        var request = try makeRequest(
+            endpoint: "bar_checkins?on_conflict=bar_id,user_id",
+            method: "POST"
+        )
+        request.setValue(
+            "resolution=merge-duplicates,return=representation",
+            forHTTPHeaderField: "Prefer"
+        )
+        request.httpBody = try encoder.encode(body)
+        _ = try await performAuthorized(request)
+    }
+
+    /// Remove the current user's check-in at a bar.
+    func uncheckIn(barID: UUID) async throws {
+        let myID = try requireUserID().uuidString
+        var request = try makeRequest(
+            endpoint: "bar_checkins?bar_id=eq.\(barID.uuidString)&user_id=eq.\(myID)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
     // MARK: - Bar Ratings
 
     /// Fetch every ambience/wine rating, mapped to domain BarRating models
@@ -825,7 +869,7 @@ final class SupabaseClient {
         jpegData: Data
     ) async throws -> URL {
 
-        let path = "avatars/\(userID.uuidString.lowecased())/avatar.jpg"
+        let path = "avatars/\(userID.uuidString.lowercased())/avatar.jpg"
         guard let url = URL(
             string: "\(baseURL)/storage/v1/object/\(path)"
         ) else {
