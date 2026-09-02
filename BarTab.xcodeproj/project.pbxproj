@@ -17,6 +17,7 @@
 		AE7839823034F16B00F1555E /* BarTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7839813034F16B00F1555E /* BarTabUITests.swift */; };
 		AE7839843034F16B00F1555E /* BarTabUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7839833034F16B00F1555E /* BarTabUITestsLaunchTests.swift */; };
 		AE7839973034F4E700F1555E /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = AE7839963034F4E700F1555E /* README.md */; };
+		AE8757A43048810B00788AD4 /* BarAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA999999999999000000000001 /* BarAttribute.swift */; };
 		AEA1BD703035ECF800DE059C /* SupabaseDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA1BD6F3035ECF800DE059C /* SupabaseDTOs.swift */; };
 		AEA1BD723035ED1C00DE059C /* SupbabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA1BD713035ED1C00DE059C /* SupbabaseClient.swift */; };
 		AEF0361A3034F92700BDA1CC /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036193034F92700BDA1CC /* MapView.swift */; };
@@ -105,7 +106,6 @@
 		BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000D /* DrinkComparisonView.swift */; };
 		BRTA0002A000000000000010 /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000011 /* FollowingListView.swift */; };
 		D89F6316A443377571D44C4B /* UserAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */; };
-		BRTA999999999999000000000002 /* BarAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA999999999999000000000001 /* BarAttribute.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -417,7 +417,6 @@
 			children = (
 				AEF03627303509AB00BDA1CC /* Bar.swift */,
 				BRTA999999999999000000000001 /* BarAttribute.swift */,
-
 				AEF03629303509E500BDA1CC /* MockBar.swift */,
 				AEF0363030350EA400BDA1CC /* Price.swift */,
 				AEF0363230350F0000BDA1CC /* Drink.swift */,
@@ -626,6 +625,7 @@
 				AEF0363D303515C100BDA1CC /* User.swift in Sources */,
 				AEF036413035160F00BDA1CC /* ProfileView.swift in Sources */,
 				AEF0363530350F4500BDA1CC /* DrinkSize.swift in Sources */,
+				AE8757A43048810B00788AD4 /* BarAttribute.swift in Sources */,
 				AEF0364F3035B7DB00BDA1CC /* LocationPickerView.swift in Sources */,
 				AEF0364730351C9700BDA1CC /* MyContributionsView.swift in Sources */,
 				AEF036533035BB2A00BDA1CC /* DrinkBrand.swift in Sources */,
