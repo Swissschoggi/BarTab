@@ -1220,6 +1220,7 @@ final class BarRepository: ObservableObject {
         let now = Date()
         let totalDays = 365.0 * 24.0 * 60.0 * 60.0
         let totalCount = Double(recentReports.count)
+        let groupCount = Double(grouped.count)
 
         var results: [AttributeConsensus] = []
         for (value, reportsInGroup) in grouped {
@@ -1231,10 +1232,17 @@ final class BarRepository: ObservableObject {
             }
             let avgAge = ageSum / Double(count)
             let recencyScore = max(0.0, 1.0 - avgAge / totalDays)
-            let volumeScore = min(Double(count) / 10.0, 1.0)
-            let agreementScore = Double(count) / totalCount
 
-            let raw = (volumeScore * 0.35 + recencyScore * 0.40 + agreementScore * 0.25) * 100.0
+            // Volume: more reports = more confidence (caps at 10)
+            let volumeScore = min(Double(count) / 10.0, 1.0)
+
+            // Agreement: fraction of ALL reports that chose this value
+            let agreementScore = totalCount > 0 ? Double(count) / totalCount : 0.0
+
+            // Unanimity bonus: if there's only one group, everyone agrees
+            let unanimityBonus = groupCount <= 1.0 ? 0.15 : 0.0
+
+            let raw = (volumeScore * 0.30 + recencyScore * 0.35 + agreementScore * 0.35 + unanimityBonus) * 100.0
             let confidence = Int(round(raw))
 
             results.append(AttributeConsensus(

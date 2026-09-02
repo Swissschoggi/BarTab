@@ -43,9 +43,9 @@ extension Color {
             alpha: 1
         ),
         dark: UIColor(
-            red: 0xE6 / 255,
-            green: 0xC0 / 255,
-            blue: 0x65 / 255,
+            red: 0xC9 / 255,
+            green: 0xA2 / 255,
+            blue: 0x27 / 255,
             alpha: 1
         )
     )
