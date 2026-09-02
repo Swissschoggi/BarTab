@@ -102,6 +102,9 @@
 		BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000D /* DrinkComparisonView.swift */; };
 		D89F6316A443377571D44C4B /* UserAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */; };
 		BRTA0002A000000000000010 /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000011 /* FollowingListView.swift */; };
+		BRTA306182674467065205936491 /* BarAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA202380054084250574808385 /* BarAttribute.swift */; };
+		BRTA177378808628329972154536 /* AttributeDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA583042391621098503552326 /* AttributeDetailSheet.swift */; };
+		BRTA136692486567988537829990 /* AllAttributesSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA232201184009195062427639 /* AllAttributesSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -222,6 +225,9 @@
 		BRTA0002A00000000000000D /* DrinkComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkComparisonView.swift; sourceTree = "<group>"; };
 		5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAvatarView.swift; sourceTree = "<group>"; };
 		BRTA0002A000000000000011 /* FollowingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingListView.swift; sourceTree = "<group>"; };
+		BRTA329008998742114159473160 /* BarAttribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarAttribute.swift; sourceTree = "<group>"; };
+		BRTA659651495282172293273044 /* AttributeDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeDetailSheet.swift; sourceTree = "<group>"; };
+		BRTA192571485359842947435953 /* AllAttributesSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllAttributesSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -297,6 +303,9 @@
 			isa = PBXGroup;
 			children = (
 				AE78396D3034F16B00F1555E /* Preview Assets.xcassets */,
+							BRTA671990926243279943001973 /* BarAttribute.swift */,
+							BRTA222340982848959195164671 /* AttributeDetailSheet.swift */,
+				BRTA207187511186165081395703 /* AllAttributesSheet.swift */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
