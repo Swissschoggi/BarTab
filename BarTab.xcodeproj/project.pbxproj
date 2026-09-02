@@ -105,6 +105,7 @@
 		BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000D /* DrinkComparisonView.swift */; };
 		BRTA0002A000000000000010 /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000011 /* FollowingListView.swift */; };
 		D89F6316A443377571D44C4B /* UserAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */; };
+		BRTA999999999999000000000002 /* BarAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA999999999999000000000001 /* BarAttribute.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -228,6 +229,7 @@
 		BRTA0002A00000000000000B /* BadgeGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeGridView.swift; sourceTree = "<group>"; };
 		BRTA0002A00000000000000D /* DrinkComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkComparisonView.swift; sourceTree = "<group>"; };
 		BRTA0002A000000000000011 /* FollowingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingListView.swift; sourceTree = "<group>"; };
+		BRTA999999999999000000000001 /* BarAttribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarAttribute.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -414,6 +416,8 @@
 			isa = PBXGroup;
 			children = (
 				AEF03627303509AB00BDA1CC /* Bar.swift */,
+				BRTA999999999999000000000001 /* BarAttribute.swift */,
+
 				AEF03629303509E500BDA1CC /* MockBar.swift */,
 				AEF0363030350EA400BDA1CC /* Price.swift */,
 				AEF0363230350F0000BDA1CC /* Drink.swift */,
