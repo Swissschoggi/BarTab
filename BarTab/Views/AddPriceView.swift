@@ -18,9 +18,6 @@ struct AddPriceView: View {
     @State private var selectedCurrency: Currency = Currency.defaultCurrency
     @State private var isSaving = false
     @State private var priceText = ""
-    @State private var showingDuplicateWarning = false
-    @State private var duplicatePrice: Price?
-    @State private var showingRequestBrand = false
     @State private var priceError: String?
 
     init(bar: Bar, editingPrice: Price? = nil) {
@@ -37,8 +34,6 @@ struct AddPriceView: View {
             _priceText = State(initialValue: price.formattedAmount)
         }
     }
-
-    private var isEditing: Bool { editingPrice != nil }
 
     private var availableBrands: [String] {
         barRepository.brands(for: selectedDrink).map(\.name)
@@ -76,49 +71,162 @@ struct AddPriceView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                    
+                    // Main Numeric Entry Card
+                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                        Text("PRICE")
+                            .font(.barTabCaption)
+                            .foregroundColor(.barTabSecondary)
 
-                    // Drink type
-                    sectionHeader("Drink")
-                    drinkPicker
+                        HStack(alignment: .firstTextBaseline, spacing: BarTabSpacing.xs) {
+                            Text(selectedCurrency.symbol)
+                                .font(.barTabTitle)
+                                .foregroundColor(.barTabSecondary)
 
-                    // Size
+                            TextField("0.00", text: $priceText)
+                                .font(.system(size: 38, weight: .bold, design: .rounded))
+                                .foregroundColor(.barTabText)
+                                .keyboardType(.decimalPad)
+
+                            Spacer()
+
+                            Picker("", selection: $selectedCurrency) {
+                                ForEach(Currency.allCases) { currency in
+                                    Text(currency.rawValue).tag(currency)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .tint(.barTabPrimary)
+                        }
+
+                        if let error = priceError {
+                            Text(error)
+                                .font(.barTabCaption)
+                                .foregroundColor(.barTabDanger)
+                        }
+                    }
+                    .padding(BarTabSpacing.md)
+                    .background(Color.barTabCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                    )
+
+                    // Category Selection
+                    selectorGroup(title: "CATEGORY") {
+                        FlowLayout(spacing: BarTabSpacing.xs) {
+                            ForEach(Drink.allCases) { drink in
+                                pillButton(
+                                    title: drink.displayName,
+                                    icon: drink.icon,
+                                    isSelected: selectedDrink == drink
+                                ) {
+                                    selectedDrink = drink
+                                }
+                            }
+                        }
+                    }
+
+                    // Size Selection
                     if !availableSizes.isEmpty {
-                        sectionHeader("Size")
-                        sizePicker
+                        selectorGroup(title: "SIZE") {
+                            FlowLayout(spacing: BarTabSpacing.xs) {
+                                ForEach(availableSizes, id: \.self) { size in
+                                    pillButton(
+                                        title: size.displayName,
+                                        isSelected: selectedSize == size
+                                    ) {
+                                        selectedSize = size
+                                    }
+                                }
+                            }
+                        }
                     }
 
-                    // Style
-                    if !availableStyles.isEmpty {
-                        sectionHeader("Style")
-                        stylePicker
-                    }
-
-                    // Serving
+                    // Serving Method
                     if !availableServingMethods.isEmpty {
-                        sectionHeader("Serving")
-                        servingPicker
+                        selectorGroup(title: "SERVING METHOD") {
+                            FlowLayout(spacing: BarTabSpacing.xs) {
+                                pillButton(
+                                    title: "Any",
+                                    isSelected: selectedServing == nil
+                                ) {
+                                    selectedServing = nil
+                                }
+                                ForEach(availableServingMethods, id: \.self) { method in
+                                    pillButton(
+                                        title: method.displayName,
+                                        icon: method.icon,
+                                        isSelected: selectedServing == method
+                                    ) {
+                                        selectedServing = method
+                                    }
+                                }
+                            }
+                        }
                     }
 
-                    // Brand
-                    sectionHeader("Brand")
-                    brandPicker
-
-                    // Price
-                    sectionHeader("Price")
-                    priceInput
-
-                    if let error = priceError {
-                        errorBanner(error)
+                    // Brand Selection
+                    if !availableBrands.isEmpty {
+                        selectorGroup(title: "BRAND") {
+                            FlowLayout(spacing: BarTabSpacing.xs) {
+                                pillButton(
+                                    title: "Any",
+                                    isSelected: selectedBrand == nil
+                                ) {
+                                    selectedBrand = nil
+                                }
+                                ForEach(availableBrands, id: \.self) { brand in
+                                    pillButton(
+                                        title: brand,
+                                        isSelected: selectedBrand == brand
+                                    ) {
+                                        selectedBrand = brand
+                                    }
+                                }
+                            }
+                        }
                     }
+
+                    // Style Selection
+                    if !availableStyles.isEmpty {
+                        selectorGroup(title: "STYLE") {
+                            FlowLayout(spacing: BarTabSpacing.xs) {
+                                pillButton(
+                                    title: "Any",
+                                    isSelected: selectedStyle == nil
+                                ) {
+                                    selectedStyle = nil
+                                }
+                                ForEach(availableStyles, id: \.self) { style in
+                                    pillButton(
+                                        title: style.displayName,
+                                        isSelected: selectedStyle == style
+                                    ) {
+                                        selectedStyle = style
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Save Action Button
+                    Button(action: savePrice) {
+                        Text(editingPrice != nil ? "Update Price" : "Save Price")
+                    }
+                    .barTabPrimaryButton()
+                    .padding(.top, BarTabSpacing.xs)
+                    .disabled(isSaving)
                 }
                 .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.lg)
+                .padding(.vertical, BarTabSpacing.md)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle(isEditing ? "Edit Drink" : "Add Drink")
+            .navigationTitle(editingPrice != nil ? "Edit Price" : "New Price")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                         .foregroundColor(.barTabPrimary)
                 }
@@ -131,382 +239,91 @@ struct AddPriceView: View {
                     selectedSize = availableSizes.first ?? .glass
                 }
             }
-            .alert("Drink already exists", isPresented: $showingDuplicateWarning) {
-                Button("Add Anyway") {
-                    guard let duplicatePrice,
-                          let user = userSession.currentUser,
-                          let amount = Decimal(string: priceText)
-                    else { return }
-                    isSaving = true
-                    actuallySavePrice(amount: amount, user: user)
-                }
-                Button("Cancel", role: .cancel) { duplicatePrice = nil }
-            } message: {
-                if let duplicatePrice {
-                    Text("\(duplicatePrice.brand ?? duplicatePrice.drink.displayName) · \(duplicatePrice.size.displayName) already has a price of \(duplicatePrice.formattedAmount) \(duplicatePrice.currency) at this bar.")
-                } else {
-                    Text("A price for this drink and size already exists at this bar.")
-                }
-            }
-            .sheet(isPresented: $showingRequestBrand) {
-                RequestBrandSheet(drink: selectedDrink)
-                    .environmentObject(barRepository)
-                    .environmentObject(userSession)
-            }
         }
     }
 
-    // MARK: - Section Header
+    // MARK: - Subviews & Helpers
 
-    private func sectionHeader(_ title: String) -> some View {
-        Text(title)
-            .font(.barTabHeading)
-            .foregroundColor(.barTabText)
-    }
-
-    // MARK: - Drink Picker
-
-    private var drinkPicker: some View {
-        FlowLayout(spacing: BarTabSpacing.xs) {
-            ForEach(Drink.allCases, id: \.self) { drink in
-                Button {
-                    selectedDrink = drink
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: drink.icon)
-                            .font(.barTabSmall)
-                        Text(drink.displayName)
-                            .font(.barTabSmall)
-                            .fontWeight(.medium)
-                    }
-                    .padding(.horizontal, BarTabSpacing.sm)
-                    .padding(.vertical, 8)
-                    .foregroundColor(selectedDrink == drink ? .white : .barTabPrimary)
-                    .background(selectedDrink == drink ? Color.barTabPrimary : Color.barTabSurface)
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule().stroke(selectedDrink == drink ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
-                    )
-                }
-                .buttonStyle(.plain)
-            }
+    private func selectorGroup<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+            Text(title)
+                .font(.barTabCaption)
+                .foregroundColor(.barTabSecondary)
+            content()
         }
     }
 
-    // MARK: - Size Picker
-
-    private var sizePicker: some View {
-        FlowLayout(spacing: BarTabSpacing.xs) {
-            ForEach(availableSizes, id: \.self) { size in
-                Button {
-                    selectedSize = size
-                } label: {
-                    Text(size.displayName)
-                        .font(.barTabSmall)
-                        .fontWeight(.medium)
-                        .padding(.horizontal, BarTabSpacing.sm)
-                        .padding(.vertical, 8)
-                        .foregroundColor(selectedSize == size ? .white : .barTabPrimary)
-                        .background(selectedSize == size ? Color.barTabPrimary : Color.barTabSurface)
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule().stroke(selectedSize == size ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
-                        )
+    private func pillButton(
+        title: String,
+        icon: String? = nil,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                if let icon = icon {
+                    Image(systemName: icon)
+                        .font(.barTabCaption)
                 }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    // MARK: - Style Picker
-
-    private var stylePicker: some View {
-        FlowLayout(spacing: BarTabSpacing.xs) {
-            Button {
-                selectedStyle = nil
-            } label: {
-                Text("Not specified")
-                    .font(.barTabSmall)
-                    .fontWeight(.medium)
-                    .padding(.horizontal, BarTabSpacing.sm)
-                    .padding(.vertical, 8)
-                    .foregroundColor(selectedStyle == nil ? .white : .barTabPrimary)
-                    .background(selectedStyle == nil ? Color.barTabPrimary : Color.barTabSurface)
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule().stroke(selectedStyle == nil ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
-                    )
-            }
-            .buttonStyle(.plain)
-
-            ForEach(availableStyles) { style in
-                Button {
-                    selectedStyle = style
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "tag.fill")
-                            .font(.barTabTiny)
-                        Text(style.displayName)
-                            .font(.barTabSmall)
-                            .fontWeight(.medium)
-                    }
-                    .padding(.horizontal, BarTabSpacing.sm)
-                    .padding(.vertical, 8)
-                    .foregroundColor(selectedStyle == style ? .white : .barTabPrimary)
-                    .background(selectedStyle == style ? Color.barTabPrimary : Color.barTabSurface)
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule().stroke(selectedStyle == style ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    // MARK: - Serving Picker
-
-    private var servingPicker: some View {
-        FlowLayout(spacing: BarTabSpacing.xs) {
-            Button {
-                selectedServing = nil
-            } label: {
-                Text("Not specified")
-                    .font(.barTabSmall)
-                    .fontWeight(.medium)
-                    .padding(.horizontal, BarTabSpacing.sm)
-                    .padding(.vertical, 8)
-                    .foregroundColor(selectedServing == nil ? .white : .barTabPrimary)
-                    .background(selectedServing == nil ? Color.barTabPrimary : Color.barTabSurface)
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule().stroke(selectedServing == nil ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
-                    )
-            }
-            .buttonStyle(.plain)
-
-            ForEach(availableServingMethods) { method in
-                Button {
-                    selectedServing = method
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: method.icon)
-                            .font(.barTabTiny)
-                        Text(method.displayName)
-                            .font(.barTabSmall)
-                            .fontWeight(.medium)
-                    }
-                    .padding(.horizontal, BarTabSpacing.sm)
-                    .padding(.vertical, 8)
-                    .foregroundColor(selectedServing == method ? .white : .barTabPrimary)
-                    .background(selectedServing == method ? Color.barTabPrimary : Color.barTabSurface)
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule().stroke(selectedServing == method ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    // MARK: - Brand Picker
-
-    private var brandPicker: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-            if !availableBrands.isEmpty {
-                FlowLayout(spacing: BarTabSpacing.xs) {
-                    Button {
-                        selectedBrand = nil
-                    } label: {
-                        Text("Not specified")
-                            .font(.barTabSmall)
-                            .fontWeight(.medium)
-                            .padding(.horizontal, BarTabSpacing.sm)
-                            .padding(.vertical, 8)
-                            .foregroundColor(selectedBrand == nil ? .white : .barTabPrimary)
-                            .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabSurface)
-                            .clipShape(Capsule())
-                            .overlay(
-                                Capsule().stroke(selectedBrand == nil ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
-                            )
-                    }
-                    .buttonStyle(.plain)
-
-                    ForEach(availableBrands, id: \.self) { brand in
-                        Button {
-                            selectedBrand = brand
-                        } label: {
-                            Text(brand)
-                                .font(.barTabSmall)
-                                .fontWeight(.medium)
-                                .padding(.horizontal, BarTabSpacing.sm)
-                                .padding(.vertical, 8)
-                                .foregroundColor(selectedBrand == brand ? .white : .barTabPrimary)
-                                .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabSurface)
-                                .clipShape(Capsule())
-                                .overlay(
-                                    Capsule().stroke(selectedBrand == brand ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
-                                )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-
-            Button {
-                showingRequestBrand = true
-            } label: {
-                Label("Can't find it? Request a brand", systemImage: "plus.circle")
+                Text(title)
                     .font(.barTabCaption)
-                    .foregroundColor(.barTabPrimary)
             }
-        }
-    }
-
-    // MARK: - Price Input
-
-    private var priceInput: some View {
-        HStack(spacing: BarTabSpacing.sm) {
-            Menu {
-                ForEach(Currency.allCases) { currency in
-                    Button {
-                        selectedCurrency = currency
-                    } label: {
-                        HStack {
-                            Text(currency.symbol)
-                            Text(currency.rawValue)
-                            if selectedCurrency == currency {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-                }
-            } label: {
-                HStack(spacing: 4) {
-                    Text(selectedCurrency.symbol)
-                        .fontWeight(.semibold)
-                    Image(systemName: "chevron.down")
-                        .font(.barTabTiny)
-                }
-                .font(.barTabBody)
-                .padding(.horizontal, BarTabSpacing.sm)
-                .padding(.vertical, 10)
-                .background(Color.barTabSurface)
-                .clipShape(Capsule())
-                .overlay(
-                    Capsule().stroke(Color.barTabCardBorder, lineWidth: 0.5)
-                )
-            }
-
-            TextField("0.00", text: $priceText)
-                .keyboardType(.decimalPad)
-                .font(.barTabStat)
-                .padding(.vertical, 10)
-        }
-    }
-
-    // MARK: - Error Banner
-
-    private func errorBanner(_ message: String) -> some View {
-        Label(message, systemImage: "exclamationmark.circle.fill")
-            .font(.barTabCaption)
-            .foregroundColor(.barTabDanger)
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, BarTabSpacing.sm)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                Color.barTabDanger.opacity(0.08),
-                in: RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+            .padding(.horizontal, BarTabSpacing.sm)
+            .padding(.vertical, 8)
+            .background(isSelected ? Color.barTabPrimary : Color.barTabSurface)
+            .foregroundColor(isSelected ? .white : .barTabText)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(isSelected ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
             )
+        }
+        .buttonStyle(.plain)
     }
 
-    // MARK: - Save
+    // MARK: - Logic
 
     private func savePrice() {
         guard !isSaving else { return }
 
-        guard let amount = Decimal(string: priceText) else {
+        guard let amount = Decimal(string: priceText), amount > 0 else {
             priceError = "Please enter a valid price."
             return
         }
 
-        guard amount > 0 else {
-            priceError = "Price must be greater than zero."
-            return
-        }
-
         priceError = nil
-
         guard let user = userSession.currentUser else { return }
-
-        if let editingPrice {
-            isSaving = true
-            actuallyUpdatePrice(editingPrice, amount: amount, user: user)
-            return
-        }
-
-        let existingPrices = barRepository.getPrices(for: bar)
-
-        if let existing = existingPrices.first(where: { price in
-            price.drink == selectedDrink &&
-            price.size == selectedSize &&
-            price.brand == selectedBrand &&
-            price.currency == selectedCurrency.rawValue &&
-            price.style == selectedStyle?.rawValue &&
-            price.serving == selectedServing
-        }) {
-            duplicatePrice = existing
-            HapticEngine.warning()
-            showingDuplicateWarning = true
-            return
-        }
-
         isSaving = true
-        actuallySavePrice(amount: amount, user: user)
-    }
 
-    private func actuallySavePrice(amount: Decimal, user: User) {
         Task {
-            let success = await barRepository.addPrice(
-                to: bar,
-                drink: selectedDrink,
-                brand: selectedBrand,
-                size: selectedSize,
-                amount: amount,
-                currency: selectedCurrency.rawValue,
-                style: selectedStyle?.rawValue,
-                serving: selectedServing,
-                reportedBy: user
-            )
-
-            if success {
-                HapticEngine.success()
-                toastCenter.show("Price saved", kind: .success)
-                dismiss()
+            if let editingPrice = editingPrice {
+                await barRepository.updatePrice(
+                    editingPrice,
+                    drink: selectedDrink,
+                    brand: selectedBrand,
+                    size: selectedSize,
+                    amount: amount,
+                    currency: selectedCurrency.rawValue,
+                    style: selectedStyle?.rawValue,
+                    serving: selectedServing,
+                    reportedBy: user
+                )
             } else {
-                isSaving = false
-                toastCenter.show("Couldn't save drink", kind: .error)
+                _ = await barRepository.addPrice(
+                    to: bar,
+                    drink: selectedDrink,
+                    brand: selectedBrand,
+                    size: selectedSize,
+                    amount: amount,
+                    currency: selectedCurrency.rawValue,
+                    style: selectedStyle?.rawValue,
+                    serving: selectedServing,
+                    reportedBy: user
+                )
             }
-        }
-    }
-
-    private func actuallyUpdatePrice(_ price: Price, amount: Decimal, user: User) {
-        Task {
-            await barRepository.updatePrice(
-                price,
-                drink: selectedDrink,
-                brand: selectedBrand,
-                size: selectedSize,
-                amount: amount,
-                currency: selectedCurrency.rawValue,
-                style: selectedStyle?.rawValue,
-                serving: selectedServing,
-                reportedBy: user
-            )
 
             HapticEngine.success()
-            toastCenter.show("Price updated", kind: .success)
+            toastCenter.show("Price saved", kind: .success)
             dismiss()
         }
     }

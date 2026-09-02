@@ -147,12 +147,11 @@ struct BarView: View {
         attachModals(
             to: ScrollView {
                 content
-                    .padding()
+                    .padding(.horizontal, BarTabSpacing.md)
+                    .padding(.top, BarTabSpacing.sm)
+                    .padding(.bottom, 32)
             }
-            .background(
-                Color.barTabBackground
-                    .ignoresSafeArea()
-            )
+            .background(Color.barTabBackground.ignoresSafeArea())
             .navigationTitle(currentBar.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -173,42 +172,58 @@ struct BarView: View {
     }
 
     private var content: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+        VStack(alignment: .leading, spacing: 0) {
+            barHeader
+                .padding(.bottom, BarTabSpacing.md)
 
-            // Bar info header
-            VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
-                Text(currentBar.address)
-                    .font(.barTabBody)
-                    .foregroundColor(.barTabSecondary)
-
-                if let location = locationService.location {
-                    Label(
-                        DistanceService.formattedDistance(from: location, to: currentBar),
-                        systemImage: "location.fill"
-                    )
-                    .font(.barTabSmall)
-                    .fontWeight(.medium)
-                    .foregroundColor(.barTabPrimary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Color.barTabPrimary.opacity(0.08))
-                    .clipShape(Capsule())
-                }
-            }
-
-            // Quick actions
             if userSession.currentUser != nil {
                 quickActionsRow
+                    .padding(.bottom, BarTabSpacing.lg)
             }
 
-            // Details card
-            detailsSection
+            compactInfoRow
+                .padding(.bottom, BarTabSpacing.lg)
 
-            // Menu
             menuSection
 
-            // Directions
             directionsButton
+                .padding(.top, BarTabSpacing.lg)
+        }
+    }
+
+    // MARK: - Header
+
+    private var barHeader: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(currentBar.address)
+                .font(.barTabSmall)
+                .foregroundColor(.barTabSecondary)
+                .lineLimit(2)
+
+            HStack(spacing: 6) {
+                if let location = locationService.location {
+                    Image(systemName: "location.fill")
+                    Text(DistanceService.formattedDistance(from: location, to: currentBar))
+                }
+
+                if let priceLevel = priceLevelString {
+                    Text("·")
+                        .foregroundColor(.barTabSecondary)
+                    Text(priceLevel)
+                        .fontWeight(.semibold)
+                }
+
+                if ambienceCount > 0 {
+                    Text("·")
+                        .foregroundColor(.barTabSecondary)
+                    Image(systemName: "star.fill")
+                    Text("\(ambienceCount)")
+                }
+
+                Spacer()
+            }
+            .font(.barTabTiny)
+            .foregroundColor(.barTabSecondary)
         }
     }
 
@@ -220,11 +235,12 @@ struct BarView: View {
             barRepository.hasUserCheckedIn(barID: currentBar.id, userID: $0.id)
         } ?? false
 
-        return HStack(spacing: BarTabSpacing.sm) {
+        return HStack(spacing: 8) {
             Button {
                 Task {
                     guard let user = userSession.currentUser else { return }
                     let ok: Bool
+
                     if hasCheckedIn {
                         ok = await barRepository.uncheckIn(bar: currentBar, user: user)
                     } else {
@@ -234,51 +250,104 @@ struct BarView: View {
                             toastCenter.show("You're here have fun! 🍻", kind: .success)
                         }
                     }
+
                     if !ok {
                         toastCenter.show("Couldn't update right now", kind: .error)
                     }
                 }
             } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: hasCheckedIn ? "checkmark.circle.fill" : "flame.fill")
-                        .font(.barTabBody)
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(hasCheckedIn ? "You're here" : "I'm here")
-                            .font(.barTabCaption)
-                            .fontWeight(.semibold)
-                        Text(busyCount > 0 ? "\(busyCount) here" : "Tap if here")
-                            .font(.barTabTiny)
-                            .opacity(0.7)
+                HStack(spacing: 7) {
+                    Image(systemName: hasCheckedIn ? "checkmark" : "location.fill")
+                    Text(hasCheckedIn ? "You're here" : "I'm here")
+
+                    if busyCount > 0 {
+                        Text("· \(busyCount)")
+                            .opacity(0.72)
                     }
                 }
-                .foregroundColor(.white)
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.sm)
+                .font(.barTabSmall)
+                .fontWeight(.semibold)
+                .foregroundColor(hasCheckedIn ? .barTabSuccess : .white)
                 .frame(maxWidth: .infinity)
-                .background(hasCheckedIn ? Color.barTabSuccess : Color.barTabAccent)
+                .padding(.vertical, 11)
+                .background(
+                    hasCheckedIn
+                        ? Color.barTabSuccess.opacity(0.10)
+                        : Color.barTabPrimary
+                )
                 .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                .overlay {
+                    if hasCheckedIn {
+                        RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                            .stroke(Color.barTabSuccess.opacity(0.25), lineWidth: 1)
+                    }
+                }
             }
             .buttonStyle(.plain)
 
             Button {
                 showingAddPrice = true
             } label: {
-                HStack(spacing: 6) {
+                HStack(spacing: 7) {
                     Image(systemName: "plus")
-                        .font(.barTabBody)
-                    Text("Add drink")
-                        .font(.barTabCaption)
-                        .fontWeight(.semibold)
+                    Text("Add price")
                 }
-                .foregroundColor(.white)
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.sm)
+                .font(.barTabSmall)
+                .fontWeight(.semibold)
+                .foregroundColor(.barTabPrimary)
                 .frame(maxWidth: .infinity)
-                .background(Color.barTabPrimary)
+                .padding(.vertical, 11)
+                .background(Color.barTabPrimary.opacity(0.08))
                 .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
             }
             .buttonStyle(.plain)
         }
+    }
+
+    // MARK: - Compact info
+
+    private var compactInfoRow: some View {
+        HStack(spacing: 10) {
+            if currentBar.outdoorSeating {
+                compactInfoItem(icon: "sun.max.fill", text: "Outdoor")
+            }
+
+            if currentBar.smokingFriendly {
+                compactInfoItem(icon: "smoke.fill", text: "Smoking")
+            }
+
+            if !ambienceStyles.isEmpty {
+                compactInfoItem(
+                    icon: ambienceStyles[0].icon,
+                    text: ambienceStyles[0].displayName
+                )
+            }
+
+            Spacer()
+
+            Button {
+                showingRateBar = true
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "star")
+                    Text("Rate")
+                }
+                .font(.barTabTiny)
+                .fontWeight(.semibold)
+                .foregroundColor(.barTabAccent)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.bottom, 1)
+    }
+
+    private func compactInfoItem(icon: String, text: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+            Text(text)
+        }
+        .font(.barTabTiny)
+        .foregroundColor(.barTabSecondary)
     }
 
     // MARK: - Directions
@@ -287,185 +356,419 @@ struct BarView: View {
         Button {
             openDirections()
         } label: {
-            HStack(spacing: 8) {
-                Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
-                    .font(.barTabBody)
-                Text("Get Directions")
-                    .font(.barTabBody)
-                    .fontWeight(.semibold)
+            HStack(spacing: 7) {
+                Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                Text("Directions")
+                    .fontWeight(.medium)
                 Spacer()
                 Image(systemName: "arrow.up.right")
                     .font(.barTabTiny)
             }
-            .foregroundColor(.barTabPrimary)
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, BarTabSpacing.sm)
-            .frame(maxWidth: .infinity)
-            .background(Color.barTabPrimary.opacity(0.06))
-            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
-        }
-    }
-
-    private var detailsSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Price level
-            if let priceLevel = priceLevelString {
-                HStack(spacing: 8) {
-                    Text(priceLevel)
-                        .font(.barTabBody)
-                        .fontWeight(.bold)
-                        .foregroundColor(.barTabPrimary)
-                    Text(priceLevelTitle(priceLevel))
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
-                    Spacer()
-                }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.sm)
-
-                Divider().padding(.horizontal, BarTabSpacing.md)
-            }
-
-            // Amenities + Ambience
-            VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-                HStack(spacing: 8) {
-                    amenityPill(
-                        icon: "sun.max.fill",
-                        label: "Outdoor",
-                        active: currentBar.outdoorSeating,
-                        action: { showingOutdoorConfirmation = true }
-                    )
-                    amenityPill(
-                        icon: "smoke.fill",
-                        label: "Smoking",
-                        active: currentBar.smokingFriendly,
-                        action: { showingSmokingConfirmation = true }
-                    )
-
-                    Spacer()
-
-                    if ambienceCount > 0 {
-                        Label("\(ambienceCount) ratings", systemImage: "star.fill")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSecondary)
-                    }
-                }
-
-                if !ambienceStyles.isEmpty {
-                    FlowLayout(spacing: 6) {
-                        ForEach(ambienceStyles) { style in
-                            HStack(spacing: 3) {
-                                Image(systemName: style.icon).font(.barTabTiny)
-                                Text(style.displayName).font(.barTabSmall).fontWeight(.medium)
-                            }
-                            .foregroundColor(.barTabPrimary)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.barTabPrimary.opacity(0.08))
-                            .clipShape(Capsule())
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, BarTabSpacing.sm)
-
-            Divider().padding(.horizontal, BarTabSpacing.md)
-
-            // Rate button
-            Button {
-                showingRateBar = true
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "star.fill")
-                        .font(.barTabSmall)
-                    Text("Rate this bar")
-                        .font(.barTabSmall)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.barTabAccent)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, BarTabSpacing.sm)
-        }
-        .barTabCard()
-    }
-
-    private func amenityPill(icon: String, label: String, active: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 4) {
-                Image(systemName: icon).font(.barTabTiny)
-                Text(label).font(.barTabSmall)
-            }
-            .padding(.horizontal, BarTabSpacing.sm)
-            .padding(.vertical, 6)
-            .foregroundColor(active ? .white : .barTabPrimary)
-            .background(active ? Color.barTabPrimary : Color.barTabPillFill)
-            .clipShape(Capsule())
+            .font(.barTabSmall)
+            .foregroundColor(.barTabSecondary)
+            .padding(.vertical, 9)
         }
         .buttonStyle(.plain)
     }
 
-    // MARK: - Menu Section
+    // MARK: - Menu
 
     private var menuSection: some View {
         VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
                 Text("Menu")
                     .font(.barTabHeading)
+                    .fontWeight(.bold)
+
                 Spacer()
+
                 if let fetchedAt = barRepository.lastFetchedAt {
                     Text("Updated \(fetchedAt.relativeFormatted)")
                         .font(.barTabTiny)
                         .foregroundColor(.barTabSecondary)
                 }
             }
+            .padding(.bottom, 2)
 
             if groupedPrices.isEmpty {
                 emptyPricesView
             } else {
-                ForEach(Drink.allCases.filter { drink in
-                    groupedPrices.contains { $0.drink == drink }
-                }) { drink in
-                    DisclosureGroup {
-                        VStack(alignment: .leading, spacing: 4) {
-                            ForEach(groupedPrices.filter { $0.drink == drink }) { group in
-                                priceGroupRow(group)
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: drink.icon)
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabPrimary)
-                                .frame(width: 20)
-
-                            Text(drink.displayName)
-                                .font(.barTabBody)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
-
-                            Spacer()
-
-                            Text("\(groupedPrices.filter { $0.drink == drink }.count)")
-                                .font(.barTabTiny)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.barTabPrimary.opacity(0.1))
-                                .clipShape(Capsule())
-                                .foregroundColor(.barTabPrimary)
-                        }
-                    }
-                    .tint(.barTabSecondary)
-                    .padding(.vertical, 2)
-                    .onAppear {
-                        expandedDrinkCategories.insert(drink)
+                VStack(spacing: 0) {
+                    ForEach(Drink.allCases.filter { drink in
+                        groupedPrices.contains { $0.drink == drink }
+                    }) { drink in
+                        drinkCategory(drink)
                     }
                 }
             }
         }
+    }
+
+    private func drinkCategory(_ drink: Drink) -> some View {
+        let groups = groupedPrices.filter { $0.drink == drink }
+
+        return VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.18)) {
+                    expandedDrinkCategories.formSymmetricDifference([drink])
+                }
+            } label: {
+                HStack(spacing: 9) {
+                    Image(systemName: drink.icon)
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabPrimary)
+                        .frame(width: 22)
+
+                    Text(drink.displayName.uppercased())
+                        .font(.barTabTiny)
+                        .fontWeight(.bold)
+                        .tracking(0.7)
+                        .foregroundColor(.barTabSecondary)
+
+                    Text("\(groups.count)")
+                        .font(.barTabTiny)
+                        .foregroundColor(.barTabSecondary.opacity(0.8))
+
+                    Spacer()
+
+                    Image(systemName: expandedDrinkCategories.contains(drink)
+                          ? "chevron.up"
+                          : "chevron.down")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.barTabSecondary)
+                }
+                .contentShape(Rectangle())
+                .padding(.vertical, 10)
+            }
+            .buttonStyle(.plain)
+
+            if expandedDrinkCategories.contains(drink) {
+                VStack(spacing: 0) {
+                    ForEach(groups) { group in
+                        priceGroupRow(group)
+                    }
+                }
+            }
+
+            Divider()
+                .opacity(0.65)
+        }
+    }
+
+    private func priceGroupRow(_ group: PriceGroup) -> some View {
+        let isExpanded = expandedGroupID == group.id
+        let groupKey = "\(group.drink)-\(group.size)-\(group.brand ?? "")-\(group.style ?? "")-\(group.serving?.rawValue ?? "")"
+        let isFlagged = cachedReports.contains { $0.targetID == groupKey }
+
+        return VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.18)) {
+                    expandedGroupID = isExpanded ? nil : group.id
+                }
+            } label: {
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 5) {
+                            if let brand = group.brand, !brand.isEmpty {
+                                Text(brand)
+                                    .font(.barTabBody)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabText)
+                            } else {
+                                Text(group.drink.displayName)
+                                    .font(.barTabBody)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabText)
+                            }
+
+                            if isFlagged {
+                                Image(systemName: "flag.fill")
+                                    .font(.barTabTiny)
+                                    .foregroundColor(.barTabWarning)
+                            }
+                        }
+
+                        HStack(spacing: 4) {
+                            Text(group.size.displayName)
+
+                            if let style = group.style, !style.isEmpty {
+                                Text("·")
+                                Text(style)
+                            }
+
+                            if let serving = group.serving {
+                                Text("·")
+                                Text(serving.displayName)
+                            }
+                        }
+                        .font(.barTabTiny)
+                        .foregroundColor(.barTabSecondary)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("\(Currency.defaultCurrency.symbol)\(Decimal(averageAmount(for: group)).formattedAmount)")
+                            .font(.barTabBody)
+                            .fontWeight(.bold)
+                            .foregroundColor(.barTabPrimary)
+
+                        if group.prices.count > 1 {
+                            Text("\(group.prices.count) reports")
+                                .font(.barTabTiny)
+                                .foregroundColor(.barTabSecondary)
+                        }
+                    }
+
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.barTabSecondary)
+                        .frame(width: 14)
+                }
+                .contentShape(Rectangle())
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 9) {
+                    if group.prices.count > 1 {
+                        PriceTrendChart(prices: group.prices)
+                            .frame(height: 110)
+                            .padding(.top, 2)
+                    } else {
+                        Text("One reported price")
+                            .font(.barTabTiny)
+                            .foregroundColor(.barTabSecondary)
+                    }
+
+                    ForEach(group.prices) { price in
+                        individualPriceRow(price)
+                    }
+
+                    HStack {
+                        Button {
+                            ratingDrinkGroup = group
+                            showingDrinkRating = true
+                        } label: {
+                            Label("Rate", systemImage: myDrinkRatingIcon(for: group))
+                                .font(.barTabTiny)
+                                .fontWeight(.semibold)
+                        }
+
+                        Button {
+                            alertDrinkGroup = group
+                            showingPriceAlert = true
+                        } label: {
+                            Label("Alert", systemImage: "bell")
+                                .font(.barTabTiny)
+                                .fontWeight(.semibold)
+                        }
+
+                        Spacer()
+
+                        Menu {
+                            Button {
+                                comparisonGroup = group
+                            } label: {
+                                Label("Compare prices", systemImage: "barchart.xaxis.2")
+                            }
+
+                            Button {
+                                pendingReportGroup = group
+                                showingPriceReport = true
+                            } label: {
+                                Label("Report price", systemImage: "exclamationmark.circle")
+                            }
+
+                            if let user = userSession.currentUser, user.isAdmin {
+                                Button(role: .destructive) {
+                                    pendingDeleteGroup = group
+                                    showingDeleteGroupConfirmation = true
+                                } label: {
+                                    Label("Delete all", systemImage: "trash")
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .font(.barTabSmall)
+                                .foregroundColor(.barTabSecondary)
+                                .frame(width: 28, height: 28)
+                        }
+                    }
+                    .foregroundColor(.barTabPrimary)
+                    .padding(.bottom, 8)
+                }
+                .padding(.leading, 34)
+                .transition(.opacity)
+            }
+        }
+        .contextMenu {
+            Button {
+                comparisonGroup = group
+            } label: {
+                Label("Compare prices", systemImage: "barchart.xaxis.2")
+            }
+        }
+    }
+
+    private func individualPriceRow(_ price: Price) -> some View {
+        let userID = userSession.currentUser?.id
+        let isMine = userID == price.reportedBy
+        let hasVerified = userID.map {
+            barRepository.hasUserVerified(priceID: price.id, userID: $0)
+        } ?? false
+        let verifyCount = barRepository.verificationCount(for: price.id)
+        let converted = ExchangeRateService.shared.convert(
+            price.amount,
+            from: price.currency,
+            to: Currency.defaultCurrency.rawValue
+        )
+        let showOriginal = price.currency != Currency.defaultCurrency.rawValue
+
+        return HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 5) {
+                    Text("\(Currency.defaultCurrency.symbol)\(converted.formattedAmount)")
+                        .font(.barTabSmall)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabText)
+
+                    if verifyCount > 0 {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.barTabTiny)
+                            .foregroundColor(.barTabSuccess)
+
+                        Text("\(verifyCount)")
+                            .font(.barTabTiny)
+                            .foregroundColor(.barTabSuccess)
+                    }
+                }
+
+                HStack(spacing: 5) {
+                    Text(price.reportedAt.relativeFormatted)
+
+                    if showOriginal {
+                        Text("· \(price.formattedAmount) \(price.currency)")
+                    }
+                }
+                .font(.barTabTiny)
+                .foregroundColor(.barTabSecondary)
+            }
+
+            Spacer()
+
+            if !isMine {
+                Button {
+                    guard let user = userSession.currentUser else { return }
+                    Task {
+                        let ok: Bool
+
+                        if hasVerified {
+                            ok = await barRepository.unverifyPrice(price, user: user)
+                            if ok {
+                                HapticEngine.lightTap()
+                                toastCenter.show("Verification removed", kind: .info)
+                            }
+                        } else {
+                            ok = await barRepository.verifyPrice(price, user: user)
+                            if ok {
+                                HapticEngine.lightTap()
+                                toastCenter.show("Thanks for confirming this price!", kind: .success)
+                            }
+                        }
+
+                        if !ok {
+                            toastCenter.show("Couldn't update right now", kind: .error)
+                        }
+                    }
+                } label: {
+                    Image(systemName: hasVerified
+                          ? "checkmark.circle.fill"
+                          : "checkmark.circle")
+                        .font(.barTabBody)
+                        .foregroundColor(hasVerified ? .barTabSuccess : .barTabSecondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(
+                    hasVerified
+                        ? "Remove your verification"
+                        : "Confirm this price is still accurate"
+                )
+            }
+
+            if isMine {
+                Button {
+                    pendingDeletePrice = price
+                    showingDeletePriceConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabDanger)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Delete price")
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(Color.barTabPrimary.opacity(0.045))
+        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+        .contextMenu {
+            if !isMine {
+                Button {
+                    guard let user = userSession.currentUser else { return }
+                    Task {
+                        if hasVerified {
+                            _ = await barRepository.unverifyPrice(price, user: user)
+                        } else {
+                            _ = await barRepository.verifyPrice(price, user: user)
+                        }
+                    }
+                } label: {
+                    Label(
+                        hasVerified ? "Remove my verification" : "Confirm this price",
+                        systemImage: hasVerified ? "xmark.circle" : "checkmark.circle"
+                    )
+                }
+            }
+
+            if isMine {
+                Button(role: .destructive) {
+                    pendingDeletePrice = price
+                    showingDeletePriceConfirmation = true
+                } label: {
+                    Label("Delete my price", systemImage: "trash")
+                }
+            }
+        }
+    }
+
+    private var emptyPricesView: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("No prices yet")
+                .font(.barTabBody)
+                .fontWeight(.semibold)
+
+            Text("Be the first to add a drink price at this bar.")
+                .font(.barTabSmall)
+                .foregroundColor(.barTabSecondary)
+
+            if userSession.currentUser != nil {
+                Button {
+                    showingAddPrice = true
+                } label: {
+                    Text("Add the first price")
+                        .font(.barTabSmall)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabPrimary)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 3)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 22)
     }
 
     @ToolbarContentBuilder
@@ -481,7 +784,20 @@ struct BarView: View {
             }
         }
 
-        ToolbarItem(placement: .navigationBarTrailing) {
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            Button {
+                HapticEngine.impact()
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    barRepository.toggleFavorite(currentBar)
+                }
+            } label: {
+                Image(systemName: isFavorited ? "heart.fill" : "heart")
+                    .foregroundColor(.barTabPrimary)
+            }
+            .accessibilityLabel(
+                isFavorited ? "Remove from favorites" : "Add to favorites"
+            )
+
             Menu {
                 ShareLink(
                     item: DeepLink.bar(currentBar.id),
@@ -516,23 +832,10 @@ struct BarView: View {
                     }
                 }
             } label: {
-                Image(systemName: "ellipsis.circle")
-                    .foregroundColor(.barTabPrimary)
+                Image(systemName: "ellipsis")
+                    .foregroundColor(.barTabSecondary)
             }
             .accessibilityLabel("More options")
-        }
-
-        ToolbarItem(placement: .navigationBarTrailing) {
-            Button {
-                HapticEngine.impact()
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    barRepository.toggleFavorite(currentBar)
-                }
-            } label: {
-                Image(systemName: isFavorited ? "heart.fill" : "heart")
-                    .foregroundColor(.barTabPrimary)
-            }
-            .accessibilityLabel(isFavorited ? "Remove from favorites" : "Add to favorites")
         }
     }
 
@@ -717,292 +1020,6 @@ struct BarView: View {
                         : "This bar will be marked as having outdoor seating."
                 )
             }
-    }
-
-    private func priceGroupRow(_ group: PriceGroup) -> some View {
-        let isExpanded = expandedGroupID == group.id
-        let groupKey = "\(group.drink)-\(group.size)-\(group.brand ?? "")-\(group.style ?? "")-\(group.serving?.rawValue ?? "")"
-        let isFlagged = cachedReports.contains { $0.targetID == groupKey }
-
-        return VStack(alignment: .leading, spacing: 0) {
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    expandedGroupID = isExpanded ? nil : group.id
-                }
-            } label: {
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 3) {
-                            HStack(spacing: 6) {
-                                Text(group.drink.displayName)
-                                    .font(.barTabBody)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.barTabText)
-
-                                if isFlagged {
-                                    Image(systemName: "flag.fill")
-                                        .font(.barTabTiny)
-                                        .foregroundColor(.barTabWarning)
-                                }
-
-                                if let brand = group.brand {
-                                    Text("·").foregroundColor(.barTabSecondary)
-                                    Text(brand)
-                                        .font(.barTabSmall)
-                                        .foregroundColor(.barTabSecondary)
-                                }
-
-                                if let style = group.style {
-                                    Text("·").foregroundColor(.barTabSecondary)
-                                    Text(style)
-                                        .font(.barTabSmall)
-                                        .foregroundColor(.barTabSecondary)
-                                }
-                            }
-
-                            HStack(spacing: 6) {
-                                Text(group.size.displayName)
-                                    .font(.barTabSmall)
-                                    .foregroundColor(.barTabSecondary)
-
-                                if let serving = group.serving {
-                                    Text("·").foregroundColor(.barTabSecondary)
-                                    Text(serving.displayName)
-                                        .font(.barTabSmall)
-                                        .foregroundColor(.barTabSecondary)
-                                }
-                            }
-                        }
-
-                        Spacer()
-
-                        Text("\(Currency.defaultCurrency.symbol)\(Decimal(averageAmount(for: group)).formattedAmount)")
-                            .font(.barTabBody)
-                            .fontWeight(.bold)
-                            .foregroundColor(.barTabPrimary)
-
-                        Menu {
-                            Button {
-                                ratingDrinkGroup = group
-                                showingDrinkRating = true
-                            } label: {
-                                Label("Rate drink", systemImage: myDrinkRatingIcon(for: group))
-                            }
-
-                            Button {
-                                alertDrinkGroup = group
-                                showingPriceAlert = true
-                            } label: {
-                                Label("Set price alert", systemImage: "bell")
-                            }
-
-                            Button {
-                                pendingReportGroup = group
-                                showingPriceReport = true
-                            } label: {
-                                Label("Report price", systemImage: "exclamationmark.circle")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
-                                .font(.barTabBody)
-                                .foregroundColor(isFlagged ? .orange : .barTabSecondary)
-                        }
-                        .accessibilityLabel("More drink actions")
-                    }
-                }
-                .padding(.vertical, 8)
-            }
-            .buttonStyle(.plain)
-
-            if isExpanded {
-                VStack(alignment: .leading, spacing: 8) {
-                    Divider()
-                    if group.prices.count > 1 {
-                        PriceTrendChart(prices: group.prices)
-                            .frame(height: 120)
-                            .padding(.horizontal, 4)
-                    } else {
-                        Text("Only one price reported   trend needs at least two.")
-                            .font(.barTabSmall)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 4)
-                    }
-
-                    ForEach(group.prices) { price in
-                        individualPriceRow(price)
-                    }
-
-                    if let user = userSession.currentUser, user.isAdmin {
-                        HStack {
-                            Spacer()
-                            Button {
-                                pendingDeleteGroup = group
-                                showingDeleteGroupConfirmation = true
-                            } label: {
-                                Label("Delete all", systemImage: "trash")
-                                    .font(.barTabSmall)
-                                    .foregroundColor(.barTabDanger)
-                            }
-                        }
-                        .padding(.top, 4)
-                    }
-                }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-                .padding(.bottom, 8)
-            }
-        }
-        .contextMenu {
-            Button {
-                comparisonGroup = group
-            } label: {
-                Label("Compare prices", systemImage: "barchart.xaxis.2")
-            }
-        }
-    }
-
-    private func individualPriceRow(_ price: Price) -> some View {
-        let userID = userSession.currentUser?.id
-        let isMine = userID == price.reportedBy
-        let hasVerified = userID.map { barRepository.hasUserVerified(priceID: price.id, userID: $0) } ?? false
-        let verifyCount = barRepository.verificationCount(for: price.id)
-        let converted = ExchangeRateService.shared.convert(
-            price.amount,
-            from: price.currency,
-            to: Currency.defaultCurrency.rawValue
-        )
-        let showOriginal = price.currency != Currency.defaultCurrency.rawValue
-
-        return HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(Currency.defaultCurrency.symbol)\(converted.formattedAmount)")
-                    .font(.barTabBody)
-                    .fontWeight(.medium)
-
-                if showOriginal {
-                    Text("\(price.formattedAmount) \(price.currency)")
-                        .font(.barTabTiny)
-                        .foregroundColor(.secondary)
-                }
-
-                HStack(spacing: 4) {
-                    Text(price.reportedAt.relativeFormatted)
-                        .font(.barTabTiny)
-                        .foregroundColor(.secondary)
-
-                    if verifyCount > 0 {
-                        Image(systemName: "checkmark.seal.fill")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSuccess)
-                        Text(
-                            verifyCount == 1
-                                ? String(localized: "Confirmed by 1 person")
-                                : String(localized: "Confirmed by \(verifyCount) people")
-                        )
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabSuccess)
-                    }
-                }
-            }
-
-            Spacer()
-
-            if !isMine {
-                Button {
-                    guard let user = userSession.currentUser else { return }
-                    Task {
-                        let ok: Bool
-                        if hasVerified {
-                            ok = await barRepository.unverifyPrice(price, user: user)
-                            if ok {
-                                HapticEngine.lightTap()
-                                toastCenter.show("Verification removed", kind: .info)
-                            }
-                        } else {
-                            ok = await barRepository.verifyPrice(price, user: user)
-                            if ok {
-                                HapticEngine.lightTap()
-                                toastCenter.show("Thanks for confirming this price!", kind: .success)
-                            }
-                        }
-
-                        if !ok {
-                            toastCenter.show("Couldn't update right now", kind: .error)
-                        }
-                    }
-                } label: {
-                    Image(systemName: hasVerified ? "checkmark.circle.fill" : "checkmark.circle")
-                        .font(.barTabBody)
-                        .foregroundColor(hasVerified ? .green : .barTabSecondary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(hasVerified ? "Remove your verification" : "Confirm this price is still accurate")
-            }
-
-            if isMine {
-                Button {
-                    pendingDeletePrice = price
-                    showingDeletePriceConfirmation = true
-                } label: {
-                    Image(systemName: "trash")
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabDanger)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Delete price")
-            }
-        }
-        .padding(.vertical, 4)
-        .padding(.horizontal, 8)
-        .background(Color.barTabBackground.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
-        .contextMenu {
-            if !isMine {
-                if hasVerified {
-                    Button {
-                        guard let user = userSession.currentUser else { return }
-                        Task { await barRepository.unverifyPrice(price, user: user) }
-                    } label: {
-                        Label("Remove my verification", systemImage: "xmark.circle")
-                    }
-                } else {
-                    Button {
-                        guard let user = userSession.currentUser else { return }
-                        Task { await barRepository.verifyPrice(price, user: user) }
-                    } label: {
-                        Label("Confirm this price", systemImage: "checkmark.circle")
-                    }
-                }
-            }
-
-            if isMine {
-                Button(role: .destructive) {
-                    pendingDeletePrice = price
-                    showingDeletePriceConfirmation = true
-                } label: {
-                    Label("Delete my price", systemImage: "trash")
-                }
-            }
-        }
-    }
-
-    // MARK: - Helper Methods / Properties Placeholder
-    private var emptyPricesView: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "cup.and.saucer")
-                .font(.barTabEmptyIcon)
-                .foregroundColor(.barTabPrimary)
-
-            Text("No drink prices added yet")
-                .font(.barTabBody)
-                .fontWeight(.medium)
-
-            Text("Be the first to add a price for this bar.")
-                .font(.barTabSmall)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 32)
-        .barTabCard()
     }
 
     private var shareText: String {
