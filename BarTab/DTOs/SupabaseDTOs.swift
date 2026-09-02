@@ -364,6 +364,28 @@ struct ProfileDTO: Codable, Identifiable {
     let avatar_url: String?
 }
 
+struct ProfileNameRow: Codable {
+    let id: UUID
+    let displayName: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case displayName = "display_name"
+    }
+}
+
+struct ProfileAvatarRow: Codable, Identifiable {
+    let id: UUID
+    let displayName: String?
+    let avatarURL: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case displayName = "display_name"
+        case avatarURL = "avatar_url"
+    }
+}
+
 // MARK: - Bar Attribute Report DTO
 
 struct BarAttributeReportDTO: Codable {
