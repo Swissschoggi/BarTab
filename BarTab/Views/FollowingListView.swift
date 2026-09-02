@@ -17,7 +17,7 @@ struct FollowingListView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if followingIDs.isEmpty {
-                VStack(spacing: 14) {
+                VStack(spacing: BarTabSpacing.sm) {
                     Image(systemName: "person.2.slash")
                         .font(.barTabEmptyIcon)
                         .foregroundColor(.barTabPrimary)

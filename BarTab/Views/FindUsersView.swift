@@ -20,7 +20,7 @@ struct FindUsersView: View {
                     subtitle: "Search by username to send a follow request."
                 )
 
-                HStack(spacing: 10) {
+                HStack(spacing: BarTabSpacing.sm) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.barTabSecondary)
 
@@ -56,7 +56,7 @@ struct FindUsersView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 40)
                 } else if hasSearched && results.isEmpty {
-                    VStack(spacing: 14) {
+                    VStack(spacing: BarTabSpacing.sm) {
                         Image(systemName: "person.crop.circle.badge.questionmark")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
@@ -113,8 +113,8 @@ struct FindUsersView: View {
 
             FollowButton(userID: profile.id)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, BarTabSpacing.sm)
+        .padding(.vertical, BarTabSpacing.sm)
     }
 
     private func search() async {

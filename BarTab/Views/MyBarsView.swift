@@ -110,7 +110,7 @@ struct MyBarsView: View {
 
     private var emptyState: some View {
 
-        VStack(spacing: 14) {
+        VStack(spacing: BarTabSpacing.sm) {
 
             ZStack {
 
@@ -204,7 +204,7 @@ struct MyBarsView: View {
                         .foregroundColor(.secondary)
                         .lineLimit(1)
 
-                    HStack(spacing: 10) {
+                    HStack(spacing: BarTabSpacing.sm) {
 
                         if let location = locationService.location {
 

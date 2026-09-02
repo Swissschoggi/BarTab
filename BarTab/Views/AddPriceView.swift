@@ -284,7 +284,7 @@ struct AddPriceView: View {
                                     .font(.barTabTiny)
                             }
                             .font(.barTabBody)
-                            .padding(.horizontal, 10)
+                            .padding(.horizontal, BarTabSpacing.sm)
                             .padding(.vertical, 6)
                             .background(Color.barTabPillFill)
                             .clipShape(Capsule())

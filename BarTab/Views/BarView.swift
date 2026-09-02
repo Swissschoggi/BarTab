@@ -175,7 +175,7 @@ struct BarView: View {
     private var content: some View {
         VStack(
             alignment: .leading,
-            spacing: 20
+            spacing: BarTabSpacing.lg
         ) {
 
             VStack(
@@ -291,8 +291,8 @@ struct BarView: View {
                         .fontWeight(.semibold)
                 }
                 .foregroundColor(.barTabPrimary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                .padding(.horizontal, BarTabSpacing.md)
+                .padding(.vertical, BarTabSpacing.sm)
                 .frame(maxWidth: .infinity)
                 .background(Color.barTabPrimary.opacity(0.06))
                 .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
@@ -361,8 +361,7 @@ struct BarView: View {
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.barTabSmall)
-                            .fontWeight(.semibold)
+                            .font(.barTabTiny)
                     }
                     .padding()
                     .barTabPrimaryButton()
@@ -384,8 +383,7 @@ struct BarView: View {
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.barTabSmall)
-                            .fontWeight(.semibold)
+                            .font(.barTabTiny)
                     }
                     .padding()
                     .barTabPrimaryButton()
@@ -418,12 +416,12 @@ struct BarView: View {
 
                     Spacer()
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(.horizontal, BarTabSpacing.md)
+                .padding(.vertical, BarTabSpacing.sm)
 
                 Divider()
                     .foregroundColor(.barTabCardBorder)
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, BarTabSpacing.md)
             }
 
             HStack(spacing: 12) {
@@ -450,7 +448,7 @@ struct BarView: View {
                         Text("Outdoor")
                             .font(.barTabSmall)
                     }
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, BarTabSpacing.sm)
                     .padding(.vertical, 6)
                     .foregroundColor(currentBar.outdoorSeating ? .white : .barTabPrimary)
                     .background(currentBar.outdoorSeating ? Color.barTabPrimary : Color.barTabPillFill)
@@ -467,7 +465,7 @@ struct BarView: View {
                         Text("Smoking")
                             .font(.barTabSmall)
                     }
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, BarTabSpacing.sm)
                     .padding(.vertical, 6)
                     .foregroundColor(currentBar.smokingFriendly ? .white : .barTabPrimary)
                     .background(currentBar.smokingFriendly ? Color.barTabPrimary : Color.barTabPillFill)
@@ -475,12 +473,12 @@ struct BarView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.vertical, BarTabSpacing.sm)
 
             Divider()
                 .foregroundColor(.barTabCardBorder)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, BarTabSpacing.md)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
@@ -521,8 +519,8 @@ struct BarView: View {
                     }
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.vertical, BarTabSpacing.sm)
 
             Button {
                 showingRateBar = true
@@ -536,8 +534,8 @@ struct BarView: View {
                         .foregroundColor(.barTabAccent)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 12)
+            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.bottom, BarTabSpacing.sm)
         }
         .barTabCard()
     }
@@ -816,7 +814,7 @@ struct BarView: View {
                                 if isFlagged {
                                     Image(systemName: "flag.fill")
                                         .font(.barTabTiny)
-                                        .foregroundColor(.orange)
+                                        .foregroundColor(.barTabWarning)
                                 }
 
                                 if let brand = group.brand {

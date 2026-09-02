@@ -71,7 +71,7 @@ struct ProfileView: View {
 
             ScrollView {
 
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
                     headerSection
 
@@ -89,8 +89,8 @@ struct ProfileView: View {
                     }
                 }
                 .padding(.horizontal)
-                .padding(.top, 70)
-                .padding(.bottom, 30)
+                .padding(.top, BarTabSpacing.xxl)
+                .padding(.bottom, BarTabSpacing.xl)
             }
             .background(
                 Color.barTabBackground
@@ -168,9 +168,9 @@ struct ProfileView: View {
 
     @ViewBuilder
     private func profileCard(user: User) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
 
-            HStack(spacing: 14) {
+            HStack(spacing: BarTabSpacing.sm) {
 
                 avatarView(user: user)
 
@@ -254,12 +254,12 @@ struct ProfileView: View {
 
     @ViewBuilder
     private var activitySection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
 
             Text("Your activity")
                 .font(.barTabHeading)
 
-            HStack(spacing: 10) {
+            HStack(spacing: BarTabSpacing.sm) {
                 statisticCard(
                     value: myPrices.count,
                     title: "Drinks",
@@ -284,7 +284,7 @@ struct ProfileView: View {
 
                 Divider()
                     .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, 44)
+                    .padding(.leading, BarTabSpacing.md)
 
                 navigationRow(
                     title: String(localized: "My bars"),
@@ -296,7 +296,7 @@ struct ProfileView: View {
 
                 Divider()
                     .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, 44)
+                    .padding(.leading, BarTabSpacing.md)
 
                 navigationRow(
                     title: "Badges",
@@ -316,7 +316,7 @@ struct ProfileView: View {
 
     @ViewBuilder
     private var savedSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
             Text("Saved")
                 .font(.barTabHeading)
 
@@ -335,7 +335,7 @@ struct ProfileView: View {
 
                         Divider()
                             .foregroundColor(.barTabCardBorder)
-                            .padding(.leading, 44)
+                            .padding(.leading, BarTabSpacing.md)
                     }
                 }
 
@@ -358,7 +358,7 @@ struct ProfileView: View {
     private var adminSection: some View {
         if let user = currentUser, user.isAdmin {
 
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
 
                 Text("Admin")
                     .font(.barTabHeading)
@@ -393,7 +393,7 @@ struct ProfileView: View {
 
     @ViewBuilder
     private var socialSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
             Text("Social")
                 .font(.barTabHeading)
 
@@ -414,7 +414,7 @@ struct ProfileView: View {
 
             Divider()
                 .foregroundColor(.barTabCardBorder)
-                .padding(.leading, 44)
+                .padding(.leading, BarTabSpacing.md)
 
             navigationRow(
                 title: "Activity",
@@ -426,7 +426,7 @@ struct ProfileView: View {
 
             Divider()
                 .foregroundColor(.barTabCardBorder)
-                .padding(.leading, 44)
+                .padding(.leading, BarTabSpacing.md)
 
             navigationRow(
                 title: "Groups",
@@ -441,7 +441,7 @@ struct ProfileView: View {
 
     @ViewBuilder
     private var accountSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
 
             Text("Account")
                 .font(.barTabHeading)
@@ -641,7 +641,7 @@ struct ProfileView: View {
                 Image(systemName: icon)
                     .font(.barTabBody)
                     .foregroundColor(.barTabPrimary)
-                    .frame(width: 28, height: 28)
+                    .frame(width: 24, height: 24)
                     .background(Color.barTabPrimary.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 

@@ -64,7 +64,7 @@ struct GroupDetailView: View {
                                             .font(.barTabSmall)
                                             .fontWeight(.medium)
                                     }
-                                    .padding(.horizontal, 10)
+                                    .padding(.horizontal, BarTabSpacing.sm)
                                     .padding(.vertical, 5)
                                     .background(Color.barTabPrimary.opacity(0.08))
                                     .clipShape(Capsule())
@@ -92,7 +92,7 @@ struct GroupDetailView: View {
                         }
 
                         if polls.isEmpty {
-                            VStack(spacing: 14) {
+                            VStack(spacing: BarTabSpacing.sm) {
                                 Image(systemName: "checkmark.circle")
                                     .font(.barTabEmptyIcon)
                                     .foregroundColor(.barTabPrimary)
@@ -115,7 +115,7 @@ struct GroupDetailView: View {
                         }
 
                         // Danger zone
-                        VStack(spacing: 10) {
+                        VStack(spacing: BarTabSpacing.sm) {
                             Button {
                                 showingLeaveConfirmation = true
                             } label: {
@@ -337,7 +337,7 @@ struct PollCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
             HStack {
                 Text(poll.title)
                     .font(.barTabHeading)
@@ -426,7 +426,7 @@ struct PollCard: View {
             Task { await vote(option) }
         } label: {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 10) {
+                HStack(spacing: BarTabSpacing.sm) {
                     Image(systemName: selected ? "checkmark.circle.fill" : "circle")
                         .foregroundColor(selected ? .barTabPrimary : .barTabSecondary)
 

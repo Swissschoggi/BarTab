@@ -87,7 +87,7 @@ struct DrinkRatingSheet: View {
                     }
 
                     // Your rating
-                    VStack(spacing: 10) {
+                    VStack(spacing: BarTabSpacing.sm) {
                         Text("Your rating")
                             .font(.barTabHeading)
 

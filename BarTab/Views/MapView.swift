@@ -69,7 +69,7 @@ struct MapView: View {
             }
             .ignoresSafeArea()
 
-            VStack(spacing: 10) {
+            VStack(spacing: BarTabSpacing.sm) {
 
                 Button {
                     showingAddBar = true

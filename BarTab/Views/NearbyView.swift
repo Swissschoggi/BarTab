@@ -237,7 +237,7 @@ struct NearbyView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: BarTabSpacing.md) {
 
                 BarTabScreenHeader(
                     title: "Discover",
@@ -372,7 +372,7 @@ struct NearbyView: View {
                                     } label: {
                                         Text(city.name)
                                             .font(.barTabBodySemibold)
-                                            .padding(.horizontal, 14)
+                                            .padding(.horizontal, BarTabSpacing.sm)
                                             .padding(.vertical, 8)
                                             .foregroundColor(isCitySelected(city.name) ? .white : .barTabPrimary)
                                             .background(isCitySelected(city.name) ? Color.barTabPrimary : Color.barTabSurface)
@@ -483,7 +483,7 @@ struct NearbyView: View {
                         .buttonStyle(.plain)
 
                         if index < nearbyBars.count - 1 {
-                            Divider().padding(.leading, 58)
+                            Divider().padding(.leading, BarTabSpacing.md)
                         }
                     }
                 }
@@ -494,7 +494,7 @@ struct NearbyView: View {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                        .stroke(Color.barTabCardBorder, lineWidth: 1)
+                        .stroke(Color.barTabCardBorder, lineWidth: 0.5)
                 )
             }
         }
@@ -548,7 +548,7 @@ struct NearbyView: View {
 
                 Image(systemName: "chevron.right")
                     .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary.opacity(0.6))
+                    .foregroundColor(.barTabSecondary)
             }
         }
         .padding(.horizontal, BarTabSpacing.md)
@@ -632,7 +632,7 @@ struct NearbyView: View {
             // Collapsible filters
             VStack(alignment: .leading, spacing: 8) {
                 if filtersExpanded {
-                    VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
                         filterRow(label: "Drink") {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 6) {
@@ -652,7 +652,7 @@ struct NearbyView: View {
                                                 Text(drink.displayName)
                                                     .font(.barTabSmall)
                                             }
-                                            .padding(.horizontal, 10)
+                                            .padding(.horizontal, BarTabSpacing.sm)
                                             .padding(.vertical, 6)
                                             .foregroundColor(selectedDrinks.contains(drink) ? .white : .barTabPrimary)
                                             .background(selectedDrinks.contains(drink) ? Color.barTabPrimary : Color.barTabSurface)
@@ -678,7 +678,7 @@ struct NearbyView: View {
                                         } label: {
                                             Text(size.displayName)
                                                 .font(.barTabSmall)
-                                                .padding(.horizontal, 10)
+                                                .padding(.horizontal, BarTabSpacing.sm)
                                                 .padding(.vertical, 6)
                                                 .foregroundColor(selectedSizes.contains(size) ? .white : .barTabPrimary)
                                                 .background(selectedSizes.contains(size) ? Color.barTabPrimary : Color.barTabSurface)
@@ -697,7 +697,7 @@ struct NearbyView: View {
                                     } label: {
                                         Text("All")
                                             .font(.barTabSmall)
-                                            .padding(.horizontal, 10)
+                                            .padding(.horizontal, BarTabSpacing.sm)
                                             .padding(.vertical, 6)
                                             .foregroundColor(selectedBrand == nil ? .white : .barTabPrimary)
                                             .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabSurface)
@@ -710,7 +710,7 @@ struct NearbyView: View {
                                         } label: {
                                             Text(brand)
                                                 .font(.barTabSmall)
-                                                .padding(.horizontal, 10)
+                                                .padding(.horizontal, BarTabSpacing.sm)
                                                 .padding(.vertical, 6)
                                                 .foregroundColor(selectedBrand == brand ? .white : .barTabPrimary)
                                                 .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabSurface)
@@ -729,7 +729,7 @@ struct NearbyView: View {
                                     } label: {
                                         Text("Any")
                                             .font(.barTabSmall)
-                                            .padding(.horizontal, 10)
+                                            .padding(.horizontal, BarTabSpacing.sm)
                                             .padding(.vertical, 6)
                                             .foregroundColor(selectedAmbience.isEmpty ? .white : .barTabPrimary)
                                             .background(selectedAmbience.isEmpty ? Color.barTabPrimary : Color.barTabSurface)
@@ -750,7 +750,7 @@ struct NearbyView: View {
                                                 Text(style.displayName)
                                             }
                                             .font(.barTabSmall)
-                                            .padding(.horizontal, 10)
+                                            .padding(.horizontal, BarTabSpacing.sm)
                                             .padding(.vertical, 6)
                                             .foregroundColor(selectedAmbience.contains(style) ? .white : .barTabPrimary)
                                             .background(selectedAmbience.contains(style) ? Color.barTabPrimary : Color.barTabSurface)
@@ -816,7 +816,7 @@ struct NearbyView: View {
                 Text(label)
                     .font(.barTabSmall)
             }
-            .padding(.horizontal, 10)
+            .padding(.horizontal, BarTabSpacing.sm)
             .padding(.vertical, 6)
             .foregroundColor(isActive ? .white : .barTabPrimary)
             .background(isActive ? Color.barTabPrimary : Color.barTabSurface)
@@ -971,7 +971,7 @@ struct NearbyView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            HStack(spacing: 5) {
+            HStack(spacing: BarTabSpacing.xxs) {
                 Text(title)
                 Image(systemName: "chevron.down")
                     .font(.barTabTiny.weight(.semibold))
@@ -1077,7 +1077,7 @@ private struct LocationSearchSheet: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                HStack(spacing: 10) {
+                HStack(spacing: BarTabSpacing.sm) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.barTabPrimary)
 

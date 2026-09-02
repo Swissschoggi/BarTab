@@ -21,7 +21,7 @@ struct FollowRequestsView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 40)
                 } else if requests.isEmpty {
-                    VStack(spacing: 14) {
+                    VStack(spacing: BarTabSpacing.sm) {
                         Image(systemName: "person.badge.plus")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
@@ -106,8 +106,8 @@ struct FollowRequestsView: View {
                 .clipShape(Capsule())
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, BarTabSpacing.sm)
+        .padding(.vertical, BarTabSpacing.sm)
     }
 
     private func loadRequests() async {

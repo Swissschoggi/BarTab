@@ -38,7 +38,7 @@ struct RequestBrandSheet: View {
 
                 if didSubmit {
 
-                    VStack(spacing: 10) {
+                    VStack(spacing: BarTabSpacing.sm) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
@@ -70,15 +70,15 @@ struct RequestBrandSheet: View {
                     if !trimmedName.isEmpty && trimmedName.count > InputValidator.maxBrandNameLength {
                         Text("Name must be \(InputValidator.maxBrandNameLength) characters or fewer.")
                             .font(.barTabSmall)
-                            .foregroundColor(.orange)
+                            .foregroundColor(.barTabWarning)
                     } else if !trimmedName.isEmpty && alreadyExists {
                         Text("That brand is already in the list.")
                             .font(.barTabSmall)
-                            .foregroundColor(.orange)
+                            .foregroundColor(.barTabWarning)
                     } else if !trimmedName.isEmpty && alreadyPending {
                         Text("You've already requested this brand.")
                             .font(.barTabSmall)
-                            .foregroundColor(.orange)
+                            .foregroundColor(.barTabWarning)
                     }
 
                     Spacer()

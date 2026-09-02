@@ -14,7 +14,7 @@ struct ActivityFeedView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: BarTabSpacing.md) {
 
                 BarTabScreenHeader(
                     title: "Activity",
@@ -24,9 +24,9 @@ struct ActivityFeedView: View {
                 if isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
+                    .padding(.vertical, BarTabSpacing.xxl)
                 } else if items.isEmpty {
-                    VStack(spacing: 14) {
+                    VStack(spacing: BarTabSpacing.sm) {
                         Image(systemName: "person.2.slash")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
@@ -48,8 +48,8 @@ struct ActivityFeedView: View {
                     }
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 20)
+            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.vertical, BarTabSpacing.lg)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
         .navigationTitle("Activity")

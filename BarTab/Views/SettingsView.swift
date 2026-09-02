@@ -28,7 +28,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
                     // Account section
                     if userSession.isLoggedIn {
@@ -57,7 +57,7 @@ struct SettingsView: View {
 
                                 Divider()
                                     .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, 44)
+                                    .padding(.leading, BarTabSpacing.md)
 
                                 Button {
                                     showingPasswordEditor = true
@@ -120,13 +120,13 @@ struct SettingsView: View {
                                                     .foregroundColor(.barTabCardBorder)
                                             }
                                         }
-                                        .padding(.vertical, 10)
+                                        .padding(.vertical, BarTabSpacing.sm)
                                     }
 
                                     if currency != Currency.allCases.last {
                                         Divider()
                                             .foregroundColor(.barTabCardBorder)
-                                            .padding(.leading, 44)
+                                            .padding(.leading, BarTabSpacing.md)
                                     }
                                 }
                             }
@@ -180,7 +180,7 @@ struct SettingsView: View {
                                                     .foregroundColor(.barTabCardBorder)
                                             }
                                         }
-                                        .padding(.vertical, 12)
+        .padding(.vertical, BarTabSpacing.sm)
                                     }
 
                                     if index < languages.count - 1 {
@@ -246,16 +246,16 @@ struct SettingsView: View {
                                         }
 
                                         Image(systemName: "chevron.right")
-                                            .font(.barTabSmall)
+                                            .font(.barTabTiny)
                                             .foregroundColor(.barTabSecondary)
                                     }
-                                    .padding(.vertical, 10)
+                                    .padding(.vertical, BarTabSpacing.sm)
                                     .padding(.horizontal, 12)
                                 }
 
                                 Divider()
                                     .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, 44)
+                                    .padding(.leading, BarTabSpacing.md)
 
                                 NavigationLink {
                                     AdminReportsView()
@@ -279,10 +279,10 @@ struct SettingsView: View {
                                         }
 
                                         Image(systemName: "chevron.right")
-                                            .font(.barTabSmall)
+                                            .font(.barTabTiny)
                                             .foregroundColor(.barTabSecondary)
                                     }
-                                    .padding(.vertical, 10)
+                                    .padding(.vertical, BarTabSpacing.sm)
                                     .padding(.horizontal, 12)
                                 }
                             }
@@ -387,7 +387,7 @@ struct SettingsView: View {
                                     .fontWeight(.semibold)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
+                            .padding(.vertical, BarTabSpacing.sm)
                             .barTabPrimaryButton()
                         }
                     }
@@ -498,10 +498,10 @@ struct SettingsView: View {
             }
 
             Image(systemName: "chevron.right")
-                .font(.barTabSmall)
+                .font(.barTabTiny)
                 .foregroundColor(.barTabSecondary)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, BarTabSpacing.sm)
     }
 }
 
@@ -550,7 +550,7 @@ private struct EditUsernameSheet: View {
         NavigationView {
             Form {
                 Section {
-                    HStack(spacing: 14) {
+                    HStack(spacing: BarTabSpacing.sm) {
                         avatarPreview
 
                         VStack(alignment: .leading, spacing: 2) {
@@ -691,7 +691,7 @@ private struct ChangePasswordSheet: View {
         NavigationView {
             Form {
                 Section {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
                         HStack {
                             SecureField("New password", text: $newPassword)
                                 .focused($focusedField, equals: .newPassword)

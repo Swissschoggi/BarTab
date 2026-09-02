@@ -111,7 +111,7 @@ struct MyContributionsView: View {
 
     private var emptyState: some View {
 
-        VStack(spacing: 14) {
+        VStack(spacing: BarTabSpacing.sm) {
 
             ZStack {
 
@@ -155,7 +155,7 @@ struct MyContributionsView: View {
 
         VStack(
             alignment: .leading,
-            spacing: 14
+            spacing: BarTabSpacing.sm
         ) {
 
             HStack(

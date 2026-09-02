@@ -31,7 +31,7 @@ struct AddBarView: View {
             VStack(spacing: 0) {
 
 
-                HStack(spacing: 10) {
+                HStack(spacing: BarTabSpacing.sm) {
 
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.barTabPrimary)
@@ -95,7 +95,7 @@ struct AddBarView: View {
                                     selectPlace(result)
                                 } label: {
 
-                                    HStack(spacing: 14) {
+                                    HStack(spacing: BarTabSpacing.sm) {
 
                                         Image(
                                             systemName: "mappin.circle.fill"
@@ -134,7 +134,7 @@ struct AddBarView: View {
 
                 } else if selectedCoordinate == nil {
 
-                    VStack(spacing: 14) {
+                    VStack(spacing: BarTabSpacing.sm) {
 
                         Spacer()
 

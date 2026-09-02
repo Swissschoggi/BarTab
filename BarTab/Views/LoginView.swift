@@ -131,7 +131,7 @@ struct LoginView: View {
                     }
 
 
-                    VStack(spacing: 14) {
+                    VStack(spacing: BarTabSpacing.sm) {
 
                         Picker(
                             "Mode",
@@ -323,7 +323,7 @@ struct LoginView: View {
             startGoogleSignIn()
         } label: {
 
-            HStack(spacing: 10) {
+            HStack(spacing: BarTabSpacing.sm) {
 
                 if isGoogleSigningIn {
                     ProgressView()

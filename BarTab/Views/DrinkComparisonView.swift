@@ -28,7 +28,7 @@ struct DrinkComparisonView: View {
             VStack(alignment: .leading, spacing: 12) {
 
                 if results.isEmpty {
-                    VStack(spacing: 14) {
+                    VStack(spacing: BarTabSpacing.sm) {
                         Image(systemName: "barchart.xaxis.2")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)

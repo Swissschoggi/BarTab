@@ -36,7 +36,7 @@ struct GroupPlanningView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 40)
                 } else if groups.isEmpty {
-                    VStack(spacing: 14) {
+                    VStack(spacing: BarTabSpacing.sm) {
                         Image(systemName: "person.3.fill")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)

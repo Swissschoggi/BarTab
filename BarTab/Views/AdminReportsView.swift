@@ -22,7 +22,7 @@ struct AdminReportsView: View {
 
                 if reports.isEmpty {
 
-                    VStack(spacing: 14) {
+                    VStack(spacing: BarTabSpacing.sm) {
                         Image(systemName: "checkmark.shield")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
@@ -95,7 +95,7 @@ struct AdminReportsView: View {
             return barRepository.barForPriceGroupKey(report.targetID)
         }()
 
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
 
             if let bar = barForReport {
                 NavigationLink {
@@ -132,7 +132,7 @@ struct AdminReportsView: View {
                     : "dollarsign.circle"
             )
             .font(.barTabBody)
-            .foregroundColor(.orange)
+            .foregroundColor(.barTabWarning)
 
             Text(report.targetLabel)
                 .font(.barTabHeading)

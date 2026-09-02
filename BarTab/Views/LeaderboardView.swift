@@ -40,7 +40,7 @@ struct LeaderboardView: View {
                 .padding(.vertical, 8)
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: BarTabSpacing.md) {
 
                         if leaderboardEntries.isEmpty {
                             VStack(spacing: 12) {
@@ -57,7 +57,7 @@ struct LeaderboardView: View {
                                     .foregroundColor(.barTabSecondary)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.top, 60)
+                            .padding(.top, BarTabSpacing.xxl)
                         } else {
                             ForEach(Array(leaderboardEntries.enumerated()), id: \.element.id) { index, entry in
                                 HStack(spacing: 12) {
@@ -101,17 +101,17 @@ struct LeaderboardView: View {
                                         .clipShape(Capsule())
                                 }
                                 .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
+                                .padding(.vertical, BarTabSpacing.sm)
 
                                 if index < leaderboardEntries.count - 1 {
                                     Divider()
                                         .foregroundColor(.barTabCardBorder)
-                                        .padding(.leading, 60)
+                                        .padding(.leading, BarTabSpacing.md)
                                 }
                             }
                         }
                     }
-                    .padding(.top, 8)
+                    .padding(.top, BarTabSpacing.xs)
                 }
             }
             .background(Color.barTabBackground.ignoresSafeArea())

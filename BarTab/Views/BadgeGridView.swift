@@ -25,7 +25,7 @@ struct BadgeGridView: View {
                     HStack(spacing: 12) {
                         Image(systemName: "flame.fill")
                             .font(.barTabTitle)
-                            .foregroundColor(.orange)
+                            .foregroundColor(.barTabWarning)
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("\(streak)-day streak")
@@ -102,7 +102,7 @@ struct BadgeGridView: View {
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 10)
+        .padding(.vertical, BarTabSpacing.sm)
         .padding(.horizontal, 6)
         .background(
             RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)

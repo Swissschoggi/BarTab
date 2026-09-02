@@ -20,7 +20,7 @@ struct RateBarSheet: View {
         NavigationView {
             VStack(alignment: .leading, spacing: 28) {
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
                     Text("Ambience")
                         .font(.barTabHeading)
 

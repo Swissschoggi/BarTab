@@ -21,7 +21,7 @@ struct AdminBrandRequestsView: View {
 
                 if requests.isEmpty {
 
-                    VStack(spacing: 14) {
+                    VStack(spacing: BarTabSpacing.sm) {
                         Image(systemName: "tag.circle")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
@@ -78,7 +78,7 @@ struct AdminBrandRequestsView: View {
     }
 
     private func requestCard(_ request: BrandRequest) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
 
             HStack(spacing: 8) {
                 Image(systemName: "tag.fill")

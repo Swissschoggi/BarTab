@@ -17,7 +17,7 @@ struct PriceAlertListView: View {
             } else {
                 List {
                     if alerts.isEmpty {
-                        VStack(spacing: 14) {
+                        VStack(spacing: BarTabSpacing.sm) {
                             Image(systemName: "bell.slash")
                                 .font(.barTabEmptyIcon)
                                 .foregroundColor(.barTabPrimary)

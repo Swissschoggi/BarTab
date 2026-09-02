@@ -71,7 +71,7 @@ struct BarHopView: View {
                             }
 
                             ForEach(Array(selectedRoute.enumerated()), id: \.element.id) { index, bar in
-                                HStack(alignment: .top, spacing: 14) {
+                                HStack(alignment: .top, spacing: BarTabSpacing.sm) {
                                     ZStack {
                                         Circle()
                                             .fill(Color.barTabPrimary)
