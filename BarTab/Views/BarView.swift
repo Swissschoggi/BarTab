@@ -430,77 +430,57 @@ struct BarView: View {
                     .padding(.horizontal, 16)
             }
 
-            Button {
-                showingOutdoorConfirmation = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: currentBar.outdoorSeating ? "sun.max.fill" : "sun.max")
-                        .font(.subheadline)
-                        .foregroundColor(currentBar.outdoorSeating ? .white : .barTabPrimary)
-                        .frame(width: 32, height: 32)
-                        .background(currentBar.outdoorSeating ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.08))
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            HStack(spacing: 12) {
+                Image(systemName: "list.bullet")
+                    .font(.subheadline)
+                    .foregroundColor(.barTabPrimary)
+                    .frame(width: 32, height: 32)
+                    .background(Color.barTabPrimary.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(currentBar.outdoorSeating ? "Outdoor seating" : "Indoor only")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.barTabText)
+                Text("Amenities")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.barTabText)
 
-                        Text("Tap to change")
+                Spacer()
+
+                Button {
+                    showingOutdoorConfirmation = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "sun.max.fill")
                             .font(.caption2)
-                            .foregroundColor(.barTabSecondary)
+                        Text("Outdoor")
+                            .font(.caption)
                     }
-
-                    Spacer()
-
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.barTabSecondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .foregroundColor(currentBar.outdoorSeating ? .white : .barTabPrimary)
+                    .background(currentBar.outdoorSeating ? Color.barTabPrimary : Color.barTabPillFill)
+                    .clipShape(Capsule())
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-            }
-            .buttonStyle(.plain)
+                .buttonStyle(.plain)
 
-            Divider()
-                .foregroundColor(.barTabCardBorder)
-                .padding(.horizontal, 16)
-
-            Button {
-                showingSmokingConfirmation = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: currentBar.smokingFriendly ? "smoke.fill" : "smoke")
-                        .font(.subheadline)
-                        .foregroundColor(currentBar.smokingFriendly ? .white : .barTabPrimary)
-                        .frame(width: 32, height: 32)
-                        .background(currentBar.smokingFriendly ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.08))
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(currentBar.smokingFriendly ? "Smoking friendly" : "No smoking")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.barTabText)
-
-                        Text("Tap to change")
+                Button {
+                    showingSmokingConfirmation = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "smoke.fill")
                             .font(.caption2)
-                            .foregroundColor(.barTabSecondary)
+                        Text("Smoking")
+                            .font(.caption)
                     }
-
-                    Spacer()
-
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.barTabSecondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .foregroundColor(currentBar.smokingFriendly ? .white : .barTabPrimary)
+                    .background(currentBar.smokingFriendly ? Color.barTabPrimary : Color.barTabPillFill)
+                    .clipShape(Capsule())
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
 
             Divider()
                 .foregroundColor(.barTabCardBorder)
@@ -879,38 +859,33 @@ struct BarView: View {
                             .fontWeight(.bold)
                             .foregroundColor(.barTabPrimary)
 
-                        Button {
-                            ratingDrinkGroup = group
-                            showingDrinkRating = true
-                        } label: {
-                            Image(systemName: myDrinkRatingIcon(for: group))
-                                .font(.caption)
-                                .foregroundColor(.barTabPrimary)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Rate drink")
+                        Menu {
+                            Button {
+                                ratingDrinkGroup = group
+                                showingDrinkRating = true
+                            } label: {
+                                Label("Rate drink", systemImage: myDrinkRatingIcon(for: group))
+                            }
 
-                        Button {
-                            pendingReportGroup = group
-                            showingPriceReport = true
+                            Button {
+                                alertDrinkGroup = group
+                                showingPriceAlert = true
+                            } label: {
+                                Label("Set price alert", systemImage: "bell")
+                            }
+
+                            Button {
+                                pendingReportGroup = group
+                                showingPriceReport = true
+                            } label: {
+                                Label("Report price", systemImage: "exclamationmark.circle")
+                            }
                         } label: {
-                            Image(systemName: "exclamationmark.circle")
-                                .font(.caption)
+                            Image(systemName: "ellipsis.circle")
+                                .font(.subheadline)
                                 .foregroundColor(isFlagged ? .orange : .barTabSecondary)
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Report drink price")
-
-                        Button {
-                            alertDrinkGroup = group
-                            showingPriceAlert = true
-                        } label: {
-                            Image(systemName: "bell")
-                                .font(.caption)
-                                .foregroundColor(.barTabSecondary)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Set price alert")
+                        .accessibilityLabel("More drink actions")
                     }
                 }
                 .padding(.vertical, 8)
@@ -1092,7 +1067,7 @@ struct BarView: View {
     private var emptyPricesView: some View {
         VStack(spacing: 12) {
             Image(systemName: "cup.and.saucer")
-                .font(.system(size: 36))
+                .font(.barTabEmptyIcon)
                 .foregroundColor(.barTabPrimary)
 
             Text("No drink prices added yet")

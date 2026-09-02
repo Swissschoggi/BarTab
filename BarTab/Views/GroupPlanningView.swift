@@ -38,7 +38,7 @@ struct GroupPlanningView: View {
                 } else if groups.isEmpty {
                     VStack(spacing: 14) {
                         Image(systemName: "person.3.fill")
-                            .font(.system(size: 44))
+                            .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
                         Text("No groups yet")

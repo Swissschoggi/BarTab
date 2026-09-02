@@ -91,11 +91,11 @@ struct GroupDetailView: View {
                         if polls.isEmpty {
                             VStack(spacing: 14) {
                                 Image(systemName: "checkmark.circle")
-                                    .font(.system(size: 36))
+                                    .font(.barTabEmptyIcon)
                                     .foregroundColor(.barTabPrimary)
                                 Text("No polls yet")
                                     .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.barTabSecondary)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 30)
@@ -344,10 +344,10 @@ struct PollCard: View {
                     Text("Closed")
                         .font(.caption2)
                         .fontWeight(.bold)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.barTabSecondary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Color.gray.opacity(0.2))
+                        .background(Color.barTabSecondary.opacity(0.2))
                         .clipShape(Capsule())
                 }
             }

@@ -411,35 +411,11 @@ struct ProfileView: View {
     private var socialRows: some View {
         VStack(spacing: 0) {
             navigationRow(
-                title: "Find Friends",
-                subtitle: "Search and follow people",
-                icon: "person.badge.plus"
-            ) {
-                FindUsersView()
-            }
-
-            Divider()
-                .foregroundColor(.barTabCardBorder)
-                .padding(.leading, 44)
-
-            navigationRow(
-                title: "Follow Requests",
-                subtitle: "Approve or decline requests",
-                icon: "person.crop.circle.badge.checkmark"
-            ) {
-                FollowRequestsView()
-            }
-
-            Divider()
-                .foregroundColor(.barTabCardBorder)
-                .padding(.leading, 44)
-
-            navigationRow(
-                title: "Following",
-                subtitle: "Manage who you follow",
+                title: "Friends",
+                subtitle: "Find people, requests and following",
                 icon: "person.2.fill"
             ) {
-                FollowingListView()
+                FriendsView()
             }
 
             Divider()
@@ -536,7 +512,7 @@ struct ProfileView: View {
         VStack(spacing: 16) {
 
             Image(systemName: "person.crop.circle")
-                .font(.system(size: 55))
+                .font(.barTabEmptyIconLarge)
                 .foregroundColor(.barTabPrimary)
 
             Text("You're not signed in")
@@ -704,5 +680,42 @@ struct ProfileView: View {
             }
             .barTabCard()
         }
+    }
+}
+
+/// Combines find-friends, follow requests and following into one screen.
+struct FriendsView: View {
+
+    private enum Tab: String, CaseIterable {
+        case find = "Find"
+        case requests = "Requests"
+        case following = "Following"
+    }
+
+    @State private var tab: Tab = .find
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Picker("Tab", selection: $tab) {
+                ForEach(Tab.allCases, id: \.self) { t in
+                    Text(t.rawValue).tag(t)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+
+            switch tab {
+            case .find:
+                FindUsersView()
+            case .requests:
+                FollowRequestsView()
+            case .following:
+                FollowingListView()
+            }
+        }
+        .background(Color.barTabBackground.ignoresSafeArea())
+        .navigationTitle("Friends")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

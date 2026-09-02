@@ -58,7 +58,7 @@ struct FindUsersView: View {
                 } else if hasSearched && results.isEmpty {
                     VStack(spacing: 14) {
                         Image(systemName: "person.crop.circle.badge.questionmark")
-                            .font(.system(size: 40))
+                            .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
                         Text("No users found")

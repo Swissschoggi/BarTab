@@ -40,7 +40,7 @@ struct RequestBrandSheet: View {
 
                     VStack(spacing: 10) {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 40))
+                            .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
                         Text("Request sent")

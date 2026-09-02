@@ -44,16 +44,16 @@ struct OnboardingView: View {
                                 .frame(width: 120, height: 120)
 
                             Image(systemName: page.icon)
-                                .font(.system(size: 48))
+                                .font(.barTabEmptyIconLarge)
                                 .foregroundColor(.barTabPrimary)
                         }
 
                         Text(page.title)
-                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .font(.barTabTitle)
                             .foregroundColor(.barTabText)
 
                         Text(page.message)
-                            .font(.system(size: 16, design: .rounded))
+                            .font(.barTabBody)
                             .foregroundColor(.barTabSecondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 32)
@@ -87,7 +87,7 @@ struct OnboardingView: View {
                     }
                 } label: {
                     Text(currentPage < pages.count - 1 ? "Continue" : "Get Started")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .font(.barTabBodySemibold)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)

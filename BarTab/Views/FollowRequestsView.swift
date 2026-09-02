@@ -23,7 +23,7 @@ struct FollowRequestsView: View {
                 } else if requests.isEmpty {
                     VStack(spacing: 14) {
                         Image(systemName: "person.badge.plus")
-                            .font(.system(size: 40))
+                            .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
                         Text("No pending requests")

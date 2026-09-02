@@ -21,7 +21,7 @@ struct ForgotPasswordView: View {
                 if didSend {
                     VStack(spacing: 14) {
                         Image(systemName: "envelope.badge.checkmark")
-                            .font(.system(size: 48))
+                            .font(.barTabEmptyIconLarge)
                             .foregroundColor(.barTabAccent)
 
                         Text("Check your inbox")

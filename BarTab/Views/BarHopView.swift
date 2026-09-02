@@ -23,12 +23,12 @@ struct BarHopView: View {
                                 .font(.title2)
                                 .foregroundColor(.barTabPrimary)
                             Text("Bar Hop Generator")
-                                .font(.system(size: 20, weight: .bold, design: .rounded))
+                                .font(.barTabStat)
                                 .foregroundColor(.barTabText)
                         }
 
                         Text("Let BarTab curate a 3-stop walking crawl featuring great drink deals near you.")
-                            .font(.system(size: 14, design: .rounded))
+                            .font(.barTabCaption)
                             .foregroundColor(.barTabSecondary)
                     }
                     .barTabCard()
@@ -36,11 +36,11 @@ struct BarHopView: View {
                     if selectedRoute.isEmpty {
                         VStack(spacing: 16) {
                             Image(systemName: "map.fill")
-                                .font(.system(size: 48))
+                                .font(.barTabEmptyIconLarge)
                                 .foregroundColor(.barTabPrimary.opacity(0.6))
 
                             Text("Ready for a night out?")
-                                .font(.system(size: 17, weight: .bold, design: .rounded))
+                                .font(.barTabHeading)
                                 .foregroundColor(.barTabText)
 
                             Button {
@@ -58,7 +58,7 @@ struct BarHopView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             HStack {
                                 Text("Your Crawl Route")
-                                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                                    .font(.barTabHeading)
                                     .foregroundColor(.barTabText)
 
                                 Spacer()
@@ -66,7 +66,7 @@ struct BarHopView: View {
                                 Button("Shuffle") {
                                     generateRoute()
                                 }
-                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .font(.barTabCaption)
                                 .foregroundColor(.barTabPrimary)
                             }
 
@@ -77,17 +77,17 @@ struct BarHopView: View {
                                             .fill(Color.barTabPrimary)
                                             .frame(width: 32, height: 32)
                                         Text("\(index + 1)")
-                                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                                            .font(.barTabBodySemibold)
                                             .foregroundColor(.white)
                                     }
 
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(bar.name)
-                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .font(.barTabBodySemibold)
                                             .foregroundColor(.barTabText)
 
                                         Text(bar.address)
-                                            .font(.system(size: 13, design: .rounded))
+                                            .font(.barTabCaption)
                                             .foregroundColor(.barTabSecondary)
 
                                         if let popular = barRepository.popularAmbience(for: bar) {

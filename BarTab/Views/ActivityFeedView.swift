@@ -27,7 +27,7 @@ struct ActivityFeedView: View {
                 } else if items.isEmpty {
                     VStack(spacing: 14) {
                         Image(systemName: "person.2.slash")
-                            .font(.system(size: 44))
+                            .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
                         Text("No activity yet")

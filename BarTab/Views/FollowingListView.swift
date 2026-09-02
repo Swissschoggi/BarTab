@@ -19,7 +19,7 @@ struct FollowingListView: View {
             } else if followingIDs.isEmpty {
                 VStack(spacing: 14) {
                     Image(systemName: "person.2.slash")
-                        .font(.system(size: 36))
+                        .font(.barTabEmptyIcon)
                         .foregroundColor(.barTabPrimary)
                     Text("Not following anyone yet")
                         .font(.subheadline)

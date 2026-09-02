@@ -69,13 +69,14 @@ struct LoginView: View {
                         }
 
                         Text("Welcome to BarTab")
-                            .font(.system(size: 26, weight: .bold))
+                            .font(.barTabTitle)
+                            .foregroundColor(.barTabText)
 
                         Text(
                             "Create an account to add and manage drinks."
                         )
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .font(.barTabBody)
+                        .foregroundColor(.barTabSecondary)
                         .multilineTextAlignment(.center)
                     }
                     .padding(.top, 24)
@@ -124,7 +125,7 @@ struct LoginView: View {
 
                         Text("or use an email")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.barTabSecondary)
 
                         VStack { Divider() }
                     }
@@ -202,7 +203,7 @@ struct LoginView: View {
                                     showPassword.toggle()
                                 } label: {
                                     Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.barTabSecondary)
                                 }
                             }
                             .padding()
@@ -260,7 +261,7 @@ struct LoginView: View {
                                         showConfirmPassword.toggle()
                                     } label: {
                                         Image(systemName: showConfirmPassword ? "eye.slash.fill" : "eye.fill")
-                                            .foregroundColor(.secondary)
+                                            .foregroundColor(.barTabSecondary)
                                     }
                                 }
                                 .padding()
@@ -298,7 +299,7 @@ struct LoginView: View {
                         .background(
                             canSubmit && !isSubmitting
                             ? Color.barTabPrimary
-                            : Color.gray
+                            : Color.barTabSecondary.opacity(0.4)
                         )
                         .clipShape(
                             RoundedRectangle(
@@ -337,7 +338,7 @@ struct LoginView: View {
                         "Your account lives on BarTab's server. "
                     )
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.barTabSecondary)
                     .multilineTextAlignment(.center)
 
                     Spacer(minLength: 16)
@@ -372,8 +373,8 @@ struct LoginView: View {
                 }
 
                 Text(isGoogleSigningIn ? "Connecting…" : "Continue with Google")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.primary)
+                    .font(.barTabBodySemibold)
+                    .foregroundColor(.barTabText)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 50)

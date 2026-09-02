@@ -296,7 +296,7 @@ struct MainTabView: View {
                 .overlay(alignment: .topTrailing) {
                     if badge > 0 {
                         Text("\(badge)")
-                            .font(.system(size: 9, weight: .bold))
+                            .font(.barTabBadge)
                             .foregroundColor(.white)
                             .frame(width: 16, height: 16)
                             .background(Color.red)
@@ -389,7 +389,7 @@ private struct DeepLinkBarView: View {
     ) -> some View {
         VStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 36))
+                .font(.barTabEmptyIcon)
                 .foregroundColor(.barTabPrimary)
             Text(title)
                 .font(.headline)
@@ -434,7 +434,7 @@ private struct DeepLinkGroupView: View {
             } else {
                 VStack(spacing: 12) {
                     Image(systemName: "person.3.fill")
-                        .font(.system(size: 36))
+                        .font(.barTabEmptyIcon)
                         .foregroundColor(.barTabPrimary)
                     Text("Group not found")
                         .font(.headline)

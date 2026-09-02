@@ -1,5 +1,51 @@
 import SwiftUI
 
+// MARK: - Typographic scale
+//
+// One small set of sizes, all rounded for the app's friendly look.
+// Use these instead of ad-hoc `.system(size:)` calls.
+
+extension Font {
+
+    /// Screen title (e.g. "Discover", "Me").
+    static let barTabDisplay = Font.system(size: 28, weight: .bold, design: .rounded)
+
+    /// Large in-content title (e.g. login welcome, onboarding).
+    static let barTabTitle = Font.system(size: 24, weight: .bold, design: .rounded)
+
+    /// Section / card heading.
+    static let barTabHeading = Font.system(size: 17, weight: .bold, design: .rounded)
+
+    /// Big numeric stat (e.g. a price, a score).
+    static let barTabStat = Font.system(size: 20, weight: .bold, design: .rounded)
+
+    /// Primary body text.
+    static let barTabBody = Font.system(size: 15, weight: .regular, design: .rounded)
+
+    /// Emphasized body text (row titles, buttons).
+    static let barTabBodySemibold = Font.system(size: 15, weight: .semibold, design: .rounded)
+
+    /// Secondary text / captions.
+    static let barTabCaption = Font.system(size: 13, weight: .medium, design: .rounded)
+
+    /// Small captions.
+    static let barTabSmall = Font.system(size: 12, weight: .regular, design: .rounded)
+
+    /// Tiny labels / counts.
+    static let barTabTiny = Font.system(size: 11, weight: .medium, design: .rounded)
+
+    /// Counts inside badge dots.
+    static let barTabBadge = Font.system(size: 9, weight: .bold, design: .rounded)
+
+    // MARK: - SF Symbol icon scale
+
+    /// Standard empty-state glyph.
+    static let barTabEmptyIcon = Font.system(size: 40, weight: .regular)
+
+    /// Large hero / onboarding glyph.
+    static let barTabEmptyIconLarge = Font.system(size: 48, weight: .regular)
+}
+
 // MARK: - Date relative formatting
 
 extension Date {
@@ -20,11 +66,11 @@ struct BarTabScreenHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(.barTabDisplay)
                 .foregroundColor(.barTabText)
 
             Text(subtitle)
-                .font(.system(size: 15, weight: .medium, design: .rounded))
+                .font(.barTabBody)
                 .foregroundColor(.barTabSecondary)
         }
         .padding(.top, 8)
@@ -88,7 +134,7 @@ extension View {
         cornerRadius: CGFloat = 18
     ) -> some View {
         self
-            .font(.system(size: 15, weight: .semibold, design: .rounded))
+            .font(.barTabBodySemibold)
             .foregroundColor(.white)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
@@ -125,7 +171,7 @@ extension View {
         color: Color = .barTabPrimary
     ) -> some View {
         self
-            .font(.system(size: 13, weight: .semibold, design: .rounded))
+            .font(.barTabCaption)
             .foregroundColor(color)
             .padding(.horizontal, 14)
             .padding(.vertical, 7)
@@ -144,14 +190,14 @@ struct BarTabSectionHeader: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .font(.barTabHeading)
                 .foregroundColor(.barTabText)
 
             Spacer()
 
             if let count = count {
                 Text("\(count)")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.barTabSmall)
                     .foregroundColor(.barTabPrimary)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
@@ -318,9 +364,9 @@ struct SkeletonModifier: ViewModifier {
             .overlay(
                 LinearGradient(
                     colors: [
-                        Color.gray.opacity(0.15),
-                        Color.gray.opacity(0.3),
-                        Color.gray.opacity(0.15)
+                        Color.barTabPillFill,
+                        Color.barTabCardBorder,
+                        Color.barTabPillFill
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
@@ -357,7 +403,7 @@ struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 40))
+                .font(.barTabEmptyIcon)
                 .foregroundColor(.barTabPrimary.opacity(0.6))
 
             Text(title)
@@ -413,20 +459,20 @@ struct BarRowSkeleton: View {
     var body: some View {
         HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color.gray.opacity(0.2))
+                .fill(Color.barTabPillFill)
                 .frame(width: 50, height: 50)
 
             VStack(alignment: .leading, spacing: 6) {
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(Color.barTabPillFill)
                     .frame(width: 140, height: 14)
 
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.gray.opacity(0.15))
+                    .fill(Color.barTabCardBorder.opacity(0.7))
                     .frame(width: 100, height: 10)
 
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.gray.opacity(0.15))
+                    .fill(Color.barTabCardBorder.opacity(0.7))
                     .frame(width: 80, height: 10)
             }
 

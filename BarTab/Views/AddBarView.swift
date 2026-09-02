@@ -139,7 +139,7 @@ struct AddBarView: View {
                         Spacer()
 
                         Image(systemName: "building.2")
-                            .font(.system(size: 45))
+                            .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
                         Text("Find your bar")

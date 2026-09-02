@@ -13,6 +13,7 @@ struct SettingsView: View {
     @State private var showingPasswordEditor = false
     @State private var showingTipJar = false
     @State private var currencyExpanded = false
+    @State private var languageExpanded = false
     @State private var selectedCurrency: Currency = Currency.defaultCurrency
     @State private var showingClearCacheConfirm = false
     @State private var showingDeleteAccount = false
@@ -73,8 +74,18 @@ struct SettingsView: View {
                         .barTabCard()
                     }
 
-                    // Currency (collapsible)
+                    // Preferences (currency + language)
                     VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "slider.horizontal.3")
+                                .font(.subheadline)
+                                .foregroundColor(.barTabPrimary)
+                            Text("Preferences")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+                        }
+
                         DisclosureGroup(isExpanded: $currencyExpanded) {
                             VStack(spacing: 0) {
                                 ForEach(Currency.allCases) { currency in
@@ -124,75 +135,78 @@ struct SettingsView: View {
                                 Image(systemName: "dollarsign.circle")
                                     .font(.subheadline)
                                     .foregroundColor(.barTabPrimary)
-                                Text("Default Currency")
+                                Text("Currency")
                                     .font(.subheadline)
-                                    .fontWeight(.semibold)
                                     .foregroundColor(.barTabText)
 
                                 Spacer()
 
-                                HStack(spacing: 4) {
-                                    Text(selectedCurrency.symbol)
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                    Text(selectedCurrency.rawValue)
-                                        .font(.caption)
-                                        .foregroundColor(.barTabSecondary)
-                                }
+                                Text(selectedCurrency.rawValue)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabSecondary)
                             }
                         }
                         .tint(.barTabSecondary)
-                    }
-                    .barTabCard()
 
-                    // Language
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "globe")
-                                .font(.subheadline)
-                                .foregroundColor(.barTabPrimary)
-                            Text("Language")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
-                        }
+                        Divider()
+                            .foregroundColor(.barTabCardBorder)
 
-                        VStack(spacing: 0) {
-                            ForEach(Array(languages.enumerated()), id: \.element.code) { index, lang in
-                                Button {
-                                    guard languageManager.selectedLanguage != lang.code else { return }
-                                    languageManager.selectedLanguage = lang.code
-                                    UserDefaults.standard.set([lang.code], forKey: "AppleLanguages")
-                                    showingRestartAlert = true
-                                } label: {
-                                    HStack {
-                                        Text(lang.flag)
-                                            .font(.title3)
+                        DisclosureGroup(isExpanded: $languageExpanded) {
+                            VStack(spacing: 0) {
+                                ForEach(Array(languages.enumerated()), id: \.element.code) { index, lang in
+                                    Button {
+                                        guard languageManager.selectedLanguage != lang.code else { return }
+                                        languageManager.selectedLanguage = lang.code
+                                        UserDefaults.standard.set([lang.code], forKey: "AppleLanguages")
+                                        showingRestartAlert = true
+                                    } label: {
+                                        HStack {
+                                            Text(lang.flag)
+                                                .font(.title3)
 
-                                        Text(lang.name)
-                                            .font(.subheadline)
-                                            .foregroundColor(.barTabText)
+                                            Text(lang.name)
+                                                .font(.subheadline)
+                                                .foregroundColor(.barTabText)
 
-                                        Spacer()
+                                            Spacer()
 
-                                        if languageManager.selectedLanguage == lang.code {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .fontWeight(.semibold)
-                                                .foregroundColor(.barTabPrimary)
-                                        } else {
-                                            Image(systemName: "circle")
-                                                .foregroundColor(.barTabCardBorder)
+                                            if languageManager.selectedLanguage == lang.code {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .fontWeight(.semibold)
+                                                    .foregroundColor(.barTabPrimary)
+                                            } else {
+                                                Image(systemName: "circle")
+                                                    .foregroundColor(.barTabCardBorder)
+                                            }
                                         }
+                                        .padding(.vertical, 12)
                                     }
-                                    .padding(.vertical, 12)
-                                }
 
-                                if index < languages.count - 1 {
-                                    Divider()
-                                        .foregroundColor(.barTabCardBorder)
+                                    if index < languages.count - 1 {
+                                        Divider()
+                                            .foregroundColor(.barTabCardBorder)
+                                    }
                                 }
                             }
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "globe")
+                                    .font(.subheadline)
+                                    .foregroundColor(.barTabPrimary)
+                                Text("Language")
+                                    .font(.subheadline)
+                                    .foregroundColor(.barTabText)
+
+                                Spacer()
+
+                                Text(languages.first { $0.code == languageManager.selectedLanguage }?.name ?? "English")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.barTabSecondary)
+                            }
                         }
+                        .tint(.barTabSecondary)
                     }
                     .barTabCard()
 
@@ -820,14 +834,14 @@ private struct DeleteAccountSheet: View {
 
                     Text("This permanently deletes your profile, prices, bars, ratings, and everything else you've contributed. This can't be undone.")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.barTabSecondary)
                         .multilineTextAlignment(.center)
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Type DELETE to confirm")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.barTabSecondary)
 
                     TextField("DELETE", text: $confirmationText)
                         .textFieldStyle(.roundedBorder)
@@ -852,7 +866,7 @@ private struct DeleteAccountSheet: View {
                     .background(
                         isConfirmed && !isDeleting
                             ? Color.red
-                            : Color.gray
+                            : Color.barTabSecondary.opacity(0.4)
                     )
                     .clipShape(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)

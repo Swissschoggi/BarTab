@@ -23,7 +23,7 @@ struct AdminBrandRequestsView: View {
 
                     VStack(spacing: 14) {
                         Image(systemName: "tag.circle")
-                            .font(.system(size: 44))
+                            .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
                         Text("No brand requests yet")
