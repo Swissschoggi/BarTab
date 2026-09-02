@@ -102,9 +102,9 @@
 		BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000D /* DrinkComparisonView.swift */; };
 		D89F6316A443377571D44C4B /* UserAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */; };
 		BRTA0002A000000000000010 /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000011 /* FollowingListView.swift */; };
-		BRTA306182674467065205936491 /* BarAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA202380054084250574808385 /* BarAttribute.swift */; };
-		BRTA177378808628329972154536 /* AttributeDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA583042391621098503552326 /* AttributeDetailSheet.swift */; };
-		BRTA136692486567988537829990 /* AllAttributesSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA232201184009195062427639 /* AllAttributesSheet.swift */; };
+		BRTA306182674467065205936491 /* BarAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA329008998742114159473160 /* BarAttribute.swift */; };
+		BRTA177378808628329972154536 /* AttributeDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA659651495282172293273044 /* AttributeDetailSheet.swift */; };
+		BRTA136692486567988537829990 /* AllAttributesSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA192571485359842947435953 /* AllAttributesSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
