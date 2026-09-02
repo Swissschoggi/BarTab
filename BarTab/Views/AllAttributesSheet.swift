@@ -20,10 +20,10 @@ struct AllAttributesSheet: View {
                             .font(.system(size: 40, weight: .light))
                             .foregroundColor(.barTabSecondary)
                         Text("No attribute reports yet")
-                            .font(.barTabHeadline)
+                            .font(.barTabHeading)
                             .foregroundColor(.barTabText)
                         Text("Be the first to report on this bar's amenities!")
-                            .font(.barTabSubheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.barTabSecondary)
                             .multilineTextAlignment(.center)
                     }
