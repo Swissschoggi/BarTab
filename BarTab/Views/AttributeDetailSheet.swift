@@ -13,10 +13,33 @@ struct AttributeDetailSheet: View {
     @State private var showingConfirmDialog = false
     @State private var showingReportDialog = false
 
+    private var reportLabel: String {
+        attribute.totalReports == 1 ? "report" : "reports"
+    }
+
+    private var confirmLabel: String {
+        attribute.isConfirmed ? "Confirmed" : "Yes, this is correct"
+    }
+
+    private var confirmIcon: String {
+        attribute.isConfirmed ? "checkmark.circle.fill" : "checkmark.circle"
+    }
+
+    private var confirmBG: Color {
+        attribute.isConfirmed ? .barTabSuccess.opacity(0.1) : .barTabPrimary.opacity(0.1)
+    }
+
+    private var confirmFG: Color {
+        attribute.isConfirmed ? .barTabSuccess : .barTabPrimary
+    }
+
+    private var confirmStroke: Color {
+        attribute.isConfirmed ? .barTabSuccess.opacity(0.3) : .barTabPrimary.opacity(0.3)
+    }
+
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Header
                 VStack(spacing: BarTabSpacing.md) {
                     Image(systemName: attribute.key.icon)
                         .font(.system(size: 40, weight: .light))
@@ -33,9 +56,8 @@ struct AttributeDetailSheet: View {
                                 .fontWeight(.bold)
                                 .foregroundColor(.barTabPrimary)
 
-                            // Confidence
                             HStack(spacing: 8) {
-                                Text("\(attribute.totalReports) report\(attribute.totalReports == 1 ? "" : "s")")
+                                Text("\(attribute.totalReports) \(reportLabel)")
                                     .font(.barTabCaption)
                                     .foregroundColor(.barTabSecondary)
 
@@ -66,30 +88,27 @@ struct AttributeDetailSheet: View {
                 Divider()
                     .padding(.horizontal, BarTabSpacing.md)
 
-                // Action buttons
                 VStack(spacing: BarTabSpacing.sm) {
-                    // Confirm button
                     Button {
                         showingConfirmDialog = true
                     } label: {
                         HStack {
-                            Image(systemName: attribute.isConfirmed ? "checkmark.circle.fill" : "checkmark.circle")
-                            Text(attribute.isConfirmed ? "Confirmed" : "Yes, this is correct")
+                            Image(systemName: confirmIcon)
+                            Text(confirmLabel)
                                 .fontWeight(.semibold)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(attribute.isConfirmed ? Color.barTabSuccess.opacity(0.1) : Color.barTabPrimary.opacity(0.1))
-                        .foregroundColor(attribute.isConfirmed ? .barTabSuccess : .barTabPrimary)
+                        .background(confirmBG)
+                        .foregroundColor(confirmFG)
                         .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                                .stroke(attribute.isConfirmed ? Color.barTabSuccess.opacity(0.3) : Color.barTabPrimary.opacity(0.3), lineWidth: 1)
+                                .stroke(confirmStroke, lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)
 
-                    // Report change button
                     Button {
                         showingReportDialog = true
                     } label: {
@@ -115,7 +134,6 @@ struct AttributeDetailSheet: View {
 
                 Spacer()
 
-                // Other reports
                 if attribute.consensus.count > 1 {
                     Divider()
                         .padding(.horizontal, BarTabSpacing.md)
@@ -133,7 +151,7 @@ struct AttributeDetailSheet: View {
                                     .font(.barTabSmall)
                                     .foregroundColor(.barTabText)
                                 Spacer()
-                                Text("\(consensus.reportCount) report\(consensus.reportCount == 1 ? "" : "s")")
+                                Text(consensusCountLabel(consensus.reportCount))
                                     .font(.barTabCaption)
                                     .foregroundColor(.barTabSecondary)
                                 Text("\(consensus.confidencePct)%")
@@ -158,7 +176,7 @@ struct AttributeDetailSheet: View {
                 }
             }
             .confirmationDialog(
-                "Confirm \(attribute.key.displayName) is \(attribute.consensusValue ?? "")?",
+                confirmDialogTitle,
                 isPresented: $showingConfirmDialog,
                 titleVisibility: .visible
             ) {
@@ -167,7 +185,7 @@ struct AttributeDetailSheet: View {
                         await barRepository.submitAttributeReport(
                             for: bar,
                             attributeKey: attribute.key.rawValue,
-                            value: attribute.consensusValue ?? "",
+                            value: topConsensusValue,
                             by: currentUser
                         )
                         HapticEngine.success()
@@ -204,6 +222,18 @@ struct AttributeDetailSheet: View {
                 Text("What should the correct value be?")
             }
         }
+    }
+
+    private var topConsensusValue: String {
+        attribute.consensusValue ?? ""
+    }
+
+    private var confirmDialogTitle: String {
+        "Confirm \(attribute.key.displayName) is \(topConsensusValue)?"
+    }
+
+    private func consensusCountLabel(_ count: Int) -> String {
+        count == 1 ? "1 report" : "\(count) reports"
     }
 
     func confidenceColor(_ pct: Int) -> Color {
