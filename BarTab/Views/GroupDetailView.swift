@@ -58,13 +58,16 @@ struct GroupDetailView: View {
 
                             FlowLayout(spacing: 8) {
                                 ForEach(members) { member in
-                                    Text(memberLabel(member))
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 5)
-                                        .background(Color.barTabPrimary.opacity(0.08))
-                                        .clipShape(Capsule())
+                                    HStack(spacing: 4) {
+                                        UserAvatarView(urlString: avatarCache[member.userID], displayName: userCache[member.userID], size: 20)
+                                        Text(memberLabel(member))
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(Color.barTabPrimary.opacity(0.08))
+                                    .clipShape(Capsule())
                                 }
                             }
                         }
@@ -214,6 +217,7 @@ struct GroupDetailView: View {
     }
 
     @State private var userCache: [UUID: String] = [:]
+    @State private var avatarCache: [UUID: String] = [:]
 
     private func loadData() async {
         do {
@@ -227,7 +231,14 @@ struct GroupDetailView: View {
 
         let userIDs = members.map(\.userID)
         if !userIDs.isEmpty {
-            userCache = (try? await SupabaseClient.shared.fetchProfileNamesByIDs(userIDs)) ?? [:]
+            if let profiles = try? await SupabaseClient.shared.fetchProfileAvatarsByIDs(userIDs) {
+                for (id, profile) in profiles {
+                    userCache[id] = profile.displayName ?? "User"
+                    if let url = profile.avatarURL {
+                        avatarCache[id] = url
+                    }
+                }
+            }
         }
 
         isLoading = false

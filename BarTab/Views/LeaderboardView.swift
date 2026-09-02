@@ -16,6 +16,7 @@ struct LeaderboardView: View {
 
     @State private var scope: Scope = .global
     @State private var displayNameCache: [UUID: String] = [:]
+    @State private var avatarCache: [UUID: String] = [:]
 
     /// Bars within the "local" radius of the user's current location.
     private var localBarIDs: Set<UUID> {
@@ -66,12 +67,16 @@ struct LeaderboardView: View {
                                         .foregroundColor(index < 3 ? .barTabAccent : .barTabSecondary)
                                         .frame(width: 32, alignment: .leading)
 
-                                    Image(systemName: entry.level.icon)
-                                        .font(.body)
-                                        .foregroundColor(.white)
-                                        .frame(width: 32, height: 32)
-                                        .background(Color.barTabAccent.opacity(index < 3 ? 1.0 : 0.7))
-                                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                    if let userID = UUID(uuidString: entry.id) {
+                                        UserAvatarView(urlString: avatarCache[userID], displayName: entry.username, size: 36)
+                                    } else {
+                                        Image(systemName: entry.level.icon)
+                                            .font(.body)
+                                            .foregroundColor(.white)
+                                            .frame(width: 32, height: 32)
+                                            .background(Color.barTabAccent.opacity(index < 3 ? 1.0 : 0.7))
+                                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                    }
 
                                     VStack(alignment: .leading, spacing: 1) {
                                         Text(entry.username)
@@ -124,6 +129,9 @@ struct LeaderboardView: View {
             if displayNameCache[userID] == nil,
                let profile = try? await SupabaseClient.shared.fetchProfile(userID: userID) {
                 displayNameCache[userID] = profile.display_name
+                if let url = profile.avatar_url {
+                    avatarCache[userID] = url
+                }
             }
         }
     }

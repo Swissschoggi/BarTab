@@ -1379,6 +1379,21 @@ final class SupabaseClient {
         return result
     }
 
+    func fetchProfileAvatarsByIDs(_ ids: [UUID]) async throws -> [UUID: ProfileAvatarRow] {
+        guard !ids.isEmpty else { return [:] }
+        let idList = ids.map(\.uuidString).joined(separator: ",")
+        let request = try makeRequest(
+            endpoint: "profiles?id=in.(\(idList))&select=id,display_name,avatar_url"
+        )
+        let data = try await performAuthorized(request)
+        let rows = try decoder.decode([ProfileAvatarRow].self, from: data)
+        var result: [UUID: ProfileAvatarRow] = [:]
+        for row in rows {
+            result[row.id] = row
+        }
+        return result
+    }
+
     // MARK: - Price Alerts
 
     func createPriceAlert(

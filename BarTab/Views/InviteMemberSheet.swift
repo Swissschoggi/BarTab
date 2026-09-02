@@ -12,6 +12,7 @@ struct InviteMemberSheet: View {
     @State private var following: [UUID] = []
     @State private var members: Set<UUID> = []
     @State private var userCache: [UUID: String] = [:]
+    @State private var avatarCache: [UUID: String] = [:]
     @State private var isLoading = true
     @State private var searchText = ""
 
@@ -63,6 +64,7 @@ struct InviteMemberSheet: View {
                                         Task { await invite(userID) }
                                     } label: {
                                         HStack {
+                                            UserAvatarView(urlString: avatarCache[userID], displayName: userCache[userID], size: 32)
                                             Text(userCache[userID] ?? "User")
                                                 .foregroundColor(.barTabText)
                                             Spacer()
@@ -102,6 +104,9 @@ struct InviteMemberSheet: View {
                 if userCache[userID] == nil,
                    let profile = try? await SupabaseClient.shared.fetchProfile(userID: userID) {
                     userCache[userID] = profile.display_name ?? "User"
+                    if let url = profile.avatar_url {
+                        avatarCache[userID] = url
+                    }
                 }
             }
         } catch {

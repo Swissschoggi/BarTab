@@ -9,6 +9,7 @@ struct ActivityFeedView: View {
     @State private var items: [ActivityItem] = []
     @State private var isLoading = true
     @State private var userCache: [UUID: String] = [:]
+    @State private var avatarCache: [UUID: String] = [:]
     @State private var selectedBar: Bar?
 
     var body: some View {
@@ -78,14 +79,7 @@ struct ActivityFeedView: View {
             }
         } label: {
             HStack(alignment: .top, spacing: 12) {
-                Circle()
-                    .fill(Color.barTabPrimary.opacity(0.12))
-                    .frame(width: 36, height: 36)
-                    .overlay(
-                        Image(systemName: item.icon)
-                            .font(.caption)
-                            .foregroundColor(.barTabPrimary)
-                    )
+                UserAvatarView(urlString: avatarCache[item.userID], displayName: username(for: item.userID))
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 4) {
@@ -173,10 +167,15 @@ struct ActivityFeedView: View {
             let following = try await SupabaseClient.shared.fetchFollowing()
             items = try await SupabaseClient.shared.fetchActivityFeed(followingIDs: following)
 
-            // Batch-fetch all unique usernames   non-fatal if it fails
+            // Batch-fetch all unique usernames + avatar URLs
             let userIDs = Set(items.map(\.userID))
-            if let names = try? await SupabaseClient.shared.fetchProfileNamesByIDs(Array(userIDs)) {
-                userCache = names
+            if let profiles = try? await SupabaseClient.shared.fetchProfileAvatarsByIDs(Array(userIDs)) {
+                for (id, profile) in profiles {
+                    userCache[id] = profile.displayName ?? "User"
+                    if let url = profile.avatarURL {
+                        avatarCache[id] = url
+                    }
+                }
             }
         } catch {
             toastCenter.showError(error)

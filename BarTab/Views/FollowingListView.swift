@@ -61,10 +61,7 @@ struct FollowingListView: View {
 
     private func followingRow(profile: ProfileDTO) -> some View {
         HStack(spacing: 12) {
-            Image(systemName: "person.circle.fill")
-                .font(.title2)
-                .foregroundColor(.barTabPrimary)
-                .frame(width: 40, height: 40)
+            UserAvatarView(urlString: profile.avatar_url, displayName: profile.display_name)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile.display_name ?? "User")

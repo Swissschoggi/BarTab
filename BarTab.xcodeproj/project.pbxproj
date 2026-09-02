@@ -100,6 +100,7 @@
 		BRTA0002A00000000000000A /* BadgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000009 /* BadgeService.swift */; };
 		BRTA0002A00000000000000C /* BadgeGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000B /* BadgeGridView.swift */; };
 		BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A00000000000000D /* DrinkComparisonView.swift */; };
+		D89F6316A443377571D44C4B /* UserAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */; };
 		BRTA0002A000000000000010 /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000011 /* FollowingListView.swift */; };
 /* End PBXBuildFile section */
 
@@ -219,6 +220,7 @@
 		BRTA0002A000000000000009 /* BadgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeService.swift; sourceTree = "<group>"; };
 		BRTA0002A00000000000000B /* BadgeGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeGridView.swift; sourceTree = "<group>"; };
 		BRTA0002A00000000000000D /* DrinkComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkComparisonView.swift; sourceTree = "<group>"; };
+		5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAvatarView.swift; sourceTree = "<group>"; };
 		BRTA0002A000000000000011 /* FollowingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -370,6 +372,7 @@
 				BRTA0002A000000000000005 /* OnboardingView.swift */,
 				BRTA0002A00000000000000B /* BadgeGridView.swift */,
 				BRTA0002A00000000000000D /* DrinkComparisonView.swift */,
+				5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -672,6 +675,7 @@
 				BRTA0002A00000000000000A /* BadgeService.swift in Sources */,
 				BRTA0002A00000000000000C /* BadgeGridView.swift in Sources */,
 				BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */,
+				D89F6316A443377571D44C4B /* UserAvatarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -63,14 +63,7 @@ struct FollowRequestsView: View {
         let profile = profiles[senderID]
 
         return HStack(spacing: 12) {
-            Circle()
-                .fill(Color.barTabPrimary.opacity(0.12))
-                .frame(width: 40, height: 40)
-                .overlay(
-                    Text(String((profile?.display_name ?? "U").prefix(1)).uppercased())
-                        .font(.headline)
-                        .foregroundColor(.barTabPrimary)
-                )
+            UserAvatarView(urlString: profile?.avatar_url, displayName: profile?.display_name)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile?.display_name ?? "User")
