@@ -1216,27 +1216,35 @@ final class BarRepository: ObservableObject {
         let recentReports = reports.filter {
             Date().timeIntervalSince($0.createdAt) <= 365 * 24 * 60 * 60
         }
-        let grouped = Dictionary(grouping: recentReports, by: \.attributeValue)
+        let grouped = Dictionary(grouping: recentReports, by: { $0.attributeValue })
         let now = Date()
+        let totalDays = 365.0 * 24.0 * 60.0 * 60.0
+        let totalCount = Double(recentReports.count)
 
-        return grouped.map { value, reports in
-            let count = reports.count
-            let lastConfirmed = reports.map(\.createdAt).max() ?? .distantPast
-            let avgAge = reports.reduce(0.0) { $0 + now.timeIntervalSince($1.createdAt) } / Double(count)
-            let recencyScore = max(0.0, 1.0 - avgAge / (365 * 24 * 60 * 60))
+        var results: [AttributeConsensus] = []
+        for (value, reportsInGroup) in grouped {
+            let count = reportsInGroup.count
+            let lastConfirmed = reportsInGroup.map({ $0.createdAt }).max() ?? .distantPast
+            var ageSum = 0.0
+            for r in reportsInGroup {
+                ageSum += now.timeIntervalSince(r.createdAt)
+            }
+            let avgAge = ageSum / Double(count)
+            let recencyScore = max(0.0, 1.0 - avgAge / totalDays)
             let volumeScore = min(Double(count) / 10.0, 1.0)
-            // Simple agreement score based on how concentrated the reports are
-            let agreementScore = Double(count) / Double(recentReports.count)
+            let agreementScore = Double(count) / totalCount
 
-            let confidence = Int(round((volumeScore * 0.35 + recencyScore * 0.40 + agreementScore * 0.25) * 100))
+            let raw = (volumeScore * 0.35 + recencyScore * 0.40 + agreementScore * 0.25) * 100.0
+            let confidence = Int(round(raw))
 
-            return AttributeConsensus(
+            results.append(AttributeConsensus(
                 value: value,
                 reportCount: count,
                 confidencePct: min(confidence, 100),
                 lastConfirmedAt: lastConfirmed
-            )
-        }.sorted { $0.reportCount > $1.reportCount }
+            ))
+        }
+        return results.sorted { $0.reportCount > $1.reportCount }
     }
 
     func submitAttributeReport(
