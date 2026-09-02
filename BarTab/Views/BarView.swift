@@ -173,26 +173,17 @@ struct BarView: View {
     }
 
     private var content: some View {
-        VStack(
-            alignment: .leading,
-            spacing: BarTabSpacing.lg
-        ) {
+        VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
-            VStack(
-                alignment: .leading,
-                spacing: 6
-            ) {
-
+            // Bar info header
+            VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
                 Text(currentBar.address)
                     .font(.barTabBody)
                     .foregroundColor(.barTabSecondary)
 
                 if let location = locationService.location {
                     Label(
-                        DistanceService.formattedDistance(
-                            from: location,
-                            to: currentBar
-                        ),
+                        DistanceService.formattedDistance(from: location, to: currentBar),
                         systemImage: "location.fill"
                     )
                     .font(.barTabSmall)
@@ -205,297 +196,157 @@ struct BarView: View {
                 }
             }
 
-            detailsSection
-
-            VStack(
-                alignment: .leading,
-                spacing: 8
-            ) {
-                HStack {
-                    Text("Menu")
-                        .font(.barTabHeading)
-
-                    Spacer()
-
-                    Text("\(groupedPrices.count) items")
-                        .font(.barTabSmall)
-                        .foregroundColor(.secondary)
-                }
-
-                if let fetchedAt = barRepository.lastFetchedAt {
-                    Text("Updated \(fetchedAt.relativeFormatted)")
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabSecondary)
-                }
-
-                if groupedPrices.isEmpty {
-                    emptyPricesView
-                } else {
-                    ForEach(Drink.allCases.filter { drink in
-                        groupedPrices.contains { $0.drink == drink }
-                    }) { drink in
-
-                        DisclosureGroup {
-                            VStack(alignment: .leading, spacing: 4) {
-                                ForEach(groupedPrices.filter { $0.drink == drink }) { group in
-                                    priceGroupRow(group)
-                                }
-                            }
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: drink.icon)
-                                    .font(.barTabSmall)
-                                    .foregroundColor(.barTabPrimary)
-                                    .frame(width: 20)
-
-                                Text(drink.displayName)
-                                    .font(.barTabBody)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.barTabText)
-
-                                Spacer()
-
-                                Text("\(groupedPrices.filter { $0.drink == drink }.count)")
-                                    .font(.barTabTiny)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.barTabPrimary.opacity(0.1))
-                                    .clipShape(Capsule())
-                                    .foregroundColor(.barTabPrimary)
-                            }
-                        }
-                        .tint(.barTabSecondary)
-                        .padding(.vertical, 2)
-                        .onAppear {
-                            expandedDrinkCategories.insert(drink)
-                        }
-                    }
-                }
+            // Quick actions
+            if userSession.currentUser != nil {
+                quickActionsRow
             }
 
+            // Details card
+            detailsSection
+
+            // Menu
+            menuSection
+
+            // Directions
+            directionsButton
+        }
+    }
+
+    // MARK: - Quick Actions
+
+    private var quickActionsRow: some View {
+        let busyCount = barRepository.busyCount(for: currentBar.id)
+        let hasCheckedIn = userSession.currentUser.map {
+            barRepository.hasUserCheckedIn(barID: currentBar.id, userID: $0.id)
+        } ?? false
+
+        return HStack(spacing: BarTabSpacing.sm) {
             Button {
-                openDirections()
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
-                        .font(.barTabBody)
-
-                    Text("Get Directions")
-                        .font(.barTabBody)
-                        .fontWeight(.semibold)
-
-                    Spacer()
-
-                    Image(systemName: "arrow.up.right")
-                        .font(.barTabSmall)
-                        .fontWeight(.semibold)
+                Task {
+                    guard let user = userSession.currentUser else { return }
+                    let ok: Bool
+                    if hasCheckedIn {
+                        ok = await barRepository.uncheckIn(bar: currentBar, user: user)
+                    } else {
+                        ok = await barRepository.checkIn(bar: currentBar, user: user)
+                        if ok {
+                            HapticEngine.success()
+                            toastCenter.show("You're here have fun! 🍻", kind: .success)
+                        }
+                    }
+                    if !ok {
+                        toastCenter.show("Couldn't update right now", kind: .error)
+                    }
                 }
-                .foregroundColor(.barTabPrimary)
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: hasCheckedIn ? "checkmark.circle.fill" : "flame.fill")
+                        .font(.barTabBody)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(hasCheckedIn ? "You're here" : "I'm here")
+                            .font(.barTabCaption)
+                            .fontWeight(.semibold)
+                        Text(busyCount > 0 ? "\(busyCount) here" : "Tap if here")
+                            .font(.barTabTiny)
+                            .opacity(0.7)
+                    }
+                }
+                .foregroundColor(.white)
                 .padding(.horizontal, BarTabSpacing.md)
                 .padding(.vertical, BarTabSpacing.sm)
                 .frame(maxWidth: .infinity)
-                .background(Color.barTabPrimary.opacity(0.06))
+                .background(hasCheckedIn ? Color.barTabSuccess : Color.barTabAccent)
                 .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
             }
+            .buttonStyle(.plain)
 
-            if let user = userSession.currentUser {
-                let busyCount = barRepository.busyCount(for: currentBar.id)
-                let hasCheckedIn = barRepository.hasUserCheckedIn(barID: currentBar.id, userID: user.id)
-
-                Button {
-                    Task {
-                        let ok: Bool
-                        if hasCheckedIn {
-                            ok = await barRepository.uncheckIn(bar: currentBar, user: user)
-                        } else {
-                            ok = await barRepository.checkIn(bar: currentBar, user: user)
-                            if ok {
-                                HapticEngine.success()
-                                toastCenter.show("You're here have fun! 🍻", kind: .success)
-                            }
-                        }
-                        if !ok {
-                            toastCenter.show("Couldn't update right now", kind: .error)
-                        }
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: hasCheckedIn ? "checkmark.circle.fill" : "flame.fill")
-                            .font(.barTabBody)
-
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(hasCheckedIn ? "You're here" : "I'm here now")
-                                .font(.barTabBody)
-                                .fontWeight(.semibold)
-                            Text(hasCheckedIn ? "Tap to leave" : "Busy right now?")
-                                .font(.barTabTiny)
-                                .opacity(0.8)
-                        }
-
-                        Spacer()
-
-                        Text(busyCount > 0 ? "\(busyCount) here now" : "Be the first")
-                            .font(.barTabSmall)
-                            .fontWeight(.semibold)
-                    }
-                    .padding()
-                    .foregroundColor(.white)
-                    .background(hasCheckedIn ? Color.barTabSuccess : Color.barTabAccent)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+            Button {
+                showingAddPrice = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "plus")
+                        .font(.barTabBody)
+                    Text("Add drink")
+                        .font(.barTabCaption)
+                        .fontWeight(.semibold)
                 }
-                .buttonStyle(.plain)
+                .foregroundColor(.white)
+                .padding(.horizontal, BarTabSpacing.md)
+                .padding(.vertical, BarTabSpacing.sm)
+                .frame(maxWidth: .infinity)
+                .background(Color.barTabPrimary)
+                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
             }
+            .buttonStyle(.plain)
+        }
+    }
 
-            if userSession.currentUser != nil {
-                Button {
-                    showingAddPrice = true
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "plus")
-                            .font(.barTabBody)
+    // MARK: - Directions
 
-                        Text("Add a drink")
-                            .font(.barTabBody)
-                            .fontWeight(.semibold)
-
-                        Spacer()
-
-                        Image(systemName: "chevron.right")
-                            .font(.barTabTiny)
-                    }
-                    .padding()
-                    .barTabPrimaryButton()
-                }
-            } else {
-                NavigationLink {
-                    LoginView()
-                        .environmentObject(userSession)
-                        .environmentObject(toastCenter)
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "plus")
-                            .font(.barTabBody)
-
-                        Text("Sign in to add a drink")
-                            .font(.barTabBody)
-                            .fontWeight(.semibold)
-
-                        Spacer()
-
-                        Image(systemName: "chevron.right")
-                            .font(.barTabTiny)
-                    }
-                    .padding()
-                    .barTabPrimaryButton()
-                }
+    private var directionsButton: some View {
+        Button {
+            openDirections()
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
+                    .font(.barTabBody)
+                Text("Get Directions")
+                    .font(.barTabBody)
+                    .fontWeight(.semibold)
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.barTabTiny)
             }
+            .foregroundColor(.barTabPrimary)
+            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.vertical, BarTabSpacing.sm)
+            .frame(maxWidth: .infinity)
+            .background(Color.barTabPrimary.opacity(0.06))
+            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
         }
     }
 
     private var detailsSection: some View {
-
-        return VStack(alignment: .leading, spacing: 0) {
-
+        VStack(alignment: .leading, spacing: 0) {
+            // Price level
             if let priceLevel = priceLevelString {
                 HStack(spacing: 8) {
                     Text(priceLevel)
                         .font(.barTabBody)
                         .fontWeight(.bold)
                         .foregroundColor(.barTabPrimary)
-
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(priceLevelTitle(priceLevel))
-                            .font(.barTabBody)
-                            .fontWeight(.medium)
-                            .foregroundColor(.barTabText)
-
-                        Text("Compared with other bars for the same drinks")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSecondary)
-                    }
-
+                    Text(priceLevelTitle(priceLevel))
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabSecondary)
                     Spacer()
                 }
                 .padding(.horizontal, BarTabSpacing.md)
                 .padding(.vertical, BarTabSpacing.sm)
 
-                Divider()
-                    .foregroundColor(.barTabCardBorder)
-                    .padding(.horizontal, BarTabSpacing.md)
+                Divider().padding(.horizontal, BarTabSpacing.md)
             }
 
-            HStack(spacing: 12) {
-                Image(systemName: "list.bullet")
-                    .font(.barTabBody)
-                    .foregroundColor(.barTabPrimary)
-                    .frame(width: 32, height: 32)
-                    .background(Color.barTabPrimary.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
-
-                Text("Amenities")
-                    .font(.barTabBody)
-                    .fontWeight(.medium)
-                    .foregroundColor(.barTabText)
-
-                Spacer()
-
-                Button {
-                    showingOutdoorConfirmation = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "sun.max.fill")
-                            .font(.barTabTiny)
-                        Text("Outdoor")
-                            .font(.barTabSmall)
-                    }
-                    .padding(.horizontal, BarTabSpacing.sm)
-                    .padding(.vertical, 6)
-                    .foregroundColor(currentBar.outdoorSeating ? .white : .barTabPrimary)
-                    .background(currentBar.outdoorSeating ? Color.barTabPrimary : Color.barTabPillFill)
-                    .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    showingSmokingConfirmation = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "smoke.fill")
-                            .font(.barTabTiny)
-                        Text("Smoking")
-                            .font(.barTabSmall)
-                    }
-                    .padding(.horizontal, BarTabSpacing.sm)
-                    .padding(.vertical, 6)
-                    .foregroundColor(currentBar.smokingFriendly ? .white : .barTabPrimary)
-                    .background(currentBar.smokingFriendly ? Color.barTabPrimary : Color.barTabPillFill)
-                    .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, BarTabSpacing.sm)
-
-            Divider()
-                .foregroundColor(.barTabCardBorder)
-                .padding(.horizontal, BarTabSpacing.md)
-
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("Ambience")
-                        .font(.barTabBody)
-                        .fontWeight(.medium)
-                        .foregroundColor(.barTabText)
+            // Amenities + Ambience
+            VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                HStack(spacing: 8) {
+                    amenityPill(
+                        icon: "sun.max.fill",
+                        label: "Outdoor",
+                        active: currentBar.outdoorSeating,
+                        action: { showingOutdoorConfirmation = true }
+                    )
+                    amenityPill(
+                        icon: "smoke.fill",
+                        label: "Smoking",
+                        active: currentBar.smokingFriendly,
+                        action: { showingSmokingConfirmation = true }
+                    )
 
                     Spacer()
 
                     if ambienceCount > 0 {
-                        Text("\(ambienceCount) ratings")
+                        Label("\(ambienceCount) ratings", systemImage: "star.fill")
                             .font(.barTabTiny)
-                            .foregroundColor(.barTabSecondary)
-                    } else {
-                        Text("No ratings yet")
-                            .font(.barTabSmall)
                             .foregroundColor(.barTabSecondary)
                     }
                 }
@@ -504,11 +355,8 @@ struct BarView: View {
                     FlowLayout(spacing: 6) {
                         ForEach(ambienceStyles) { style in
                             HStack(spacing: 3) {
-                                Image(systemName: style.icon)
-                                    .font(.barTabTiny)
-                                Text(style.displayName)
-                                    .font(.barTabSmall)
-                                    .fontWeight(.medium)
+                                Image(systemName: style.icon).font(.barTabTiny)
+                                Text(style.displayName).font(.barTabSmall).fontWeight(.medium)
                             }
                             .foregroundColor(.barTabPrimary)
                             .padding(.horizontal, 8)
@@ -522,6 +370,9 @@ struct BarView: View {
             .padding(.horizontal, BarTabSpacing.md)
             .padding(.vertical, BarTabSpacing.sm)
 
+            Divider().padding(.horizontal, BarTabSpacing.md)
+
+            // Rate button
             Button {
                 showingRateBar = true
             } label: {
@@ -533,11 +384,88 @@ struct BarView: View {
                         .fontWeight(.semibold)
                         .foregroundColor(.barTabAccent)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .buttonStyle(.plain)
             .padding(.horizontal, BarTabSpacing.md)
-            .padding(.bottom, BarTabSpacing.sm)
+            .padding(.vertical, BarTabSpacing.sm)
         }
         .barTabCard()
+    }
+
+    private func amenityPill(icon: String, label: String, active: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Image(systemName: icon).font(.barTabTiny)
+                Text(label).font(.barTabSmall)
+            }
+            .padding(.horizontal, BarTabSpacing.sm)
+            .padding(.vertical, 6)
+            .foregroundColor(active ? .white : .barTabPrimary)
+            .background(active ? Color.barTabPrimary : Color.barTabPillFill)
+            .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Menu Section
+
+    private var menuSection: some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+            HStack {
+                Text("Menu")
+                    .font(.barTabHeading)
+                Spacer()
+                if let fetchedAt = barRepository.lastFetchedAt {
+                    Text("Updated \(fetchedAt.relativeFormatted)")
+                        .font(.barTabTiny)
+                        .foregroundColor(.barTabSecondary)
+                }
+            }
+
+            if groupedPrices.isEmpty {
+                emptyPricesView
+            } else {
+                ForEach(Drink.allCases.filter { drink in
+                    groupedPrices.contains { $0.drink == drink }
+                }) { drink in
+                    DisclosureGroup {
+                        VStack(alignment: .leading, spacing: 4) {
+                            ForEach(groupedPrices.filter { $0.drink == drink }) { group in
+                                priceGroupRow(group)
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: drink.icon)
+                                .font(.barTabSmall)
+                                .foregroundColor(.barTabPrimary)
+                                .frame(width: 20)
+
+                            Text(drink.displayName)
+                                .font(.barTabBody)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+
+                            Spacer()
+
+                            Text("\(groupedPrices.filter { $0.drink == drink }.count)")
+                                .font(.barTabTiny)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.barTabPrimary.opacity(0.1))
+                                .clipShape(Capsule())
+                                .foregroundColor(.barTabPrimary)
+                        }
+                    }
+                    .tint(.barTabSecondary)
+                    .padding(.vertical, 2)
+                    .onAppear {
+                        expandedDrinkCategories.insert(drink)
+                    }
+                }
+            }
+        }
     }
 
     @ToolbarContentBuilder
