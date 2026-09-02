@@ -442,3 +442,76 @@ struct AttributeConsensusDTO: Codable {
         )
     }
 }
+import Foundation
+
+// MARK: - Bar Attribute Report Model
+
+struct BarAttributeReport: Identifiable, Codable {
+    let id: UUID
+    let barID: UUID
+    let userID: UUID
+    let attributeKey: String
+    let attributeValue: String
+    let evidenceText: String?
+    let evidencePhotoURL: URL?
+    let createdAt: Date
+    let updatedAt: Date
+}
+
+// MARK: - Attribute Consensus Model
+
+struct AttributeConsensus: Codable {
+    let value: String
+    let reportCount: Int
+    let confidencePct: Int
+    let lastConfirmedAt: Date
+}
+
+import Foundation
+
+// MARK: - Bar Attribute Keys
+
+enum BarAttributeKey: String, CaseIterable, Codable, Identifiable {
+    case smoking
+    case outdoorSeating = "outdoor_seating"
+    case liveMusic = "live_music"
+    case happyHour = "happy_hour"
+    case foodAvailable = "food_available"
+    case creditCardsAccepted = "credit_cards_accepted"
+
+    var id: String { rawValue }
+
+    var icon: String {
+        switch self {
+        case .smoking:
+            return "smoke"
+        case .outdoorSeating:
+            return "sun.max"
+        case .liveMusic:
+            return "music.note"
+        case .happyHour:
+            return "clock"
+        case .foodAvailable:
+            return "fork.knife"
+        case .creditCardsAccepted:
+            return "creditcard"
+        }
+    }
+}
+
+// MARK: - Bar Attribute Domain Model
+
+struct BarAttribute: Identifiable {
+    var id: String { key.rawValue }
+    let key: BarAttributeKey
+    let consensus: [AttributeConsensus]
+    let myReport: BarAttributeReport?
+
+    var consensusValue: String? {
+        consensus.first?.value
+    }
+
+    var consensusConfidence: Int {
+        consensus.first?.confidencePct ?? 0
+    }
+}
