@@ -23,10 +23,10 @@ struct PriceAlertListView: View {
                                 .foregroundColor(.barTabPrimary)
 
                             Text("No alerts")
-                                .font(.headline)
+                                .font(.barTabHeading)
 
                             Text("Set a price alert on any drink to be notified when the price changes.")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                         }
@@ -53,7 +53,7 @@ struct PriceAlertListView: View {
     private func alertRow(_ alert: PriceAlert) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "bell.fill")
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.barTabAccent)
                 .frame(width: 32, height: 32)
                 .background(Color.barTabAccent.opacity(0.1))
@@ -61,11 +61,11 @@ struct PriceAlertListView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(alert.drink)
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .fontWeight(.medium)
 
                 Text(alert.size)
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .foregroundColor(.secondary)
             }
 
@@ -73,12 +73,12 @@ struct PriceAlertListView: View {
 
             if let target = alert.targetPrice {
                 Text("\(Currency.defaultCurrency.symbol)\(String(format: "%.2f", target))")
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .fontWeight(.bold)
                     .foregroundColor(.barTabAccent)
             } else {
                 Text("Any price")
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .foregroundColor(.barTabSecondary)
             }
         }

@@ -22,10 +22,10 @@ struct FollowingListView: View {
                         .font(.barTabEmptyIcon)
                         .foregroundColor(.barTabPrimary)
                     Text("Not following anyone yet")
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .fontWeight(.medium)
                     Text("Find friends to see their drink reports here.")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                 }
@@ -65,7 +65,7 @@ struct FollowingListView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile.display_name ?? "User")
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .fontWeight(.semibold)
                     .foregroundColor(.barTabText)
             }
@@ -76,12 +76,12 @@ struct FollowingListView: View {
                 Task { await unfollow(profile) }
             } label: {
                 Text("Unfollow")
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .fontWeight(.medium)
                     .foregroundColor(.red)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.red.opacity(0.08))
+                    .background(Color.barTabDanger.opacity(0.08))
                     .clipShape(Capsule())
             }
             .buttonStyle(.plain)

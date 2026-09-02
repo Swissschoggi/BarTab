@@ -118,19 +118,70 @@ extension Color {
         )
     )
 
-    // MARK: - Card border (soft warm edge)
+    // MARK: - Card border (crisp hairline, not a glow)
 
     static let barTabCardBorder = barTabAdaptive(
         light: UIColor(
-            red: 0xEC / 255,
-            green: 0xE4 / 255,
-            blue: 0xD8 / 255,
+            red: 0xE4 / 255,
+            green: 0xDA / 255,
+            blue: 0xCA / 255,
             alpha: 1
         ),
         dark: UIColor(
-            red: 0x30 / 255,
-            green: 0x2A / 255,
-            blue: 0x24 / 255,
+            red: 0x33 / 255,
+            green: 0x2C / 255,
+            blue: 0x25 / 255,
+            alpha: 1
+        )
+    )
+
+    // MARK: - Elevated surface (one step above background, e.g. text fields, chips)
+
+    static let barTabSurface = barTabAdaptive(
+        light: UIColor(
+            red: 0xEF / 255,
+            green: 0xE8 / 255,
+            blue: 0xD9 / 255,
+            alpha: 1
+        ),
+        dark: UIColor(
+            red: 0x24 / 255,
+            green: 0x1F / 255,
+            blue: 0x1A / 255,
+            alpha: 1
+        )
+    )
+
+    // MARK: - Danger (brick red, tuned to sit with the warm palette)
+
+    static let barTabDanger = barTabAdaptive(
+        light: UIColor(
+            red: 0xB8 / 255,
+            green: 0x3A / 255,
+            blue: 0x33 / 255,
+            alpha: 1
+        ),
+        dark: UIColor(
+            red: 0xE0 / 255,
+            green: 0x8A / 255,
+            blue: 0x82 / 255,
+            alpha: 1
+        )
+    )
+
+    // MARK: - Warning (amber, distinct from the gold accent)
+
+    static let barTabWarning = barTabAdaptive(
+        light: UIColor(
+            red: 0xB8 / 255,
+            green: 0x74 / 255,
+            blue: 0x1F / 255,
+            alpha: 1
+        ),
+        dark: UIColor(
+            red: 0xE0 / 255,
+            green: 0xAB / 255,
+            blue: 0x62 / 255,
             alpha: 1
         )
     )

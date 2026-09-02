@@ -28,7 +28,7 @@ struct FollowButton: View {
                         Task { await sendRequest() }
                     } label: {
                         Text("Follow")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.semibold)
                             .frame(width: 80, height: 32)
                     }
@@ -42,7 +42,7 @@ struct FollowButton: View {
                         Task { await cancelRequest() }
                     } label: {
                         Text("Requested")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.semibold)
                             .frame(width: 80, height: 32)
                     }
@@ -57,7 +57,7 @@ struct FollowButton: View {
                             Task { await approveRequest() }
                         } label: {
                             Text("Accept")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .frame(width: 64, height: 32)
                         }
@@ -70,7 +70,7 @@ struct FollowButton: View {
                             Task { await rejectRequest() }
                         } label: {
                             Text("Decline")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .frame(width: 64, height: 32)
                         }
@@ -85,7 +85,7 @@ struct FollowButton: View {
                         Task { await removeFollow() }
                     } label: {
                         Text("Following")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.semibold)
                             .frame(width: 80, height: 32)
                     }

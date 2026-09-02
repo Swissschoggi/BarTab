@@ -22,10 +22,10 @@ struct RateBarSheet: View {
 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Ambience")
-                        .font(.headline)
+                        .font(.barTabHeading)
 
                     Text("What's the vibe at \(bar.name)? Select all that apply.")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.secondary)
 
                     LazyVGrid(columns: [
@@ -42,9 +42,9 @@ struct RateBarSheet: View {
                             } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: style.icon)
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                     Text(style.displayName)
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                 }
                                 .fixedSize(horizontal: true, vertical: false)
                                 .padding(.horizontal, 12)
@@ -65,7 +65,7 @@ struct RateBarSheet: View {
                     submit()
                 } label: {
                     Text("Save rating")
-                        .font(.headline)
+                        .font(.barTabHeading)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .barTabPrimaryButton()

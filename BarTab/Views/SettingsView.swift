@@ -35,10 +35,10 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(spacing: 8) {
                                 Image(systemName: "person.circle")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.barTabPrimary)
                                 Text("Account")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabText)
                             }
@@ -78,10 +78,10 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "slider.horizontal.3")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(.barTabPrimary)
                             Text("Preferences")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
                         }
@@ -95,17 +95,17 @@ struct SettingsView: View {
                                     } label: {
                                         HStack {
                                             Text(currency.symbol)
-                                                .font(.title3)
+                                                .font(.barTabHeading)
                                                 .fontWeight(.semibold)
                                                 .frame(width: 32)
 
                                             VStack(alignment: .leading, spacing: 1) {
                                                 Text(currency.rawValue)
-                                                    .font(.subheadline)
+                                                    .font(.barTabBody)
                                                     .fontWeight(.medium)
                                                     .foregroundColor(.barTabText)
                                                 Text(currency.displayName)
-                                                    .font(.caption)
+                                                    .font(.barTabSmall)
                                                     .foregroundColor(.barTabSecondary)
                                             }
 
@@ -133,16 +133,16 @@ struct SettingsView: View {
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: "dollarsign.circle")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.barTabPrimary)
                                 Text("Currency")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.barTabText)
 
                                 Spacer()
 
                                 Text(selectedCurrency.rawValue)
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabSecondary)
                             }
@@ -163,10 +163,10 @@ struct SettingsView: View {
                                     } label: {
                                         HStack {
                                             Text(lang.flag)
-                                                .font(.title3)
+                                                .font(.barTabHeading)
 
                                             Text(lang.name)
-                                                .font(.subheadline)
+                                                .font(.barTabBody)
                                                 .foregroundColor(.barTabText)
 
                                             Spacer()
@@ -192,16 +192,16 @@ struct SettingsView: View {
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: "globe")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.barTabPrimary)
                                 Text("Language")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.barTabText)
 
                                 Spacer()
 
                                 Text(languages.first { $0.code == languageManager.selectedLanguage }?.name ?? "English")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabSecondary)
                             }
@@ -215,10 +215,10 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(spacing: 8) {
                                 Image(systemName: "shield.lefthalf.filled")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.barTabPrimary)
                                 Text("Admin")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabText)
                             }
@@ -229,24 +229,24 @@ struct SettingsView: View {
                                 } label: {
                                     HStack {
                                         Label("Brand Requests", systemImage: "tag.fill")
-                                            .font(.subheadline)
+                                            .font(.barTabBody)
                                             .foregroundColor(.barTabText)
 
                                         Spacer()
 
                                         if barRepository.pendingBrandRequestCount > 0 {
                                             Text("\(barRepository.pendingBrandRequestCount)")
-                                                .font(.caption2)
+                                                .font(.barTabTiny)
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.white)
                                                 .padding(.horizontal, 7)
                                                 .padding(.vertical, 2)
-                                                .background(Color.orange)
+                                                .background(Color.barTabWarning)
                                                 .clipShape(Capsule())
                                         }
 
                                         Image(systemName: "chevron.right")
-                                            .font(.caption)
+                                            .font(.barTabSmall)
                                             .foregroundColor(.barTabSecondary)
                                     }
                                     .padding(.vertical, 10)
@@ -262,24 +262,24 @@ struct SettingsView: View {
                                 } label: {
                                     HStack {
                                         Label("Reported Content", systemImage: "exclamationmark.shield.fill")
-                                            .font(.subheadline)
+                                            .font(.barTabBody)
                                             .foregroundColor(.barTabText)
 
                                         Spacer()
 
                                         if barRepository.unreviewedReportCount > 0 {
                                             Text("\(barRepository.unreviewedReportCount)")
-                                                .font(.caption2)
+                                                .font(.barTabTiny)
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.white)
                                                 .padding(.horizontal, 7)
                                                 .padding(.vertical, 2)
-                                                .background(Color.red)
+                                                .background(Color.barTabDanger)
                                                 .clipShape(Capsule())
                                         }
 
                                         Image(systemName: "chevron.right")
-                                            .font(.caption)
+                                            .font(.barTabSmall)
                                             .foregroundColor(.barTabSecondary)
                                     }
                                     .padding(.vertical, 10)
@@ -294,22 +294,22 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "info.circle")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(.barTabPrimary)
                             Text("About")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("BarTab")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
 
                             Text("Find bars, compare drinks, and discover the best drink deals around you.")
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .foregroundColor(.barTabSecondary)
                         }
 
@@ -318,11 +318,11 @@ struct SettingsView: View {
 
                         HStack {
                             Text("Version")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(.barTabText)
                             Spacer()
                             Text("BETA")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(.barTabSecondary)
                         }
                     }
@@ -332,10 +332,10 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "trash")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(.barTabPrimary)
                             Text("Cache")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
                         }
@@ -359,22 +359,22 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "cup.and.saucer.fill")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(.barTabPrimary)
                             Text("Support the Dev")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Buy the developer a drink!")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
 
                             Text("If BarTab helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running.")
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .foregroundColor(.barTabSecondary)
                         }
 
@@ -398,10 +398,10 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.red)
                                 Text("Danger Zone")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabText)
                             }
@@ -486,19 +486,19 @@ struct SettingsView: View {
                 .frame(width: 24)
 
             Text(title)
-                .font(.subheadline)
+                .font(.barTabBody)
                 .foregroundColor(.barTabText)
 
             Spacer()
 
             if !value.isEmpty {
                 Text(value)
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .foregroundColor(.barTabSecondary)
             }
 
             Image(systemName: "chevron.right")
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.barTabSecondary)
         }
         .padding(.vertical, 12)
@@ -555,11 +555,11 @@ private struct EditUsernameSheet: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("This is how others see you")
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .foregroundColor(.barTabSecondary)
 
                             Text(trimmed.isEmpty ? "No name yet" : trimmed)
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
                                 .lineLimit(1)
@@ -633,7 +633,7 @@ private struct EditUsernameSheet: View {
                 .frame(width: 44, height: 44)
 
             Text(String(trimmed.prefix(1)).uppercased())
-                .font(.headline)
+                .font(.barTabHeading)
                 .foregroundColor(.white)
         }
     }
@@ -778,7 +778,7 @@ private struct ChangePasswordSheet: View {
             }
 
             Text(strength.label)
-                .font(.caption)
+                .font(.barTabSmall)
                 .fontWeight(.semibold)
                 .foregroundColor(strength.color)
         }
@@ -818,7 +818,7 @@ private struct DeleteAccountSheet: View {
 
                 ZStack {
                     Circle()
-                        .fill(Color.red.opacity(0.12))
+                        .fill(Color.barTabDanger.opacity(0.12))
                         .frame(width: 72, height: 72)
 
                     Image(systemName: "exclamationmark.triangle.fill")
@@ -829,18 +829,18 @@ private struct DeleteAccountSheet: View {
 
                 VStack(spacing: 8) {
                     Text("Delete your account?")
-                        .font(.title3)
+                        .font(.barTabHeading)
                         .fontWeight(.bold)
 
                     Text("This permanently deletes your profile, prices, bars, ratings, and everything else you've contributed. This can't be undone.")
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.barTabSecondary)
                         .multilineTextAlignment(.center)
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Type DELETE to confirm")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.barTabSecondary)
 
                     TextField("DELETE", text: $confirmationText)
@@ -865,7 +865,7 @@ private struct DeleteAccountSheet: View {
                     .foregroundColor(.white)
                     .background(
                         isConfirmed && !isDeleting
-                            ? Color.red
+                            ? Color.barTabDanger
                             : Color.barTabSecondary.opacity(0.4)
                     )
                     .clipShape(

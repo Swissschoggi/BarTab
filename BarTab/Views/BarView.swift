@@ -184,7 +184,7 @@ struct BarView: View {
             ) {
 
                 Text(currentBar.address)
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .foregroundColor(.barTabSecondary)
 
                 if let location = locationService.location {
@@ -195,7 +195,7 @@ struct BarView: View {
                         ),
                         systemImage: "location.fill"
                     )
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .fontWeight(.medium)
                     .foregroundColor(.barTabPrimary)
                     .padding(.horizontal, 8)
@@ -213,18 +213,18 @@ struct BarView: View {
             ) {
                 HStack {
                     Text("Menu")
-                        .font(.headline)
+                        .font(.barTabHeading)
 
                     Spacer()
 
                     Text("\(groupedPrices.count) items")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.secondary)
                 }
 
                 if let fetchedAt = barRepository.lastFetchedAt {
                     Text("Updated \(fetchedAt.relativeFormatted)")
-                        .font(.caption2)
+                        .font(.barTabTiny)
                         .foregroundColor(.barTabSecondary)
                 }
 
@@ -244,19 +244,19 @@ struct BarView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: drink.icon)
-                                    .font(.caption)
+                                    .font(.barTabSmall)
                                     .foregroundColor(.barTabPrimary)
                                     .frame(width: 20)
 
                                 Text(drink.displayName)
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabText)
 
                                 Spacer()
 
                                 Text("\(groupedPrices.filter { $0.drink == drink }.count)")
-                                    .font(.caption2)
+                                    .font(.barTabTiny)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
                                     .background(Color.barTabPrimary.opacity(0.1))
@@ -278,16 +278,16 @@ struct BarView: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
-                        .font(.subheadline)
+                        .font(.barTabBody)
 
                     Text("Get Directions")
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .fontWeight(.semibold)
 
                     Spacer()
 
                     Image(systemName: "arrow.up.right")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .fontWeight(.semibold)
                 }
                 .foregroundColor(.barTabPrimary)
@@ -321,21 +321,21 @@ struct BarView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: hasCheckedIn ? "checkmark.circle.fill" : "flame.fill")
-                            .font(.subheadline)
+                            .font(.barTabBody)
 
                         VStack(alignment: .leading, spacing: 1) {
                             Text(hasCheckedIn ? "You're here" : "I'm here now")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .fontWeight(.semibold)
                             Text(hasCheckedIn ? "Tap to leave" : "Busy right now?")
-                                .font(.caption2)
+                                .font(.barTabTiny)
                                 .opacity(0.8)
                         }
 
                         Spacer()
 
                         Text(busyCount > 0 ? "\(busyCount) here now" : "Be the first")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .fontWeight(.semibold)
                     }
                     .padding()
@@ -356,16 +356,16 @@ struct BarView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus")
-                            .font(.subheadline)
+                            .font(.barTabBody)
 
                         Text("Add a drink")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.semibold)
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .fontWeight(.semibold)
                     }
                     .padding()
@@ -379,16 +379,16 @@ struct BarView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus")
-                            .font(.subheadline)
+                            .font(.barTabBody)
 
                         Text("Sign in to add a drink")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.semibold)
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .fontWeight(.semibold)
                     }
                     .padding()
@@ -405,18 +405,18 @@ struct BarView: View {
             if let priceLevel = priceLevelString {
                 HStack(spacing: 8) {
                     Text(priceLevel)
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .fontWeight(.bold)
                         .foregroundColor(.barTabPrimary)
 
                     VStack(alignment: .leading, spacing: 1) {
                         Text(priceLevelTitle(priceLevel))
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.medium)
                             .foregroundColor(.barTabText)
 
                         Text("Compared with other bars for the same drinks")
-                            .font(.caption2)
+                            .font(.barTabTiny)
                             .foregroundColor(.barTabSecondary)
                     }
 
@@ -432,14 +432,14 @@ struct BarView: View {
 
             HStack(spacing: 12) {
                 Image(systemName: "list.bullet")
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .foregroundColor(.barTabPrimary)
                     .frame(width: 32, height: 32)
                     .background(Color.barTabPrimary.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
                 Text("Amenities")
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .fontWeight(.medium)
                     .foregroundColor(.barTabText)
 
@@ -450,9 +450,9 @@ struct BarView: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "sun.max.fill")
-                            .font(.caption2)
+                            .font(.barTabTiny)
                         Text("Outdoor")
-                            .font(.caption)
+                            .font(.barTabSmall)
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
@@ -467,9 +467,9 @@ struct BarView: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "smoke.fill")
-                            .font(.caption2)
+                            .font(.barTabTiny)
                         Text("Smoking")
-                            .font(.caption)
+                            .font(.barTabSmall)
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
@@ -489,7 +489,7 @@ struct BarView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("Ambience")
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .fontWeight(.medium)
                         .foregroundColor(.barTabText)
 
@@ -497,11 +497,11 @@ struct BarView: View {
 
                     if ambienceCount > 0 {
                         Text("\(ambienceCount) ratings")
-                            .font(.caption2)
+                            .font(.barTabTiny)
                             .foregroundColor(.barTabSecondary)
                     } else {
                         Text("No ratings yet")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .foregroundColor(.barTabSecondary)
                     }
                 }
@@ -511,9 +511,9 @@ struct BarView: View {
                         ForEach(ambienceStyles) { style in
                             HStack(spacing: 3) {
                                 Image(systemName: style.icon)
-                                    .font(.caption2)
+                                    .font(.barTabTiny)
                                 Text(style.displayName)
-                                    .font(.caption)
+                                    .font(.barTabSmall)
                                     .fontWeight(.medium)
                             }
                             .foregroundColor(.barTabPrimary)
@@ -533,9 +533,9 @@ struct BarView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "star.fill")
-                        .font(.caption)
+                        .font(.barTabSmall)
                     Text("Rate this bar")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .fontWeight(.semibold)
                         .foregroundColor(.barTabAccent)
                 }
@@ -813,40 +813,40 @@ struct BarView: View {
                         VStack(alignment: .leading, spacing: 3) {
                             HStack(spacing: 6) {
                                 Text(group.drink.displayName)
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabText)
 
                                 if isFlagged {
                                     Image(systemName: "flag.fill")
-                                        .font(.caption2)
+                                        .font(.barTabTiny)
                                         .foregroundColor(.orange)
                                 }
 
                                 if let brand = group.brand {
                                     Text("·").foregroundColor(.barTabSecondary)
                                     Text(brand)
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                         .foregroundColor(.barTabSecondary)
                                 }
 
                                 if let style = group.style {
                                     Text("·").foregroundColor(.barTabSecondary)
                                     Text(style)
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                         .foregroundColor(.barTabSecondary)
                                 }
                             }
 
                             HStack(spacing: 6) {
                                 Text(group.size.displayName)
-                                    .font(.caption)
+                                    .font(.barTabSmall)
                                     .foregroundColor(.barTabSecondary)
 
                                 if let serving = group.serving {
                                     Text("·").foregroundColor(.barTabSecondary)
                                     Text(serving.displayName)
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                         .foregroundColor(.barTabSecondary)
                                 }
                             }
@@ -855,7 +855,7 @@ struct BarView: View {
                         Spacer()
 
                         Text("\(Currency.defaultCurrency.symbol)\(Decimal(averageAmount(for: group)).formattedAmount)")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.bold)
                             .foregroundColor(.barTabPrimary)
 
@@ -882,7 +882,7 @@ struct BarView: View {
                             }
                         } label: {
                             Image(systemName: "ellipsis.circle")
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(isFlagged ? .orange : .barTabSecondary)
                         }
                         .accessibilityLabel("More drink actions")
@@ -901,7 +901,7 @@ struct BarView: View {
                             .padding(.horizontal, 4)
                     } else {
                         Text("Only one price reported   trend needs at least two.")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .foregroundColor(.secondary)
                             .padding(.horizontal, 4)
                     }
@@ -918,7 +918,7 @@ struct BarView: View {
                                 showingDeleteGroupConfirmation = true
                             } label: {
                                 Label("Delete all", systemImage: "trash")
-                                    .font(.caption)
+                                    .font(.barTabSmall)
                                     .foregroundColor(.red)
                             }
                         }
@@ -953,30 +953,30 @@ struct BarView: View {
         return HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(Currency.defaultCurrency.symbol)\(converted.formattedAmount)")
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .fontWeight(.medium)
 
                 if showOriginal {
                     Text("\(price.formattedAmount) \(price.currency)")
-                        .font(.caption2)
+                        .font(.barTabTiny)
                         .foregroundColor(.secondary)
                 }
 
                 HStack(spacing: 4) {
                     Text(price.reportedAt.relativeFormatted)
-                        .font(.caption2)
+                        .font(.barTabTiny)
                         .foregroundColor(.secondary)
 
                     if verifyCount > 0 {
                         Image(systemName: "checkmark.seal.fill")
-                            .font(.caption2)
+                            .font(.barTabTiny)
                             .foregroundColor(.green)
                         Text(
                             verifyCount == 1
                                 ? String(localized: "Confirmed by 1 person")
                                 : String(localized: "Confirmed by \(verifyCount) people")
                         )
-                        .font(.caption2)
+                        .font(.barTabTiny)
                         .foregroundColor(.green)
                     }
                 }
@@ -1009,7 +1009,7 @@ struct BarView: View {
                     }
                 } label: {
                     Image(systemName: hasVerified ? "checkmark.circle.fill" : "checkmark.circle")
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(hasVerified ? .green : .barTabSecondary)
                 }
                 .buttonStyle(.plain)
@@ -1022,7 +1022,7 @@ struct BarView: View {
                     showingDeletePriceConfirmation = true
                 } label: {
                     Image(systemName: "trash")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.red)
                 }
                 .buttonStyle(.plain)
@@ -1071,11 +1071,11 @@ struct BarView: View {
                 .foregroundColor(.barTabPrimary)
 
             Text("No drink prices added yet")
-                .font(.subheadline)
+                .font(.barTabBody)
                 .fontWeight(.medium)
 
             Text("Be the first to add a price for this bar.")
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)

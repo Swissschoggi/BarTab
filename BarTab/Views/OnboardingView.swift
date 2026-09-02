@@ -40,8 +40,12 @@ struct OnboardingView: View {
 
                         ZStack {
                             Circle()
-                                .fill(Color.barTabPrimary.opacity(0.12))
-                                .frame(width: 120, height: 120)
+                                .fill(Color.barTabPrimary.opacity(0.1))
+                                .frame(width: 128, height: 128)
+
+                            Circle()
+                                .stroke(Color.barTabPrimary.opacity(0.18), lineWidth: 1)
+                                .frame(width: 128, height: 128)
 
                             Image(systemName: page.icon)
                                 .font(.barTabEmptyIconLarge)
@@ -98,7 +102,8 @@ struct OnboardingView: View {
                                 endPoint: .trailing
                             )
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                        .shadow(color: Color.barTabPrimary.opacity(0.18), radius: 10, x: 0, y: 4)
                 }
 
                 if currentPage < pages.count - 1 {
@@ -106,7 +111,7 @@ struct OnboardingView: View {
                         UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
                         dismiss()
                     }
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .foregroundColor(.barTabSecondary)
                 }
             }

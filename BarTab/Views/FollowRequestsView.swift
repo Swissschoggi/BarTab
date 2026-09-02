@@ -27,10 +27,10 @@ struct FollowRequestsView: View {
                             .foregroundColor(.barTabPrimary)
 
                         Text("No pending requests")
-                            .font(.headline)
+                            .font(.barTabHeading)
 
                         Text("When someone follows you, their request will appear here.")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity)
@@ -67,12 +67,12 @@ struct FollowRequestsView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile?.display_name ?? "User")
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .fontWeight(.medium)
                     .foregroundColor(.barTabText)
 
                 Text("wants to follow you")
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .foregroundColor(.secondary)
             }
 
@@ -83,7 +83,7 @@ struct FollowRequestsView: View {
                     Task { await approve(request: request) }
                 } label: {
                     Text("Accept")
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .fontWeight(.semibold)
                         .frame(width: 64, height: 32)
                 }
@@ -96,7 +96,7 @@ struct FollowRequestsView: View {
                     Task { await reject(request: request) }
                 } label: {
                     Text("Decline")
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .fontWeight(.semibold)
                         .frame(width: 64, height: 32)
                 }

@@ -34,7 +34,7 @@ struct MyContributionsView: View {
                         Text(
                             "\(myPrices.count) \(myPrices.count == 1 ? "contribution" : "contributions")"
                         )
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.secondary)
 
                         Spacer()
@@ -134,13 +134,13 @@ struct MyContributionsView: View {
             }
 
             Text("No contributions yet")
-                .font(.title3)
+                .font(.barTabHeading)
                 .fontWeight(.semibold)
 
             Text(
                 "Drinks you add to bars will appear here."
             )
-            .font(.subheadline)
+            .font(.barTabBody)
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 30)
@@ -176,7 +176,7 @@ struct MyContributionsView: View {
                     Image(
                         systemName: price.drink.icon
                     )
-                    .font(.title3)
+                    .font(.barTabHeading)
                     .foregroundColor(
                         .barTabPrimary
                     )
@@ -195,12 +195,12 @@ struct MyContributionsView: View {
                         price.brand
                             ?? price.drink.displayName
                     )
-                    .font(.headline)
+                    .font(.barTabHeading)
 
                     Text(
                         "\(price.drink.displayName) · \(price.size.displayName)"
                     )
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .foregroundColor(.secondary)
                 }
 
@@ -225,7 +225,7 @@ struct MyContributionsView: View {
                     )
 
                     Text(price.currency)
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.secondary)
                 }
             }
@@ -251,11 +251,11 @@ struct MyContributionsView: View {
                     ) {
 
                         Text(bar.name)
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.medium)
 
                         Text(bar.address)
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .foregroundColor(.secondary)
                             .lineLimit(1)
                     }
@@ -272,7 +272,7 @@ struct MyContributionsView: View {
                     )
 
                     Text("Bar no longer available")
-                        .font(.caption)
+                        .font(.barTabSmall)
                 }
                 .foregroundColor(.secondary)
             }

@@ -213,25 +213,22 @@ struct MainTabView: View {
         )
         .simultaneousGesture(tabBarSwipeGesture)
         .padding(6)
-        .background(
-            Color.barTabCardFill
-                .opacity(0.9)
-        )
+        .background(.ultraThinMaterial)
         .clipShape(
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
+            RoundedRectangle(cornerRadius: BarTabRadius.sheet, style: .continuous)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .stroke(Color.barTabCardBorder.opacity(0.8), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: BarTabRadius.sheet, style: .continuous)
+                .stroke(Color.barTabCardBorder, lineWidth: 1)
         )
         .shadow(
-            color: Color.barTabPrimary.opacity(0.15),
-            radius: 24,
+            color: Color.black.opacity(0.12),
+            radius: 18,
             x: 0,
-            y: 12
+            y: 8
         )
-        .padding(.horizontal, 24)
-        .padding(.bottom, 20)
+        .padding(.horizontal, BarTabSpacing.lg)
+        .padding(.bottom, BarTabSpacing.lg)
     }
 
     private var tabBarSwipeGesture: some Gesture {
@@ -292,16 +289,17 @@ struct MainTabView: View {
         return HStack(spacing: 4) {
 
             Image(systemName: tab.icon)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold))
                 .overlay(alignment: .topTrailing) {
                     if badge > 0 {
                         Text("\(badge)")
                             .font(.barTabBadge)
                             .foregroundColor(.white)
-                            .frame(width: 16, height: 16)
-                            .background(Color.red)
+                            .frame(width: 15, height: 15)
+                            .background(Color.barTabDanger)
                             .clipShape(Circle())
-                            .offset(x: 8, y: -8)
+                            .overlay(Circle().stroke(Color.barTabCardFill, lineWidth: 1.5))
+                            .offset(x: 9, y: -7)
                     }
                 }
 
@@ -317,7 +315,7 @@ struct MainTabView: View {
         .foregroundColor(
             isSelected
                 ? .white
-                : .barTabSecondary
+                : .barTabSecondary.opacity(0.8)
         )
         .contentShape(Rectangle())
         .accessibilityLabel(Text(tab.title))
@@ -392,9 +390,9 @@ private struct DeepLinkBarView: View {
                 .font(.barTabEmptyIcon)
                 .foregroundColor(.barTabPrimary)
             Text(title)
-                .font(.headline)
+                .font(.barTabHeading)
             Text(message)
-                .font(.subheadline)
+                .font(.barTabBody)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             Button("Close") { dismiss() }
@@ -437,9 +435,9 @@ private struct DeepLinkGroupView: View {
                         .font(.barTabEmptyIcon)
                         .foregroundColor(.barTabPrimary)
                     Text("Group not found")
-                        .font(.headline)
+                        .font(.barTabHeading)
                     Text("You may not be a member of this group.")
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                     Button("Close") { dismiss() }

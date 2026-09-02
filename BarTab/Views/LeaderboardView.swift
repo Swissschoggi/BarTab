@@ -45,15 +45,15 @@ struct LeaderboardView: View {
                         if leaderboardEntries.isEmpty {
                             VStack(spacing: 12) {
                                 Image(systemName: "person.3.sequence")
-                                    .font(.largeTitle)
+                                    .font(.barTabDisplay)
                                     .foregroundColor(.barTabSecondary)
 
                                 Text(scope == .local ? "No contributors nearby yet" : "No contributors yet")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.barTabSecondary)
 
                                 Text("Be the first to add drinks and bars!")
-                                    .font(.caption)
+                                    .font(.barTabSmall)
                                     .foregroundColor(.barTabSecondary)
                             }
                             .frame(maxWidth: .infinity)
@@ -62,7 +62,7 @@ struct LeaderboardView: View {
                             ForEach(Array(leaderboardEntries.enumerated()), id: \.element.id) { index, entry in
                                 HStack(spacing: 12) {
                                     Text("#\(index + 1)")
-                                        .font(.subheadline)
+                                        .font(.barTabBody)
                                         .fontWeight(.bold)
                                         .foregroundColor(index < 3 ? .barTabAccent : .barTabSecondary)
                                         .frame(width: 32, alignment: .leading)
@@ -71,7 +71,7 @@ struct LeaderboardView: View {
                                         UserAvatarView(urlString: avatarCache[userID], displayName: entry.username, size: 36)
                                     } else {
                                         Image(systemName: entry.level.icon)
-                                            .font(.body)
+                                            .font(.barTabBody)
                                             .foregroundColor(.white)
                                             .frame(width: 32, height: 32)
                                             .background(Color.barTabAccent.opacity(index < 3 ? 1.0 : 0.7))
@@ -80,19 +80,19 @@ struct LeaderboardView: View {
 
                                     VStack(alignment: .leading, spacing: 1) {
                                         Text(entry.username)
-                                            .font(.subheadline)
+                                            .font(.barTabBody)
                                             .fontWeight(.semibold)
                                             .foregroundColor(.barTabText)
 
                                         Text(entry.level.name)
-                                            .font(.caption2)
+                                            .font(.barTabTiny)
                                             .foregroundColor(.barTabSecondary)
                                     }
 
                                     Spacer()
 
                                     Text("\(entry.contributions)")
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.barTabPrimary)
                                         .padding(.horizontal, 8)

@@ -100,7 +100,7 @@ struct AddBarView: View {
                                         Image(
                                             systemName: "mappin.circle.fill"
                                         )
-                                        .font(.title3)
+                                        .font(.barTabHeading)
                                         .foregroundColor(.barTabPrimary)
 
                                         VStack(
@@ -109,11 +109,11 @@ struct AddBarView: View {
                                         ) {
 
                                             Text(result.title)
-                                                .font(.headline)
+                                                .font(.barTabHeading)
                                                 .foregroundColor(.primary)
 
                                             Text(result.subtitle)
-                                                .font(.subheadline)
+                                                .font(.barTabBody)
                                                 .foregroundColor(.secondary)
                                                 .lineLimit(2)
                                         }
@@ -143,13 +143,13 @@ struct AddBarView: View {
                             .foregroundColor(.barTabPrimary)
 
                         Text("Find your bar")
-                            .font(.title3)
+                            .font(.barTabHeading)
                             .fontWeight(.semibold)
 
                         Text(
                             "Search for a bar, pub, cafe or other place."
                         )
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .multilineTextAlignment(.center)
                         .foregroundColor(.secondary)
                         .padding(.horizontal, 40)
@@ -197,7 +197,7 @@ struct AddBarView: View {
                             } label: {
 
                                 Text("Add Bar")
-                                    .font(.headline)
+                                    .font(.barTabHeading)
                                     .frame(maxWidth: .infinity)
                                     .padding()
                                     .barTabPrimaryButton()
@@ -272,17 +272,17 @@ struct AddBarView: View {
                 .foregroundColor(.barTabPrimary)
 
                 Text("Selected place")
-                    .font(.headline)
+                    .font(.barTabHeading)
 
                 Spacer()
             }
 
             Text(name)
-                .font(.title3)
+                .font(.barTabHeading)
                 .fontWeight(.semibold)
 
             Text(address)
-                .font(.subheadline)
+                .font(.barTabBody)
                 .foregroundColor(.secondary)
         }
         .barTabCard()

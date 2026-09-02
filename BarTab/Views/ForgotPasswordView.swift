@@ -28,7 +28,7 @@ struct ForgotPasswordView: View {
                             .font(.title3.bold())
 
                         Text("We sent a password reset link to **\(email)**. Follow the link to set a new password.")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
 
@@ -44,7 +44,7 @@ struct ForgotPasswordView: View {
                 } else {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Email")
-                            .font(.headline)
+                            .font(.barTabHeading)
 
                         TextField("your@email.com", text: $email)
                             .textFieldStyle(.plain)
@@ -65,7 +65,7 @@ struct ForgotPasswordView: View {
                             }
                             Text("Send Reset Link")
                         }
-                        .font(.headline)
+                        .font(.barTabHeading)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()

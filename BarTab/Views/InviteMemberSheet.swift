@@ -56,7 +56,7 @@ struct InviteMemberSheet: View {
                                 Text(searchText.isEmpty
                                     ? "All your friends are already in this group."
                                     : "No friends match your search.")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.secondary)
                             } else {
                                 ForEach(filteredFriends, id: \.self) { userID in

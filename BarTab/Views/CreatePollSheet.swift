@@ -56,17 +56,17 @@ struct CreatePollSheet: View {
                                let bar = barRepository.getBar(id: barID) {
                                 HStack(spacing: 4) {
                                     Image(systemName: "mappin.circle.fill")
-                                        .font(.caption2)
+                                        .font(.barTabTiny)
                                         .foregroundColor(.barTabPrimary)
                                     Text(bar.name)
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                         .foregroundColor(.barTabPrimary)
                                     Spacer()
                                     Button {
                                         optionBarIDs[index] = nil
                                     } label: {
                                         Image(systemName: "xmark.circle.fill")
-                                            .font(.caption)
+                                            .font(.barTabSmall)
                                             .foregroundColor(.barTabSecondary)
                                     }
                                 }
@@ -77,7 +77,7 @@ struct CreatePollSheet: View {
                                     showingBarPicker = true
                                 } label: {
                                     Label("Link a bar", systemImage: "mappin.and.ellipse")
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                         .foregroundColor(.barTabSecondary)
                                 }
                             }
@@ -131,10 +131,10 @@ struct CreatePollSheet: View {
                             } label: {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(bar.name)
-                                        .font(.subheadline)
+                                        .font(.barTabBody)
                                         .foregroundColor(.barTabText)
                                     Text(bar.address)
-                                        .font(.caption2)
+                                        .font(.barTabTiny)
                                         .foregroundColor(.barTabSecondary)
                                 }
                             }

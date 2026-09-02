@@ -32,10 +32,10 @@ struct ActivityFeedView: View {
                             .foregroundColor(.barTabPrimary)
 
                         Text("No activity yet")
-                            .font(.headline)
+                            .font(.barTabHeading)
 
                         Text("Accept follow requests to see their price reports and ratings here.")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
@@ -84,25 +84,25 @@ struct ActivityFeedView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 4) {
                         Text(username(for: item.userID))
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.semibold)
 
                         Text(item.actionText)
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                     }
 
                     switch item.kind {
-                    case .priceReport(let barName, let drink, let amount, let currency):
+                    case .priceReport(let barName, _, let amount, let currency):
                         HStack(spacing: 4) {
                             Text(barName)
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .fontWeight(.medium)
                             Text("·")
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .foregroundColor(.secondary)
                             Text("\(Currency(rawValue: currency)?.symbol ?? currency)\(amount.formattedAmount)")
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .fontWeight(.bold)
                                 .foregroundColor(.barTabAccent)
                         }
@@ -110,14 +110,14 @@ struct ActivityFeedView: View {
                     case .barRating(let barName, let ambience):
                         HStack(spacing: 4) {
                             Text(barName)
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .fontWeight(.medium)
                             if let ambience {
                                 Text("·")
-                                    .font(.caption)
+                                    .font(.barTabSmall)
                                     .foregroundColor(.secondary)
                                 Text(ambience)
-                                    .font(.caption)
+                                    .font(.barTabSmall)
                                     .foregroundColor(.barTabSecondary)
                             }
                         }
@@ -125,24 +125,24 @@ struct ActivityFeedView: View {
                     case .drinkRating(let barName, let drink, let quality):
                         HStack(spacing: 4) {
                             Text(barName)
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .fontWeight(.medium)
                             Text("·")
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .foregroundColor(.secondary)
                             Text("\(drink) · \(quality)/5")
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .foregroundColor(.barTabSecondary)
                         }
 
                     case .barCreated(let barName):
                         Text(barName)
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .fontWeight(.medium)
                     }
 
                     Text(item.timestamp.relativeDescription)
-                        .font(.caption2)
+                        .font(.barTabTiny)
                         .foregroundColor(.barTabSecondary)
                 }
 
@@ -150,7 +150,7 @@ struct ActivityFeedView: View {
 
                 if item.barID != nil {
                     Image(systemName: "chevron.right")
-                        .font(.caption2)
+                        .font(.barTabTiny)
                         .foregroundColor(.barTabSecondary)
                         .padding(.top, 4)
                 }

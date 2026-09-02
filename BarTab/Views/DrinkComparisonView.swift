@@ -33,7 +33,7 @@ struct DrinkComparisonView: View {
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
                         Text("No comparisons found")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity)
@@ -41,7 +41,7 @@ struct DrinkComparisonView: View {
                     .barTabCard()
                 } else {
                     Text("\(results.count) bars have this drink")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.barTabSecondary)
 
                     ForEach(Array(results.enumerated()), id: \.element.bar.id) { index, result in
@@ -51,7 +51,7 @@ struct DrinkComparisonView: View {
                             HStack(spacing: 12) {
                                 // Rank
                                 Text("\(index + 1)")
-                                    .font(.headline)
+                                    .font(.barTabHeading)
                                     .foregroundColor(.barTabPrimary)
                                     .frame(width: 28, height: 28)
                                     .background(Color.barTabPrimary.opacity(0.1))
@@ -59,11 +59,11 @@ struct DrinkComparisonView: View {
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(result.bar.name)
-                                        .font(.subheadline)
+                                        .font(.barTabBody)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.barTabText)
                                     Text(result.bar.address)
-                                        .font(.caption2)
+                                        .font(.barTabTiny)
                                         .foregroundColor(.barTabSecondary)
                                 }
 
@@ -71,12 +71,12 @@ struct DrinkComparisonView: View {
 
                                 VStack(alignment: .trailing, spacing: 2) {
                                     Text("\(Currency.defaultCurrency.symbol)\(result.summary.convertedAmount.formattedAmount)")
-                                        .font(.subheadline)
+                                        .font(.barTabBody)
                                         .fontWeight(.bold)
                                         .foregroundColor(.barTabPrimary)
 
                                     Text("\(result.summary.confidence)% confidence")
-                                        .font(.caption2)
+                                        .font(.barTabTiny)
                                         .foregroundColor(.barTabSecondary)
                                 }
                             }

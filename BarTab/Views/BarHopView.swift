@@ -20,7 +20,7 @@ struct BarHopView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
                             Image(systemName: "figure.walk.circle.fill")
-                                .font(.title2)
+                                .font(.barTabTitle)
                                 .foregroundColor(.barTabPrimary)
                             Text("Bar Hop Generator")
                                 .font(.barTabStat)
@@ -93,9 +93,9 @@ struct BarHopView: View {
                                         if let popular = barRepository.popularAmbience(for: bar) {
                                             HStack(spacing: 4) {
                                                 Image(systemName: popular.icon)
-                                                    .font(.caption2)
+                                                    .font(.barTabTiny)
                                                 Text(popular.displayName)
-                                                    .font(.caption2)
+                                                    .font(.barTabTiny)
                                             }
                                             .foregroundColor(.barTabPrimary)
                                             .padding(.horizontal, 8)

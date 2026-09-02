@@ -62,10 +62,10 @@ struct FindUsersView: View {
                             .foregroundColor(.barTabPrimary)
 
                         Text("No users found")
-                            .font(.headline)
+                            .font(.barTabHeading)
 
                         Text("Try a different search term.")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity)
@@ -98,13 +98,13 @@ struct FindUsersView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile.display_name ?? "User")
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .fontWeight(.medium)
                     .foregroundColor(.barTabText)
 
                 if profile.is_admin {
                     Text("Admin")
-                        .font(.caption2)
+                        .font(.barTabTiny)
                         .foregroundColor(.barTabAccent)
                 }
             }

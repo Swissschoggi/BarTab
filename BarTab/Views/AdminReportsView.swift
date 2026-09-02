@@ -28,10 +28,10 @@ struct AdminReportsView: View {
                             .foregroundColor(.barTabPrimary)
 
                         Text("All clear")
-                            .font(.headline)
+                            .font(.barTabHeading)
 
                         Text("Flagged bars and drinks will show up here for review.")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
@@ -47,7 +47,7 @@ struct AdminReportsView: View {
                             + "\(barRepository.unreviewedReportCount == 1 ? "needs" : "need") review",
                             systemImage: "exclamationmark.circle"
                         )
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.secondary)
 
                         Spacer()
@@ -112,7 +112,7 @@ struct AdminReportsView: View {
             }
 
             Text(report.reason.title)
-                .font(.subheadline)
+                .font(.barTabBody)
                 .foregroundColor(.primary)
 
             reportCardActions(report)
@@ -131,24 +131,24 @@ struct AdminReportsView: View {
                     ? "mappin.and.ellipse"
                     : "dollarsign.circle"
             )
-            .font(.subheadline)
+            .font(.barTabBody)
             .foregroundColor(.orange)
 
             Text(report.targetLabel)
-                .font(.headline)
+                .font(.barTabHeading)
                 .lineLimit(1)
 
             Spacer()
 
             if tappable {
                 Image(systemName: "chevron.right")
-                    .font(.caption2)
+                    .font(.barTabTiny)
                     .foregroundColor(.barTabSecondary)
             }
 
             if !report.isReviewed {
                 Text("New")
-                    .font(.caption2)
+                    .font(.barTabTiny)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .padding(.horizontal, 8)
@@ -160,7 +160,7 @@ struct AdminReportsView: View {
                     "Reviewed",
                     systemImage: "checkmark.circle.fill"
                 )
-                .font(.caption)
+                .font(.barTabSmall)
                 .fontWeight(.semibold)
                 .foregroundColor(.green)
             }
@@ -173,15 +173,15 @@ struct AdminReportsView: View {
         HStack(spacing: 6) {
 
             Text("by \(report.reportedByName)")
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.secondary)
 
             Text("\u{00B7}")
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.secondary)
 
             Text(relativeDate(report.reportedAt))
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.secondary)
 
             Spacer()
@@ -192,7 +192,7 @@ struct AdminReportsView: View {
                     showingDeleteConfirmation = true
                 } label: {
                     Label("Remove", systemImage: "trash")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .fontWeight(.semibold)
                         .foregroundColor(.red)
                 }
@@ -203,7 +203,7 @@ struct AdminReportsView: View {
                     }
                 } label: {
                     Text("Mark reviewed")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .fontWeight(.semibold)
                         .foregroundColor(.barTabPrimary)
                 }

@@ -41,6 +41,7 @@ struct NearbyView: View {
     @State private var origin: Origin = .myLocation
     @State private var radiusKM: Double = 2
     @State private var showingLocationSearch = false
+    @State private var showingLocationSheet = false
     @State private var displayMode: DisplayMode = .bars
     @State private var isRefreshing = false
 
@@ -243,11 +244,14 @@ struct NearbyView: View {
                     subtitle: "Find bars and compare drink prices nearby."
                 )
 
-                originCard
-
-                cityExplorer
-
-                radiusCard
+                BarTabInfoBar(
+                    icon: originIcon,
+                    title: "Searching near",
+                    value: origin.label,
+                    trailingValue: formattedRadius
+                ) {
+                    showingLocationSheet = true
+                }
 
                     // Segment control
                     Picker("Display mode", selection: $displayMode) {
@@ -284,6 +288,11 @@ struct NearbyView: View {
                     origin = .custom(name: name, coordinate: coordinate)
                 }
             }
+            .sheet(isPresented: $showingLocationSheet) {
+                locationSheet
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+            }
             .onChange(of: selectedDrinks) { _ in
                 let validSizes = Set(availableSizes)
                 selectedSizes = selectedSizes.filter { validSizes.contains($0) }
@@ -295,65 +304,137 @@ struct NearbyView: View {
         }
     }
 
-    // MARK: - Origin card
+    // MARK: - Location sheet
+    //
+    // Replaces what used to be three separate stacked cards (origin,
+    // explore-a-city, radius) with one sheet opened from the compact
+    // info bar — keeps the scroll content focused on results.
 
-    private var originCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Near")
-                .font(.headline)
+    private var locationSheet: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
-            HStack {
-                Image(systemName: originIcon)
-                    .foregroundColor(.barTabPrimary)
+                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                        Text("Location")
+                            .font(.barTabCaption)
+                            .foregroundColor(.barTabSecondary)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(origin.label)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
+                        HStack(spacing: BarTabSpacing.sm) {
+                            locationOptionButton(
+                                icon: "location.fill",
+                                label: "My location",
+                                isSelected: { if case .myLocation = origin { return true }; return false }()
+                            ) {
+                                origin = .myLocation
+                            }
 
-                    if case .myLocation = origin, locationService.location == nil {
-                        HStack(spacing: 6) {
-                            Text("Waiting for location...")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            locationOptionButton(
+                                icon: "magnifyingglass",
+                                label: "Search a place",
+                                isSelected: false
+                            ) {
+                                showingLocationSheet = false
+                                showingLocationSearch = true
+                            }
+                        }
 
-                            Button {
-                                UIApplication.shared.open(
-                                    URL(string: UIApplication.openSettingsURLString)!
-                                )
-                            } label: {
-                                Text("Open Settings")
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.barTabPrimary)
+                        if case .myLocation = origin, locationService.location == nil {
+                            HStack(spacing: 6) {
+                                Text("Waiting for location...")
+                                    .font(.barTabSmall)
+                                    .foregroundColor(.barTabSecondary)
+
+                                Button {
+                                    UIApplication.shared.open(
+                                        URL(string: UIApplication.openSettingsURLString)!
+                                    )
+                                } label: {
+                                    Text("Open Settings")
+                                        .font(.barTabSmall)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.barTabPrimary)
+                                }
                             }
                         }
                     }
+
+                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                        Text("Explore a city")
+                            .font(.barTabCaption)
+                            .foregroundColor(.barTabSecondary)
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(Self.exploreCities, id: \.name) { city in
+                                    Button {
+                                        origin = .custom(name: city.name, coordinate: city.coordinate)
+                                    } label: {
+                                        Text(city.name)
+                                            .font(.barTabBodySemibold)
+                                            .padding(.horizontal, 14)
+                                            .padding(.vertical, 8)
+                                            .foregroundColor(isCitySelected(city.name) ? .white : .barTabPrimary)
+                                            .background(isCitySelected(city.name) ? Color.barTabPrimary : Color.barTabSurface)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                        HStack {
+                            Text("Radius")
+                                .font(.barTabCaption)
+                                .foregroundColor(.barTabSecondary)
+                            Spacer()
+                            Text(formattedRadius)
+                                .font(.barTabBodySemibold)
+                                .foregroundColor(.barTabPrimary)
+                        }
+
+                        Slider(value: $radiusKM, in: Self.radiusRange)
+                            .tint(.barTabPrimary)
+                    }
+
+                    Spacer(minLength: 0)
                 }
-
-                Spacer()
-
-                Menu {
-                    Button {
-                        origin = .myLocation
-                    } label: {
-                        Label("My location", systemImage: "location.fill")
-                    }
-
-                    Button {
-                        showingLocationSearch = true
-                    } label: {
-                        Label("Search a place...", systemImage: "magnifyingglass")
-                    }
-                } label: {
-                    Text("Change")
-                        .font(.subheadline)
+                .padding(BarTabSpacing.lg)
+            }
+            .background(Color.barTabBackground.ignoresSafeArea())
+            .navigationTitle("Search area")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { showingLocationSheet = false }
                         .fontWeight(.semibold)
-                        .foregroundColor(.barTabPrimary)
                 }
             }
         }
-        .barTabCard()
+    }
+
+    private func locationOptionButton(
+        icon: String,
+        label: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.barTabHeading)
+                Text(label)
+                    .font(.barTabCaption)
+                    .fontWeight(.semibold)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, BarTabSpacing.sm)
+            .foregroundColor(isSelected ? .white : .barTabPrimary)
+            .background(isSelected ? Color.barTabPrimary : Color.barTabSurface)
+            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+        }
     }
 
     private var originIcon: String {
@@ -363,68 +444,11 @@ struct NearbyView: View {
         return "mappin.circle.fill"
     }
 
-    // MARK: - City explorer
-
-    private var cityExplorer: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("Explore a city")
-                    .font(.headline)
-                Spacer()
-                Image(systemName: "globe.europe.africa.fill")
-                    .foregroundColor(.barTabPrimary)
-                    .font(.subheadline)
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(Self.exploreCities, id: \.name) { city in
-                        Button {
-                            origin = .custom(name: city.name, coordinate: city.coordinate)
-                        } label: {
-                            Text(city.name)
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                                .foregroundColor(isCitySelected(city.name) ? .white : .barTabPrimary)
-                                .background(isCitySelected(city.name) ? Color.barTabPrimary : Color.barTabPillFill)
-                                .clipShape(Capsule())
-                        }
-                    }
-                }
-            }
-        }
-        .barTabCard()
-    }
-
     private func isCitySelected(_ name: String) -> Bool {
         if case .custom(let selected, _) = origin {
             return selected == name
         }
         return false
-    }
-
-    // MARK: - Radius card
-
-    private var radiusCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("Radius")
-                    .font(.headline)
-
-                Spacer()
-
-                Text(formattedRadius)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.barTabPrimary)
-            }
-
-            Slider(value: $radiusKM, in: Self.radiusRange)
-                .tint(.barTabPrimary)
-        }
-        .barTabCard()
     }
 
     // MARK: - Bars section
@@ -446,63 +470,70 @@ struct NearbyView: View {
                     message: "Try widening the radius or picking a different place."
                 )
             } else {
-                ForEach(nearbyBars, id: \.bar.id) { result in
-                    NavigationLink(
-                        destination: BarView(bar: result.bar)
-                            .environmentObject(barRepository)
-                            .environmentObject(userSession)
-                            .environmentObject(toastCenter)
-                    ) {
-                        barRow(bar: result.bar, distance: result.distance)
+                VStack(spacing: 0) {
+                    ForEach(Array(nearbyBars.enumerated()), id: \.element.bar.id) { index, result in
+                        NavigationLink(
+                            destination: BarView(bar: result.bar)
+                                .environmentObject(barRepository)
+                                .environmentObject(userSession)
+                                .environmentObject(toastCenter)
+                        ) {
+                            barRow(bar: result.bar, distance: result.distance)
+                        }
+                        .buttonStyle(.plain)
+
+                        if index < nearbyBars.count - 1 {
+                            Divider().padding(.leading, 58)
+                        }
                     }
-                    .buttonStyle(.plain)
                 }
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                        .fill(Color.barTabCardFill)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                        .stroke(Color.barTabCardBorder, lineWidth: 1)
+                )
             }
         }
     }
 
     private func barRow(bar: Bar, distance: CLLocationDistance) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: "wineglass.fill")
-                .font(.body)
-                .foregroundColor(.white)
-                .frame(width: 36, height: 36)
-                .background(
-                    LinearGradient(
-                        colors: [Color.barTabPrimary, Color.barTabPrimary.opacity(0.8)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        HStack(spacing: BarTabSpacing.sm) {
+            ZStack {
+                Circle()
+                    .fill(Color.barTabPrimary.opacity(0.1))
+                    .frame(width: 40, height: 40)
+                Image(systemName: "wineglass.fill")
+                    .font(.barTabCaption)
+                    .foregroundColor(.barTabPrimary)
+            }
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(bar.name)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
+                        .font(.barTabBodySemibold)
                         .foregroundColor(.barTabText)
+                        .lineLimit(1)
 
                     if barRepository.isBarFlagged(bar) {
                         Image(systemName: "flag.fill")
-                            .font(.caption2)
-                            .foregroundColor(.orange)
+                            .font(.barTabTiny)
+                            .foregroundColor(.barTabWarning)
                     }
 
                     if let level = barRepository.priceLevel(for: bar) {
                         Text(level)
-                            .font(.caption2)
+                            .font(.barTabTiny)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabAccent)
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 1)
-                            .background(Color.barTabAccent.opacity(0.12))
-                            .clipShape(Capsule())
                     }
                 }
 
                 Text(bar.address)
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .foregroundColor(.barTabSecondary)
                     .lineLimit(1)
             }
@@ -511,16 +542,18 @@ struct NearbyView: View {
 
             VStack(alignment: .trailing, spacing: 1) {
                 Text(Self.formattedDistance(distance))
-                    .font(.caption)
+                    .font(.barTabCaption)
                     .fontWeight(.semibold)
                     .foregroundColor(.barTabPrimary)
 
                 Image(systemName: "chevron.right")
-                    .font(.caption2)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.barTabTiny)
+                    .foregroundColor(.barTabSecondary.opacity(0.6))
             }
         }
-        .barTabCard()
+        .padding(.horizontal, BarTabSpacing.md)
+        .padding(.vertical, BarTabSpacing.xs)
+        .contentShape(Rectangle())
     }
 
     // MARK: - Price filters
@@ -529,32 +562,7 @@ struct NearbyView: View {
         VStack(alignment: .leading, spacing: 12) {
 
             // Search bar (always visible)
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.barTabSecondary)
-                    .font(.subheadline)
-
-                TextField("Search bars...", text: $searchText)
-                    .textFieldStyle(.plain)
-                    .autocorrectionDisabled()
-
-                if !searchText.isEmpty {
-                    Button {
-                        searchText = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.barTabSecondary)
-                    }
-                }
-            }
-            .padding(10)
-            .background(Color.barTabCardFill)
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(Color.barTabPrimary.opacity(0.25), lineWidth: 1)
-            )
-
+            BarTabSearchField(text: $searchText, placeholder: "Search bars...")
             // Active filter summary (always visible)
             if selectedDrinks.count > 1 || selectedBrand != nil || !selectedAmbience.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -562,10 +570,10 @@ struct NearbyView: View {
                         if selectedDrinks.count > 1 {
                             HStack(spacing: 3) {
                                 Image(systemName: "line.3.horizontal.decrease.circle.fill")
-                                    .font(.caption2)
+                                    .font(.barTabTiny)
                                 Text("\(selectedDrinks.count) drinks")
                             }
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .background(Color.barTabPrimary.opacity(0.1))
@@ -578,7 +586,7 @@ struct NearbyView: View {
                                 Image(systemName: "xmark.circle.fill")
                                     .onTapGesture { selectedBrand = nil }
                             }
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .background(Color.barTabPrimary.opacity(0.1))
@@ -588,12 +596,12 @@ struct NearbyView: View {
                         ForEach(Array(selectedAmbience)) { ambience in
                             HStack(spacing: 3) {
                                 Image(systemName: ambience.icon)
-                                    .font(.caption2)
+                                    .font(.barTabTiny)
                                 Text(ambience.displayName)
                                 Image(systemName: "xmark.circle.fill")
                                     .onTapGesture { selectedAmbience.remove(ambience) }
                             }
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .background(Color.barTabPrimary.opacity(0.1))
@@ -603,27 +611,26 @@ struct NearbyView: View {
                 }
             }
 
+            // Filters / Sort toggles share one row instead of two
+            // full-width stacked strips.
+            HStack(spacing: 8) {
+                toggleChip(
+                    title: "Filters",
+                    isExpanded: filtersExpanded
+                ) {
+                    withAnimation(.spring()) { filtersExpanded.toggle() }
+                }
+
+                toggleChip(
+                    title: "Sort: \(sortLabel)",
+                    isExpanded: sortExpanded
+                ) {
+                    withAnimation(.spring()) { sortExpanded.toggle() }
+                }
+            }
+
             // Collapsible filters
             VStack(alignment: .leading, spacing: 8) {
-                Button {
-                    withAnimation(.spring()) {
-                        filtersExpanded.toggle()
-                    }
-                } label: {
-                    HStack {
-                        Text("Filters")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .rotationEffect(.degrees(filtersExpanded ? 90 : 0))
-                    }
-                    .padding(12)
-                    .background(Color.barTabPillFill)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                }
-                .foregroundColor(.barTabText)
-
                 if filtersExpanded {
                     VStack(alignment: .leading, spacing: 14) {
                         filterRow(label: "Drink") {
@@ -641,14 +648,14 @@ struct NearbyView: View {
                                         } label: {
                                             HStack(spacing: 4) {
                                                 Image(systemName: drink.icon)
-                                                    .font(.caption2)
+                                                    .font(.barTabTiny)
                                                 Text(drink.displayName)
-                                                    .font(.caption)
+                                                    .font(.barTabSmall)
                                             }
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 6)
                                             .foregroundColor(selectedDrinks.contains(drink) ? .white : .barTabPrimary)
-                                            .background(selectedDrinks.contains(drink) ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .background(selectedDrinks.contains(drink) ? Color.barTabPrimary : Color.barTabSurface)
                                             .clipShape(Capsule())
                                         }
                                     }
@@ -670,11 +677,11 @@ struct NearbyView: View {
                                             }
                                         } label: {
                                             Text(size.displayName)
-                                                .font(.caption)
+                                                .font(.barTabSmall)
                                                 .padding(.horizontal, 10)
                                                 .padding(.vertical, 6)
                                                 .foregroundColor(selectedSizes.contains(size) ? .white : .barTabPrimary)
-                                                .background(selectedSizes.contains(size) ? Color.barTabPrimary : Color.barTabPillFill)
+                                                .background(selectedSizes.contains(size) ? Color.barTabPrimary : Color.barTabSurface)
                                                 .clipShape(Capsule())
                                         }
                                     }
@@ -689,11 +696,11 @@ struct NearbyView: View {
                                         selectedBrand = nil
                                     } label: {
                                         Text("All")
-                                            .font(.caption)
+                                            .font(.barTabSmall)
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 6)
                                             .foregroundColor(selectedBrand == nil ? .white : .barTabPrimary)
-                                            .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabSurface)
                                             .clipShape(Capsule())
                                     }
 
@@ -702,11 +709,11 @@ struct NearbyView: View {
                                             selectedBrand = brand
                                         } label: {
                                             Text(brand)
-                                                .font(.caption)
+                                                .font(.barTabSmall)
                                                 .padding(.horizontal, 10)
                                                 .padding(.vertical, 6)
                                                 .foregroundColor(selectedBrand == brand ? .white : .barTabPrimary)
-                                                .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabPillFill)
+                                                .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabSurface)
                                                 .clipShape(Capsule())
                                         }
                                     }
@@ -721,11 +728,11 @@ struct NearbyView: View {
                                         selectedAmbience = []
                                     } label: {
                                         Text("Any")
-                                            .font(.caption)
+                                            .font(.barTabSmall)
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 6)
                                             .foregroundColor(selectedAmbience.isEmpty ? .white : .barTabPrimary)
-                                            .background(selectedAmbience.isEmpty ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .background(selectedAmbience.isEmpty ? Color.barTabPrimary : Color.barTabSurface)
                                             .clipShape(Capsule())
                                     }
 
@@ -739,14 +746,14 @@ struct NearbyView: View {
                                         } label: {
                                             HStack(spacing: 3) {
                                                 Image(systemName: style.icon)
-                                                    .font(.caption2)
+                                                    .font(.barTabTiny)
                                                 Text(style.displayName)
                                             }
-                                            .font(.caption)
+                                            .font(.barTabSmall)
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 6)
                                             .foregroundColor(selectedAmbience.contains(style) ? .white : .barTabPrimary)
-                                            .background(selectedAmbience.contains(style) ? Color.barTabPrimary : Color.barTabPillFill)
+                                            .background(selectedAmbience.contains(style) ? Color.barTabPrimary : Color.barTabSurface)
                                             .clipShape(Capsule())
                                         }
                                     }
@@ -769,43 +776,17 @@ struct NearbyView: View {
                     .padding(.top, 8)
                 }
             }
-            .font(.subheadline)
+            .font(.barTabBody)
             .fontWeight(.medium)
             .foregroundColor(.barTabText)
 
-            // Sort (collapsible)
-            VStack(alignment: .leading, spacing: 8) {
-                Button {
-                    withAnimation(.spring()) {
-                        sortExpanded.toggle()
-                    }
-                } label: {
-                    HStack {
-                        Text("Sort by")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .rotationEffect(.degrees(sortExpanded ? 90 : 0))
-                    }
-                    .padding(12)
-                    .background(Color.barTabPillFill)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                }
-                .foregroundColor(.barTabText)
-
-                if sortExpanded {
-                    HStack(spacing: 8) {
-                        sortButton(title: "Cheapest", option: .cheapest)
-                        sortButton(title: "Closest", option: .closest)
-                        sortButton(title: "Brand", option: .brand)
-                    }
-                    .padding(.top, 8)
+            if sortExpanded {
+                HStack(spacing: 8) {
+                    sortButton(title: "Cheapest", option: .cheapest)
+                    sortButton(title: "Closest", option: .closest)
+                    sortButton(title: "Brand", option: .brand)
                 }
             }
-            .font(.subheadline)
-            .fontWeight(.medium)
-            .foregroundColor(.barTabText)
         }
     }
 
@@ -815,7 +796,7 @@ struct NearbyView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label)
-                .font(.caption)
+                .font(.barTabSmall)
                 .fontWeight(.medium)
                 .foregroundColor(.barTabSecondary)
             content()
@@ -831,14 +812,14 @@ struct NearbyView: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.caption2)
+                    .font(.barTabTiny)
                 Text(label)
-                    .font(.caption)
+                    .font(.barTabSmall)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .foregroundColor(isActive ? .white : .barTabPrimary)
-            .background(isActive ? Color.barTabPrimary : Color.barTabPillFill)
+            .background(isActive ? Color.barTabPrimary : Color.barTabSurface)
             .clipShape(Capsule())
         }
     }
@@ -846,7 +827,7 @@ struct NearbyView: View {
     // MARK: - Price results
 
     private var priceResultsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
             BarTabSectionHeader(title: "Drinks", count: priceResults.count)
 
             if priceResults.isEmpty {
@@ -858,106 +839,99 @@ struct NearbyView: View {
                         : "Be the first to add a drink in this area."
                 )
             } else {
-                ForEach(priceResults, id: \.summary.id) { result in
-                    NavigationLink(
-                        destination: BarView(bar: result.bar)
-                            .environmentObject(barRepository)
-                            .environmentObject(userSession)
-                            .environmentObject(toastCenter)
-                    ) {
-                        priceRow(
-                            bar: result.bar,
-                            summary: result.summary,
-                            isBestDeal: result.summary.id == bestDealSummaryID
-                        )
+                VStack(spacing: BarTabSpacing.xs) {
+                    ForEach(priceResults, id: \.summary.id) { result in
+                        NavigationLink(
+                            destination: BarView(bar: result.bar)
+                                .environmentObject(barRepository)
+                                .environmentObject(userSession)
+                                .environmentObject(toastCenter)
+                        ) {
+                            priceRow(
+                                bar: result.bar,
+                                summary: result.summary,
+                                isBestDeal: result.summary.id == bestDealSummaryID
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }
     }
 
     private func priceRow(bar: Bar, summary: PriceSummary, isBestDeal: Bool = false) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(bar.name)
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
+        HStack(alignment: .top, spacing: BarTabSpacing.sm) {
 
-                        if barRepository.isBarFlagged(bar) {
-                            Image(systemName: "flag.fill")
-                                .font(.caption2)
-                                .foregroundColor(.orange)
-                        }
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(bar.name)
+                        .font(.barTabBodySemibold)
+                        .foregroundColor(.barTabText)
+                        .lineLimit(1)
 
-                        if isBestDeal {
-                            Text("Best deal")
-                                .font(.caption2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.barTabAccent)
-                                .clipShape(Capsule())
-                        }
+                    if barRepository.isBarFlagged(bar) {
+                        Image(systemName: "flag.fill")
+                            .font(.barTabTiny)
+                            .foregroundColor(.barTabWarning)
                     }
+                }
 
-                    HStack(spacing: 4) {
-                        Text(summary.drink.displayName)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                HStack(spacing: 4) {
+                    Text(summary.drink.displayName)
+                    Text("\u{00B7}")
+                    Text(summary.size.displayName)
 
+                    if let brand = summary.brand {
                         Text("\u{00B7}")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        Text(summary.size.displayName)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        if let brand = summary.brand {
-                            Text("\u{00B7}")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(brand)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-
-                        if let style = summary.style {
-                            Text("\u{00B7}")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(style)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                        Text(brand)
                     }
 
+                    if let style = summary.style {
+                        Text("\u{00B7}")
+                        Text(style)
+                    }
+                }
+                .font(.barTabSmall)
+                .foregroundColor(.barTabSecondary)
+                .lineLimit(1)
+
+                HStack(spacing: 6) {
                     if let location = locationService.location {
                         Text(DistanceService.formattedDistance(from: location, to: bar))
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
                     }
-                }
-
-                Spacer()
-
-                VStack(alignment: .trailing, spacing: 1) {
-                    Text("\(summary.formattedConvertedAmount) \(Currency.defaultCurrency.rawValue)")
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.barTabPrimary)
 
                     Text(summary.reportCount == 1 ? "1 report" : "\(summary.reportCount) reports")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
                 }
+                .font(.barTabTiny)
+                .foregroundColor(.barTabSecondary.opacity(0.8))
+
+                confidenceView(summary: summary)
+                    .padding(.top, 2)
             }
 
-            confidenceView(summary: summary)
+            Spacer(minLength: BarTabSpacing.xs)
+
+            VStack(alignment: .trailing, spacing: 4) {
+                if isBestDeal {
+                    Text("Best deal")
+                        .font(.barTabTiny)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.barTabAccent)
+                        .clipShape(Capsule())
+                }
+
+                Text(summary.formattedConvertedAmount)
+                    .font(.barTabStat)
+                    .foregroundColor(.barTabPrimary)
+
+                Text(Currency.defaultCurrency.rawValue)
+                    .font(.barTabTiny)
+                    .foregroundColor(.barTabSecondary)
+            }
         }
         .barTabCard()
     }
@@ -968,16 +942,51 @@ struct NearbyView: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: option == .cheapest ? "arrow.down" : "location")
-                    .font(.caption)
+                    .font(.barTabTiny)
                 Text(title)
             }
-            .font(.caption)
+            .font(.barTabSmall)
             .fontWeight(.semibold)
             .foregroundColor(sortOption == option ? .white : .barTabPrimary)
-            .padding(.horizontal, 10)
+            .padding(.horizontal, BarTabSpacing.sm)
             .padding(.vertical, 7)
-            .background(sortOption == option ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.12))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .background(sortOption == option ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.1))
+            .clipShape(Capsule())
+        }
+    }
+
+    private var sortLabel: String {
+        switch sortOption {
+        case .cheapest: return "Cheapest"
+        case .closest: return "Closest"
+        case .brand: return "Brand"
+        }
+    }
+
+    /// Compact toggle used for the "Filters" / "Sort" row — replaces two
+    /// full-width stacked disclosure strips with a pair of pill buttons.
+    private func toggleChip(
+        title: String,
+        isExpanded: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Text(title)
+                Image(systemName: "chevron.down")
+                    .font(.barTabTiny.weight(.semibold))
+                    .rotationEffect(.degrees(isExpanded ? 180 : 0))
+            }
+            .font(.barTabCaption)
+            .fontWeight(.semibold)
+            .foregroundColor(isExpanded ? .white : .barTabText)
+            .padding(.horizontal, BarTabSpacing.sm)
+            .padding(.vertical, BarTabSpacing.xs)
+            .background(isExpanded ? Color.barTabPrimary : Color.barTabSurface)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule().stroke(isExpanded ? Color.clear : Color.barTabCardBorder, lineWidth: 1)
+            )
         }
     }
 
@@ -987,17 +996,17 @@ struct NearbyView: View {
         return VStack(alignment: .leading, spacing: 3) {
             HStack {
                 Text("Confidence")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .font(.barTabTiny)
+                    .foregroundColor(.barTabSecondary)
 
                 Text("\u{00B7} \(summary.reportCount) \(summary.reportCount == 1 ? "report" : "reports")")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .font(.barTabTiny)
+                    .foregroundColor(.barTabSecondary)
 
                 Spacer()
 
                 Text(summary.confidenceLabel)
-                    .font(.caption2)
+                    .font(.barTabTiny)
                     .fontWeight(.semibold)
                     .foregroundColor(.barTabPrimary)
             }
@@ -1025,12 +1034,12 @@ struct NearbyView: View {
                 .foregroundColor(.barTabPrimary.opacity(0.6))
 
             Text(title)
-                .font(.subheadline)
+                .font(.barTabBody)
                 .fontWeight(.medium)
                 .foregroundColor(.barTabText)
 
             Text(message)
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.barTabSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 20)
@@ -1087,7 +1096,7 @@ private struct LocationSearchSheet: View {
                             searchService.clearResults()
                         } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.barTabSecondary)
                         }
                     }
                 }
@@ -1106,12 +1115,12 @@ private struct LocationSearchSheet: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 3) {
                             Text(result.title)
-                                .font(.headline)
+                                .font(.barTabHeading)
                                 .foregroundColor(.primary)
 
                             Text(result.subtitle)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .font(.barTabBody)
+                                .foregroundColor(.barTabSecondary)
                                 .lineLimit(2)
                         }
                     }

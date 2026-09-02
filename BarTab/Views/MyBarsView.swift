@@ -35,7 +35,7 @@ struct MyBarsView: View {
                         Text(
                             "\(myBars.count) \(myBars.count == 1 ? "bar" : "bars")"
                         )
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.secondary)
 
                         Spacer()
@@ -133,13 +133,13 @@ struct MyBarsView: View {
             }
 
             Text("No bars yet")
-                .font(.title3)
+                .font(.barTabHeading)
                 .fontWeight(.semibold)
 
             Text(
                 "Bars you add will appear here."
             )
-            .font(.subheadline)
+            .font(.barTabBody)
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 30)
@@ -180,7 +180,7 @@ struct MyBarsView: View {
                     Image(
                         systemName: "wineglass.fill"
                     )
-                    .font(.title3)
+                    .font(.barTabHeading)
                     .foregroundColor(
                         .barTabPrimary
                     )
@@ -196,11 +196,11 @@ struct MyBarsView: View {
                 ) {
 
                     Text(bar.name)
-                        .font(.headline)
+                        .font(.barTabHeading)
                         .foregroundColor(.primary)
 
                     Text(bar.address)
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.secondary)
                         .lineLimit(1)
 
@@ -222,7 +222,7 @@ struct MyBarsView: View {
                             systemImage: "mug.fill"
                         )
                     }
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .foregroundColor(.secondary)
                 }
 
@@ -231,7 +231,7 @@ struct MyBarsView: View {
                 Image(
                     systemName: "chevron.right"
                 )
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.secondary)
             }
 
@@ -251,7 +251,7 @@ struct MyBarsView: View {
                             Text(
                                 "\(summary.drink.displayName) · \(summary.size.displayName)"
                             )
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
 
                             Spacer()
@@ -259,7 +259,7 @@ struct MyBarsView: View {
                             Text(
                                 "\(summary.formattedConvertedAmount) \(Currency.defaultCurrency.rawValue)"
                             )
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabPrimary)
                         }
@@ -270,7 +270,7 @@ struct MyBarsView: View {
                         Text(
                             "And \(summaries.count - visibleSummaries.count) more…"
                         )
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.secondary)
                     }
                 }

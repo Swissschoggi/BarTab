@@ -42,10 +42,10 @@ struct GroupPlanningView: View {
                             .foregroundColor(.barTabPrimary)
 
                         Text("No groups yet")
-                            .font(.headline)
+                            .font(.barTabHeading)
 
                         Text("Create a group to plan nights out with friends.")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
@@ -94,7 +94,7 @@ struct GroupPlanningView: View {
     private func groupRow(_ group: BarGroup) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "person.3.fill")
-                .font(.headline)
+                .font(.barTabHeading)
                 .foregroundColor(.white)
                 .frame(width: 40, height: 40)
                 .background(
@@ -108,19 +108,19 @@ struct GroupPlanningView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(group.name)
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .fontWeight(.semibold)
                     .foregroundColor(.barTabText)
 
                 Text("Tap to open")
-                    .font(.caption2)
+                    .font(.barTabTiny)
                     .foregroundColor(.barTabSecondary)
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.caption2)
+                .font(.barTabTiny)
                 .foregroundColor(.barTabSecondary)
         }
         .barTabCard()

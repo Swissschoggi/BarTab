@@ -93,8 +93,26 @@ final class SupabaseClient {
 
     /// Serializes token-refresh attempts so concurrent 401s don't
     /// race and invalidate the refresh token.
-    private static let refreshLock = NSLock()
-    private static var isRefreshing = false
+    /// Actor-isolated flag replacing the old NSLock — safe to touch
+    /// from async contexts under Swift 6 strict concurrency, and
+    /// still guarantees only one refresh runs at a time.
+    private actor RefreshGate {
+        private(set) var isRefreshing = false
+
+        /// Attempts to claim the gate. Returns false if a refresh is
+        /// already in progress.
+        func tryAcquire() -> Bool {
+            guard !isRefreshing else { return false }
+            isRefreshing = true
+            return true
+        }
+
+        func release() {
+            isRefreshing = false
+        }
+    }
+
+    private static let refreshGate = RefreshGate()
 
     /// Decoded user ID from the current JWT. Nil when not signed in.
     var currentUserID: UUID? {
@@ -207,15 +225,6 @@ final class SupabaseClient {
                 encoding: .utf8
             ) ?? "No response body"
 
-            #if DEBUG
-            print(
-                "⚠️ BarTab request failed "
-                + "\(request.httpMethod ?? "GET") "
-                + "\(request.url?.absoluteString ?? "") "
-                + "→ \(http.statusCode): \(message)"
-            )
-            #endif
-
             throw SupabaseError(
                 statusCode: http.statusCode,
                 message: message
@@ -239,22 +248,13 @@ final class SupabaseClient {
                 throw error
             }
 
-            Self.refreshLock.lock()
-            guard !Self.isRefreshing else {
-                Self.refreshLock.unlock()
+            guard await Self.refreshGate.tryAcquire() else {
                 throw error
-            }
-            Self.isRefreshing = true
-            Self.refreshLock.unlock()
-
-            defer {
-                Self.refreshLock.lock()
-                Self.isRefreshing = false
-                Self.refreshLock.unlock()
             }
 
             guard (try? await SupabaseAuthService().refreshSession()) != nil,
                   let baseRequest = retriedRequest(request) else {
+                await Self.refreshGate.release()
                 throw error
             }
 
@@ -263,7 +263,15 @@ final class SupabaseClient {
                 "Bearer \(AuthTokenStore.shared.accessToken ?? "")",
                 forHTTPHeaderField: "Authorization"
             )
-            return try await perform(retried)
+
+            do {
+                let result = try await perform(retried)
+                await Self.refreshGate.release()
+                return result
+            } catch {
+                await Self.refreshGate.release()
+                throw error
+            }
         }
     }
 
@@ -518,6 +526,8 @@ final class SupabaseClient {
 
     // MARK: - Bar Check-ins
 
+    /// Fetch every active "I'm here now" check-in. BarRepository
+    /// filters these down to the still-fresh window itself.
     func fetchBarCheckins() async throws -> [BarCheckin] {
         let request = try makeRequest(endpoint: "bar_checkins?select=*")
         let data = try await performAuthorized(request)
@@ -525,14 +535,17 @@ final class SupabaseClient {
     }
 
     /// Record (or refresh) the current user's check-in at a bar.
+    /// Upserts on `bar_id + user_id` and bumps `created_at`, so
+    /// checking in again while already checked in just refreshes
+    /// the timestamp instead of creating a duplicate row.
     func checkIn(barID: UUID) async throws {
-        struct CheckinBody: Codable {
+        struct CheckInBody: Codable {
             let bar_id: UUID
             let user_id: UUID
             let created_at: Date
         }
 
-        let body = CheckinBody(
+        let body = CheckInBody(
             bar_id: barID,
             user_id: try requireUserID(),
             created_at: Date()
@@ -553,7 +566,7 @@ final class SupabaseClient {
     /// Remove the current user's check-in at a bar.
     func uncheckIn(barID: UUID) async throws {
         let myID = try requireUserID().uuidString
-        var request = try makeRequest(
+        let request = try makeRequest(
             endpoint: "bar_checkins?bar_id=eq.\(barID.uuidString)&user_id=eq.\(myID)",
             method: "DELETE"
         )
@@ -899,8 +912,13 @@ final class SupabaseClient {
 
         _ = try await performAuthorized(request)
 
+        // Cache-bust: the object path never changes between uploads
+        // (same user, same filename), so without a unique query item
+        // both AsyncImage's cache and Supabase's CDN edge cache would
+        // keep serving the old image for a while after a re-upload.
+        let cacheBuster = Int(Date().timeIntervalSince1970)
         guard let publicURL = URL(
-            string: "\(baseURL)/storage/v1/object/public/\(path)"
+            string: "\(baseURL)/storage/v1/object/public/\(path)?v=\(cacheBuster)"
         ) else {
             throw SupabaseError(statusCode: 0, message: "Invalid avatar public URL")
         }
@@ -1379,6 +1397,9 @@ final class SupabaseClient {
         return result
     }
 
+    /// Batch-fetch display name + avatar URL for a set of user IDs,
+    /// keyed by user ID — used to populate activity feed rows without
+    /// one request per row.
     func fetchProfileAvatarsByIDs(_ ids: [UUID]) async throws -> [UUID: ProfileAvatarRow] {
         guard !ids.isEmpty else { return [:] }
         let idList = ids.map(\.uuidString).joined(separator: ",")

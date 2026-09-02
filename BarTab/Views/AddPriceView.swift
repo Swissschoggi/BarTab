@@ -162,7 +162,7 @@ struct AddPriceView: View {
                             ForEach(availableStyles) { style in
                                 HStack {
                                     Image(systemName: "tag.fill")
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                     Text(style.displayName)
                                 }
                                 .tag(DrinkStyle?.some(style))
@@ -183,7 +183,7 @@ struct AddPriceView: View {
                             ForEach(availableServingMethods) { method in
                                 HStack {
                                     Image(systemName: method.icon)
-                                        .font(.caption)
+                                        .font(.barTabSmall)
                                     Text(method.displayName)
                                 }
                                 .tag(ServingMethod?.some(method))
@@ -233,7 +233,7 @@ struct AddPriceView: View {
                             "Can't find it? Request a brand",
                             systemImage: "plus.circle"
                         )
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.barTabPrimary)
                     }
                 }
@@ -281,9 +281,9 @@ struct AddPriceView: View {
                                 Text(selectedCurrency.symbol)
                                     .fontWeight(.semibold)
                                 Image(systemName: "chevron.down")
-                                    .font(.caption2)
+                                    .font(.barTabTiny)
                             }
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
                             .background(Color.barTabPillFill)
@@ -299,7 +299,7 @@ struct AddPriceView: View {
 
                     if let error = priceError {
                         Text(error)
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .foregroundColor(.red)
                             .padding(.top, 4)
                     }

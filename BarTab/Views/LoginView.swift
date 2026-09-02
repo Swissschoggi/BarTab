@@ -60,11 +60,18 @@ struct LoginView: View {
 
                         ZStack {
                             Circle()
-                                .fill(Color.barTabPrimary)
-                                .frame(width: 84, height: 84)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Color.barTabGradientStart, Color.barTabGradientEnd],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 76, height: 76)
+                                .shadow(color: Color.barTabPrimary.opacity(0.2), radius: 10, x: 0, y: 4)
 
                             Image(systemName: "wineglass.fill")
-                                .font(.system(size: 34))
+                                .font(.system(size: 30))
                                 .foregroundColor(.white)
                         }
 
@@ -124,7 +131,7 @@ struct LoginView: View {
                         VStack { Divider() }
 
                         Text("or use an email")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .foregroundColor(.barTabSecondary)
 
                         VStack { Divider() }
@@ -150,7 +157,8 @@ struct LoginView: View {
                         ) {
 
                             Text("Email")
-                                .font(.headline)
+                                .font(.barTabCaption)
+                                .foregroundColor(.barTabSecondary)
 
                             TextField(
                                 "Your email",
@@ -159,17 +167,7 @@ struct LoginView: View {
                             .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
-                            .padding()
-                            .background(
-                                Color.barTabPrimary
-                                    .opacity(0.08)
-                            )
-                            .clipShape(
-                                RoundedRectangle(
-                                    cornerRadius: 12,
-                                    style: .continuous
-                                )
-                            )
+                            .textFieldStyle(BarTabFieldStyle())
                         }
 
                         VStack(
@@ -178,7 +176,8 @@ struct LoginView: View {
                         ) {
 
                             Text("Password")
-                                .font(.headline)
+                                .font(.barTabCaption)
+                                .foregroundColor(.barTabSecondary)
 
                             HStack {
                                 if showPassword {
@@ -204,19 +203,11 @@ struct LoginView: View {
                                 } label: {
                                     Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
                                         .foregroundColor(.barTabSecondary)
+                                        .font(.barTabCaption)
                                 }
                             }
-                            .padding()
-                            .background(
-                                Color.barTabPrimary
-                                    .opacity(0.08)
-                            )
-                            .clipShape(
-                                RoundedRectangle(
-                                    cornerRadius: 12,
-                                    style: .continuous
-                                )
-                            )
+                            .font(.barTabBody)
+                            .barTabFieldSurface()
                         }
 
                         if mode == .signIn {
@@ -226,7 +217,7 @@ struct LoginView: View {
                                     ForgotPasswordView()
                                 } label: {
                                     Text("Forgot Password?")
-                                        .font(.subheadline)
+                                        .font(.barTabBody)
                                         .foregroundColor(.barTabAccent)
                                 }
                             }
@@ -240,7 +231,8 @@ struct LoginView: View {
                             ) {
 
                                 Text("Confirm password")
-                                    .font(.headline)
+                                    .font(.barTabCaption)
+                                    .foregroundColor(.barTabSecondary)
 
                                 HStack {
                                     if showConfirmPassword {
@@ -262,19 +254,11 @@ struct LoginView: View {
                                     } label: {
                                         Image(systemName: showConfirmPassword ? "eye.slash.fill" : "eye.fill")
                                             .foregroundColor(.barTabSecondary)
+                                            .font(.barTabCaption)
                                     }
                                 }
-                                .padding()
-                                .background(
-                                    Color.barTabPrimary
-                                        .opacity(0.08)
-                                )
-                                .clipShape(
-                                    RoundedRectangle(
-                                        cornerRadius: 12,
-                                        style: .continuous
-                                    )
-                                )
+                                .font(.barTabBody)
+                                .barTabFieldSurface()
                             }
                         }
                     }
@@ -292,7 +276,7 @@ struct LoginView: View {
 
                             Text(submitTitle)
                         }
-                        .font(.headline)
+                        .font(.barTabHeading)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -315,18 +299,18 @@ struct LoginView: View {
 
                         Label {
                             Text(errorMessage)
-                                .font(.footnote)
+                                .font(.barTabTiny)
                                 .multilineTextAlignment(.leading)
                         } icon: {
                             Image(systemName: "exclamationmark.circle.fill")
                         }
-                        .foregroundColor(.red)
-                        .padding(12)
+                        .foregroundColor(.barTabDanger)
+                        .padding(BarTabSpacing.sm)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(
-                            Color.red.opacity(0.08),
+                            Color.barTabDanger.opacity(0.08),
                             in: RoundedRectangle(
-                                cornerRadius: 12,
+                                cornerRadius: BarTabRadius.control,
                                 style: .continuous
                             )
                         )
@@ -337,7 +321,7 @@ struct LoginView: View {
                     Text(
                         "Your account lives on BarTab's server. "
                     )
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .foregroundColor(.barTabSecondary)
                     .multilineTextAlignment(.center)
 

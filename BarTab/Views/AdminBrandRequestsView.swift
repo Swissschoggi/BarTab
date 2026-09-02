@@ -27,10 +27,10 @@ struct AdminBrandRequestsView: View {
                             .foregroundColor(.barTabPrimary)
 
                         Text("No brand requests yet")
-                            .font(.headline)
+                            .font(.barTabHeading)
 
                         Text("Requests for new brands will show up here.")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
@@ -45,7 +45,7 @@ struct AdminBrandRequestsView: View {
                             "\(barRepository.pendingBrandRequestCount) pending",
                             systemImage: "clock"
                         )
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.secondary)
 
                         Spacer()
@@ -82,11 +82,11 @@ struct AdminBrandRequestsView: View {
 
             HStack(spacing: 8) {
                 Image(systemName: "tag.fill")
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .foregroundColor(.barTabPrimary)
 
                 Text(request.name)
-                    .font(.headline)
+                    .font(.barTabHeading)
 
                 Spacer()
 
@@ -94,20 +94,20 @@ struct AdminBrandRequestsView: View {
             }
 
             Text(request.drink.displayName)
-                .font(.subheadline)
+                .font(.barTabBody)
                 .foregroundColor(.primary)
 
             HStack(spacing: 6) {
                 Text("by \(request.requestedByName)")
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .foregroundColor(.secondary)
 
                 Text("\u{00B7}")
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .foregroundColor(.secondary)
 
                 Text(relativeDate(request.createdAt))
-                    .font(.caption)
+                    .font(.barTabSmall)
                     .foregroundColor(.secondary)
 
                 Spacer()
@@ -120,7 +120,7 @@ struct AdminBrandRequestsView: View {
                         }
                     } label: {
                         Text("Reject")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .fontWeight(.semibold)
                             .foregroundColor(.red)
                     }
@@ -131,7 +131,7 @@ struct AdminBrandRequestsView: View {
                         }
                     } label: {
                         Text("Approve")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabPrimary)
                     }
@@ -141,7 +141,7 @@ struct AdminBrandRequestsView: View {
                         showingDeleteConfirmation = true
                     } label: {
                         Label("Remove", systemImage: "trash")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .fontWeight(.semibold)
                             .foregroundColor(.red)
                     }
@@ -165,7 +165,7 @@ struct AdminBrandRequestsView: View {
         }()
 
         return Text(label)
-            .font(.caption2)
+            .font(.barTabTiny)
             .fontWeight(.bold)
             .foregroundColor(.white)
             .padding(.horizontal, 8)

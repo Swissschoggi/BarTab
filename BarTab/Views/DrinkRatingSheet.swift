@@ -47,12 +47,12 @@ struct DrinkRatingSheet: View {
 
                         if let brand {
                             Text(brand)
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(.secondary)
                         }
 
                         Text(size.displayName)
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .foregroundColor(.secondary)
                     }
                     .padding(.top, 8)
@@ -66,12 +66,12 @@ struct DrinkRatingSheet: View {
                                         .foregroundColor(.yellow)
                                 }
                             }
-                            .font(.title2)
+                            .font(.barTabTitle)
 
                             Text(String(format: "%.1f", data.average))
-                                .font(.headline)
+                                .font(.barTabHeading)
                                 + Text(" from \(data.count) \(data.count == 1 ? "rating" : "ratings")")
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .foregroundColor(.secondary)
                         }
                         .frame(maxWidth: .infinity)
@@ -79,7 +79,7 @@ struct DrinkRatingSheet: View {
                         .barTabCard()
                     } else {
                         Text("No ratings yet   be the first!")
-                            .font(.subheadline)
+                            .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -89,7 +89,7 @@ struct DrinkRatingSheet: View {
                     // Your rating
                     VStack(spacing: 10) {
                         Text("Your rating")
-                            .font(.headline)
+                            .font(.barTabHeading)
 
                         HStack(spacing: 16) {
                             ForEach(1...5, id: \.self) { star in

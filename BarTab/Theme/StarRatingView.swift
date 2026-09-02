@@ -55,7 +55,7 @@ struct StarRatingSummaryView: View {
             Text(
                 "\(String(format: "%.1f", average)) (\(count))"
             )
-            .font(.caption)
+            .font(.barTabSmall)
             .foregroundColor(.secondary)
         }
     }

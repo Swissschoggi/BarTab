@@ -24,15 +24,15 @@ struct BadgeGridView: View {
                 if streak > 0 {
                     HStack(spacing: 12) {
                         Image(systemName: "flame.fill")
-                            .font(.title2)
+                            .font(.barTabTitle)
                             .foregroundColor(.orange)
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("\(streak)-day streak")
-                                .font(.headline)
+                                .font(.barTabHeading)
                                 .foregroundColor(.barTabText)
                             Text("Keep it going!")
-                                .font(.caption)
+                                .font(.barTabSmall)
                                 .foregroundColor(.barTabSecondary)
                         }
 
@@ -45,7 +45,7 @@ struct BadgeGridView: View {
                 // Earned badges
                 if !earnedBadges.isEmpty {
                     Text("Earned")
-                        .font(.headline)
+                        .font(.barTabHeading)
                         .foregroundColor(.barTabText)
 
                     LazyVGrid(columns: columns, spacing: 12) {
@@ -58,7 +58,7 @@ struct BadgeGridView: View {
                 // Unearned badges
                 if !unearnedBadges.isEmpty {
                     Text("Locked")
-                        .font(.headline)
+                        .font(.barTabHeading)
                         .foregroundColor(.barTabText)
 
                     LazyVGrid(columns: columns, spacing: 12) {
@@ -79,7 +79,7 @@ struct BadgeGridView: View {
     private func badgeCard(_ badge: Badge, earned: Bool) -> some View {
         VStack(spacing: 6) {
             Image(systemName: badge.icon)
-                .font(.title2)
+                .font(.barTabTitle)
                 .foregroundColor(earned ? .barTabPrimary : .barTabSecondary)
                 .frame(width: 44, height: 44)
                 .background(
@@ -90,13 +90,13 @@ struct BadgeGridView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             Text(badge.name)
-                .font(.caption)
+                .font(.barTabSmall)
                 .fontWeight(.semibold)
                 .foregroundColor(earned ? .barTabText : .barTabSecondary)
                 .lineLimit(1)
 
             Text(badge.description)
-                .font(.caption2)
+                .font(.barTabTiny)
                 .foregroundColor(.barTabSecondary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)

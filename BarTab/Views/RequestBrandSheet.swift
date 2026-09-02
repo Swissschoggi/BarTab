@@ -44,13 +44,13 @@ struct RequestBrandSheet: View {
                             .foregroundColor(.barTabPrimary)
 
                         Text("Request sent")
-                            .font(.headline)
+                            .font(.barTabHeading)
 
                         Text(
                             "We'll review \"\(trimmedName)\" and "
                             + "add it if it's a good fit."
                         )
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                     }
@@ -60,7 +60,7 @@ struct RequestBrandSheet: View {
                 } else {
 
                     Text("Requesting a \(drink.displayName.lowercased()) brand")
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.secondary)
 
                     TextField("Brand name", text: $name)
@@ -69,15 +69,15 @@ struct RequestBrandSheet: View {
 
                     if !trimmedName.isEmpty && trimmedName.count > InputValidator.maxBrandNameLength {
                         Text("Name must be \(InputValidator.maxBrandNameLength) characters or fewer.")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .foregroundColor(.orange)
                     } else if !trimmedName.isEmpty && alreadyExists {
                         Text("That brand is already in the list.")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .foregroundColor(.orange)
                     } else if !trimmedName.isEmpty && alreadyPending {
                         Text("You've already requested this brand.")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .foregroundColor(.orange)
                     }
 
@@ -87,7 +87,7 @@ struct RequestBrandSheet: View {
                         submit()
                     } label: {
                         Text("Send request")
-                            .font(.headline)
+                            .font(.barTabHeading)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .barTabPrimaryButton()

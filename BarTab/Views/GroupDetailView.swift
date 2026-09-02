@@ -38,20 +38,20 @@ struct GroupDetailView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
                                 Text("Members")
-                                    .font(.headline)
+                                    .font(.barTabHeading)
                                 Spacer()
                                 Button {
                                     showingInvite = true
                                 } label: {
                                     Image(systemName: "person.badge.plus")
-                                        .font(.subheadline)
+                                        .font(.barTabBody)
                                         .foregroundColor(.barTabPrimary)
                                 }
                                 Button {
                                     shareGroup()
                                 } label: {
                                     Image(systemName: "square.and.arrow.up")
-                                        .font(.subheadline)
+                                        .font(.barTabBody)
                                         .foregroundColor(.barTabPrimary)
                                 }
                             }
@@ -61,7 +61,7 @@ struct GroupDetailView: View {
                                     HStack(spacing: 4) {
                                         UserAvatarView(urlString: avatarCache[member.userID], displayName: userCache[member.userID], size: 20)
                                         Text(memberLabel(member))
-                                            .font(.caption)
+                                            .font(.barTabSmall)
                                             .fontWeight(.medium)
                                     }
                                     .padding(.horizontal, 10)
@@ -76,7 +76,7 @@ struct GroupDetailView: View {
                         // Polls section header
                         HStack {
                             Text("Polls")
-                                .font(.headline)
+                                .font(.barTabHeading)
                             Spacer()
                             Button {
                                 showingNewPoll = true
@@ -86,7 +86,7 @@ struct GroupDetailView: View {
                                     Text("New Poll")
                                         .fontWeight(.semibold)
                                 }
-                                .font(.subheadline)
+                                .font(.barTabBody)
                                 .foregroundColor(.barTabPrimary)
                             }
                         }
@@ -97,7 +97,7 @@ struct GroupDetailView: View {
                                     .font(.barTabEmptyIcon)
                                     .foregroundColor(.barTabPrimary)
                                 Text("No polls yet")
-                                    .font(.subheadline)
+                                    .font(.barTabBody)
                                     .foregroundColor(.barTabSecondary)
                             }
                             .frame(maxWidth: .infinity)
@@ -124,7 +124,7 @@ struct GroupDetailView: View {
                             }
                             .buttonStyle(.plain)
                             .padding(.vertical, 12)
-                            .background(Color.red.opacity(0.08))
+                            .background(Color.barTabDanger.opacity(0.08))
                             .foregroundColor(.red)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
@@ -137,7 +137,7 @@ struct GroupDetailView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .padding(.vertical, 12)
-                                .background(Color.red.opacity(0.15))
+                                .background(Color.barTabDanger.opacity(0.15))
                                 .foregroundColor(.red)
                                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             }
@@ -340,11 +340,11 @@ struct PollCard: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text(poll.title)
-                    .font(.headline)
+                    .font(.barTabHeading)
                 Spacer()
                 if isOpen {
                     Text("Active")
-                        .font(.caption2)
+                        .font(.barTabTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .padding(.horizontal, 8)
@@ -353,7 +353,7 @@ struct PollCard: View {
                         .clipShape(Capsule())
                 } else {
                     Text("Closed")
-                        .font(.caption2)
+                        .font(.barTabTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.barTabSecondary)
                         .padding(.horizontal, 8)
@@ -373,9 +373,9 @@ struct PollCard: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "xmark.circle")
-                            .font(.caption)
+                            .font(.barTabSmall)
                         Text("Close poll")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .fontWeight(.medium)
                     }
                     .foregroundColor(.red)
@@ -431,13 +431,13 @@ struct PollCard: View {
                         .foregroundColor(selected ? .barTabPrimary : .barTabSecondary)
 
                     Text(option.label)
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .foregroundColor(.barTabText)
 
                     Spacer()
 
                     Text("\(voteCount)")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .fontWeight(.bold)
                         .foregroundColor(.barTabAccent)
                 }
@@ -446,9 +446,9 @@ struct PollCard: View {
                    let bar = barRepository.getBar(id: barID) {
                     HStack(spacing: 4) {
                         Image(systemName: "mappin.circle.fill")
-                            .font(.caption2)
+                            .font(.barTabTiny)
                         Text(bar.name)
-                            .font(.caption2)
+                            .font(.barTabTiny)
                             .foregroundColor(.barTabSecondary)
                     }
                     .padding(.leading, 26)

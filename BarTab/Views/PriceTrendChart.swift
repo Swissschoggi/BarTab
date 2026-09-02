@@ -209,7 +209,7 @@ struct PriceTrendChart: View {
                 .frame(width: 10, height: 10)
 
             Text("Only one report so far   add another to see a trend.")
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.secondary)
         }
         .frame(
@@ -223,7 +223,7 @@ struct PriceTrendChart: View {
     ) -> some View {
 
         Text(message)
-            .font(.caption)
+            .font(.barTabSmall)
             .foregroundColor(.secondary)
             .frame(
                 maxWidth: .infinity,

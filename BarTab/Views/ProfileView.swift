@@ -159,7 +159,7 @@ struct ProfileView: View {
 
             if let fetchedAt = barRepository.lastFetchedAt {
                 Text("Data updated \(fetchedAt.relativeFormatted)")
-                    .font(.caption2)
+                    .font(.barTabTiny)
                     .foregroundColor(.barTabSecondary)
                     .padding(.top, 2)
             }
@@ -177,12 +177,12 @@ struct ProfileView: View {
                 VStack(alignment: .leading, spacing: 2) {
 
                     Text(user.username)
-                        .font(.headline)
+                        .font(.barTabHeading)
                         .fontWeight(.bold)
                         .foregroundColor(.barTabText)
 
                     Text("Member since \(user.createdAt.formatted(date: .abbreviated, time: .omitted))")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.barTabSecondary)
 
                     PhotosPicker(
@@ -190,7 +190,7 @@ struct ProfileView: View {
                         matching: .images
                     ) {
                         Text(isUploadingAvatar ? "Uploading…" : "Change photo")
-                            .font(.caption)
+                            .font(.barTabSmall)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabPrimary)
                     }
@@ -206,7 +206,7 @@ struct ProfileView: View {
             // Level + progress
             HStack(spacing: 12) {
                 Image(systemName: currentLevel.icon)
-                    .font(.body)
+                    .font(.barTabBody)
                     .foregroundColor(.white)
                     .frame(width: 32, height: 32)
                     .background(Color.barTabAccent)
@@ -214,17 +214,17 @@ struct ProfileView: View {
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(currentLevel.name)
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .fontWeight(.semibold)
                         .foregroundColor(.barTabText)
 
                     if let remaining = UserLevel.remaining(for: totalContributions) {
                         Text("\(remaining) more to next level")
-                            .font(.caption2)
+                            .font(.barTabTiny)
                             .foregroundColor(.barTabSecondary)
                     } else {
                         Text("Max level reached!")
-                            .font(.caption2)
+                            .font(.barTabTiny)
                             .foregroundColor(.barTabAccent)
                     }
                 }
@@ -232,7 +232,7 @@ struct ProfileView: View {
                 Spacer()
 
                 Text("\(totalContributions)")
-                    .font(.title3)
+                    .font(.barTabHeading)
                     .fontWeight(.bold)
                     .foregroundColor(.barTabAccent)
             }
@@ -263,7 +263,7 @@ struct ProfileView: View {
         VStack(alignment: .leading, spacing: 10) {
 
             Text("Your activity")
-                .font(.headline)
+                .font(.barTabHeading)
 
             HStack(spacing: 10) {
                 statisticCard(
@@ -324,7 +324,7 @@ struct ProfileView: View {
     private var savedSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Saved")
-                .font(.headline)
+                .font(.barTabHeading)
 
             VStack(spacing: 0) {
                 if !barRepository.favoriteBars.isEmpty {
@@ -367,7 +367,7 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 10) {
 
                 Text("Admin")
-                    .font(.headline)
+                    .font(.barTabHeading)
 
                 navigationRow(
                     title: String(localized: "Reported content"),
@@ -401,7 +401,7 @@ struct ProfileView: View {
     private var socialSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Social")
-                .font(.headline)
+                .font(.barTabHeading)
 
             socialRows
         }
@@ -450,7 +450,7 @@ struct ProfileView: View {
         VStack(alignment: .leading, spacing: 10) {
 
             Text("Account")
-                .font(.headline)
+                .font(.barTabHeading)
 
             Button {
                 showingSettings = true
@@ -465,7 +465,7 @@ struct ProfileView: View {
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.secondary)
                 }
                 .barTabCard()
@@ -484,7 +484,7 @@ struct ProfileView: View {
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.secondary)
                 }
                 .barTabCard()
@@ -516,7 +516,7 @@ struct ProfileView: View {
                 .foregroundColor(.barTabPrimary)
 
             Text("You're not signed in")
-                .font(.title3)
+                .font(.barTabHeading)
                 .fontWeight(.semibold)
 
             Text("Sign in to add bars, report drinks and keep track of your contributions.")
@@ -527,7 +527,7 @@ struct ProfileView: View {
                 showingLogin = true
             } label: {
                 Text("Sign In")
-                    .font(.headline)
+                    .font(.barTabHeading)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .barTabPrimaryButton()
@@ -585,7 +585,7 @@ struct ProfileView: View {
                 )
 
             Image(systemName: "person.fill")
-                .font(.title3)
+                .font(.barTabHeading)
                 .foregroundColor(.white)
         }
     }
@@ -621,19 +621,19 @@ struct ProfileView: View {
         VStack(alignment: .leading, spacing: 8) {
 
             Image(systemName: icon)
-                .font(.subheadline)
+                .font(.barTabBody)
                 .foregroundColor(.barTabPrimary)
                 .frame(width: 28, height: 28)
                 .background(Color.barTabPrimary.opacity(0.08))
                 .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
 
             Text("\(value)")
-                .font(.title3)
+                .font(.barTabHeading)
                 .fontWeight(.bold)
                 .foregroundColor(.barTabText)
 
             Text(title)
-                .font(.caption)
+                .font(.barTabSmall)
                 .foregroundColor(.barTabSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -654,7 +654,7 @@ struct ProfileView: View {
             HStack(spacing: 12) {
 
                 Image(systemName: icon)
-                    .font(.subheadline)
+                    .font(.barTabBody)
                     .foregroundColor(.barTabPrimary)
                     .frame(width: 28, height: 28)
                     .background(Color.barTabPrimary.opacity(0.08))
@@ -663,19 +663,19 @@ struct ProfileView: View {
                 VStack(alignment: .leading, spacing: 1) {
 
                     Text(title)
-                        .font(.subheadline)
+                        .font(.barTabBody)
                         .fontWeight(.medium)
                         .foregroundColor(.barTabText)
 
                     Text(subtitle)
-                        .font(.caption)
+                        .font(.barTabSmall)
                         .foregroundColor(.barTabSecondary)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.caption2)
+                    .font(.barTabTiny)
                     .foregroundColor(.barTabSecondary)
             }
             .barTabCard()
