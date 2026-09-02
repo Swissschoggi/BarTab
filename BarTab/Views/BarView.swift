@@ -29,8 +29,6 @@ struct BarView: View {
     @State private var showingDeleteGroupConfirmation = false
 
     @State private var showingRateBar = false
-    @State private var showingSmokingConfirmation = false
-    @State private var showingOutdoorConfirmation = false
     @State private var ratingDrinkGroup: PriceGroup?
     @State private var showingDrinkRating = false
     @State private var alertDrinkGroup: PriceGroup?
@@ -213,13 +211,6 @@ struct BarView: View {
                         .fontWeight(.semibold)
                 }
 
-                if ambienceCount > 0 {
-                    Text("·")
-                        .foregroundColor(.barTabSecondary)
-                    Image(systemName: "star.fill")
-                    Text("\(ambienceCount)")
-                }
-
                 Spacer()
             }
             .font(.barTabTiny)
@@ -257,7 +248,7 @@ struct BarView: View {
                 }
             } label: {
                 HStack(spacing: 7) {
-                    Image(systemName: hasCheckedIn ? "checkmark" : "location.fill")
+                    Image(systemName: hasCheckedIn ? "checkmark.circle.fill" : "figure.walk")
                     Text(hasCheckedIn ? "You're here" : "I'm here")
 
                     if busyCount > 0 {
@@ -307,24 +298,37 @@ struct BarView: View {
     // MARK: - Compact info
 
     private var compactInfoRow: some View {
-        HStack(spacing: 10) {
-            if currentBar.outdoorSeating {
-                compactInfoItem(icon: "sun.max.fill", text: "Outdoor")
+        let attributes = barRepository.allAttributeConsensus(for: currentBar, currentUser: userSession.currentUser)
+        return HStack(spacing: 6) {
+            ForEach(attributes.prefix(4)) { attr in
+                ConsensusChip(attribute: attr) {
+                    selectedAttribute = attr
+                    showingAttributeDetail = true
+                }
             }
 
-            if currentBar.smokingFriendly {
-                compactInfoItem(icon: "smoke.fill", text: "Smoking")
-            }
-
-            if !ambienceStyles.isEmpty {
-                compactInfoItem(
-                    icon: ambienceStyles[0].icon,
-                    text: ambienceStyles[0].displayName
-                )
+            if attributes.count > 4 {
+                Button {
+                    showingAllAttributes = true
+                } label: {
+                    Text("+\(attributes.count - 4) more")
+                        .font(.barTabTiny)
+                        .fontWeight(.medium)
+                        .foregroundColor(.barTabSecondary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.barTabSurface)
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule().stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        )
+                }
+                .buttonStyle(.plain)
             }
 
             Spacer()
 
+            // Rate button
             Button {
                 showingRateBar = true
             } label: {
@@ -335,19 +339,78 @@ struct BarView: View {
                 .font(.barTabTiny)
                 .fontWeight(.semibold)
                 .foregroundColor(.barTabAccent)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.barTabAccent.opacity(0.1))
+                .clipShape(Capsule())
             }
             .buttonStyle(.plain)
         }
         .padding(.bottom, 1)
     }
 
-    private func compactInfoItem(icon: String, text: String) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-            Text(text)
+    @State private var selectedAttribute: BarAttribute?
+    @State private var showingAttributeDetail = false
+    @State private var showingAllAttributes = false
+
+    // Consensus chip showing community consensus with confirm/report action
+    private struct ConsensusChip: View {
+        let attribute: BarAttribute
+        let action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                HStack(spacing: 4) {
+                    Image(systemName: attribute.key.icon)
+                        .font(.barTabTiny)
+                    if let value = attribute.consensusValue {
+                        Text(value)
+                            .font(.barTabTiny)
+                            .fontWeight(.medium)
+                        // Confidence indicator
+                        if attribute.consensusConfidence > 0 {
+                            Text("\(attribute.consensusConfidence)%")
+                                .font(.system(size: 8, weight: .bold))
+                                .foregroundColor(confidenceColor(attribute.consensusConfidence))
+                                .padding(.horizontal, 3)
+                                .padding(.vertical, 1)
+                                .background(confidenceColor(attribute.consensusConfidence).opacity(0.15))
+                                .clipShape(Capsule())
+                        }
+                    } else {
+                        Text("Unknown")
+                            .font(.barTabTiny)
+                            .foregroundColor(.barTabSecondary)
+                    }
+                }
+                .foregroundColor(attribute.consensusValue != nil ? .barTabPrimary : .barTabSecondary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(
+                    attribute.consensusValue != nil
+                    ? Color.barTabPrimary.opacity(0.1)
+                    : Color.barTabSurface
+                )
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule().stroke(
+                        attribute.consensusValue != nil
+                        ? Color.barTabCardBorder
+                        : Color.barTabCardBorder,
+                        lineWidth: 0.5
+                    )
+                )
+            }
+            .buttonStyle(.plain)
         }
-        .font(.barTabTiny)
-        .foregroundColor(.barTabSecondary)
+
+        func confidenceColor(_ pct: Int) -> Color {
+            switch pct {
+            case 80...100: return .barTabSuccess
+            case 50..<80: return .barTabWarning
+            default: return .barTabDanger
+            }
+        }
     }
 
     // MARK: - Directions
@@ -975,50 +1038,27 @@ struct BarView: View {
             } message: {
                 Text("This removes all entries for this drink at this bar. This can't be undone.")
             }
-            .confirmationDialog(
-                currentBar.smokingFriendly ? "Remove smoking policy?" : "Mark as smoking friendly?",
-                isPresented: $showingSmokingConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button(currentBar.smokingFriendly ? "Remove" : "Confirm") {
-                    Task {
-                        let barToUpdate = currentBar
-                        await barRepository.toggleSmokingPolicy(for: barToUpdate)
-                        if let latest = barRepository.getBar(id: bar.id) {
-                            currentBar = latest
-                        }
-                    }
+            .sheet(isPresented: $showingAttributeDetail) {
+                if let attr = selectedAttribute,
+                   let user = userSession.currentUser {
+                    AttributeDetailSheet(
+                        bar: currentBar,
+                        attribute: attr,
+                        currentUser: user
+                    )
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+                    .environmentObject(toastCenter)
                 }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text(
-                    currentBar.smokingFriendly
-                        ? "This bar will be marked as no smoking."
-                        : "This bar will be marked as smoking friendly."
-                )
             }
-            .confirmationDialog(
-                currentBar.outdoorSeating ? "Remove outdoor seating?" : "Mark as outdoor seating?",
-                isPresented: $showingOutdoorConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button(currentBar.outdoorSeating ? "Remove" : "Confirm") {
-                    HapticEngine.impact()
-                    Task {
-                        let barToUpdate = currentBar
-                        await barRepository.toggleOutdoorSeating(for: barToUpdate)
-                        if let latest = barRepository.getBar(id: bar.id) {
-                            currentBar = latest
-                        }
-                    }
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text(
-                    currentBar.outdoorSeating
-                        ? "This bar will be marked as indoor only."
-                        : "This bar will be marked as having outdoor seating."
+            .sheet(isPresented: $showingAllAttributes) {
+                AllAttributesSheet(
+                    bar: currentBar,
+                    currentUser: userSession.currentUser
                 )
+                .environmentObject(barRepository)
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
             }
     }
 

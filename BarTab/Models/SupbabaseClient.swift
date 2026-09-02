@@ -1489,4 +1489,60 @@ final class SupabaseClient {
 
         _ = try await performAuthorized(request)
     }
+
+    // MARK: - Bar Attribute Reports
+
+    /// Fetch attribute reports for a specific bar
+    func fetchAttributeReports(for barID: UUID) async throws -> [BarAttributeReport] {
+        let request = try makeRequest(
+            endpoint: "bar_attribute_reports?bar_id=eq.\(barID.uuidString)&select=*"
+        )
+        let data = try await performAuthorized(request)
+        let dtos = try decoder.decode([BarAttributeReportDTO].self, from: data)
+        return dtos.map { $0.toDomain }
+    }
+
+    /// Fetch all attribute reports (for activity feed, etc.)
+    func fetchAllAttributeReports() async throws -> [BarAttributeReport] {
+        let request = try makeRequest(endpoint: "bar_attribute_reports?select=*")
+        let data = try await performAuthorized(request)
+        let dtos = try decoder.decode([BarAttributeReportDTO].self, from: data)
+        return dtos.map { $0.toDomain }
+    }
+
+    /// Submit or update an attribute report (upsert on bar_id, user_id, attribute_key)
+    func upsertAttributeReport(_ report: BarAttributeReport) async throws {
+        var request = try makeRequest(
+            endpoint: "bar_attribute_reports?on_conflict=bar_id,user_id,attribute_key",
+            method: "POST"
+        )
+        request.setValue(
+            "resolution=merge-duplicates,return=representation",
+            forHTTPHeaderField: "Prefer"
+        )
+        let dto = BarAttributeReportDTO(from: report)
+        request.httpBody = try encoder.encode(dto)
+        _ = try await performAuthorized(request)
+    }
+
+    /// Delete an attribute report
+    func deleteAttributeReport(_ reportID: UUID) async throws {
+        let request = try makeRequest(
+            endpoint: "bar_attribute_reports?id=eq.\(reportID.uuidString)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    /// Get consensus for a specific attribute at a bar using the database function
+    func fetchAttributeConsensus(barID: UUID, attributeKey: String) async throws -> [AttributeConsensus] {
+        // Use RPC to call the database function
+        let request = try makeRequest(
+            endpoint: "rpc/get_attribute_consensus?p_bar_id=\(barID.uuidString)&p_attribute_key=\(attributeKey)",
+            method: "POST"
+        )
+        let data = try await performAuthorized(request)
+        let dtos = try decoder.decode([AttributeConsensusDTO].self, from: data)
+        return dtos.map { $0.toDomain }
+    }
 }

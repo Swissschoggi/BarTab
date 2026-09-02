@@ -16,6 +16,10 @@ final class BarRepository: ObservableObject {
     @Published private(set) var barCheckins: [BarCheckin] = []
     @Published private(set) var defaultCurrency: Currency = Currency.defaultCurrency
 
+    // MARK: - Attribute Reports
+    @Published private(set) var attributeReports: [BarAttributeReport] = []
+    private var attributeConsensusCache: [String: [AttributeConsensus]] = [:]
+
     private var latestVerificationByPriceID: [UUID: Date] = [:]
     private var verificationCountByPriceID: [UUID: Int] = [:]
 
@@ -82,6 +86,7 @@ final class BarRepository: ObservableObject {
         async let fetchedReports = SupabaseClient.shared.fetchContentReports()
         async let fetchedVerifications = SupabaseClient.shared.fetchPriceVerifications()
         async let fetchedCheckins = SupabaseClient.shared.fetchBarCheckins()
+        async let fetchedAttributeReports = SupabaseClient.shared.fetchAllAttributeReports()
 
         if let bars = try? await fetchedBars {
             self.bars = bars
@@ -107,6 +112,9 @@ final class BarRepository: ObservableObject {
         }
         if let checkins = try? await fetchedCheckins {
             self.barCheckins = checkins
+        }
+        if let attributeReports = try? await fetchedAttributeReports {
+            self.attributeReports = attributeReports
         }
 
         // Merge the server-approved catalog with the bundled defaults,
@@ -808,50 +816,6 @@ final class BarRepository: ObservableObject {
         saveFavoritesToDisk()
     }
 
-    func toggleSmokingPolicy(for bar: Bar) async {
-        guard let index = bars.firstIndex(where: { $0.id == bar.id }) else { return }
-        let currentValue = bars[index].smokingFriendly
-        let updated = Bar(
-            id: bar.id,
-            name: bar.name,
-            address: bar.address,
-            coordinate: bar.coordinate,
-            createdAt: bar.createdAt,
-            createdBy: bar.createdBy,
-            smokingFriendly: !currentValue,
-            outdoorSeating: bars[index].outdoorSeating
-        )
-
-        do {
-            try await SupabaseClient.shared.updateBar(updated)
-            bars[index] = updated
-        } catch {
-            toastCenter?.showError(error)
-        }
-    }
-
-    func toggleOutdoorSeating(for bar: Bar) async {
-        guard let index = bars.firstIndex(where: { $0.id == bar.id }) else { return }
-        let currentValue = bars[index].outdoorSeating
-        let updated = Bar(
-            id: bar.id,
-            name: bar.name,
-            address: bar.address,
-            coordinate: bar.coordinate,
-            createdAt: bar.createdAt,
-            createdBy: bar.createdBy,
-            smokingFriendly: bars[index].smokingFriendly,
-            outdoorSeating: !currentValue
-        )
-
-        do {
-            try await SupabaseClient.shared.updateBar(updated)
-            bars[index] = updated
-        } catch {
-            toastCenter?.showError(error)
-        }
-    }
-
     func getPrices(reportedBy user: User) -> [Price] {
         prices.filter { $0.reportedBy == user.id }
     }
@@ -1209,6 +1173,122 @@ final class BarRepository: ObservableObject {
 
         barCheckins.removeAll { $0.barID == bar.id && $0.userID == user.id }
         return true
+    }
+
+    // MARK: - Bar Attribute Reports
+
+    func attributeReports(for bar: Bar) -> [BarAttributeReport] {
+        attributeReports.filter { $0.barID == bar.id }
+    }
+
+    func myAttributeReport(for bar: Bar, attributeKey: String, by user: User) -> BarAttributeReport? {
+        attributeReports.first {
+            $0.barID == bar.id &&
+            $0.attributeKey == attributeKey &&
+            $0.userID == user.id
+        }
+    }
+
+    func attributeConsensus(for bar: Bar, attributeKey: String) -> [AttributeConsensus] {
+        let cacheKey = "\(bar.id.uuidString)|\(attributeKey)"
+        if let cached = attributeConsensusCache[cacheKey] {
+            return cached
+        }
+        // Fallback to local computation if not cached
+        let reports = attributeReports(for: bar).filter { $0.attributeKey == attributeKey }
+        let consensus = computeConsensus(from: reports)
+        attributeConsensusCache[cacheKey] = consensus
+        return consensus
+    }
+
+    func allAttributeConsensus(for bar: Bar, currentUser: User?) -> [BarAttribute] {
+        let keys = BarAttributeKey.allCases
+        return keys.compactMap { key in
+            let reports = attributeReports(for: bar).filter { $0.attributeKey == key.rawValue }
+            let consensus = computeConsensus(from: reports)
+            let myReport = reports.first { $0.userID == currentUser?.id }
+            guard !consensus.isEmpty || myReport != nil else { return nil }
+            return BarAttribute(key: key, consensus: consensus, myReport: myReport)
+        }
+    }
+
+    private func computeConsensus(from reports: [BarAttributeReport]) -> [AttributeConsensus] {
+        let recentReports = reports.filter {
+            Date().timeIntervalSince($0.createdAt) <= 365 * 24 * 60 * 60
+        }
+        let grouped = Dictionary(grouping: recentReports, by: \.attributeValue)
+        let now = Date()
+
+        return grouped.map { value, reports in
+            let count = reports.count
+            let lastConfirmed = reports.map(\.createdAt).max() ?? .distantPast
+            let avgAge = reports.reduce(0.0) { $0 + now.timeIntervalSince($1.createdAt) } / Double(count)
+            let recencyScore = max(0.0, 1.0 - avgAge / (365 * 24 * 60 * 60))
+            let volumeScore = min(Double(count) / 10.0, 1.0)
+            // Simple agreement score based on how concentrated the reports are
+            let agreementScore = Double(count) / Double(recentReports.count)
+
+            let confidence = Int(round((volumeScore * 0.35 + recencyScore * 0.40 + agreementScore * 0.25) * 100))
+
+            return AttributeConsensus(
+                value: value,
+                reportCount: count,
+                confidencePct: min(confidence, 100),
+                lastConfirmedAt: lastConfirmed
+            )
+        }.sorted { $0.reportCount > $1.reportCount }
+    }
+
+    func submitAttributeReport(
+        for bar: Bar,
+        attributeKey: String,
+        value: String,
+        evidenceText: String? = nil,
+        evidencePhotoURL: URL? = nil,
+        by user: User
+    ) async {
+        let existing = myAttributeReport(for: bar, attributeKey: attributeKey, by: user)
+
+        let report = BarAttributeReport(
+            id: existing?.id ?? UUID(),
+            barID: bar.id,
+            userID: user.id,
+            attributeKey: attributeKey,
+            attributeValue: value,
+            evidenceText: evidenceText,
+            evidencePhotoURL: evidencePhotoURL,
+            createdAt: existing?.createdAt ?? Date(),
+            updatedAt: Date()
+        )
+
+        do {
+            try await SupabaseClient.shared.upsertAttributeReport(report)
+
+            // Update local cache
+            if let existing, let index = attributeReports.firstIndex(where: { $0.id == existing.id }) {
+                attributeReports[index] = report
+            } else {
+                attributeReports.append(report)
+            }
+
+            // Invalidate consensus cache
+            attributeConsensusCache["\(bar.id.uuidString)|\(attributeKey)"] = nil
+
+            checkBadgesAfterContribution(for: user)
+        } catch {
+            toastCenter?.showError(error)
+        }
+    }
+
+    func deleteAttributeReport(_ report: BarAttributeReport, by user: User) async {
+        guard report.userID == user.id else { return }
+
+        do {
+            try await SupabaseClient.shared.deleteAttributeReport(report.id)
+            attributeReports.removeAll { $0.id == report.id }
+        } catch {
+            toastCenter?.showError(error)
+        }
     }
 
     // MARK: - Badges

@@ -364,24 +364,59 @@ struct ProfileDTO: Codable, Identifiable {
     let avatar_url: String?
 }
 
-struct ProfileNameRow: Codable {
-    let id: UUID
-    let displayName: String?
+// MARK: - Bar Attribute Report DTO
 
-    enum CodingKeys: String, CodingKey {
-        case id
-        case displayName = "display_name"
+struct BarAttributeReportDTO: Codable {
+    let id: UUID
+    let bar_id: UUID
+    let user_id: UUID
+    let attribute_key: String
+    let attribute_value: String
+    let evidence_text: String?
+    let evidence_photo_url: String?
+    let created_at: Date
+    let updated_at: Date
+
+    var toDomain: BarAttributeReport {
+        BarAttributeReport(
+            id: id,
+            barID: bar_id,
+            userID: user_id,
+            attributeKey: attribute_key,
+            attributeValue: attribute_value,
+            evidenceText: evidence_text,
+            evidencePhotoURL: evidence_photo_url.flatMap { URL(string: $0) },
+            createdAt: created_at,
+            updatedAt: updated_at
+        )
+    }
+
+    init(from domain: BarAttributeReport) {
+        self.id = domain.id
+        self.bar_id = domain.barID
+        self.user_id = domain.userID
+        self.attribute_key = domain.attributeKey
+        self.attribute_value = domain.attributeValue
+        self.evidence_text = domain.evidenceText
+        self.evidence_photo_url = domain.evidencePhotoURL?.absoluteString
+        self.created_at = domain.createdAt
+        self.updated_at = domain.updatedAt
     }
 }
 
-struct ProfileAvatarRow: Codable, Identifiable {
-    let id: UUID
-    let displayName: String?
-    let avatarURL: String?
+/// Consensus row from the database function
+struct AttributeConsensusDTO: Codable {
+    let value: String
+    let report_count: Int
+    let confidence_pct: Int
+    let last_confirmed_at: Date
 
-    enum CodingKeys: String, CodingKey {
-        case id
-        case displayName = "display_name"
-        case avatarURL = "avatar_url"
+    var toDomain: AttributeConsensus {
+        AttributeConsensus(
+            value: value,
+            reportCount: report_count,
+            confidencePct: confidence_pct,
+            lastConfirmedAt: last_confirmed_at
+        )
     }
 }
