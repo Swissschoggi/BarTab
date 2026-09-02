@@ -57,7 +57,7 @@ struct PriceAlertListView: View {
                 .foregroundColor(.barTabAccent)
                 .frame(width: 32, height: 32)
                 .background(Color.barTabAccent.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(alert.drink)

@@ -162,7 +162,7 @@ struct AdminReportsView: View {
                 )
                 .font(.barTabSmall)
                 .fontWeight(.semibold)
-                .foregroundColor(.green)
+                .foregroundColor(.barTabSuccess)
             }
         }
     }
@@ -194,7 +194,7 @@ struct AdminReportsView: View {
                     Label("Remove", systemImage: "trash")
                         .font(.barTabSmall)
                         .fontWeight(.semibold)
-                        .foregroundColor(.red)
+                        .foregroundColor(.barTabDanger)
                 }
             } else {
                 Button {

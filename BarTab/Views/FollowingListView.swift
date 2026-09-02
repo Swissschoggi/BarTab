@@ -78,7 +78,7 @@ struct FollowingListView: View {
                 Text("Unfollow")
                     .font(.barTabSmall)
                     .fontWeight(.medium)
-                    .foregroundColor(.red)
+                    .foregroundColor(.barTabDanger)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
                     .background(Color.barTabDanger.opacity(0.08))

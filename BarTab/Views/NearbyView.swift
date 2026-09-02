@@ -1102,9 +1102,9 @@ private struct LocationSearchSheet: View {
                 }
                 .padding(14)
                 .background(Color.barTabCardFill)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
                         .stroke(Color.barTabPrimary.opacity(0.25), lineWidth: 1)
                 )
                 .padding()

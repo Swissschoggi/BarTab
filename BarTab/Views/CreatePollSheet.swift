@@ -95,7 +95,7 @@ struct CreatePollSheet: View {
                 } footer: {
                     if filledOptionCount < 2 {
                         Text("Add at least 2 options to create a poll.")
-                            .foregroundColor(.red)
+                            .foregroundColor(.barTabDanger)
                     } else {
                         Text("Add bars, drinks, or whatever you're deciding on. Link bars to show their location in the poll.")
                     }

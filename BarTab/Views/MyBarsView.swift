@@ -170,7 +170,7 @@ struct MyBarsView: View {
                 ZStack {
 
                     RoundedRectangle(
-                        cornerRadius: 12,
+                        cornerRadius: BarTabRadius.control,
                         style: .continuous
                     )
                     .fill(

@@ -97,14 +97,8 @@ struct GroupPlanningView: View {
                 .font(.barTabHeading)
                 .foregroundColor(.white)
                 .frame(width: 40, height: 40)
-                .background(
-                    LinearGradient(
-                        colors: [.barTabPrimary, .barTabPrimary.opacity(0.8)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .background(Color.barTabPrimary)
+                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(group.name)

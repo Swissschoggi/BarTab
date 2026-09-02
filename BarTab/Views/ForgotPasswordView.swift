@@ -53,7 +53,7 @@ struct ForgotPasswordView: View {
                             .autocapitalization(.none)
                             .padding()
                             .background(Color.barTabPrimary.opacity(0.08))
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
                     }
 
                     Button {
@@ -74,7 +74,7 @@ struct ForgotPasswordView: View {
                                 ? Color.barTabPrimary
                                 : Color.gray
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
                     }
                     .disabled(!isEmailValid || isSubmitting)
                 }

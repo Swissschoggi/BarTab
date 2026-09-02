@@ -55,15 +55,8 @@ struct MapView: View {
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(.white)
                                 .frame(width: 32, height: 32)
-                                .background(
-                                    LinearGradient(
-                                        colors: [Color.barTabPrimary, Color.barTabPrimary.opacity(0.8)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                                .shadow(color: Color.barTabPrimary.opacity(0.3), radius: 4, x: 0, y: 2)
+                                .background(Color.barTabPrimary)
+                                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 
                             Image(systemName: "triangle.fill")
                                 .font(.system(size: 6))
@@ -85,15 +78,8 @@ struct MapView: View {
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(width: 44, height: 44)
-                        .background(
-                            LinearGradient(
-                                colors: [Color.barTabPrimary, Color.barTabPrimary.opacity(0.85)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .shadow(color: Color.barTabPrimary.opacity(0.3), radius: 6, x: 0, y: 3)
+                        .background(Color.barTabPrimary)
+                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
                 }
                 .accessibilityLabel("Add bar")
 
@@ -105,8 +91,7 @@ struct MapView: View {
                         .foregroundColor(.barTabPrimary)
                         .frame(width: 44, height: 44)
                         .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 3)
+                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
                 }
                 .accessibilityLabel("Center on my location")
             }

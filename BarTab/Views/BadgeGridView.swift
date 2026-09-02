@@ -87,7 +87,7 @@ struct BadgeGridView: View {
                         ? Color.barTabPrimary.opacity(0.1)
                         : Color.gray.opacity(0.1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 
             Text(badge.name)
                 .font(.barTabSmall)
@@ -105,11 +105,11 @@ struct BadgeGridView: View {
         .padding(.vertical, 10)
         .padding(.horizontal, 6)
         .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
                 .fill(earned ? Color.barTabCardFill : Color.barTabCardFill.opacity(0.5))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
                 .stroke(earned ? Color.barTabPrimary.opacity(0.2) : Color.clear, lineWidth: 1)
         )
         .opacity(earned ? 1.0 : 0.6)

@@ -125,8 +125,8 @@ struct GroupDetailView: View {
                             .buttonStyle(.plain)
                             .padding(.vertical, 12)
                             .background(Color.barTabDanger.opacity(0.08))
-                            .foregroundColor(.red)
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .foregroundColor(.barTabDanger)
+                            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 
                             if isAdmin {
                                 Button {
@@ -138,8 +138,8 @@ struct GroupDetailView: View {
                                 .buttonStyle(.plain)
                                 .padding(.vertical, 12)
                                 .background(Color.barTabDanger.opacity(0.15))
-                                .foregroundColor(.red)
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .foregroundColor(.barTabDanger)
+                                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
                             }
                         }
                     }
@@ -378,7 +378,7 @@ struct PollCard: View {
                             .font(.barTabSmall)
                             .fontWeight(.medium)
                     }
-                    .foregroundColor(.red)
+                    .foregroundColor(.barTabDanger)
                 }
                 .padding(.top, 4)
             }
@@ -456,10 +456,10 @@ struct PollCard: View {
             }
             .padding(10)
             .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous)
                     .fill(selected ? Color.barTabPrimary.opacity(0.08) : Color.clear)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous)
                             .stroke(selected ? Color.barTabPrimary.opacity(0.3) : Color.barTabCardBorder, lineWidth: 1)
                     )
             )

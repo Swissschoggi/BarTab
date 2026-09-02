@@ -110,9 +110,9 @@ struct BarHopView: View {
                                 }
                                 .padding(12)
                                 .background(Color.barTabCardFill)
-                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
                                         .stroke(Color.barTabCardBorder, lineWidth: 0.5)
                                 )
                             }

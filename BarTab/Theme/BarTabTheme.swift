@@ -1,9 +1,6 @@
 import SwiftUI
 
 // MARK: - Spacing scale
-//
-// One 4pt-based scale used everywhere instead of ad-hoc padding numbers,
-// so rhythm stays consistent across all 40+ screens.
 
 enum BarTabSpacing {
     static let xxs: CGFloat = 4
@@ -16,44 +13,34 @@ enum BarTabSpacing {
 }
 
 // MARK: - Corner radius scale
-//
-// Radius now communicates hierarchy instead of being one flat 24 on
-// everything: bigger surfaces get more room to breathe, small controls
-// stay tight.
 
 enum BarTabRadius {
-    static let sheet: CGFloat = 28
-    static let card: CGFloat = 20
-    static let control: CGFloat = 14
-    static let chip: CGFloat = 10
+    static let sheet: CGFloat = 20
+    static let card: CGFloat = 16
+    static let control: CGFloat = 12
+    static let chip: CGFloat = 8
 }
 
 // MARK: - Typographic scale
-//
-// Display and stat numbers keep the rounded design for personality;
-// reading text (body/caption/small) moves to the system default design,
-// which renders crisper at small sizes and reads as considered rather
-// than uniformly "soft." Spend the rounded, expressive treatment where
-// it earns its keep: headlines, hero numbers, the tab bar.
 
 extension Font {
 
-    /// Screen title (e.g. "Discover", "Me").
-    static let barTabDisplay = Font.system(size: 30, weight: .bold, design: .rounded)
+    /// Screen title.
+    static let barTabDisplay = Font.system(size: 28, weight: .bold, design: .rounded)
 
-    /// Large in-content title (e.g. login welcome, onboarding).
-    static let barTabTitle = Font.system(size: 23, weight: .bold, design: .rounded)
+    /// Large in-content title.
+    static let barTabTitle = Font.system(size: 22, weight: .bold, design: .rounded)
 
     /// Section / card heading.
-    static let barTabHeading = Font.system(size: 16, weight: .semibold, design: .default)
+    static let barTabHeading = Font.system(size: 15, weight: .semibold, design: .default)
 
-    /// Big numeric stat (e.g. a price, a score).
-    static let barTabStat = Font.system(size: 21, weight: .bold, design: .rounded)
+    /// Big numeric stat.
+    static let barTabStat = Font.system(size: 20, weight: .bold, design: .rounded)
 
     /// Primary body text.
     static let barTabBody = Font.system(size: 15, weight: .regular, design: .default)
 
-    /// Emphasized body text (row titles, buttons).
+    /// Emphasized body text.
     static let barTabBodySemibold = Font.system(size: 15, weight: .semibold, design: .default)
 
     /// Secondary text / captions.
@@ -109,11 +96,6 @@ struct BarTabScreenHeader: View {
 }
 
 // MARK: - Cards
-//
-// Flat by default — a filled surface plus a single crisp hairline.
-// Shadow is opt-in and reserved for content that should feel like it's
-// floating above the page (sheets, the tab bar, the primary CTA), not
-// sprayed under every card as ambient decoration.
 
 extension View {
 
@@ -141,21 +123,18 @@ extension View {
                     cornerRadius: cornerRadius,
                     style: .continuous
                 )
-                .stroke(Color.barTabCardBorder, lineWidth: 1)
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
             )
             .shadow(
-                color: Color.black.opacity(shadow ? 0.06 : 0),
-                radius: shadow ? 10 : 0,
+                color: Color.black.opacity(shadow ? 0.04 : 0),
+                radius: shadow ? 8 : 0,
                 x: 0,
-                y: shadow ? 3 : 0
+                y: shadow ? 2 : 0
             )
     }
 }
 
 // MARK: - Primary button
-//
-// The gradient is the one loud element per screen — keep it here and
-// on the tab bar's selection pill, nowhere else.
 
 extension View {
 
@@ -165,40 +144,25 @@ extension View {
         self
             .font(.barTabBodySemibold)
             .foregroundColor(.white)
-            .padding(.vertical, 15)
+            .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .background(
-                LinearGradient(
-                    colors: [
-                        Color.barTabGradientStart,
-                        Color.barTabGradientEnd
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+            .background(Color.barTabPrimary)
             .clipShape(
                 RoundedRectangle(
                     cornerRadius: cornerRadius,
                     style: .continuous
                 )
             )
-            .shadow(
-                color: Color.barTabPrimary.opacity(0.18),
-                radius: 10,
-                x: 0,
-                y: 4
-            )
     }
 
-    /// Quiet secondary action — flat surface, no gradient, hairline edge.
+    /// Quiet secondary action.
     func barTabSecondaryButton(
         cornerRadius: CGFloat = BarTabRadius.control
     ) -> some View {
         self
             .font(.barTabBodySemibold)
             .foregroundColor(.barTabText)
-            .padding(.vertical, 15)
+            .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
             .background(Color.barTabSurface)
             .clipShape(
@@ -206,7 +170,7 @@ extension View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 1)
+                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
             )
     }
 }
@@ -259,12 +223,6 @@ struct BarTabSectionHeader: View {
 }
 
 // MARK: - List container
-//
-// A set of rows sharing one card surface with hairline dividers between
-// them, instead of each row being its own floating card. This is the
-// standard "list" pattern (Mail, Revolut, Yelp) — reach for it whenever
-// you're about to put >1 similar row in a ForEach; it reads as considered
-// hierarchy where a stack of identical shadowed cards reads as a template.
 
 struct BarTabListContainer<Data: RandomAccessCollection, RowContent: View>: View
 where Data.Element: Identifiable {
@@ -291,17 +249,12 @@ where Data.Element: Identifiable {
         )
         .overlay(
             RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 1)
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
         )
     }
 }
 
 // MARK: - Compact info bar
-//
-// A single-row summary control (icon + label + value + chevron) used to
-// collapse what would otherwise be several stacked settings cards
-// (location, radius, filters) into one tappable strip that opens detail
-// in a sheet.
 
 struct BarTabInfoBar: View {
 
@@ -353,44 +306,42 @@ struct BarTabInfoBar: View {
         .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 1)
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
         )
     }
 }
 
-/// Shared input style: flat surface, hairline edge, tight radius — used
-/// in place of each screen hand-rolling its own `.background(...opacity(0.08))`.
+// MARK: - Input field
+
 struct BarTabFieldStyle: TextFieldStyle {
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .font(.barTabBody)
             .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, 13)
+            .padding(.vertical, 12)
             .background(Color.barTabSurface)
             .clipShape(
                 RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 1)
+                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
             )
     }
 }
 
 extension View {
-    /// Wraps content (e.g. an `HStack` with a `TextField` + trailing icon)
-    /// in the same flat field surface `BarTabFieldStyle` gives a plain field.
     func barTabFieldSurface() -> some View {
         self
             .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, 13)
+            .padding(.vertical, 12)
             .background(Color.barTabSurface)
             .clipShape(
                 RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 1)
+                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
             )
     }
 }
@@ -409,97 +360,6 @@ extension Decimal {
         return formatter.string(
             from: self as NSDecimalNumber
         ) ?? description
-    }
-}
-
-// MARK: - Organic blob shape (for decorative backgrounds)
-
-struct BlobShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let w = rect.size.width
-        let h = rect.size.height
-
-        path.move(to: CGPoint(x: w * 0.5, y: 0))
-        path.addCurve(
-            to: CGPoint(x: w, y: h * 0.4),
-            control1: CGPoint(x: w * 0.8, y: 0),
-            control2: CGPoint(x: w, y: h * 0.2)
-        )
-        path.addCurve(
-            to: CGPoint(x: w * 0.7, y: h),
-            control1: CGPoint(x: w, y: h * 0.7),
-            control2: CGPoint(x: w * 0.8, y: h)
-        )
-        path.addCurve(
-            to: CGPoint(x: 0, y: h * 0.6),
-            control1: CGPoint(x: w * 0.4, y: h),
-            control2: CGPoint(x: 0, y: h * 0.8)
-        )
-        path.addCurve(
-            to: CGPoint(x: w * 0.5, y: 0),
-            control1: CGPoint(x: 0, y: h * 0.3),
-            control2: CGPoint(x: w * 0.2, y: 0)
-        )
-        path.closeSubpath()
-        return path
-    }
-}
-
-// MARK: - Gradient accent bar (used for top accents)
-
-struct AccentBar: View {
-    var body: some View {
-        LinearGradient(
-            colors: [
-                Color.barTabGradientStart,
-                Color.barTabGradientEnd
-            ],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-        .frame(height: 3)
-        .clipShape(Capsule())
-    }
-}
-
-// MARK: - Subtle divider
-
-struct WarmDivider: View {
-    var body: some View {
-        Rectangle()
-            .fill(
-                LinearGradient(
-                    colors: [
-                        Color.clear,
-                        Color.barTabCardBorder.opacity(0.5),
-                        Color.clear
-                    ],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .frame(height: 1)
-    }
-}
-
-// MARK: - Modifier: subtle card border
-
-struct CardBorder: ViewModifier {
-
-    func body(content: Content) -> some View {
-        content
-            .overlay(
-                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 1)
-            )
-    }
-}
-
-extension View {
-
-    func cardBorder() -> some View {
-        modifier(CardBorder())
     }
 }
 
@@ -589,7 +449,7 @@ struct EmptyStateView: View {
         VStack(spacing: BarTabSpacing.sm) {
             Image(systemName: icon)
                 .font(.barTabEmptyIcon)
-                .foregroundColor(.barTabPrimary.opacity(0.55))
+                .foregroundColor(.barTabPrimary.opacity(0.5))
 
             Text(title)
                 .font(.barTabBodySemibold)

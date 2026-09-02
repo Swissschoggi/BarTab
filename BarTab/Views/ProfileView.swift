@@ -210,7 +210,7 @@ struct ProfileView: View {
                     .foregroundColor(.white)
                     .frame(width: 32, height: 32)
                     .background(Color.barTabAccent)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(currentLevel.name)
@@ -243,13 +243,7 @@ struct ProfileView: View {
                         .fill(Color.barTabPillFill)
 
                     Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [.barTabAccent, .barTabAccent.opacity(0.7)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                        .fill(Color.barTabAccent)
                         .frame(width: geometry.size.width * CGFloat(UserLevel.progress(for: totalContributions)))
                 }
             }
@@ -495,10 +489,10 @@ struct ProfileView: View {
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
-                        .foregroundColor(.red)
+                        .foregroundColor(.barTabDanger)
 
                     Text("Log out")
-                        .foregroundColor(.red)
+                        .foregroundColor(.barTabDanger)
 
                     Spacer()
                 }
@@ -573,16 +567,7 @@ struct ProfileView: View {
     private var placeholderAvatar: some View {
         ZStack {
             Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.barTabPrimary,
-                            Color.barTabPrimary.opacity(0.7)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(Color.barTabPrimary)
 
             Image(systemName: "person.fill")
                 .font(.barTabHeading)
@@ -625,7 +610,7 @@ struct ProfileView: View {
                 .foregroundColor(.barTabPrimary)
                 .frame(width: 28, height: 28)
                 .background(Color.barTabPrimary.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 
             Text("\(value)")
                 .font(.barTabHeading)
@@ -658,7 +643,7 @@ struct ProfileView: View {
                     .foregroundColor(.barTabPrimary)
                     .frame(width: 28, height: 28)
                     .background(Color.barTabPrimary.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 1) {
 

@@ -88,7 +88,7 @@ struct LocationPickerView: View {
                         )
                         .clipShape(
                             RoundedRectangle(
-                                cornerRadius: 16,
+                                cornerRadius: BarTabRadius.card,
                                 style: .continuous
                             )
                         )

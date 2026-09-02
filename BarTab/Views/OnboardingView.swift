@@ -91,19 +91,7 @@ struct OnboardingView: View {
                     }
                 } label: {
                     Text(currentPage < pages.count - 1 ? "Continue" : "Get Started")
-                        .font(.barTabBodySemibold)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            LinearGradient(
-                                colors: [Color.barTabGradientStart, Color.barTabGradientEnd],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
-                        .shadow(color: Color.barTabPrimary.opacity(0.18), radius: 10, x: 0, y: 4)
+                        .barTabPrimaryButton()
                 }
 
                 if currentPage < pages.count - 1 {

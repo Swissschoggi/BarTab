@@ -399,7 +399,7 @@ struct SettingsView: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.barTabBody)
-                                    .foregroundColor(.red)
+                                    .foregroundColor(.barTabDanger)
                                 Text("Danger Zone")
                                     .font(.barTabBody)
                                     .fontWeight(.semibold)
@@ -416,7 +416,7 @@ struct SettingsView: View {
                                         title: "Delete Account",
                                         value: ""
                                     )
-                                    .foregroundColor(.red)
+                                    .foregroundColor(.barTabDanger)
                                 }
                             }
                         }
@@ -581,7 +581,7 @@ private struct EditUsernameSheet: View {
                     HStack(alignment: .top) {
                         if let error = validationError {
                             Label(error, systemImage: "exclamationmark.circle.fill")
-                                .foregroundColor(.red)
+                                .foregroundColor(.barTabDanger)
                         } else {
                             Text("Pick a name your friends will recognize.")
                         }
@@ -623,13 +623,7 @@ private struct EditUsernameSheet: View {
     private var avatarPreview: some View {
         ZStack {
             Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.barTabGradientStart, Color.barTabGradientEnd],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(Color.barTabPrimary)
                 .frame(width: 44, height: 44)
 
             Text(String(trimmed.prefix(1)).uppercased())
@@ -720,7 +714,7 @@ private struct ChangePasswordSheet: View {
                 } footer: {
                     if let error = validationError {
                         Label(error, systemImage: "exclamationmark.circle.fill")
-                            .foregroundColor(.red)
+                            .foregroundColor(.barTabDanger)
                     } else if !newPassword.isEmpty {
                         Text(strength.hint)
                     }
@@ -744,7 +738,7 @@ private struct ChangePasswordSheet: View {
                 } footer: {
                     if !confirmPassword.isEmpty && newPassword != confirmPassword {
                         Text("Passwords don't match.")
-                            .foregroundColor(.red)
+                            .foregroundColor(.barTabDanger)
                     }
                 }
             }
@@ -823,7 +817,7 @@ private struct DeleteAccountSheet: View {
 
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 30))
-                        .foregroundColor(.red)
+                        .foregroundColor(.barTabDanger)
                 }
                 .padding(.top, 24)
 
@@ -869,7 +863,7 @@ private struct DeleteAccountSheet: View {
                             : Color.barTabSecondary.opacity(0.4)
                     )
                     .clipShape(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
                     )
                 }
                 .disabled(!isConfirmed || isDeleting)

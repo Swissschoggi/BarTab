@@ -63,13 +63,13 @@ struct AddBarView: View {
                 .background(Color.barTabCardFill)
                 .clipShape(
                     RoundedRectangle(
-                        cornerRadius: 14,
+                        cornerRadius: BarTabRadius.control,
                         style: .continuous
                     )
                 )
                 .overlay(
                     RoundedRectangle(
-                        cornerRadius: 14,
+                        cornerRadius: BarTabRadius.control,
                         style: .continuous
                     )
                     .stroke(Color.barTabPrimary.opacity(0.25), lineWidth: 1)
@@ -189,7 +189,7 @@ struct AddBarView: View {
                                     )
                                 }
                                 .foregroundColor(.barTabPrimary)
-                                .barTabCard(cornerRadius: 14)
+                                .barTabCard(cornerRadius: BarTabRadius.control)
                             }
 
                             Button {

@@ -47,7 +47,7 @@ struct InviteMemberSheet: View {
                         }
                         .padding(10)
                         .background(Color.barTabPillFill)
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
                         .padding(.horizontal)
                         .padding(.top, 8)
 

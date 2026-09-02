@@ -171,22 +171,10 @@ struct MainTabView: View {
 
             // Layer 2: fluid selection pill (slides above the gray labels)
             Capsule()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.barTabGradientStart, Color.barTabGradientEnd],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
+                .fill(Color.barTabPrimary)
                 .frame(width: max(tabWidth - 4, 0), height: 40)
                 .offset(x: pillOffsetX)
                 .scaleEffect(x: pillStretch, y: 1, anchor: .center)
-                .shadow(
-                    color: Color.barTabPrimary.opacity(0.3),
-                    radius: 6,
-                    x: 0,
-                    y: 3
-                )
 
             // Layer 3: selected label (white), drawn above the pill
             HStack(spacing: 0) {
@@ -219,13 +207,7 @@ struct MainTabView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: BarTabRadius.sheet, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 1)
-        )
-        .shadow(
-            color: Color.black.opacity(0.12),
-            radius: 18,
-            x: 0,
-            y: 8
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
         )
         .padding(.horizontal, BarTabSpacing.lg)
         .padding(.bottom, BarTabSpacing.lg)

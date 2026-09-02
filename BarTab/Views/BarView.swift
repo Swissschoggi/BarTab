@@ -295,7 +295,7 @@ struct BarView: View {
                 .padding(.vertical, 14)
                 .frame(maxWidth: .infinity)
                 .background(Color.barTabPrimary.opacity(0.06))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
             }
 
             if let user = userSession.currentUser {
@@ -340,12 +340,8 @@ struct BarView: View {
                     }
                     .padding()
                     .foregroundColor(.white)
-                    .background(
-                        hasCheckedIn
-                            ? LinearGradient(colors: [Color.barTabSuccess, Color.barTabSuccess.opacity(0.8)], startPoint: .leading, endPoint: .trailing)
-                            : LinearGradient(colors: [Color.barTabAccent, Color.barTabPrimary], startPoint: .leading, endPoint: .trailing)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .background(hasCheckedIn ? Color.barTabSuccess : Color.barTabAccent)
+                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
                 }
                 .buttonStyle(.plain)
             }
@@ -436,7 +432,7 @@ struct BarView: View {
                     .foregroundColor(.barTabPrimary)
                     .frame(width: 32, height: 32)
                     .background(Color.barTabPrimary.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
 
                 Text("Amenities")
                     .font(.barTabBody)
@@ -919,7 +915,7 @@ struct BarView: View {
                             } label: {
                                 Label("Delete all", systemImage: "trash")
                                     .font(.barTabSmall)
-                                    .foregroundColor(.red)
+                                    .foregroundColor(.barTabDanger)
                             }
                         }
                         .padding(.top, 4)
@@ -970,14 +966,14 @@ struct BarView: View {
                     if verifyCount > 0 {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.barTabTiny)
-                            .foregroundColor(.green)
+                            .foregroundColor(.barTabSuccess)
                         Text(
                             verifyCount == 1
                                 ? String(localized: "Confirmed by 1 person")
                                 : String(localized: "Confirmed by \(verifyCount) people")
                         )
                         .font(.barTabTiny)
-                        .foregroundColor(.green)
+                        .foregroundColor(.barTabSuccess)
                     }
                 }
             }
@@ -1023,7 +1019,7 @@ struct BarView: View {
                 } label: {
                     Image(systemName: "trash")
                         .font(.barTabSmall)
-                        .foregroundColor(.red)
+                        .foregroundColor(.barTabDanger)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Delete price")
@@ -1032,7 +1028,7 @@ struct BarView: View {
         .padding(.vertical, 4)
         .padding(.horizontal, 8)
         .background(Color.barTabBackground.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
         .contextMenu {
             if !isMine {
                 if hasVerified {

@@ -122,7 +122,7 @@ struct AdminBrandRequestsView: View {
                         Text("Reject")
                             .font(.barTabSmall)
                             .fontWeight(.semibold)
-                            .foregroundColor(.red)
+                            .foregroundColor(.barTabDanger)
                     }
 
                     Button {
@@ -143,7 +143,7 @@ struct AdminBrandRequestsView: View {
                         Label("Remove", systemImage: "trash")
                             .font(.barTabSmall)
                             .fontWeight(.semibold)
-                            .foregroundColor(.red)
+                            .foregroundColor(.barTabDanger)
                     }
                 }
             }

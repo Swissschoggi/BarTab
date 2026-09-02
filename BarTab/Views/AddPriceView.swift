@@ -300,7 +300,7 @@ struct AddPriceView: View {
                     if let error = priceError {
                         Text(error)
                             .font(.barTabSmall)
-                            .foregroundColor(.red)
+                            .foregroundColor(.barTabDanger)
                             .padding(.top, 4)
                     }
                 }

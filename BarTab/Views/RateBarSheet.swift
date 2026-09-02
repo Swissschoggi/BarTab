@@ -52,7 +52,7 @@ struct RateBarSheet: View {
                                 .frame(maxWidth: .infinity)
                                 .foregroundColor(selectedAmbiences.contains(style) ? .white : .barTabPrimary)
                                 .background(selectedAmbiences.contains(style) ? Color.barTabPrimary : Color.barTabPillFill)
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
                             }
                         }
                     }

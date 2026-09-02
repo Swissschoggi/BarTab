@@ -60,18 +60,11 @@ struct LoginView: View {
 
                         ZStack {
                             Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color.barTabGradientStart, Color.barTabGradientEnd],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .frame(width: 76, height: 76)
-                                .shadow(color: Color.barTabPrimary.opacity(0.2), radius: 10, x: 0, y: 4)
+                                .fill(Color.barTabPrimary)
+                                .frame(width: 72, height: 72)
 
                             Image(systemName: "wineglass.fill")
-                                .font(.system(size: 30))
+                                .font(.system(size: 28))
                                 .foregroundColor(.white)
                         }
 
@@ -116,7 +109,7 @@ struct LoginView: View {
                     .frame(height: 50)
                     .clipShape(
                         RoundedRectangle(
-                            cornerRadius: 14,
+                            cornerRadius: BarTabRadius.control,
                             style: .continuous
                         )
                     )
@@ -276,21 +269,7 @@ struct LoginView: View {
 
                             Text(submitTitle)
                         }
-                        .font(.barTabHeading)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            canSubmit && !isSubmitting
-                            ? Color.barTabPrimary
-                            : Color.barTabSecondary.opacity(0.4)
-                        )
-                        .clipShape(
-                            RoundedRectangle(
-                                cornerRadius: 14,
-                                style: .continuous
-                            )
-                        )
+                        .barTabPrimaryButton()
                     }
                     .disabled(!canSubmit || isSubmitting || isGoogleSigningIn)
 
@@ -362,22 +341,16 @@ struct LoginView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 50)
-            .background(
+            .background(Color.white)
+            .clipShape(
                 RoundedRectangle(
-                    cornerRadius: 14,
+                    cornerRadius: BarTabRadius.control,
                     style: .continuous
-                )
-                .fill(Color.white)
-                .shadow(
-                    color: Color.black.opacity(0.06),
-                    radius: 6,
-                    x: 0,
-                    y: 2
                 )
             )
             .overlay(
                 RoundedRectangle(
-                    cornerRadius: 14,
+                    cornerRadius: BarTabRadius.control,
                     style: .continuous
                 )
                 .stroke(Color.barTabCardBorder, lineWidth: 0.5)

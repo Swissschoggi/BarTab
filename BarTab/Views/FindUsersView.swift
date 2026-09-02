@@ -45,9 +45,9 @@ struct FindUsersView: View {
                 }
                 .padding(12)
                 .background(Color.barTabCardFill)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
                         .stroke(Color.barTabCardBorder, lineWidth: 1)
                 )
 

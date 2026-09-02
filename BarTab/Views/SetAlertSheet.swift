@@ -55,11 +55,11 @@ struct SetAlertSheet: View {
                     if let price = Double(targetPrice.replacingOccurrences(of: ",", with: ".")), price < 0 {
                         Text("Price cannot be negative.")
                             .font(.barTabSmall)
-                            .foregroundColor(.red)
+                            .foregroundColor(.barTabDanger)
                     } else if let price = Double(targetPrice.replacingOccurrences(of: ",", with: ".")), price == 0 {
                         Text("Price must be greater than zero, or leave empty for any price.")
                             .font(.barTabSmall)
-                            .foregroundColor(.red)
+                            .foregroundColor(.barTabDanger)
                     } else {
                         Text("Leave empty to be alerted on any new price. Set a value to be notified when the price drops to or below it.")
                             .font(.barTabSmall)

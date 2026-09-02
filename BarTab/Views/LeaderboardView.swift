@@ -75,7 +75,7 @@ struct LeaderboardView: View {
                                             .foregroundColor(.white)
                                             .frame(width: 32, height: 32)
                                             .background(Color.barTabAccent.opacity(index < 3 ? 1.0 : 0.7))
-                                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
                                     }
 
                                     VStack(alignment: .leading, spacing: 1) {
