@@ -215,6 +215,30 @@ struct BarView: View {
             }
             .font(.barTabTiny)
             .foregroundColor(.barTabSecondary)
+
+            if !ambienceStyles.isEmpty {
+                HStack(spacing: 6) {
+                    ForEach(ambienceStyles) { style in
+                        HStack(spacing: 3) {
+                            Image(systemName: style.icon)
+                                .font(.barTabTiny)
+                            Text(style.displayName)
+                                .font(.barTabTiny)
+                        }
+                        .foregroundColor(.barTabAccent)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.barTabAccent.opacity(0.1))
+                        .clipShape(Capsule())
+                    }
+                    if ambienceCount > ambienceStyles.count {
+                        Text("+\(ambienceCount - ambienceStyles.count)")
+                            .font(.barTabTiny)
+                            .foregroundColor(.barTabSecondary)
+                    }
+                }
+                .padding(.top, 2)
+            }
         }
     }
 
