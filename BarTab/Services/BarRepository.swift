@@ -1202,12 +1202,14 @@ final class BarRepository: ObservableObject {
     }
 
     func allAttributeConsensus(for bar: Bar, currentUser: User?) -> [BarAttribute] {
+        let alwaysShow: [BarAttributeKey] = [.outdoorSeating, .smoking]
         let keys = BarAttributeKey.allCases
         return keys.compactMap { key in
             let reports = attributeReports(for: bar).filter { $0.attributeKey == key.rawValue }
             let consensus = computeConsensus(from: reports)
             let myReport = reports.first { $0.userID == currentUser?.id }
-            guard !consensus.isEmpty || myReport != nil else { return nil }
+            let shouldShow = alwaysShow.contains(key) || !consensus.isEmpty || myReport != nil
+            guard shouldShow else { return nil }
             return BarAttribute(key: key, consensus: consensus, myReport: myReport)
         }
     }
