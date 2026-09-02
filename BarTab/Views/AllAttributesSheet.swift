@@ -15,11 +15,20 @@ struct AllAttributesSheet: View {
         NavigationView {
             List {
                 if attributes.isEmpty {
-                    ContentUnavailableView(
-                        "No attribute reports yet",
-                        systemImage: "info.circle",
-                        description: Text("Be the first to report on this bar's amenities!")
-                    )
+                    VStack(spacing: BarTabSpacing.md) {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 40, weight: .light))
+                            .foregroundColor(.barTabSecondary)
+                        Text("No attribute reports yet")
+                            .font(.barTabHeadline)
+                            .foregroundColor(.barTabText)
+                        Text("Be the first to report on this bar's amenities!")
+                            .font(.barTabSubheadline)
+                            .foregroundColor(.barTabSecondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
                     .listRowBackground(Color.barTabBackground)
                 } else {
                     ForEach(attributes) { attr in
