@@ -257,6 +257,9 @@ struct AddPriceView: View {
                     selectedSize = availableSizes.first ?? .glass
                 }
             }
+            .sheet(isPresented: $showingRequestBrand) {
+                RequestBrandSheet(drink: selectedDrink)
+            }
         }
     }
 
