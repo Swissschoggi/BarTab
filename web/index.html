@@ -13,8 +13,6 @@
 
   <meta name="apple-itunes-app" content="app-id=0000000000" />
 
-  <!-- Leaflet CSS for Map Preview -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
   <title>BarTab Know what you're paying</title>
 </head>
@@ -27,10 +25,9 @@
         BarTab
       </div>   
       <div class="nav-links">
-        <a href="#map">Map</a>
-        <a href="#calculator">Estimator</a>
+        <a href="#nearby">Nearby</a>
         <a href="#features">Features</a>
-        <a href="#how">How it works</a>
+        <a href="#cities">Cities</a>
         <a href="privacy.html">Privacy</a>
         <a href="terms.html">Terms</a>
       </div>
@@ -41,11 +38,11 @@
     <div class="container hero-grid">
       <div>
         <span class="eyebrow">🥂 Crowdsourced drink prices</span>
-        <h1>Know what you're <span class="grad">paying</span> before you go.</h1>
-        <p>BarTab shows real drink prices at bars near you reported by people who were actually there. Compare, save, and never overpay for a pint again.</p>
+        <h1>Know what you're paying before you go.</h1>
+        <p>A pint in Zürich's Niederdorf can cost twice what it does two tram stops away. BarTab tracks real prices, reported by people who were standing at the bar so you find out before you order, not after.</p>
         <div class="hero-actions">
-          <a class="button" href="#map">Explore Map</a>
-          <a class="button secondary" href="#calculator">Estimate Bar Tab</a>
+          <a class="button" href="#nearby">See Nearby Bars</a>
+          <a class="button secondary" href="#features">See what's inside</a>
         </div>
       </div>
 
@@ -58,10 +55,10 @@
         </div>
 
         <div class="phone-filters">
-          <button class="phone-filter active" data-type="all">All</button>
-          <button class="phone-filter" data-type="beer">🍺 Beer</button>
-          <button class="phone-filter" data-type="cocktail">🍸 Cocktails</button>
-          <button class="phone-filter" data-type="wine">🍷 Wine</button>
+          <button class="phone-filter active" data-scope="hero" data-type="all">All</button>
+          <button class="phone-filter" data-scope="hero" data-type="beer">🍺 Beer</button>
+          <button class="phone-filter" data-scope="hero" data-type="cocktail">🍸 Cocktails</button>
+          <button class="phone-filter" data-scope="hero" data-type="wine">🍷 Wine</button>
         </div>
 
         <div id="bar-cards">
@@ -74,7 +71,7 @@
     </div>
   </header>
 
-  <!-- Animated Stats Section -->
+  <!-- Live Stats Strip -->
   <section class="container stats">
     <div class="stat reveal">
       <div class="num" id="stat-bars" data-value="0"></div>
@@ -90,82 +87,102 @@
     </div>
   </section>
 
-  <!-- Interactive Map Section -->
-  <section id="map" class="container map-section">
-    <div class="section-head reveal">
-      <span class="tag">Live Explorer</span>
-      <h2>Explore bars around you</h2>
-      <p>Interactive preview of crowdsourced drink prices mapped in real-time.</p>
+  <!-- Recent Prices Ticker -->
+  <section class="container reveal" style="padding: 8px 24px 40px;">
+    <div class="ticker-wrap">
+      <div class="ticker" id="price-ticker">
+        <div class="chip"><span class="chip-bar">Loading recent reports…</span></div>
+      </div>
     </div>
-    <div id="map-container" class="reveal"></div>
   </section>
 
-  <!-- Night Out Bar Tab Estimator Feature -->
-  <section id="calculator" class="container">
+  <!-- Nearby Bars — Full Phone Simulation -->
+  <section id="nearby" class="container nearby-section">
     <div class="section-head reveal">
-      <span class="tag">Interactive Tool</span>
-      <h2>Night Out Estimator</h2>
-      <p>Estimate your round or night out total before setting foot in the bar.</p>
+      <span class="tag">In the app</span>
+      <h2>What's nearby, right now</h2>
+      <p>This is the actual Nearby screen — real reports, pulled live.</p>
     </div>
-    <div class="calc-card reveal">
-      <div class="calc-grid">
-        <div class="calc-group">
-          <label for="drink-type">Drink Type</label>
-          <select id="drink-type" class="calc-input">
-            <option value="6.50">Pint of Beer (~CHF 6.50)</option>
-            <option value="15.00">Cocktail (~CHF 15.00)</option>
-            <option value="8.00">Glass of Wine (~CHF 8.00)</option>
-            <option value="5.00">Shot (~CHF 5.00)</option>
-          </select>
+
+    <div class="iphone reveal">
+      <div class="iphone-island"></div>
+      <div class="iphone-screen">
+        <div class="ios-statusbar">
+          <span class="ios-time">9:41</span>
+          <div class="ios-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="6" width="3" height="5" rx="0.5" fill="currentColor"/><rect x="4.5" y="4" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="9" y="2" width="3" height="9" rx="0.5" fill="currentColor"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="currentColor"/></svg>
+            <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><path d="M7.5 10.2c.5 0 1-.2 1.3-.6.4-.4.4-1 0-1.4-.7-.7-1.9-.7-2.6 0-.4.4-.4 1 0 1.4.3.4.8.6 1.3.6zM4.3 6.8c1.8-1.7 4.6-1.7 6.4 0 .3.3.8.3 1.1 0 .3-.3.3-.8 0-1.1-2.3-2.2-6.3-2.2-8.6 0-.3.3-.3.8 0 1.1.3.3.8.3 1.1 0zM1.6 4.1c3.2-3 8.6-3 11.8 0 .3.3.8.3 1.1 0 .3-.3.3-.8 0-1.1-3.8-3.5-10.2-3.5-14 0-.3.3-.3.8 0 1.1.3.3.8.3 1.1 0z" fill="currentColor"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11" fill="none"><rect x="0.5" y="0.5" width="20" height="10" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="15" height="7" rx="1.2" fill="currentColor"/><rect x="21.5" y="3.5" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+          </div>
         </div>
-        <div class="calc-group">
-          <label for="drink-count">Number of Drinks</label>
-          <input type="number" id="drink-count" class="calc-input" value="3" min="1" max="50" />
+
+        <div class="ios-app-header">
+          <div>
+            <div class="ios-app-title">Nearby</div>
+            <div class="ios-app-sub">📍 Zürich, Niederdorf</div>
+          </div>
+          <div class="ios-avatar">Y</div>
         </div>
+
+        <div class="phone-filters ios-filters">
+          <button class="phone-filter active" data-scope="nearby" data-type="all">All</button>
+          <button class="phone-filter" data-scope="nearby" data-type="beer">🍺 Beer</button>
+          <button class="phone-filter" data-scope="nearby" data-type="cocktail">🍸 Cocktails</button>
+          <button class="phone-filter" data-scope="nearby" data-type="wine">🍷 Wine</button>
+        </div>
+
+        <div class="ios-list" id="nearby-cards">
+          <div class="pcard">
+            <div class="ic">🍺</div>
+            <div><div class="name">Loading nearby bars…</div></div>
+          </div>
+        </div>
+
+        <div class="ios-tabbar">
+          <div class="ios-tab"><span>🗺️</span>Map</div>
+          <div class="ios-tab active"><span>📍</span>Nearby</div>
+          <div class="ios-tab"><span>🔔</span>Alerts</div>
+          <div class="ios-tab"><span>👤</span>Profile</div>
+        </div>
+        <div class="ios-home-indicator"></div>
       </div>
-      <div class="calc-result">
-        <div class="desc">Estimated Bar Tab</div>
-        <div class="total" id="calc-total">CHF 19.50</div>
-      </div>
+      <div class="iphone-btn iphone-btn-mute"></div>
+      <div class="iphone-btn iphone-btn-vol-up"></div>
+      <div class="iphone-btn iphone-btn-vol-down"></div>
+      <div class="iphone-btn iphone-btn-power"></div>
     </div>
   </section>
 
   <section id="features" class="container">
     <div class="section-head reveal">
-      <span class="tag">Features</span>
+      <span class="tag">In the app</span>
       <h2>Everything you need for a night out</h2>
-      <p>Built for people who'd rather know than guess.</p>
+      <p>Nothing you don't. No feed, no ads  just prices and the people who found them.</p>
     </div>
-    <div class="features">
-      <div class="feature reveal">
-        <div class="icon">📍</div>
-        <h3>Find bars nearby</h3>
-        <p>Map and list views, filtered by distance, vibe and outdoor seating.</p>
+    <div class="feature-rows reveal">
+      <div class="feature-row">
+        <div class="f-name"><span class="f-icon">📍</span> Find bars nearby</div>
+        <p>Map and list views, filtered by distance, vibe and whether they've got outdoor seating.</p>
       </div>
-      <div class="feature reveal">
-        <div class="icon">💰</div>
-        <h3>Compare drink prices</h3>
-        <p>See what a beer, wine or cocktail actually costs  reported by real people.</p>
+      <div class="feature-row">
+        <div class="f-name"><span class="f-icon">💰</span> Compare drink prices</div>
+        <p>See what a beer, a glass of wine or a cocktail actually costs at each spot, reported by people who were there  not a menu photo from three years ago.</p>
       </div>
-      <div class="feature reveal">
-        <div class="icon">👯</div>
-        <h3>Follow friends</h3>
-        <p>See what your friends are drinking and where they hang out.</p>
+      <div class="feature-row">
+        <div class="f-name"><span class="f-icon">👯</span> Follow friends</div>
+        <p>See what your friends are drinking and where they've been hanging out lately.</p>
       </div>
-      <div class="feature reveal">
-        <div class="icon">🗳️</div>
-        <h3>Plan nights out</h3>
-        <p>Create groups, run polls and pick a spot together.</p>
+      <div class="feature-row">
+        <div class="f-name"><span class="f-icon">🗳️</span> Plan nights out</div>
+        <p>Start a group, run a quick poll, and land on a spot everyone's actually happy with.</p>
       </div>
-      <div class="feature reveal">
-        <div class="icon">🔔</div>
-        <h3>Price alerts</h3>
-        <p>Get notified when a drink hits the price you're after.</p>
+      <div class="feature-row">
+        <div class="f-name"><span class="f-icon">🔔</span> Price alerts</div>
+        <p>Set the price you're willing to pay for your usual, and get pinged when a nearby bar hits it.</p>
       </div>
-      <div class="feature reveal">
-        <div class="icon">✅</div>
-        <h3>Fresh, verified prices</h3>
-        <p>Community "still accurate" checks keep prices trustworthy.</p>
+      <div class="feature-row">
+        <div class="f-name"><span class="f-icon">✅</span> Prices that stay fresh</div>
+        <p>A quick "still accurate?" tap from the community keeps old reports from lingering and misleading people.</p>
       </div>
     </div>
   </section>
@@ -175,21 +192,42 @@
       <span class="tag">How it works</span>
       <h2>Three steps to cheaper drinks</h2>
     </div>
-    <div class="steps">
-      <div class="step reveal">
+    <div class="steps-line reveal">
+      <div class="step-item">
         <div class="n">1</div>
-        <h3>Open the map</h3>
-        <p>See bars around you with a quick price-level glance.</p>
+        <div>
+          <h3>Open the map</h3>
+          <p>See bars around you with a quick price-level glance before you decide where you're headed.</p>
+        </div>
       </div>
-      <div class="step reveal">
+      <div class="step-item">
         <div class="n">2</div>
-        <h3>Compare prices</h3>
-        <p>Check what drinks cost at each spot before you head out.</p>
+        <div>
+          <h3>Compare prices</h3>
+          <p>Check what a round actually costs at each spot  beer, wine, cocktails, whatever you're having.</p>
+        </div>
       </div>
-      <div class="step reveal">
+      <div class="step-item">
         <div class="n">3</div>
-        <h3>Report what you paid</h3>
-        <p>Add the price you saw  keep the map fresh for everyone.</p>
+        <div>
+          <h3>Report what you paid</h3>
+          <p>Takes ten seconds. Add the price you saw on the receipt or menu, and the map stays honest for the next person.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="section-head reveal">
+      <span class="tag">Why I built this</span>
+      <h2>A note from the developer</h2>
+    </div>
+    <div class="founder reveal">
+      <p>I started BarTab after one too many nights where the "quick drink" turned into one too many wines.</p>
+      <p>So I built the list I wished existed: prices from people who were actually there, updated by the same people who use it. No paid placements, no "recommended" bars pushed by whoever pays us just what a round costs, city by city.</p>
+      <div class="sign">
+        <div class="name">The BarTab dev</div>
+        <div class="role">Built in Zürich</div>
       </div>
     </div>
   </section>
@@ -199,34 +237,36 @@
       <span class="tag">People say</span>
       <h2>Made for the bar crowd</h2>
     </div>
-    <div class="testimonials">
-      <div class="quote reveal">
-        <p>"Finally I know which bar has cheap beer before I leave the house."</p>
+    <div class="testimonials-feature reveal">
+      <div class="quote lead">
+        <p>"I used to just pick whatever bar was closest. Now I check BarTab first  found out the place two streets over has the same beer for four francs less."</p>
         <div class="who">
           <div class="avatar">L</div>
           <div>
             <div class="name">Lena</div>
-            <div class="role">Regular</div>
+            <div class="role">Regular, Zürich</div>
           </div>
         </div>
       </div>
-      <div class="quote reveal">
-        <p>"The price alerts saved me from another overpriced cocktail."</p>
-        <div class="who">
-          <div class="avatar">M</div>
-          <div>
-            <div class="name">Marco</div>
-            <div class="role">Cocktail fan</div>
+      <div class="quote-stack">
+        <div class="quote">
+          <p>"The price alerts saved me from another overpriced cocktail on a Friday I really didn't need it."</p>
+          <div class="who">
+            <div class="avatar">M</div>
+            <div>
+              <div class="name">Marco</div>
+              <div class="role">Cocktail fan</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="quote reveal">
-        <p>"We plan our whole weekend with the group polls now."</p>
-        <div class="who">
-          <div class="avatar">S</div>
-          <div>
-            <div class="name">Sofia</div>
-            <div class="role">Group admin</div>
+        <div class="quote">
+          <p>"We plan our whole weekend with the group polls now instead of a 40-message group chat."</p>
+          <div class="who">
+            <div class="avatar">S</div>
+            <div>
+              <div class="name">Sofia</div>
+              <div class="role">Group admin</div>
+            </div>
           </div>
         </div>
       </div>
@@ -241,15 +281,27 @@
     <div class="faq reveal">
       <details>
         <summary>Is BarTab free?</summary>
-        <p>Yes. BarTab is free to use and will stay free for everyone.</p>
+        <p>Yes. BarTab is free to use and will stay free for everyone. We're not selling placement to bars.</p>
       </details>
       <details>
         <summary>Where do the prices come from?</summary>
-        <p>Prices are added by users like you. The community keeps them fresh.</p>
+        <p>Entirely from people using the app. There's no scraping and no menus pulled from bar websites  if a price is on the map, someone reported paying it.</p>
+      </details>
+      <details>
+        <summary>How do you keep prices from going stale?</summary>
+        <p>Older reports get flagged for a "still accurate?" check, and anyone can confirm or correct them. Prices that go unconfirmed for a while get pushed down in search.</p>
       </details>
       <details>
         <summary>Do you track my location?</summary>
-        <p>Only with your permission, and only to show nearby bars. We don't store a location history.</p>
+        <p>Only with your permission, and only to show nearby bars or verify you were close enough to submit a price. We don't build a location history tied to your account.</p>
+      </details>
+      <details>
+        <summary>Is BarTab only for Switzerland?</summary>
+        <p>We started in Zürich and are expanding city by city, driven by where people actually report prices. See the <a href="#cities">cities list</a> above for current coverage.</p>
+      </details>
+      <details>
+        <summary>What if a bar disagrees with a price on the app?</summary>
+        <p>Prices are self-reported by customers, not confirmed with venues, so they're a reference point rather than a guarantee see our <a href="terms.html">Terms</a> for details. Bars can flag a listing for review if something's clearly wrong.</p>
       </details>
     </div>
   </section>
@@ -272,17 +324,22 @@
     </div>
   </footer>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <script>
+    let statsInView = false;
+    let statsLoaded = false;
+
+    function maybeAnimateStats() {
+      if (statsInView && statsLoaded) animateStats();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add('visible');
             if (e.target.classList.contains('stats')) {
-              animateStats();
+              statsInView = true;
+              maybeAnimateStats();
             }
             observer.unobserve(e.target);
           }
@@ -311,7 +368,7 @@
     };
 
     let allPricesData = [];
-    let activeFilter = 'all';
+    const activeFilters = { hero: 'all', nearby: 'all' };
 
     function esc(s) {
       return String(s).replace(/[&<>"']/g, (c) => ({
@@ -344,37 +401,71 @@
       });
     }
 
-    async function fetchCount(table, column) {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/' + table + '?select=' + column, { headers: HEADERS });
+    // Exact row count via a HEAD request + the Content-Range header, so we
+    // never transfer (or silently truncate at PostgREST's default page size)
+    // the rows themselves just to count them.
+    async function fetchExactCount(table) {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/' + table + '?select=id', {
+        method: 'HEAD',
+        headers: { ...HEADERS, Prefer: 'count=exact' }
+      });
       if (!res.ok) return null;
-      const rows = await res.json();
-      return rows.length;
+      const range = res.headers.get('content-range'); // "0-24/125"
+      if (!range) return null;
+      const total = range.split('/')[1];
+      return total && total !== '*' ? parseInt(total, 10) : null;
+    }
+
+    // PostgREST has no distinct-count endpoint, so counting unique
+    // contributors means paging through reported_by in batches rather than
+    // trusting a single request (which used to cap out at ~1000 rows and
+    // under-report). Capped so a very large table can't hang the page.
+    async function fetchDistinctContributors(maxRows = 20000, pageSize = 1000) {
+      const seen = new Set();
+      for (let offset = 0; offset < maxRows; offset += pageSize) {
+        const res = await fetch(
+          SUPABASE_URL + '/rest/v1/prices?select=reported_by&order=id',
+          {
+            headers: {
+              ...HEADERS,
+              Range: offset + '-' + (offset + pageSize - 1)
+            }
+          }
+        );
+        if (!res.ok) break;
+        const rows = await res.json();
+        rows.forEach(r => r.reported_by && seen.add(r.reported_by));
+        if (rows.length < pageSize) break; // reached the end
+      }
+      return seen.size;
     }
 
     async function loadStats() {
       try {
-        const bars = await fetchCount('bars', 'id');
+        const [bars, prices, contributors] = await Promise.all([
+          fetchExactCount('bars'),
+          fetchExactCount('prices'),
+          fetchDistinctContributors()
+        ]);
+
         if (bars !== null) document.getElementById('stat-bars').setAttribute('data-value', bars);
-
-        const prices = await fetchCount('prices', 'id');
         if (prices !== null) document.getElementById('stat-prices').setAttribute('data-value', prices);
-
-        const res = await fetch(SUPABASE_URL + '/rest/v1/prices?select=reported_by', { headers: HEADERS });
-        if (res.ok) {
-          const rows = await res.json();
-          const contributors = new Set(rows.map(r => r.reported_by)).size;
-          document.getElementById('stat-contributors').setAttribute('data-value', contributors);
-        }
-      } catch (e) {}
+        document.getElementById('stat-contributors').setAttribute('data-value', contributors);
+      } catch (e) {
+        // Leave the em dashes in place rather than show a wrong number.
+      } finally {
+        statsLoaded = true;
+        maybeAnimateStats();
+      }
     }
 
-    function renderPhoneCards() {
-      const container = document.getElementById('bar-cards');
+    function renderBarCards(containerId, filterType, limit) {
+      const container = document.getElementById(containerId);
       if (!container) return;
 
-      const filtered = activeFilter === 'all' 
-        ? allPricesData 
-        : allPricesData.filter(p => p.drink === activeFilter);
+      const filtered = filterType === 'all'
+        ? allPricesData
+        : allPricesData.filter(p => p.drink === filterType);
 
       const picks = [];
       const seen = new Set();
@@ -383,7 +474,7 @@
         if (!name || seen.has(name)) continue;
         seen.add(name);
         picks.push(p);
-        if (picks.length === 3) break;
+        if (picks.length === limit) break;
       }
 
       if (!picks.length) {
@@ -409,6 +500,33 @@
       }).join('');
     }
 
+    function renderTicker(data) {
+      const el = document.getElementById('price-ticker');
+      if (!el) return;
+
+      const entries = data.filter(p => p.bars && p.bars.name).slice(0, 16);
+      if (!entries.length) {
+        el.innerHTML = '<div class="chip"><span class="chip-bar">No reports yet be the first to add one</span></div>';
+        return;
+      }
+
+      const chips = entries.map(p => {
+        const meta = DRINK_META[p.drink] || DRINK_META.other;
+        const amt = Number(p.amount).toFixed(2);
+        return (
+          '<div class="chip">' +
+            '<span>' + meta.icon + '</span>' +
+            '<span class="chip-bar">' + esc(p.bars.name) + '</span>' +
+            '<span class="chip-amt">' + esc(p.currency) + ' ' + amt + '</span>' +
+          '</div>'
+        );
+      }).join('');
+
+      // Duplicate the sequence so the CSS animation (which translates by
+      // -50%) loops seamlessly instead of jumping at the end.
+      el.innerHTML = chips + chips;
+    }
+
     async function loadBars() {
       try {
         const res = await fetch(
@@ -418,67 +536,27 @@
         if (!res.ok) return;
 
         allPricesData = await res.json();
-        renderPhoneCards();
-        initMap(allPricesData);
+        renderBarCards('bar-cards', activeFilters.hero, 3);
+        renderBarCards('nearby-cards', activeFilters.nearby, 8);
+        renderTicker(allPricesData);
       } catch (e) {}
     }
 
     document.querySelectorAll('.phone-filter').forEach(button => {
       button.addEventListener('click', (e) => {
-        document.querySelectorAll('.phone-filter').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        activeFilter = e.target.getAttribute('data-type');
-        renderPhoneCards();
-      });
-    });
+        const btn = e.currentTarget;
+        const scope = btn.getAttribute('data-scope') || 'hero';
+        btn.parentElement.querySelectorAll('.phone-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilters[scope] = btn.getAttribute('data-type');
 
-    function initMap(data) {
-      const mapContainer = document.getElementById('map-container');
-      if (!mapContainer) return;
-
-      const map = L.map('map-container').setView([47.3769, 8.5417], 13);
-
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19
-      }).addTo(map);
-
-      const bounds = [];
-      data.forEach(p => {
-        if (p.bars && p.bars.latitude && p.bars.longitude) {
-          const lat = p.bars.latitude;
-          const lng = p.bars.longitude;
-          bounds.push([lat, lng]);
-
-          const meta = DRINK_META[p.drink] || DRINK_META.other;
-          L.marker([lat, lng])
-            .addTo(map)
-            .bindPopup(`<h4>${esc(p.bars.name)}</h4><p>${meta.icon} ${esc(p.currency)} ${Number(p.amount).toFixed(2)}</p>`);
+        if (scope === 'nearby') {
+          renderBarCards('nearby-cards', activeFilters.nearby, 8);
+        } else {
+          renderBarCards('bar-cards', activeFilters.hero, 3);
         }
       });
-
-      if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [30, 30] });
-      }
-    }
-
-    // Estimator Calculation Logic
-    const drinkTypeSelect = document.getElementById('drink-type');
-    const drinkCountInput = document.getElementById('drink-count');
-    const calcTotalEl = document.getElementById('calc-total');
-
-    function updateEstimator() {
-      const price = parseFloat(drinkTypeSelect.value) || 0;
-      const count = parseInt(drinkCountInput.value) || 0;
-      const total = price * count;
-      calcTotalEl.textContent = 'CHF ' + total.toFixed(2);
-    }
-
-    if (drinkTypeSelect && drinkCountInput) {
-      drinkTypeSelect.addEventListener('change', updateEstimator);
-      drinkCountInput.addEventListener('input', updateEstimator);
-    }
+    });
 
     loadStats();
     loadBars();
