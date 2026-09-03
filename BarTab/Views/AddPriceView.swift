@@ -19,6 +19,7 @@ struct AddPriceView: View {
     @State private var isSaving = false
     @State private var priceText = ""
     @State private var priceError: String?
+    @State private var showingRequestBrand = false
 
     init(bar: Bar, editingPrice: Price? = nil) {
         self.bar = bar
@@ -168,24 +169,41 @@ struct AddPriceView: View {
                     }
 
                     // Brand Selection
-                    if !availableBrands.isEmpty {
-                        selectorGroup(title: "BRAND") {
-                            FlowLayout(spacing: BarTabSpacing.xs) {
+                    selectorGroup(title: "BRAND") {
+                        FlowLayout(spacing: BarTabSpacing.xs) {
+                            pillButton(
+                                title: "Any",
+                                isSelected: selectedBrand == nil
+                            ) {
+                                selectedBrand = nil
+                            }
+                            ForEach(availableBrands, id: \.self) { brand in
                                 pillButton(
-                                    title: "Any",
-                                    isSelected: selectedBrand == nil
+                                    title: brand,
+                                    isSelected: selectedBrand == brand
                                 ) {
-                                    selectedBrand = nil
-                                }
-                                ForEach(availableBrands, id: \.self) { brand in
-                                    pillButton(
-                                        title: brand,
-                                        isSelected: selectedBrand == brand
-                                    ) {
-                                        selectedBrand = brand
-                                    }
+                                    selectedBrand = brand
                                 }
                             }
+                            Button {
+                                showingRequestBrand = true
+                            } label: {
+                                HStack(spacing: 3) {
+                                    Image(systemName: "plus.circle")
+                                        .font(.barTabCaption)
+                                    Text("Request brand")
+                                        .font(.barTabSmall)
+                                }
+                                .foregroundColor(.barTabAccent)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color.barTabAccent.opacity(0.1))
+                                .clipShape(Capsule())
+                                .overlay(
+                                    Capsule().stroke(Color.barTabAccent.opacity(0.3), lineWidth: 0.5)
+                                )
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
 
