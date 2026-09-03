@@ -25,10 +25,10 @@ struct ActivityItem: Identifiable {
 
     var actionText: String {
         switch kind {
-        case .priceReport: return "reported a price"
-        case .barRating: return "rated a bar"
-        case .drinkRating: return "rated a drink"
-        case .barCreated: return "added a bar"
+        case .priceReport: return String(localized: "reported a price")
+        case .barRating: return String(localized: "rated a bar")
+        case .drinkRating: return String(localized: "rated a drink")
+        case .barCreated: return String(localized: "added a bar")
         }
     }
 }

@@ -66,7 +66,7 @@ struct BarTabApp: App {
                     let success = await SupabaseAuthService().handleResetPasswordCallback(url)
                     if success {
                         await MainActor.run {
-                            toastCenter.show("Password updated successfully!", kind: .success)
+                            toastCenter.show(String(localized: "Password updated successfully!"), kind: .success)
                         }
                     }
                     return

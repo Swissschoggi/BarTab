@@ -31,10 +31,10 @@ struct ActivityFeedView: View {
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
-                        Text("No activity yet")
+                        Text(String(localized: "No activity yet"))
                             .font(.barTabHeading)
 
-                        Text("Accept follow requests to see their price reports and ratings here.")
+                        Text(String(localized: "Accept follow requests to see their price reports and ratings here."))
                             .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -52,7 +52,7 @@ struct ActivityFeedView: View {
             .padding(.vertical, BarTabSpacing.lg)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Activity")
+        .navigationTitle(String(localized: "Activity"))
         .navigationBarTitleDisplayMode(.inline)
         .refreshable {
             await loadFeed()

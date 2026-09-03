@@ -27,10 +27,10 @@ struct AdminReportsView: View {
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
-                        Text("All clear")
+                        Text(String(localized: "All clear"))
                             .font(.barTabHeading)
 
-                        Text("Flagged bars and drinks will show up here for review.")
+                        Text(String(localized: "Flagged bars and drinks will show up here for review."))
                             .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -43,8 +43,7 @@ struct AdminReportsView: View {
 
                     HStack {
                         Label(
-                            "\(barRepository.unreviewedReportCount) "
-                            + "\(barRepository.unreviewedReportCount == 1 ? "needs" : "need") review",
+                            String(localized: "\(barRepository.unreviewedReportCount) \(barRepository.unreviewedReportCount == 1 ? "needs" : "need") review"),
                             systemImage: "exclamationmark.circle"
                         )
                         .font(.barTabBody)
@@ -65,21 +64,21 @@ struct AdminReportsView: View {
             .padding(.vertical, 20)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Reported content")
+        .navigationTitle(String(localized: "Reported content"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             ReportNotificationService.requestPermission()
         }
-        .alert("Delete this report?", isPresented: $showingDeleteConfirmation) {
-            Button("Delete", role: .destructive) {
+        .alert(String(localized: "Delete this report?"), isPresented: $showingDeleteConfirmation) {
+            Button(String(localized: "Delete"), role: .destructive) {
                 guard let report = pendingDeleteReport else { return }
                 Task {
                     await barRepository.deleteReport(report)
                 }
             }
-            Button("Cancel", role: .cancel) {}
+            Button(String(localized: "Cancel"), role: .cancel) {}
         } message: {
-            Text("This removes the report permanently.")
+            Text(String(localized: "This removes the report permanently."))
         }
     }
 
@@ -147,7 +146,7 @@ struct AdminReportsView: View {
             }
 
             if !report.isReviewed {
-                Text("New")
+                Text(String(localized: "New"))
                     .font(.barTabTiny)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -157,7 +156,7 @@ struct AdminReportsView: View {
                     .clipShape(Capsule())
             } else {
                 Label(
-                    "Reviewed",
+                    String(localized: "Reviewed"),
                     systemImage: "checkmark.circle.fill"
                 )
                 .font(.barTabSmall)
@@ -172,7 +171,7 @@ struct AdminReportsView: View {
     ) -> some View {
         HStack(spacing: 6) {
 
-            Text("by \(report.reportedByName)")
+            Text(String(localized: "by \(report.reportedByName)"))
                 .font(.barTabSmall)
                 .foregroundColor(.secondary)
 
@@ -191,7 +190,7 @@ struct AdminReportsView: View {
                     pendingDeleteReport = report
                     showingDeleteConfirmation = true
                 } label: {
-                    Label("Remove", systemImage: "trash")
+                    Label(String(localized: "Remove"), systemImage: "trash")
                         .font(.barTabSmall)
                         .fontWeight(.semibold)
                         .foregroundColor(.barTabDanger)
@@ -202,7 +201,7 @@ struct AdminReportsView: View {
                         await barRepository.markReportReviewed(report)
                     }
                 } label: {
-                    Text("Mark reviewed")
+                    Text(String(localized: "Mark reviewed"))
                         .font(.barTabSmall)
                         .fontWeight(.semibold)
                         .foregroundColor(.barTabPrimary)

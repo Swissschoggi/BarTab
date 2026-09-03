@@ -14,11 +14,11 @@ struct AttributeDetailSheet: View {
     @State private var showingReportDialog = false
 
     private var reportLabel: String {
-        attribute.totalReports == 1 ? "report" : "reports"
+        attribute.totalReports == 1 ? String(localized: "report") : String(localized: "reports")
     }
 
     private var confirmLabel: String {
-        attribute.isConfirmed ? "Confirmed" : "Yes, this is correct"
+        attribute.isConfirmed ? String(localized: "Confirmed") : String(localized: "Yes, this is correct")
     }
 
     private var confirmIcon: String {
@@ -72,7 +72,7 @@ struct AttributeDetailSheet: View {
                             }
                         }
                     } else {
-                        Text("No consensus yet")
+                        Text(String(localized: "No consensus yet"))
                             .font(.barTabBody)
                             .foregroundColor(.barTabSecondary)
                     }
@@ -114,7 +114,7 @@ struct AttributeDetailSheet: View {
                     } label: {
                         HStack {
                             Image(systemName: "exclamationmark.triangle")
-                            Text("Report a change")
+                            Text(String(localized: "Report a change"))
                                 .fontWeight(.semibold)
                         }
                         .frame(maxWidth: .infinity)
@@ -139,7 +139,7 @@ struct AttributeDetailSheet: View {
                         .padding(.horizontal, BarTabSpacing.md)
 
                     VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-                        Text("Other reports")
+                        Text(String(localized: "Other reports"))
                             .font(.barTabSmall)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabSecondary)
@@ -167,11 +167,11 @@ struct AttributeDetailSheet: View {
                 }
             }
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Attribute")
+            .navigationTitle(String(localized: "Attribute"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button(String(localized: "Done")) { dismiss() }
                         .foregroundColor(.barTabPrimary)
                 }
             }
@@ -180,7 +180,7 @@ struct AttributeDetailSheet: View {
                 isPresented: $showingConfirmDialog,
                 titleVisibility: .visible
             ) {
-                Button("Yes, confirm") {
+                Button(String(localized: "Yes, confirm")) {
                     Task {
                         await barRepository.submitAttributeReport(
                             for: bar,
@@ -189,16 +189,16 @@ struct AttributeDetailSheet: View {
                             by: currentUser
                         )
                         HapticEngine.success()
-                        toastCenter.show("Confirmed!", kind: .success)
+                        toastCenter.show(String(localized: "Confirmed!"), kind: .success)
                         dismiss()
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String(localized: "Cancel"), role: .cancel) {}
             } message: {
-                Text("This adds your confirmation to the community consensus.")
+                Text(String(localized: "This adds your confirmation to the community consensus."))
             }
             .confirmationDialog(
-                "Report a different value?",
+                String(localized: "Report a different value?"),
                 isPresented: $showingReportDialog,
                 titleVisibility: .visible
             ) {
@@ -212,14 +212,14 @@ struct AttributeDetailSheet: View {
                                 by: currentUser
                             )
                             HapticEngine.impact()
-                            toastCenter.show("Change reported", kind: .info)
+                            toastCenter.show(String(localized: "Change reported"), kind: .info)
                             dismiss()
                         }
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String(localized: "Cancel"), role: .cancel) {}
             } message: {
-                Text("What should the correct value be?")
+                Text(String(localized: "What should the correct value be?"))
             }
         }
     }
@@ -233,7 +233,7 @@ struct AttributeDetailSheet: View {
     }
 
     private func consensusCountLabel(_ count: Int) -> String {
-        count == 1 ? "1 report" : "\(count) reports"
+        count == 1 ? String(localized: "1 report") : String(localized: "\(count) reports")
     }
 
     func confidenceColor(_ pct: Int) -> Color {

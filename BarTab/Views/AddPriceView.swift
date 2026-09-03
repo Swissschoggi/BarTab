@@ -344,7 +344,7 @@ struct AddPriceView: View {
             }
 
             HapticEngine.success()
-            toastCenter.show("Price saved", kind: .success)
+            toastCenter.show(String(localized: "Price saved"), kind: .success)
             dismiss()
         }
     }

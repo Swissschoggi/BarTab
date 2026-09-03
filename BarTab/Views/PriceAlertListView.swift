@@ -22,10 +22,10 @@ struct PriceAlertListView: View {
                                 .font(.barTabEmptyIcon)
                                 .foregroundColor(.barTabPrimary)
 
-                            Text("No alerts")
+                            Text(String(localized: "No alerts"))
                                 .font(.barTabHeading)
 
-                            Text("Set a price alert on any drink to be notified when the price changes.")
+                            Text(String(localized: "Set a price alert on any drink to be notified when the price changes."))
                                 .font(.barTabBody)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
@@ -43,7 +43,7 @@ struct PriceAlertListView: View {
                 .listStyle(.plain)
             }
         }
-        .navigationTitle("Price Alerts")
+            .navigationTitle(String(localized: "Price Alerts"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadAlerts()
@@ -77,7 +77,7 @@ struct PriceAlertListView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.barTabAccent)
             } else {
-                Text("Any price")
+                Text(String(localized: "Any price"))
                     .font(.barTabSmall)
                     .foregroundColor(.barTabSecondary)
             }

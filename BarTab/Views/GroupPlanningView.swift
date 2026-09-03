@@ -15,8 +15,8 @@ struct GroupPlanningView: View {
             VStack(alignment: .leading, spacing: 16) {
 
                 BarTabScreenHeader(
-                    title: "Groups",
-                    subtitle: "Plan where to go with friends."
+                    title: String(localized: "Groups"),
+                    subtitle: String(localized: "Plan where to go with friends.")
                 )
 
                 Button {
@@ -24,7 +24,7 @@ struct GroupPlanningView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus")
-                        Text("Create Group")
+                        Text(String(localized: "Create Group"))
                             .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
@@ -41,10 +41,10 @@ struct GroupPlanningView: View {
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
-                        Text("No groups yet")
+                        Text(String(localized: "No groups yet"))
                             .font(.barTabHeading)
 
-                        Text("Create a group to plan nights out with friends.")
+                        Text(String(localized: "Create a group to plan nights out with friends."))
                             .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -70,7 +70,7 @@ struct GroupPlanningView: View {
             .padding(.vertical, 20)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Groups")
+        .navigationTitle(String(localized: "Groups"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingCreateGroup) {
             CreateGroupSheet()
@@ -106,7 +106,7 @@ struct GroupPlanningView: View {
                     .fontWeight(.semibold)
                     .foregroundColor(.barTabText)
 
-                Text("Tap to open")
+                Text(String(localized: "Tap to open"))
                     .font(.barTabTiny)
                     .foregroundColor(.barTabSecondary)
             }

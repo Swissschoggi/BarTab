@@ -21,10 +21,10 @@ struct FollowingListView: View {
                     Image(systemName: "person.2.slash")
                         .font(.barTabEmptyIcon)
                         .foregroundColor(.barTabPrimary)
-                    Text("Not following anyone yet")
+                    Text(String(localized: "Not following anyone yet"))
                         .font(.barTabBody)
                         .fontWeight(.medium)
-                    Text("Find friends to see their drink reports here.")
+                    Text(String(localized: "Find friends to see their drink reports here."))
                         .font(.barTabSmall)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -52,7 +52,7 @@ struct FollowingListView: View {
             }
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Following")
+        .navigationTitle(String(localized: "Following"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadData()
@@ -64,7 +64,7 @@ struct FollowingListView: View {
             UserAvatarView(urlString: profile.avatar_url, displayName: profile.display_name)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(profile.display_name ?? "User")
+                Text(profile.display_name ?? String(localized: "User"))
                     .font(.barTabBody)
                     .fontWeight(.semibold)
                     .foregroundColor(.barTabText)
@@ -75,7 +75,7 @@ struct FollowingListView: View {
             Button {
                 Task { await unfollow(profile) }
             } label: {
-                Text("Unfollow")
+                Text(String(localized: "Unfollow"))
                     .font(.barTabSmall)
                     .fontWeight(.medium)
                     .foregroundColor(.barTabDanger)
@@ -108,7 +108,7 @@ struct FollowingListView: View {
             try await SupabaseClient.shared.removeFollow(profile.id)
             followingIDs.removeAll { $0 == profile.id }
             profiles.removeValue(forKey: profile.id)
-            toastCenter.show("Unfollowed \(profile.display_name ?? "user")", kind: .success)
+            toastCenter.show(String(localized: "Unfollowed \(profile.display_name ?? "user")"), kind: .success)
         } catch {
             toastCenter.showError(error)
         }

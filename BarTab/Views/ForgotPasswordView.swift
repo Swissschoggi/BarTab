@@ -14,8 +14,8 @@ struct ForgotPasswordView: View {
             VStack(alignment: .leading, spacing: 24) {
 
                 BarTabScreenHeader(
-                    title: "Reset Password",
-                    subtitle: "Enter your email and we'll send you a reset link."
+                    title: String(localized: "Reset Password"),
+                    subtitle: String(localized: "Enter your email and we'll send you a reset link.")
                 )
 
                 if didSend {
@@ -24,15 +24,15 @@ struct ForgotPasswordView: View {
                             .font(.barTabEmptyIconLarge)
                             .foregroundColor(.barTabAccent)
 
-                        Text("Check your inbox")
+                        Text(String(localized: "Check your inbox"))
                             .font(.title3.bold())
 
-                        Text("We sent a password reset link to **\(email)**. Follow the link to set a new password.")
+                        Text(String(localized: "We sent a password reset link to **\(email)**. Follow the link to set a new password."))
                             .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
 
-                        Button("Back to Sign In") {
+                        Button(String(localized: "Back to Sign In")) {
                             dismiss()
                         }
                         .font(.subheadline.bold())
@@ -43,10 +43,10 @@ struct ForgotPasswordView: View {
                     .barTabCard()
                 } else {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Email")
+                        Text(String(localized: "Email"))
                             .font(.barTabHeading)
 
-                        TextField("your@email.com", text: $email)
+                        TextField(String(localized: "your@email.com"), text: $email)
                             .textFieldStyle(.plain)
                             .keyboardType(.emailAddress)
                             .textContentType(.emailAddress)
@@ -63,7 +63,7 @@ struct ForgotPasswordView: View {
                             if isSubmitting {
                                 ProgressView().tint(.white)
                             }
-                            Text("Send Reset Link")
+                            Text(String(localized: "Send Reset Link"))
                         }
                         .font(.barTabHeading)
                         .foregroundColor(.white)
@@ -83,7 +83,7 @@ struct ForgotPasswordView: View {
             .padding(.vertical, 24)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Reset Password")
+        .navigationTitle(String(localized: "Reset Password"))
         .navigationBarTitleDisplayMode(.inline)
     }
 

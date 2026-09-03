@@ -34,7 +34,7 @@ struct InviteMemberSheet: View {
                         HStack(spacing: 8) {
                             Image(systemName: "magnifyingglass")
                                 .foregroundColor(.secondary)
-                            TextField("Search friends...", text: $searchText)
+                            TextField(String(localized: "Search friends..."), text: $searchText)
                                 .textFieldStyle(.plain)
                             if !searchText.isEmpty {
                                 Button {
@@ -54,8 +54,8 @@ struct InviteMemberSheet: View {
                         List {
                             if filteredFriends.isEmpty {
                                 Text(searchText.isEmpty
-                                    ? "All your friends are already in this group."
-                                    : "No friends match your search.")
+                                    ? String(localized: "All your friends are already in this group.")
+                                    : String(localized: "No friends match your search."))
                                     .font(.barTabBody)
                                     .foregroundColor(.secondary)
                             } else {
@@ -78,11 +78,11 @@ struct InviteMemberSheet: View {
                     }
                 }
             }
-            .navigationTitle("Invite Friends")
+            .navigationTitle(String(localized: "Invite Friends"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button(String(localized: "Done")) {
                         dismiss()
                     }
                 }
@@ -120,7 +120,7 @@ struct InviteMemberSheet: View {
             try await SupabaseClient.shared.inviteToGroup(groupID: group.id, userID: userID)
             members.insert(userID)
             HapticEngine.lightTap()
-            toastCenter.show("Invited!", kind: .success)
+            toastCenter.show(String(localized: "Invited!"), kind: .success)
         } catch {
             toastCenter.showError(error)
         }

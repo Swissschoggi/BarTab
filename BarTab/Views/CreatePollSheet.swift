@@ -40,16 +40,16 @@ struct CreatePollSheet: View {
         NavigationView {
             Form {
                 Section {
-                    TextField("What are we deciding?", text: $pollTitle)
+                    TextField(String(localized: "What are we deciding?"), text: $pollTitle)
                         .textInputAutocapitalization(.sentences)
                 } header: {
-                    Text("Poll question")
+                    Text(String(localized: "Poll question"))
                 }
 
                 Section {
                     ForEach(0..<optionTexts.count, id: \.self) { index in
                         VStack(alignment: .leading, spacing: 6) {
-                            TextField("Option \(index + 1)", text: $optionTexts[index])
+                            TextField(String(localized: "Option \(index + 1)"), text: $optionTexts[index])
                                 .textInputAutocapitalization(.words)
 
                             if let barID = optionBarIDs[index],
@@ -76,7 +76,7 @@ struct CreatePollSheet: View {
                                     barPickerIndex = index
                                     showingBarPicker = true
                                 } label: {
-                                    Label("Link a bar", systemImage: "mappin.and.ellipse")
+                                    Label(String(localized: "Link a bar"), systemImage: "mappin.and.ellipse")
                                         .font(.barTabSmall)
                                         .foregroundColor(.barTabSecondary)
                                 }
@@ -88,29 +88,29 @@ struct CreatePollSheet: View {
                         optionTexts.append("")
                         optionBarIDs.append(nil)
                     } label: {
-                        Label("Add option", systemImage: "plus")
+                        Label(String(localized: "Add option"), systemImage: "plus")
                     }
                 } header: {
-                    Text("Options")
+                    Text(String(localized: "Options"))
                 } footer: {
                     if filledOptionCount < 2 {
-                        Text("Add at least 2 options to create a poll.")
+                        Text(String(localized: "Add at least 2 options to create a poll."))
                             .foregroundColor(.barTabDanger)
                     } else {
-                        Text("Add bars, drinks, or whatever you're deciding on. Link bars to show their location in the poll.")
+                        Text(String(localized: "Add bars, drinks, or whatever you're deciding on. Link bars to show their location in the poll."))
                     }
                 }
             }
-            .navigationTitle("New Poll")
+            .navigationTitle(String(localized: "New Poll"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button(String(localized: "Cancel")) {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Create") {
+                    Button(String(localized: "Create")) {
                         Task { await createPoll() }
                     }
                     .disabled(!canCreate)
@@ -119,7 +119,7 @@ struct CreatePollSheet: View {
             .sheet(isPresented: $showingBarPicker) {
                 NavigationView {
                     List {
-                        TextField("Search bars...", text: $barSearchQuery)
+                        TextField(String(localized: "Search bars..."), text: $barSearchQuery)
                             .textInputAutocapitalization(.never)
                             .listRowSeparator(.hidden)
 
@@ -140,11 +140,11 @@ struct CreatePollSheet: View {
                             }
                         }
                     }
-                    .navigationTitle("Select Bar")
+                    .navigationTitle(String(localized: "Select Bar"))
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
-                            Button("Cancel") {
+                            Button(String(localized: "Cancel")) {
                                 showingBarPicker = false
                                 barSearchQuery = ""
                             }
@@ -163,7 +163,7 @@ struct CreatePollSheet: View {
         let options: [(barID: UUID?, label: String)] = zip(texts, Array(optionBarIDs.prefix(texts.count))).map { (barID: $1, label: $0) }
 
         guard !title.isEmpty, options.count >= 2 else {
-            toastCenter.show("Add at least 2 options to create a poll.", kind: .error)
+            toastCenter.show(String(localized: "Add at least 2 options to create a poll."), kind: .error)
             return
         }
 
@@ -175,7 +175,7 @@ struct CreatePollSheet: View {
                 options: options
             )
             HapticEngine.success()
-            toastCenter.show("Poll created", kind: .success)
+            toastCenter.show(String(localized: "Poll created"), kind: .success)
             dismiss()
         } catch {
             toastCenter.showError(error)

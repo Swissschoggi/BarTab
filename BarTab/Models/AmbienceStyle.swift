@@ -15,14 +15,14 @@ enum AmbienceStyle: String, CaseIterable, Identifiable, Codable {
 
     var displayName: String {
         switch self {
-        case .cozy: return "Cozy"
-        case .modern: return "Modern"
-        case .elegant: return "Elegant"
-        case .casual: return "Casual"
-        case .rustic: return "Rustic"
-        case .trendy: return "Trendy"
-        case .lively: return "Lively"
-        case .chill: return "Chill"
+        case .cozy: return String(localized: "Cozy")
+        case .modern: return String(localized: "Modern")
+        case .elegant: return String(localized: "Elegant")
+        case .casual: return String(localized: "Casual")
+        case .rustic: return String(localized: "Rustic")
+        case .trendy: return String(localized: "Trendy")
+        case .lively: return String(localized: "Lively")
+        case .chill: return String(localized: "Chill")
         }
     }
 

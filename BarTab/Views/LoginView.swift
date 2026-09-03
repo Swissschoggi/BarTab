@@ -23,10 +23,10 @@ struct LoginView: View {
         var title: String {
             switch self {
             case .signIn:
-                return "Sign in"
+                return String(localized: "Sign in")
 
             case .createAccount:
-                return "Create account"
+                return String(localized: "Create account")
             }
         }
     }
@@ -68,12 +68,12 @@ struct LoginView: View {
                                 .foregroundColor(.white)
                         }
 
-                        Text("Welcome to BarTab")
+                        Text(String(localized: "Welcome to BarTab"))
                             .font(.barTabTitle)
                             .foregroundColor(.barTabText)
 
                         Text(
-                            "Create an account to add and manage drinks."
+                            String(localized: "Create an account to add and manage drinks.")
                         )
                         .font(.barTabBody)
                         .foregroundColor(.barTabSecondary)
@@ -123,7 +123,7 @@ struct LoginView: View {
 
                         VStack { Divider() }
 
-                        Text("or use an email")
+                        Text(String(localized: "or use an email"))
                             .font(.barTabSmall)
                             .foregroundColor(.barTabSecondary)
 
@@ -134,7 +134,7 @@ struct LoginView: View {
                     VStack(spacing: BarTabSpacing.sm) {
 
                         Picker(
-                            "Mode",
+                            String(localized: "Mode"),
                             selection: $mode
                         ) {
                             ForEach(Mode.allCases) { option in
@@ -149,12 +149,12 @@ struct LoginView: View {
                             spacing: 6
                         ) {
 
-                            Text("Email")
+                            Text(String(localized: "Email"))
                                 .font(.barTabCaption)
                                 .foregroundColor(.barTabSecondary)
 
                             TextField(
-                                "Your email",
+                                String(localized: "Your email"),
                                 text: $email
                             )
                             .keyboardType(.emailAddress)
@@ -168,7 +168,7 @@ struct LoginView: View {
                             spacing: 6
                         ) {
 
-                            Text("Password")
+                            Text(String(localized: "Password"))
                                 .font(.barTabCaption)
                                 .foregroundColor(.barTabSecondary)
 
@@ -176,8 +176,8 @@ struct LoginView: View {
                                 if showPassword {
                                     TextField(
                                         mode == .createAccount
-                                        ? "At least 8 characters"
-                                        : "Your password",
+                                        ? String(localized: "At least 8 characters")
+                                        : String(localized: "Your password"),
                                         text: $password
                                     )
                                     .textInputAutocapitalization(.never)
@@ -185,8 +185,8 @@ struct LoginView: View {
                                 } else {
                                     SecureField(
                                         mode == .createAccount
-                                        ? "At least 8 characters"
-                                        : "Your password",
+                                        ? String(localized: "At least 8 characters")
+                                        : String(localized: "Your password"),
                                         text: $password
                                     )
                                 }
@@ -209,7 +209,7 @@ struct LoginView: View {
                                 NavigationLink {
                                     ForgotPasswordView()
                                 } label: {
-                                    Text("Forgot Password?")
+                                    Text(String(localized: "Forgot Password?"))
                                         .font(.barTabBody)
                                         .foregroundColor(.barTabAccent)
                                 }
@@ -223,21 +223,21 @@ struct LoginView: View {
                                 spacing: 6
                             ) {
 
-                                Text("Confirm password")
+                                Text(String(localized: "Confirm password"))
                                     .font(.barTabCaption)
                                     .foregroundColor(.barTabSecondary)
 
                                 HStack {
                                     if showConfirmPassword {
                                         TextField(
-                                            "Repeat your password",
+                                            String(localized: "Repeat your password"),
                                             text: $confirmPassword
                                         )
                                         .textInputAutocapitalization(.never)
                                         .autocorrectionDisabled()
                                     } else {
                                         SecureField(
-                                            "Repeat your password",
+                                            String(localized: "Repeat your password"),
                                             text: $confirmPassword
                                         )
                                     }
@@ -298,7 +298,7 @@ struct LoginView: View {
 
 
                     Text(
-                        "Your account lives on BarTab's server. "
+                        String(localized: "Your account lives on BarTab's server. ")
                     )
                     .font(.barTabSmall)
                     .foregroundColor(.barTabSecondary)
@@ -309,7 +309,7 @@ struct LoginView: View {
                 .padding(24)
             }
             .background(Color.barTabBackground)
-            .navigationTitle("Sign In")
+            .navigationTitle(String(localized: "Sign In"))
             .navigationBarTitleDisplayMode(.inline)
         }
         .animation(.easeOut(duration: 0.2), value: errorMessage)
@@ -335,7 +335,7 @@ struct LoginView: View {
                         )
                 }
 
-                Text(isGoogleSigningIn ? "Connecting…" : "Continue with Google")
+                Text(isGoogleSigningIn ? String(localized: "Connecting…") : String(localized: "Continue with Google"))
                     .font(.barTabBodySemibold)
                     .foregroundColor(.barTabText)
             }
@@ -362,7 +362,7 @@ struct LoginView: View {
     private func startGoogleSignIn() {
 
         guard let authorizeURL = SupabaseAuthService.googleAuthorizeURL() else {
-            errorMessage = "Google sign-in isn't configured."
+            errorMessage = String(localized: "Google sign-in isn't configured.")
             return
         }
 
@@ -382,7 +382,7 @@ struct LoginView: View {
                         )
                         isGoogleSigningIn = false
                         toastCenter.show(
-                            "Signed in with Google",
+                            String(localized: "Signed in with Google"),
                             kind: .success
                         )
                         dismiss()
@@ -391,7 +391,7 @@ struct LoginView: View {
                         if (error as? SupabaseAuthService.AuthError) != nil {
                             errorMessage = FriendlyError.message(for: error)
                         } else {
-                            errorMessage = "Google sign-in failed. Please try again."
+                            errorMessage = String(localized: "Google sign-in failed. Please try again.")
                         }
                     }
                 }
@@ -448,7 +448,7 @@ struct LoginView: View {
         )
 
         guard !trimmed.isEmpty else {
-            errorMessage = "Enter your email."
+            errorMessage = String(localized: "Enter your email.")
             return
         }
 
@@ -456,19 +456,19 @@ struct LoginView: View {
 
             guard password.count >= 8 else {
                 errorMessage =
-                    "Password must be at least 8 characters."
+                    String(localized: "Password must be at least 8 characters.")
                 return
             }
 
             guard password == confirmPassword else {
-                errorMessage = "Passwords don't match."
+                errorMessage = String(localized: "Passwords don't match.")
                 return
             }
 
         } else {
 
             guard !password.isEmpty else {
-                errorMessage = "Enter your password."
+                errorMessage = String(localized: "Enter your password.")
                 return
             }
         }
@@ -502,10 +502,10 @@ struct LoginView: View {
                 if case .emailConfirmationRequired = authError {
                     // Account was created; the user just needs to confirm.
                     toastCenter.show(
-                        "Account created! Check your inbox to confirm your email, then sign in.",
-                        kind: .success,
-                        duration: 6
-                    )
+                            String(localized: "Account created! Check your inbox to confirm your email, then sign in."),
+                            kind: .success,
+                            duration: 6
+                        )
                     mode = .signIn
                     password = ""
                     confirmPassword = ""
@@ -538,14 +538,14 @@ struct LoginView: View {
                 errorMessage = FriendlyError.message(for: error)
             } else {
                 errorMessage =
-                    "Sign in with Apple failed. Please try again."
+                    String(localized: "Sign in with Apple failed. Please try again.")
             }
             return
         }
 
         guard let rawNonce = currentNonce else {
             errorMessage =
-                "Sign in with Apple failed. Please try again."
+                String(localized: "Sign in with Apple failed. Please try again.")
             return
         }
 

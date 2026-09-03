@@ -3,29 +3,30 @@ import SwiftUI
 struct OnboardingView: View {
 
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var locationService: LocationService
 
     @State private var currentPage = 0
 
     private let pages: [(icon: String, title: String, message: String)] = [
         (
             "wineglass.fill",
-            "Welcome to BarTab",
-            "Discover drink prices at bars near you, crowdsourced by the community."
+            String(localized: "Welcome to BarTab"),
+            String(localized: "Discover drink prices at bars near you, crowdsourced by the community.")
         ),
         (
             "mappin.circle.fill",
-            "Find Nearby Bars",
-            "See what drinks cost at bars around you. Compare prices and find the best deals."
+            String(localized: "Find Nearby Bars"),
+            String(localized: "See what drinks cost at bars around you. Compare prices and find the best deals.")
         ),
         (
             "plus.circle.fill",
-            "Contribute Prices",
-            "Spotted a price? Add it to help others find great drink deals."
+            String(localized: "Contribute Prices"),
+            String(localized: "Spotted a price? Add it to help others find great drink deals.")
         ),
         (
             "person.3.fill",
-            "Go Social",
-            "Create groups, plan nights out, and see what your friends are drinking."
+            String(localized: "Go Social"),
+            String(localized: "Create groups, plan nights out, and see what your friends are drinking.")
         )
     ]
 
@@ -68,6 +69,11 @@ struct OnboardingView: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+            .onChange(of: currentPage) { page in
+                if page == 1 {
+                    locationService.requestPermission()
+                }
+            }
 
             VStack(spacing: 16) {
 
@@ -86,16 +92,17 @@ struct OnboardingView: View {
                             currentPage += 1
                         }
                     } else {
+                        locationService.requestPermission()
                         UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
                         dismiss()
                     }
                 } label: {
-                    Text(currentPage < pages.count - 1 ? "Continue" : "Get Started")
+                    Text(currentPage < pages.count - 1 ? String(localized: "Continue") : String(localized: "Get Started"))
                         .barTabPrimaryButton()
                 }
 
                 if currentPage < pages.count - 1 {
-                    Button("Skip") {
+                    Button(String(localized: "Skip")) {
                         UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
                         dismiss()
                     }

@@ -23,21 +23,21 @@ enum BarAttributeKey: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .outdoorSeating: return "Outdoor Seating"
-        case .smoking: return "Smoking"
-        case .dogsAllowed: return "Dogs Allowed"
-        case .wifi: return "Wi-Fi"
-        case .cardAccepted: return "Card Payments"
-        case .accessibility: return "Wheelchair Accessible"
-        case .toilets: return "Toilets"
-        case .music: return "Music"
-        case .liveMusic: return "Live Music"
-        case .poolTable: return "Pool Table"
-        case .darts: return "Darts"
-        case .tableFootball: return "Table Football"
-        case .tvSports: return "TV Sports"
-        case .food: return "Food Served"
-        case .outdoorSmoking: return "Outdoor Smoking Area"
+        case .outdoorSeating: return String(localized: "Outdoor Seating")
+        case .smoking: return String(localized: "Smoking")
+        case .dogsAllowed: return String(localized: "Dogs Allowed")
+        case .wifi: return String(localized: "Wi-Fi")
+        case .cardAccepted: return String(localized: "Card Payments")
+        case .accessibility: return String(localized: "Wheelchair Accessible")
+        case .toilets: return String(localized: "Toilets")
+        case .music: return String(localized: "Music")
+        case .liveMusic: return String(localized: "Live Music")
+        case .poolTable: return String(localized: "Pool Table")
+        case .darts: return String(localized: "Darts")
+        case .tableFootball: return String(localized: "Table Football")
+        case .tvSports: return String(localized: "TV Sports")
+        case .food: return String(localized: "Food Served")
+        case .outdoorSmoking: return String(localized: "Outdoor Smoking Area")
         }
     }
 
@@ -83,10 +83,10 @@ enum BarAttributeKey: String, CaseIterable, Identifiable {
 
     func displayValue(_ value: String) -> String {
         switch (self, value) {
-        case (.smoking, "allowed"): return "Allowed"
-        case (.smoking, "not_allowed"): return "Not Allowed"
-        case (_, "yes"): return "Yes"
-        case (_, "no"): return "No"
+        case (.smoking, "allowed"): return String(localized: "Allowed")
+        case (.smoking, "not_allowed"): return String(localized: "Not Allowed")
+        case (_, "yes"): return String(localized: "Yes")
+        case (_, "no"): return String(localized: "No")
         default: return value.capitalized
         }
     }

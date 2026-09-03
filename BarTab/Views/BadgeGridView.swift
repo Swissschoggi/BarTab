@@ -28,10 +28,10 @@ struct BadgeGridView: View {
                             .foregroundColor(.barTabWarning)
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("\(streak)-day streak")
+                            Text(String(localized: "\(streak)-day streak"))
                                 .font(.barTabHeading)
                                 .foregroundColor(.barTabText)
-                            Text("Keep it going!")
+                            Text(String(localized: "Keep it going!"))
                                 .font(.barTabSmall)
                                 .foregroundColor(.barTabSecondary)
                         }
@@ -44,7 +44,7 @@ struct BadgeGridView: View {
 
                 // Earned badges
                 if !earnedBadges.isEmpty {
-                    Text("Earned")
+                    Text(String(localized: "Earned"))
                         .font(.barTabHeading)
                         .foregroundColor(.barTabText)
 
@@ -57,7 +57,7 @@ struct BadgeGridView: View {
 
                 // Unearned badges
                 if !unearnedBadges.isEmpty {
-                    Text("Locked")
+                    Text(String(localized: "Locked"))
                         .font(.barTabHeading)
                         .foregroundColor(.barTabText)
 
@@ -72,7 +72,7 @@ struct BadgeGridView: View {
             .padding(.vertical, 20)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Badges")
+        .navigationTitle(String(localized: "Badges"))
         .navigationBarTitleDisplayMode(.inline)
     }
 

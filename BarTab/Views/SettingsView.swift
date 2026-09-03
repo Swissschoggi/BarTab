@@ -37,7 +37,7 @@ struct SettingsView: View {
                                 Image(systemName: "person.circle")
                                     .font(.barTabBody)
                                     .foregroundColor(.barTabPrimary)
-                                Text("Account")
+                                Text(String(localized: "Account"))
                                     .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabText)
@@ -50,8 +50,8 @@ struct SettingsView: View {
                                     settingsRow(
                                         icon: "person.fill",
                                         iconColor: .barTabPrimary,
-                                        title: "Username",
-                                        value: userSession.currentUser?.username ?? "Not set"
+                                        title: String(localized: "Username"),
+                                        value: userSession.currentUser?.username ?? String(localized: "Not set")
                                     )
                                 }
 
@@ -65,7 +65,7 @@ struct SettingsView: View {
                                     settingsRow(
                                         icon: "lock.fill",
                                         iconColor: .barTabPrimary,
-                                        title: "Change Password",
+                                        title: String(localized: "Change Password"),
                                         value: ""
                                     )
                                 }
@@ -80,7 +80,7 @@ struct SettingsView: View {
                             Image(systemName: "slider.horizontal.3")
                                 .font(.barTabBody)
                                 .foregroundColor(.barTabPrimary)
-                            Text("Preferences")
+                            Text(String(localized: "Preferences"))
                                 .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
@@ -135,7 +135,7 @@ struct SettingsView: View {
                                 Image(systemName: "dollarsign.circle")
                                     .font(.barTabBody)
                                     .foregroundColor(.barTabPrimary)
-                                Text("Currency")
+                                Text(String(localized: "Currency"))
                                     .font(.barTabBody)
                                     .foregroundColor(.barTabText)
 
@@ -194,7 +194,7 @@ struct SettingsView: View {
                                 Image(systemName: "globe")
                                     .font(.barTabBody)
                                     .foregroundColor(.barTabPrimary)
-                                Text("Language")
+                                Text(String(localized: "Language"))
                                     .font(.barTabBody)
                                     .foregroundColor(.barTabText)
 
@@ -217,7 +217,7 @@ struct SettingsView: View {
                                 Image(systemName: "shield.lefthalf.filled")
                                     .font(.barTabBody)
                                     .foregroundColor(.barTabPrimary)
-                                Text("Admin")
+                                Text(String(localized: "Admin"))
                                     .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabText)
@@ -228,7 +228,7 @@ struct SettingsView: View {
                                     AdminBrandRequestsView()
                                 } label: {
                                     HStack {
-                                        Label("Brand Requests", systemImage: "tag.fill")
+                                        Label(String(localized: "Brand Requests"), systemImage: "tag.fill")
                                             .font(.barTabBody)
                                             .foregroundColor(.barTabText)
 
@@ -261,7 +261,7 @@ struct SettingsView: View {
                                     AdminReportsView()
                                 } label: {
                                     HStack {
-                                        Label("Reported Content", systemImage: "exclamationmark.shield.fill")
+                                        Label(String(localized: "Reported Content"), systemImage: "exclamationmark.shield.fill")
                                             .font(.barTabBody)
                                             .foregroundColor(.barTabText)
 
@@ -296,7 +296,7 @@ struct SettingsView: View {
                             Image(systemName: "info.circle")
                                 .font(.barTabBody)
                                 .foregroundColor(.barTabPrimary)
-                            Text("About")
+                            Text(String(localized: "About"))
                                 .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
@@ -308,7 +308,7 @@ struct SettingsView: View {
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
 
-                            Text("Find bars, compare drinks, and discover the best drink deals around you.")
+                            Text(String(localized: "Find bars, compare drinks, and discover the best drink deals around you."))
                                 .font(.barTabSmall)
                                 .foregroundColor(.barTabSecondary)
                         }
@@ -317,7 +317,7 @@ struct SettingsView: View {
                             .foregroundColor(.barTabCardBorder)
 
                         HStack {
-                            Text("Version")
+                            Text(String(localized: "Version"))
                                 .font(.barTabBody)
                                 .foregroundColor(.barTabText)
                             Spacer()
@@ -334,7 +334,7 @@ struct SettingsView: View {
                             Image(systemName: "trash")
                                 .font(.barTabBody)
                                 .foregroundColor(.barTabPrimary)
-                            Text("Cache")
+                            Text(String(localized: "Cache"))
                                 .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
@@ -347,7 +347,7 @@ struct SettingsView: View {
                                 settingsRow(
                                     icon: "xmark.circle",
                                     iconColor: .red,
-                                    title: "Clear Cache",
+                                    title: String(localized: "Clear Cache"),
                                     value: ""
                                 )
                             }
@@ -361,19 +361,19 @@ struct SettingsView: View {
                             Image(systemName: "cup.and.saucer.fill")
                                 .font(.barTabBody)
                                 .foregroundColor(.barTabPrimary)
-                            Text("Support the Dev")
+                            Text(String(localized: "Support the Dev"))
                                 .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Buy the developer a drink!")
+                            Text(String(localized: "Buy the developer a drink!"))
                                 .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
 
-                            Text("If BarTab helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running.")
+                            Text(String(localized: "If BarTab helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running."))
                                 .font(.barTabSmall)
                                 .foregroundColor(.barTabSecondary)
                         }
@@ -383,7 +383,7 @@ struct SettingsView: View {
                         } label: {
                             HStack {
                                 Image(systemName: "cup.and.saucer.fill")
-                                Text("Buy a Drink")
+                                Text(String(localized: "Buy a Drink"))
                                     .fontWeight(.semibold)
                             }
                             .frame(maxWidth: .infinity)
@@ -400,7 +400,7 @@ struct SettingsView: View {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.barTabBody)
                                     .foregroundColor(.barTabDanger)
-                                Text("Danger Zone")
+                                Text(String(localized: "Danger Zone"))
                                     .font(.barTabBody)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.barTabText)
@@ -413,7 +413,7 @@ struct SettingsView: View {
                                     settingsRow(
                                         icon: "trash",
                                         iconColor: .red,
-                                        title: "Delete Account",
+                                        title: String(localized: "Delete Account"),
                                         value: ""
                                     )
                                     .foregroundColor(.barTabDanger)
@@ -428,29 +428,29 @@ struct SettingsView: View {
                 .padding(.bottom, 30)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Settings")
+            .navigationTitle(String(localized: "Settings"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") {
+                    Button(String(localized: "Done")) {
                         dismiss()
                     }
                 }
             }
         }
-        .alert("Clear Cache", isPresented: $showingClearCacheConfirm) {
-            Button("Clear", role: .destructive) {
+        .alert(String(localized: "Clear Cache"), isPresented: $showingClearCacheConfirm) {
+            Button(String(localized: "Clear"), role: .destructive) {
                 ExchangeRateService.shared.clearCache()
-                toastCenter.show("Cache cleared", kind: .success)
+                toastCenter.show(String(localized: "Cache cleared"), kind: .success)
             }
-            Button("Cancel", role: .cancel) {}
+            Button(String(localized: "Cancel"), role: .cancel) {}
         } message: {
-            Text("This will reset exchange rates to default values.")
+            Text(String(localized: "This will reset exchange rates to default values."))
         }
-        .alert("Restart Required", isPresented: $showingRestartAlert) {
-            Button("OK", role: .cancel) {}
+        .alert(String(localized: "Restart Required"), isPresented: $showingRestartAlert) {
+            Button(String(localized: "OK"), role: .cancel) {}
         } message: {
-            Text("Please close and reopen the app to apply the language change.")
+            Text(String(localized: "Please close and reopen the app to apply the language change."))
         }
         .sheet(isPresented: $showingUsernameEditor) {
             EditUsernameSheet(currentUsername: userSession.currentUser?.username ?? "")
@@ -467,10 +467,10 @@ struct SettingsView: View {
                 .environmentObject(userSession)
                 .environmentObject(toastCenter)
         }
-        .alert("Coming Soon", isPresented: $showingTipJar) {
-            Button("OK", role: .cancel) {}
+        .alert(String(localized: "Coming Soon"), isPresented: $showingTipJar) {
+            Button(String(localized: "OK"), role: .cancel) {}
         } message: {
-            Text("Tip jar coming soon! We're setting up payments   stay tuned.")
+            Text(String(localized: "Tip jar coming soon! We're setting up payments   stay tuned."))
         }
     }
 
@@ -554,11 +554,11 @@ private struct EditUsernameSheet: View {
                         avatarPreview
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("This is how others see you")
+                            Text(String(localized: "This is how others see you"))
                                 .font(.barTabSmall)
                                 .foregroundColor(.barTabSecondary)
 
-                            Text(trimmed.isEmpty ? "No name yet" : trimmed)
+                            Text(trimmed.isEmpty ? String(localized: "No name yet") : trimmed)
                                 .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.barTabText)
@@ -567,23 +567,23 @@ private struct EditUsernameSheet: View {
                     }
                     .padding(.vertical, 6)
                 } header: {
-                    Text("Preview")
+                    Text(String(localized: "Preview"))
                 }
 
                 Section {
-                    TextField("Username", text: $username)
+                    TextField(String(localized: "Username"), text: $username)
                         .focused($isFocused)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                 } header: {
-                    Text("New username")
+                    Text(String(localized: "New username"))
                 } footer: {
                     HStack(alignment: .top) {
                         if let error = validationError {
                             Label(error, systemImage: "exclamationmark.circle.fill")
                                 .foregroundColor(.barTabDanger)
                         } else {
-                            Text("Pick a name your friends will recognize.")
+                            Text(String(localized: "Pick a name your friends will recognize."))
                         }
 
                         Spacer()
@@ -599,14 +599,14 @@ private struct EditUsernameSheet: View {
             }
             .scrollContentBackground(.hidden)
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Edit Username")
+            .navigationTitle(String(localized: "Edit Username"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(String(localized: "Cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(String(localized: "Save")) {
                         Task { await save() }
                     }
                     .fontWeight(.semibold)
@@ -636,7 +636,7 @@ private struct EditUsernameSheet: View {
         isSaving = true
         do {
             try await userSession.updateUsername(trimmed)
-            toastCenter.show("Username updated", kind: .success)
+            toastCenter.show(String(localized: "Username updated"), kind: .success)
             dismiss()
         } catch {
             toastCenter.showError(error)
@@ -672,10 +672,10 @@ private struct ChangePasswordSheet: View {
     private var validationError: String? {
         if newPassword.isEmpty { return nil }
         if newPassword.count < 8 {
-            return "Password must be at least 8 characters."
+            return String(localized: "Password must be at least 8 characters.")
         }
         if !confirmPassword.isEmpty && newPassword != confirmPassword {
-            return "Passwords don't match."
+            return String(localized: "Passwords don't match.")
         }
         return nil
     }
@@ -693,7 +693,7 @@ private struct ChangePasswordSheet: View {
                 Section {
                     VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
                         HStack {
-                            SecureField("New password", text: $newPassword)
+                            SecureField(String(localized: "New password"), text: $newPassword)
                                 .focused($focusedField, equals: .newPassword)
                                 .textContentType(.newPassword)
 
@@ -710,7 +710,7 @@ private struct ChangePasswordSheet: View {
                         }
                     }
                 } header: {
-                    Text("New password")
+                    Text(String(localized: "New password"))
                 } footer: {
                     if let error = validationError {
                         Label(error, systemImage: "exclamationmark.circle.fill")
@@ -722,7 +722,7 @@ private struct ChangePasswordSheet: View {
 
                 Section {
                     HStack {
-                        SecureField("Confirm password", text: $confirmPassword)
+                        SecureField(String(localized: "Confirm password"), text: $confirmPassword)
                             .focused($focusedField, equals: .confirmPassword)
                             .textContentType(.newPassword)
 
@@ -734,24 +734,24 @@ private struct ChangePasswordSheet: View {
                         }
                     }
                 } header: {
-                    Text("Confirm")
+                    Text(String(localized: "Confirm"))
                 } footer: {
                     if !confirmPassword.isEmpty && newPassword != confirmPassword {
-                        Text("Passwords don't match.")
+                        Text(String(localized: "Passwords don't match."))
                             .foregroundColor(.barTabDanger)
                     }
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Change Password")
+            .navigationTitle(String(localized: "Change Password"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(String(localized: "Cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Update") {
+                    Button(String(localized: "Update")) {
                         Task { await save() }
                     }
                     .fontWeight(.semibold)
@@ -782,7 +782,7 @@ private struct ChangePasswordSheet: View {
         isSaving = true
         do {
             try await userSession.updatePassword(newPassword)
-            toastCenter.show("Password updated", kind: .success)
+            toastCenter.show(String(localized: "Password updated"), kind: .success)
             dismiss()
         } catch {
             toastCenter.showError(error)
@@ -822,18 +822,18 @@ private struct DeleteAccountSheet: View {
                 .padding(.top, 24)
 
                 VStack(spacing: 8) {
-                    Text("Delete your account?")
+                    Text(String(localized: "Delete your account?"))
                         .font(.barTabHeading)
                         .fontWeight(.bold)
 
-                    Text("This permanently deletes your profile, prices, bars, ratings, and everything else you've contributed. This can't be undone.")
+                    Text(String(localized: "This permanently deletes your profile, prices, bars, ratings, and everything else you've contributed. This can't be undone."))
                         .font(.barTabBody)
                         .foregroundColor(.barTabSecondary)
                         .multilineTextAlignment(.center)
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Type DELETE to confirm")
+                    Text(String(localized: "Type DELETE to confirm"))
                         .font(.barTabSmall)
                         .foregroundColor(.barTabSecondary)
 
@@ -851,7 +851,7 @@ private struct DeleteAccountSheet: View {
                             ProgressView()
                                 .tint(.white)
                         }
-                        Text("Delete Account")
+                        Text(String(localized: "Delete Account"))
                             .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
@@ -872,11 +872,11 @@ private struct DeleteAccountSheet: View {
             }
             .padding(.horizontal, 24)
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Delete Account")
+            .navigationTitle(String(localized: "Delete Account"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(String(localized: "Cancel")) { dismiss() }
                 }
             }
         }
@@ -886,7 +886,7 @@ private struct DeleteAccountSheet: View {
         isDeleting = true
         do {
             try await userSession.deleteAccount()
-            toastCenter.show("Account deleted", kind: .success)
+            toastCenter.show(String(localized: "Account deleted"), kind: .success)
             dismiss()
         } catch {
             toastCenter.showError(error)
@@ -904,17 +904,17 @@ private enum PasswordStrength {
 
     var label: String {
         switch self {
-        case .weak: return "Weak password"
-        case .medium: return "Fair password"
-        case .strong: return "Strong password"
+        case .weak: return String(localized: "Weak password")
+        case .medium: return String(localized: "Fair password")
+        case .strong: return String(localized: "Strong password")
         }
     }
 
     var hint: String {
         switch self {
-        case .weak: return "Add numbers, symbols or uppercase letters."
-        case .medium: return "Good   add more variety for extra strength."
-        case .strong: return "Nice, that's a strong password."
+        case .weak: return String(localized: "Add numbers, symbols or uppercase letters.")
+        case .medium: return String(localized: "Good   add more variety for extra strength.")
+        case .strong: return String(localized: "Nice, that's a strong password.")
         }
     }
 

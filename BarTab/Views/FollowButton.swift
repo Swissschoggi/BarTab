@@ -27,7 +27,7 @@ struct FollowButton: View {
                     Button {
                         Task { await sendRequest() }
                     } label: {
-                        Text("Follow")
+                        Text(String(localized: "Follow"))
                             .font(.barTabBody)
                             .fontWeight(.semibold)
                             .frame(width: 80, height: 32)
@@ -41,7 +41,7 @@ struct FollowButton: View {
                     Button {
                         Task { await cancelRequest() }
                     } label: {
-                        Text("Requested")
+                        Text(String(localized: "Requested"))
                             .font(.barTabBody)
                             .fontWeight(.semibold)
                             .frame(width: 80, height: 32)
@@ -56,7 +56,7 @@ struct FollowButton: View {
                         Button {
                             Task { await approveRequest() }
                         } label: {
-                            Text("Accept")
+                            Text(String(localized: "Accept"))
                                 .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .frame(width: 64, height: 32)
@@ -69,7 +69,7 @@ struct FollowButton: View {
                         Button {
                             Task { await rejectRequest() }
                         } label: {
-                            Text("Decline")
+                            Text(String(localized: "Decline"))
                                 .font(.barTabBody)
                                 .fontWeight(.semibold)
                                 .frame(width: 64, height: 32)
@@ -84,7 +84,7 @@ struct FollowButton: View {
                     Button {
                         Task { await removeFollow() }
                     } label: {
-                        Text("Following")
+                        Text(String(localized: "Following"))
                             .font(.barTabBody)
                             .fontWeight(.semibold)
                             .frame(width: 80, height: 32)

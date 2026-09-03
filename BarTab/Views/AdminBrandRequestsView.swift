@@ -26,10 +26,10 @@ struct AdminBrandRequestsView: View {
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
-                        Text("No brand requests yet")
+                        Text(String(localized: "No brand requests yet"))
                             .font(.barTabHeading)
 
-                        Text("Requests for new brands will show up here.")
+                        Text(String(localized: "Requests for new brands will show up here."))
                             .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -42,7 +42,7 @@ struct AdminBrandRequestsView: View {
 
                     HStack {
                         Label(
-                            "\(barRepository.pendingBrandRequestCount) pending",
+                            String(localized: "\(barRepository.pendingBrandRequestCount) pending"),
                             systemImage: "clock"
                         )
                         .font(.barTabBody)
@@ -62,18 +62,18 @@ struct AdminBrandRequestsView: View {
             .padding(.vertical, 20)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Brand requests")
+        .navigationTitle(String(localized: "Brand requests"))
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Delete this request?", isPresented: $showingDeleteConfirmation) {
-            Button("Delete", role: .destructive) {
+        .alert(String(localized: "Delete this request?"), isPresented: $showingDeleteConfirmation) {
+            Button(String(localized: "Delete"), role: .destructive) {
                 guard let request = pendingDeleteRequest else { return }
                 Task {
                     await barRepository.deleteBrandRequest(request)
                 }
             }
-            Button("Cancel", role: .cancel) {}
+            Button(String(localized: "Cancel"), role: .cancel) {}
         } message: {
-            Text("This removes the brand request permanently.")
+            Text(String(localized: "This removes the brand request permanently."))
         }
     }
 
@@ -98,7 +98,7 @@ struct AdminBrandRequestsView: View {
                 .foregroundColor(.primary)
 
             HStack(spacing: 6) {
-                Text("by \(request.requestedByName)")
+                Text(String(localized: "by \(request.requestedByName)"))
                     .font(.barTabSmall)
                     .foregroundColor(.secondary)
 
@@ -119,7 +119,7 @@ struct AdminBrandRequestsView: View {
                             await barRepository.rejectBrandRequest(request)
                         }
                     } label: {
-                        Text("Reject")
+                        Text(String(localized: "Reject"))
                             .font(.barTabSmall)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabDanger)
@@ -130,7 +130,7 @@ struct AdminBrandRequestsView: View {
                             await barRepository.approveBrandRequest(request)
                         }
                     } label: {
-                        Text("Approve")
+                        Text(String(localized: "Approve"))
                             .font(.barTabSmall)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabPrimary)
@@ -140,7 +140,7 @@ struct AdminBrandRequestsView: View {
                         pendingDeleteRequest = request
                         showingDeleteConfirmation = true
                     } label: {
-                        Label("Remove", systemImage: "trash")
+                        Label(String(localized: "Remove"), systemImage: "trash")
                             .font(.barTabSmall)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabDanger)
@@ -156,11 +156,11 @@ struct AdminBrandRequestsView: View {
         let (label, color): (String, Color) = {
             switch status {
             case .pending:
-                return ("Pending", .orange)
+                return (String(localized: "Pending"), .orange)
             case .approved:
-                return ("Approved", .green)
+                return (String(localized: "Approved"), .green)
             case .rejected:
-                return ("Rejected", .gray)
+                return (String(localized: "Rejected"), .gray)
             }
         }()
 

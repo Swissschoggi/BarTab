@@ -18,6 +18,8 @@
 </head>
 <body>
 
+  <div class="scroll-progress" id="scroll-progress"></div>
+
   <div class="container">
     <nav>
       <div class="logo">
@@ -25,9 +27,9 @@
         BarTab
       </div>   
       <div class="nav-links">
-        <a href="#nearby">Nearby</a>
+        <a href="#screenshots">App</a>
         <a href="#features">Features</a>
-        <a href="#cities">Cities</a>
+        <a href="#faq">FAQ</a>
         <a href="privacy.html">Privacy</a>
         <a href="terms.html">Terms</a>
       </div>
@@ -35,38 +37,13 @@
   </div>
 
   <header class="hero">
-    <div class="container hero-grid">
-      <div>
-        <span class="eyebrow">🥂 Crowdsourced drink prices</span>
-        <h1>Know what you're paying before you go.</h1>
-        <p>A pint in Zürich's Niederdorf can cost twice what it does two tram stops away. BarTab tracks real prices, reported by people who were standing at the bar so you find out before you order, not after.</p>
-        <div class="hero-actions">
-          <a class="button" href="#nearby">See Nearby Bars</a>
-          <a class="button secondary" href="#features">See what's inside</a>
-        </div>
-      </div>
-
-      <!-- Glassmorphic Interactive Phone Mockup -->
-      <div class="phone reveal">
-        <div class="notch"></div>
-        <div class="app-header">
-          <div class="app-title">Live prices near you</div>
-          <div class="app-sub">Tap filters to test live menu</div>
-        </div>
-
-        <div class="phone-filters">
-          <button class="phone-filter active" data-scope="hero" data-type="all">All</button>
-          <button class="phone-filter" data-scope="hero" data-type="beer">🍺 Beer</button>
-          <button class="phone-filter" data-scope="hero" data-type="cocktail">🍸 Cocktails</button>
-          <button class="phone-filter" data-scope="hero" data-type="wine">🍷 Wine</button>
-        </div>
-
-        <div id="bar-cards">
-          <div class="pcard">
-            <div class="ic">🍺</div>
-            <div><div class="name">Loading bars…</div></div>
-          </div>
-        </div>
+    <div class="container hero-center">
+      <span class="eyebrow">🥂 Crowdsourced drink prices</span>
+      <h1>Know what you're paying before you go.</h1>
+      <p>A pint in Zürich's Niederdorf can cost twice what it does two tram stops away. BarTab tracks real prices, reported by people who were standing at the bar so you find out before you order, not after.</p>
+      <div class="hero-actions">
+        <a class="button" href="#screenshots">See the App</a>
+        <a class="button secondary" href="#features">See what's inside</a>
       </div>
     </div>
   </header>
@@ -87,69 +64,63 @@
     </div>
   </section>
 
-  <!-- Recent Prices Ticker -->
-  <section class="container reveal" style="padding: 8px 24px 40px;">
-    <div class="ticker-wrap">
-      <div class="ticker" id="price-ticker">
-        <div class="chip"><span class="chip-bar">Loading recent reports…</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Nearby Bars — Full Phone Simulation -->
-  <section id="nearby" class="container nearby-section">
+  <!-- App Screenshots -->
+  <section id="screenshots" class="container">
     <div class="section-head reveal">
-      <span class="tag">In the app</span>
-      <h2>What's nearby, right now</h2>
-      <p>This is the actual Nearby screen — real reports, pulled live.</p>
+      <span class="tag">The App</span>
+      <h2>See BarTab in action</h2>
     </div>
-
-    <div class="iphone reveal">
-      <div class="iphone-island"></div>
-      <div class="iphone-screen">
-        <div class="ios-statusbar">
-          <span class="ios-time">9:41</span>
-          <div class="ios-icons">
-            <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="6" width="3" height="5" rx="0.5" fill="currentColor"/><rect x="4.5" y="4" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="9" y="2" width="3" height="9" rx="0.5" fill="currentColor"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="currentColor"/></svg>
-            <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><path d="M7.5 10.2c.5 0 1-.2 1.3-.6.4-.4.4-1 0-1.4-.7-.7-1.9-.7-2.6 0-.4.4-.4 1 0 1.4.3.4.8.6 1.3.6zM4.3 6.8c1.8-1.7 4.6-1.7 6.4 0 .3.3.8.3 1.1 0 .3-.3.3-.8 0-1.1-2.3-2.2-6.3-2.2-8.6 0-.3.3-.3.8 0 1.1.3.3.8.3 1.1 0zM1.6 4.1c3.2-3 8.6-3 11.8 0 .3.3.8.3 1.1 0 .3-.3.3-.8 0-1.1-3.8-3.5-10.2-3.5-14 0-.3.3-.3.8 0 1.1.3.3.8.3 1.1 0z" fill="currentColor"/></svg>
-            <svg width="24" height="11" viewBox="0 0 24 11" fill="none"><rect x="0.5" y="0.5" width="20" height="10" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="15" height="7" rx="1.2" fill="currentColor"/><rect x="21.5" y="3.5" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
-          </div>
+    <div class="screenshots-gallery reveal">
+      <div class="phone-frame">
+        <div class="phone-frame-notch"></div>
+        <div class="phone-frame-screen">
+          <img src="screenshots/discover.png" alt="Discover" loading="lazy" />
         </div>
-
-        <div class="ios-app-header">
-          <div>
-            <div class="ios-app-title">Nearby</div>
-            <div class="ios-app-sub">📍 Zürich, Niederdorf</div>
-          </div>
-          <div class="ios-avatar">Y</div>
-        </div>
-
-        <div class="phone-filters ios-filters">
-          <button class="phone-filter active" data-scope="nearby" data-type="all">All</button>
-          <button class="phone-filter" data-scope="nearby" data-type="beer">🍺 Beer</button>
-          <button class="phone-filter" data-scope="nearby" data-type="cocktail">🍸 Cocktails</button>
-          <button class="phone-filter" data-scope="nearby" data-type="wine">🍷 Wine</button>
-        </div>
-
-        <div class="ios-list" id="nearby-cards">
-          <div class="pcard">
-            <div class="ic">🍺</div>
-            <div><div class="name">Loading nearby bars…</div></div>
-          </div>
-        </div>
-
-        <div class="ios-tabbar">
-          <div class="ios-tab"><span>🗺️</span>Map</div>
-          <div class="ios-tab active"><span>📍</span>Nearby</div>
-          <div class="ios-tab"><span>🔔</span>Alerts</div>
-          <div class="ios-tab"><span>👤</span>Profile</div>
-        </div>
-        <div class="ios-home-indicator"></div>
+        <div class="phone-frame-bar"></div>
       </div>
-      <div class="iphone-btn iphone-btn-mute"></div>
-      <div class="iphone-btn iphone-btn-vol-up"></div>
-      <div class="iphone-btn iphone-btn-vol-down"></div>
-      <div class="iphone-btn iphone-btn-power"></div>
+      <div class="phone-frame">
+        <div class="phone-frame-notch"></div>
+        <div class="phone-frame-screen">
+          <img src="screenshots/barview.png" alt="Bar View" loading="lazy" />
+        </div>
+        <div class="phone-frame-bar"></div>
+      </div>
+      <div class="phone-frame">
+        <div class="phone-frame-notch"></div>
+        <div class="phone-frame-screen">
+          <img src="screenshots/mapview.png" alt="Map" loading="lazy" />
+        </div>
+        <div class="phone-frame-bar"></div>
+      </div>
+      <div class="phone-frame">
+        <div class="phone-frame-notch"></div>
+        <div class="phone-frame-screen">
+          <img src="screenshots/compare.png" alt="Compare" loading="lazy" />
+        </div>
+        <div class="phone-frame-bar"></div>
+      </div>
+      <div class="phone-frame">
+        <div class="phone-frame-notch"></div>
+        <div class="phone-frame-screen">
+          <img src="screenshots/addprice.png" alt="Add Price" loading="lazy" />
+        </div>
+        <div class="phone-frame-bar"></div>
+      </div>
+      <div class="phone-frame">
+        <div class="phone-frame-notch"></div>
+        <div class="phone-frame-screen">
+          <img src="screenshots/group.png" alt="Group Polls" loading="lazy" />
+        </div>
+        <div class="phone-frame-bar"></div>
+      </div>
+    </div>
+    <div class="screenshots-captions reveal">
+      <div class="caption active" data-idx="0">Discover Find bars near you with live price-level glances</div>
+      <div class="caption" data-idx="1">Bar View Full menu, ratings, and community consensus</div>
+      <div class="caption" data-idx="2">Map Prices pinned on the map around you</div>
+      <div class="caption" data-idx="3">Compare Side-by-side price comparison across bars</div>
+      <div class="caption" data-idx="4">Add Price Report what you paid in ten seconds</div>
+      <div class="caption" data-idx="5">Group Polls Plan nights out with polls, no group chat needed</div>
     </div>
   </section>
 
@@ -179,10 +150,6 @@
       <div class="feature-row">
         <div class="f-name"><span class="f-icon">🔔</span> Price alerts</div>
         <p>Set the price you're willing to pay for your usual, and get pinged when a nearby bar hits it.</p>
-      </div>
-      <div class="feature-row">
-        <div class="f-name"><span class="f-icon">✅</span> Prices that stay fresh</div>
-        <p>A quick "still accurate?" tap from the community keeps old reports from lingering and misleading people.</p>
       </div>
     </div>
   </section>
@@ -273,19 +240,23 @@
     </div>
   </section>
 
-  <section class="container">
+  <section id="faq" class="container">
     <div class="section-head reveal">
       <span class="tag">FAQ</span>
       <h2>Questions</h2>
     </div>
     <div class="faq reveal">
       <details>
+        <summary>Why not just use Google Maps?</summary>
+        <p>We've all been there, wer want to check prices beforehand and eh! The picture of the menu is 3 Years old... You dont know if its still valid or not. Thats where Bartap shines :)</p>
+      </details>
+      <details>
         <summary>Is BarTab free?</summary>
         <p>Yes. BarTab is free to use and will stay free for everyone. We're not selling placement to bars.</p>
       </details>
       <details>
         <summary>Where do the prices come from?</summary>
-        <p>Entirely from people using the app. There's no scraping and no menus pulled from bar websites  if a price is on the map, someone reported paying it.</p>
+        <p>Entirely from people using the app. There's no scraping and no menus pulled from bar websites if a price is on the map, someone reported paying it.</p>
       </details>
       <details>
         <summary>How do you keep prices from going stale?</summary>
@@ -294,10 +265,6 @@
       <details>
         <summary>Do you track my location?</summary>
         <p>Only with your permission, and only to show nearby bars or verify you were close enough to submit a price. We don't build a location history tied to your account.</p>
-      </details>
-      <details>
-        <summary>Is BarTab only for Switzerland?</summary>
-        <p>We started in Zürich and are expanding city by city, driven by where people actually report prices. See the <a href="#cities">cities list</a> above for current coverage.</p>
       </details>
       <details>
         <summary>What if a bar disagrees with a price on the app?</summary>
@@ -323,6 +290,10 @@
       <div>© 2026 BarTab. All rights reserved.</div>
     </div>
   </footer>
+
+  <button class="scroll-top" id="scroll-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 16V4M10 4l-5 5M10 4l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
 
   <script>
     let statsInView = false;
@@ -356,19 +327,6 @@
       apikey: SUPABASE_KEY,
       Authorization: 'Bearer ' + SUPABASE_KEY
     };
-
-    const DRINK_META = {
-      beer:      { icon: '🍺', label: 'Beer' },
-      wine:      { icon: '🍷', label: 'Wine' },
-      cocktail:  { icon: '🍸', label: 'Cocktail' },
-      shot:      { icon: '🥃', label: 'Shot' },
-      softDrink: { icon: '🥤', label: 'Soft drink' },
-      coffee:    { icon: '☕', label: 'Coffee' },
-      other:     { icon: '🥂', label: 'Drink' }
-    };
-
-    let allPricesData = [];
-    const activeFilters = { hero: 'all', nearby: 'all' };
 
     function esc(s) {
       return String(s).replace(/[&<>"']/g, (c) => ({
@@ -459,107 +417,63 @@
       }
     }
 
-    function renderBarCards(containerId, filterType, limit) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
+    // Scroll progress bar
+    const progressEl = document.getElementById('scroll-progress');
+    const scrollTopBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+      progressEl.style.width = pct + '%';
+      scrollTopBtn.classList.toggle('visible', window.scrollY > 600);
+    }, { passive: true });
 
-      const filtered = filterType === 'all'
-        ? allPricesData
-        : allPricesData.filter(p => p.drink === filterType);
-
-      const picks = [];
-      const seen = new Set();
-      for (const p of filtered) {
-        const name = p.bars && p.bars.name;
-        if (!name || seen.has(name)) continue;
-        seen.add(name);
-        picks.push(p);
-        if (picks.length === limit) break;
-      }
-
-      if (!picks.length) {
-        container.innerHTML = '<div class="pcard"><div><div class="name">No prices found</div></div></div>';
-        return;
-      }
-
-      container.innerHTML = picks.map((p) => {
-        const meta = DRINK_META[p.drink] || DRINK_META.other;
-        const amt = Number(p.amount).toFixed(2);
-        return (
-          '<div class="pcard">' +
-            '<div class="ic">' + meta.icon + '</div>' +
-            '<div>' +
-              '<div class="name">' + esc(p.bars.name) + '</div>' +
-              '<div class="sub">' + meta.label + '</div>' +
-            '</div>' +
-            '<div class="price">' +
-              '<div class="amt">' + esc(p.currency) + ' ' + amt + '</div>' +
-            '</div>' +
-          '</div>'
-        );
-      }).join('');
-    }
-
-    function renderTicker(data) {
-      const el = document.getElementById('price-ticker');
-      if (!el) return;
-
-      const entries = data.filter(p => p.bars && p.bars.name).slice(0, 16);
-      if (!entries.length) {
-        el.innerHTML = '<div class="chip"><span class="chip-bar">No reports yet be the first to add one</span></div>';
-        return;
-      }
-
-      const chips = entries.map(p => {
-        const meta = DRINK_META[p.drink] || DRINK_META.other;
-        const amt = Number(p.amount).toFixed(2);
-        return (
-          '<div class="chip">' +
-            '<span>' + meta.icon + '</span>' +
-            '<span class="chip-bar">' + esc(p.bars.name) + '</span>' +
-            '<span class="chip-amt">' + esc(p.currency) + ' ' + amt + '</span>' +
-          '</div>'
-        );
-      }).join('');
-
-      // Duplicate the sequence so the CSS animation (which translates by
-      // -50%) loops seamlessly instead of jumping at the end.
-      el.innerHTML = chips + chips;
-    }
-
-    async function loadBars() {
-      try {
-        const res = await fetch(
-          SUPABASE_URL + '/rest/v1/prices?select=amount,currency,drink,bars(name,latitude,longitude)&order=reported_at.desc&limit=40',
-          { headers: HEADERS }
-        );
-        if (!res.ok) return;
-
-        allPricesData = await res.json();
-        renderBarCards('bar-cards', activeFilters.hero, 3);
-        renderBarCards('nearby-cards', activeFilters.nearby, 8);
-        renderTicker(allPricesData);
-      } catch (e) {}
-    }
-
-    document.querySelectorAll('.phone-filter').forEach(button => {
-      button.addEventListener('click', (e) => {
-        const btn = e.currentTarget;
-        const scope = btn.getAttribute('data-scope') || 'hero';
-        btn.parentElement.querySelectorAll('.phone-filter').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeFilters[scope] = btn.getAttribute('data-type');
-
-        if (scope === 'nearby') {
-          renderBarCards('nearby-cards', activeFilters.nearby, 8);
-        } else {
-          renderBarCards('bar-cards', activeFilters.hero, 3);
-        }
-      });
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     loadStats();
-    loadBars();
+
+    // Screenshot gallery
+    const gallery = document.querySelector('.screenshots-gallery');
+    const captions = document.querySelectorAll('.screenshots-captions .caption');
+    if (gallery && captions.length) {
+      const frames = gallery.querySelectorAll('.phone-frame');
+
+      // Sync caption on scroll
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            const idx = Array.from(frames).indexOf(e.target);
+            if (idx >= 0) {
+              captions.forEach(c => c.classList.remove('active'));
+              captions[idx].classList.add('active');
+            }
+          }
+        });
+      }, { root: gallery, threshold: 0.6 });
+      frames.forEach(f => observer.observe(f));
+
+      // Click caption to scroll to frame
+      captions.forEach((cap, i) => {
+        cap.style.cursor = 'pointer';
+        cap.addEventListener('click', () => {
+          frames[i].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        });
+      });
+    }
+
+    // 3D tilt on phone frames
+    document.querySelectorAll('.phone-frame').forEach(frame => {
+      frame.addEventListener('mousemove', (e) => {
+        const rect = frame.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        frame.style.transform = `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 5}deg) translateY(-4px)`;
+      });
+      frame.addEventListener('mouseleave', () => {
+        frame.style.transform = 'perspective(600px) rotateY(0) rotateX(0) translateY(0)';
+      });
+    });
   </script>
 
 </body>

@@ -37,7 +37,7 @@ struct GroupDetailView: View {
                         // Members
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Text("Members")
+                                Text(String(localized: "Members"))
                                     .font(.barTabHeading)
                                 Spacer()
                                 Button {
@@ -75,7 +75,7 @@ struct GroupDetailView: View {
 
                         // Polls section header
                         HStack {
-                            Text("Polls")
+                            Text(String(localized: "Polls"))
                                 .font(.barTabHeading)
                             Spacer()
                             Button {
@@ -83,7 +83,7 @@ struct GroupDetailView: View {
                             } label: {
                                 HStack(spacing: 4) {
                                     Image(systemName: "plus")
-                                    Text("New Poll")
+                                    Text(String(localized: "New Poll"))
                                         .fontWeight(.semibold)
                                 }
                                 .font(.barTabBody)
@@ -96,7 +96,7 @@ struct GroupDetailView: View {
                                 Image(systemName: "checkmark.circle")
                                     .font(.barTabEmptyIcon)
                                     .foregroundColor(.barTabPrimary)
-                                Text("No polls yet")
+                                Text(String(localized: "No polls yet"))
                                     .font(.barTabBody)
                                     .foregroundColor(.barTabSecondary)
                             }
@@ -119,7 +119,7 @@ struct GroupDetailView: View {
                             Button {
                                 showingLeaveConfirmation = true
                             } label: {
-                                Label("Leave Group", systemImage: "rectangle.right.and.line.left")
+                                Label(String(localized: "Leave Group"), systemImage: "rectangle.right.and.line.left")
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.plain)
@@ -132,7 +132,7 @@ struct GroupDetailView: View {
                                 Button {
                                     showingDeleteConfirmation = true
                                 } label: {
-                                    Label("Delete Group", systemImage: "trash")
+                                    Label(String(localized: "Delete Group"), systemImage: "trash")
                                         .frame(maxWidth: .infinity)
                                 }
                                 .buttonStyle(.plain)
@@ -172,34 +172,34 @@ struct GroupDetailView: View {
                 )) {
                     ShareSheet(items: shareItems)
                 }
-                .confirmationDialog("Leave this group?", isPresented: $showingLeaveConfirmation, titleVisibility: .visible) {
-                    Button("Leave", role: .destructive) {
+                .confirmationDialog(String(localized: "Leave this group?"), isPresented: $showingLeaveConfirmation, titleVisibility: .visible) {
+                    Button(String(localized: "Leave"), role: .destructive) {
                         Task { await leaveGroup() }
                     }
-                    Button("Cancel", role: .cancel) {}
+                    Button(String(localized: "Cancel"), role: .cancel) {}
                 } message: {
-                    Text("You won't be able to see this group's polls anymore.")
+                    Text(String(localized: "You won't be able to see this group's polls anymore."))
                 }
-                .confirmationDialog("Delete this group?", isPresented: $showingDeleteConfirmation, titleVisibility: .visible) {
-                    Button("Delete", role: .destructive) {
+                .confirmationDialog(String(localized: "Delete this group?"), isPresented: $showingDeleteConfirmation, titleVisibility: .visible) {
+                    Button(String(localized: "Delete"), role: .destructive) {
                         Task { await deleteGroup() }
                     }
-                    Button("Cancel", role: .cancel) {}
+                    Button(String(localized: "Cancel"), role: .cancel) {}
                 } message: {
-                    Text("All polls will be lost. This can't be undone.")
+                    Text(String(localized: "All polls will be lost. This can't be undone."))
                 }
-                .confirmationDialog("Close this poll?", isPresented: Binding(
+                .confirmationDialog(String(localized: "Close this poll?"), isPresented: Binding(
                     get: { pendingClosePoll != nil },
                     set: { if !$0 { pendingClosePoll = nil } }
                 ), titleVisibility: .visible) {
-                    Button("Close Poll", role: .destructive) {
+                    Button(String(localized: "Close Poll"), role: .destructive) {
                         if let poll = pendingClosePoll {
                             Task { await closePoll(poll) }
                         }
                     }
-                    Button("Cancel", role: .cancel) {}
+                    Button(String(localized: "Cancel"), role: .cancel) {}
                 } message: {
-                    Text("No more votes will be accepted.")
+                    Text(String(localized: "No more votes will be accepted."))
                 }
                 .refreshable {
                     await loadData()
@@ -255,7 +255,7 @@ struct GroupDetailView: View {
     private func leaveGroup() async {
         do {
             try await SupabaseClient.shared.leaveGroup(groupID: group.id)
-            toastCenter.show("Left group", kind: .success)
+            toastCenter.show(String(localized: "Left group"), kind: .success)
             dismiss()
         } catch {
             toastCenter.showError(error)
@@ -265,7 +265,7 @@ struct GroupDetailView: View {
     private func deleteGroup() async {
         do {
             try await SupabaseClient.shared.deleteGroup(groupID: group.id)
-            toastCenter.show("Group deleted", kind: .success)
+            toastCenter.show(String(localized: "Group deleted"), kind: .success)
             dismiss()
         } catch {
             toastCenter.showError(error)
@@ -343,7 +343,7 @@ struct PollCard: View {
                     .font(.barTabHeading)
                 Spacer()
                 if isOpen {
-                    Text("Active")
+                    Text(String(localized: "Active"))
                         .font(.barTabTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -352,7 +352,7 @@ struct PollCard: View {
                         .background(Color.barTabSuccess)
                         .clipShape(Capsule())
                 } else {
-                    Text("Closed")
+                    Text(String(localized: "Closed"))
                         .font(.barTabTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.barTabSecondary)
@@ -374,7 +374,7 @@ struct PollCard: View {
                     HStack(spacing: 4) {
                         Image(systemName: "xmark.circle")
                             .font(.barTabSmall)
-                        Text("Close poll")
+                        Text(String(localized: "Close poll"))
                             .font(.barTabSmall)
                             .fontWeight(.medium)
                     }

@@ -240,13 +240,13 @@ struct NearbyView: View {
             VStack(alignment: .leading, spacing: BarTabSpacing.md) {
 
                 BarTabScreenHeader(
-                    title: "Discover",
-                    subtitle: "Find bars and compare drink prices nearby."
+                    title: String(localized: "Discover"),
+                    subtitle: String(localized: "Find bars and compare drink prices nearby.")
                 )
 
                 BarTabInfoBar(
                     icon: originIcon,
-                    title: "Searching near",
+                    title: String(localized: "Searching near"),
                     value: origin.label,
                     trailingValue: formattedRadius
                 ) {
@@ -254,7 +254,7 @@ struct NearbyView: View {
                 }
 
                     // Segment control
-                    Picker("Display mode", selection: $displayMode) {
+                    Picker(String(localized: "Display mode"), selection: $displayMode) {
                         ForEach(DisplayMode.allCases, id: \.self) { mode in
                             Text(mode.rawValue).tag(mode)
                         }
@@ -316,14 +316,14 @@ struct NearbyView: View {
                 VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
                     VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-                        Text("Location")
+                        Text(String(localized: "Location"))
                             .font(.barTabCaption)
                             .foregroundColor(.barTabSecondary)
 
                         HStack(spacing: BarTabSpacing.sm) {
                             locationOptionButton(
                                 icon: "location.fill",
-                                label: "My location",
+                                label: String(localized: "My location"),
                                 isSelected: { if case .myLocation = origin { return true }; return false }()
                             ) {
                                 origin = .myLocation
@@ -331,7 +331,7 @@ struct NearbyView: View {
 
                             locationOptionButton(
                                 icon: "magnifyingglass",
-                                label: "Search a place",
+                                label: String(localized: "Search a place"),
                                 isSelected: false
                             ) {
                                 showingLocationSheet = false
@@ -341,7 +341,7 @@ struct NearbyView: View {
 
                         if case .myLocation = origin, locationService.location == nil {
                             HStack(spacing: 6) {
-                                Text("Waiting for location...")
+                                Text(String(localized: "Waiting for location..."))
                                     .font(.barTabSmall)
                                     .foregroundColor(.barTabSecondary)
 
@@ -350,7 +350,7 @@ struct NearbyView: View {
                                         URL(string: UIApplication.openSettingsURLString)!
                                     )
                                 } label: {
-                                    Text("Open Settings")
+                                    Text(String(localized: "Open Settings"))
                                         .font(.barTabSmall)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.barTabPrimary)
@@ -360,7 +360,7 @@ struct NearbyView: View {
                     }
 
                     VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-                        Text("Explore a city")
+                        Text(String(localized: "Explore a city"))
                             .font(.barTabCaption)
                             .foregroundColor(.barTabSecondary)
 
@@ -385,7 +385,7 @@ struct NearbyView: View {
 
                     VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
                         HStack {
-                            Text("Radius")
+                            Text(String(localized: "Radius"))
                                 .font(.barTabCaption)
                                 .foregroundColor(.barTabSecondary)
                             Spacer()
@@ -403,11 +403,11 @@ struct NearbyView: View {
                 .padding(BarTabSpacing.lg)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Search area")
+            .navigationTitle(String(localized: "Search area"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { showingLocationSheet = false }
+                    Button(String(localized: "Done")) { showingLocationSheet = false }
                         .fontWeight(.semibold)
                 }
             }
@@ -455,7 +455,7 @@ struct NearbyView: View {
 
     private var barsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            BarTabSectionHeader(title: "Bars", count: nearbyBars.count)
+            BarTabSectionHeader(title: String(localized: "Bars"), count: nearbyBars.count)
 
             if originCoordinate == nil {
                 emptyState(
@@ -562,7 +562,7 @@ struct NearbyView: View {
         VStack(alignment: .leading, spacing: 12) {
 
             // Search bar (always visible)
-            BarTabSearchField(text: $searchText, placeholder: "Search bars...")
+            BarTabSearchField(text: $searchText, placeholder: String(localized: "Search bars..."))
             // Active filter summary (always visible)
             if selectedDrinks.count > 1 || selectedBrand != nil || !selectedAmbience.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -571,7 +571,7 @@ struct NearbyView: View {
                             HStack(spacing: 3) {
                                 Image(systemName: "line.3.horizontal.decrease.circle.fill")
                                     .font(.barTabTiny)
-                                Text("\(selectedDrinks.count) drinks")
+                                Text(String(localized: "\(selectedDrinks.count) drinks"))
                             }
                             .font(.barTabSmall)
                             .padding(.horizontal, 8)
@@ -615,14 +615,14 @@ struct NearbyView: View {
             // full-width stacked strips.
             HStack(spacing: 8) {
                 toggleChip(
-                    title: "Filters",
+                    title: String(localized: "Filters"),
                     isExpanded: filtersExpanded
                 ) {
                     withAnimation(.spring()) { filtersExpanded.toggle() }
                 }
 
                 toggleChip(
-                    title: "Sort: \(sortLabel)",
+                    title: String(localized: "Sort: \(sortLabel)"),
                     isExpanded: sortExpanded
                 ) {
                     withAnimation(.spring()) { sortExpanded.toggle() }
@@ -633,7 +633,7 @@ struct NearbyView: View {
             VStack(alignment: .leading, spacing: 8) {
                 if filtersExpanded {
                     VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-                        filterRow(label: "Drink") {
+                        filterRow(label: String(localized: "Drink")) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 6) {
                                     ForEach(Drink.allCases, id: \.self) { drink in
@@ -663,7 +663,7 @@ struct NearbyView: View {
                             }
                         }
 
-                        filterRow(label: "Size") {
+                        filterRow(label: String(localized: "Size")) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 6) {
                                     ForEach(availableSizes, id: \.self) { size in
@@ -689,13 +689,13 @@ struct NearbyView: View {
                             }
                         }
 
-                        filterRow(label: "Brand") {
+                        filterRow(label: String(localized: "Brand")) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 6) {
                                     Button {
                                         selectedBrand = nil
                                     } label: {
-                                        Text("All")
+                                        Text(String(localized: "All"))
                                             .font(.barTabSmall)
                                             .padding(.horizontal, BarTabSpacing.sm)
                                             .padding(.vertical, 6)
@@ -721,13 +721,13 @@ struct NearbyView: View {
                             }
                         }
 
-                        filterRow(label: "Vibe") {
+                        filterRow(label: String(localized: "Vibe")) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 6) {
                                     Button {
                                         selectedAmbience = []
                                     } label: {
-                                        Text("Any")
+                                        Text(String(localized: "Any"))
                                             .font(.barTabSmall)
                                             .padding(.horizontal, BarTabSpacing.sm)
                                             .padding(.vertical, 6)
@@ -761,11 +761,11 @@ struct NearbyView: View {
                             }
                         }
 
-                        filterRow(label: "Seating") {
+                        filterRow(label: String(localized: "Seating")) {
                             HStack(spacing: 6) {
                                 filterPill(
                                     icon: "sun.max.fill",
-                                    label: "Outdoor",
+                                    label: String(localized: "Outdoor"),
                                     isActive: outdoorOnly
                                 ) {
                                     outdoorOnly.toggle()
@@ -828,7 +828,7 @@ struct NearbyView: View {
 
     private var priceResultsSection: some View {
         VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
-            BarTabSectionHeader(title: "Drinks", count: priceResults.count)
+            BarTabSectionHeader(title: String(localized: "Drinks"), count: priceResults.count)
 
             if priceResults.isEmpty {
                 emptyState(
@@ -901,7 +901,7 @@ struct NearbyView: View {
                         Text(DistanceService.formattedDistance(from: location, to: bar))
                     }
 
-                    Text(summary.reportCount == 1 ? "1 report" : "\(summary.reportCount) reports")
+                    Text(summary.reportCount == 1 ? String(localized: "1 report") : String(localized: "\(summary.reportCount) reports"))
                 }
                 .font(.barTabTiny)
                 .foregroundColor(.barTabSecondary.opacity(0.8))
@@ -914,7 +914,7 @@ struct NearbyView: View {
 
             VStack(alignment: .trailing, spacing: 4) {
                 if isBestDeal {
-                    Text("Best deal")
+                    Text(String(localized: "Best deal"))
                         .font(.barTabTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -995,11 +995,11 @@ struct NearbyView: View {
 
         return VStack(alignment: .leading, spacing: 3) {
             HStack {
-                Text("Confidence")
+                Text(String(localized: "Confidence"))
                     .font(.barTabTiny)
                     .foregroundColor(.barTabSecondary)
 
-                Text("\u{00B7} \(summary.reportCount) \(summary.reportCount == 1 ? "report" : "reports")")
+                    Text(String(localized: "\u{00B7} \(summary.reportCount) \(summary.reportCount == 1 ? "report" : "reports")"))
                     .font(.barTabTiny)
                     .foregroundColor(.barTabSecondary)
 
@@ -1082,7 +1082,7 @@ private struct LocationSearchSheet: View {
                         .foregroundColor(.barTabPrimary)
 
                     TextField(
-                        "Search a city or place",
+                        String(localized: "Search a city or place"),
                         text: Binding(
                             get: { searchService.query },
                             set: { searchService.updateQuery($0) }
@@ -1128,11 +1128,11 @@ private struct LocationSearchSheet: View {
                 .listStyle(.plain)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Search a place")
+            .navigationTitle(String(localized: "Search a place"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button(String(localized: "Cancel")) {
                         dismiss()
                     }
                 }
@@ -1147,7 +1147,7 @@ private struct LocationSearchSheet: View {
         search.start { response, error in
             guard error == nil, let item = response?.mapItems.first else {
                 DispatchQueue.main.async {
-                    toastCenter.show("Could not find location", kind: .error)
+                    toastCenter.show(String(localized: "Could not find location"), kind: .error)
                 }
                 return
             }

@@ -44,7 +44,6 @@
 		AEF036533035BB2A00BDA1CC /* DrinkBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */; };
 		AEF036553035BB3F00BDA1CC /* DrinkBrands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */; };
 		AEF036573035BF5100BDA1CC /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036563035BF5100BDA1CC /* LoginView.swift */; };
-		AEF036593035C62000BDA1CC /* PriceConfidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF036583035C62000BDA1CC /* PriceConfidence.swift */; };
 		AEF0365B3035C7FA00BDA1CC /* PriceSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */; };
 		AEF0365D3035C80000BDA1CC /* BarTabTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */; };
 		AEF0365F3035C80000BDA1CC /* MyBarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF0365E3035C80000BDA1CC /* MyBarsView.swift */; };
@@ -166,7 +165,6 @@
 		AEF036523035BB2A00BDA1CC /* DrinkBrand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkBrand.swift; sourceTree = "<group>"; };
 		AEF036543035BB3F00BDA1CC /* DrinkBrands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkBrands.swift; sourceTree = "<group>"; };
 		AEF036563035BF5100BDA1CC /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		AEF036583035C62000BDA1CC /* PriceConfidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceConfidence.swift; sourceTree = "<group>"; };
 		AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceSummary.swift; sourceTree = "<group>"; };
 		AEF0365C3035C80000BDA1CC /* BarTabTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabTheme.swift; sourceTree = "<group>"; };
 		AEF0365E3035C80000BDA1CC /* MyBarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyBarsView.swift; sourceTree = "<group>"; };
@@ -396,7 +394,6 @@
 				AEF0363E303515D400BDA1CC /* UserSession.swift */,
 				AEF0364A3035260A00BDA1CC /* DistanceService.swift */,
 				AEF036503035B9EE00BDA1CC /* PlaceSearchService.swift */,
-				AEF036583035C62000BDA1CC /* PriceConfidence.swift */,
 				AEF0365A3035C7FA00BDA1CC /* PriceSummary.swift */,
 				BRTA0001306000010000002C /* ExchangeRateService.swift */,
 				AEF036673035E20000BDA1CC /* ReportNotificationService.swift */,
@@ -605,7 +602,6 @@
 			files = (
 				AEF0362C30350C5100BDA1CC /* BarView.swift in Sources */,
 				AEF03628303509AB00BDA1CC /* Bar.swift in Sources */,
-				AEF036593035C62000BDA1CC /* PriceConfidence.swift in Sources */,
 				AEF03639303510D700BDA1CC /* AddPriceView.swift in Sources */,
 				AEF036553035BB3F00BDA1CC /* DrinkBrands.swift in Sources */,
 				AEF0365B3035C7FA00BDA1CC /* PriceSummary.swift in Sources */,

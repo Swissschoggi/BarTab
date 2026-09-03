@@ -21,10 +21,10 @@ struct RateBarSheet: View {
             VStack(alignment: .leading, spacing: 28) {
 
                 VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-                    Text("Ambience")
+                    Text(String(localized: "Ambience"))
                         .font(.barTabHeading)
 
-                    Text("What's the vibe at \(bar.name)? Select all that apply.")
+                    Text(String(localized: "What's the vibe at \(bar.name)? Select all that apply."))
                         .font(.barTabSmall)
                         .foregroundColor(.secondary)
 
@@ -64,7 +64,7 @@ struct RateBarSheet: View {
                 Button {
                     submit()
                 } label: {
-                    Text("Save rating")
+                    Text(String(localized: "Save rating"))
                         .font(.barTabHeading)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -76,11 +76,11 @@ struct RateBarSheet: View {
             .background(
                 Color.barTabBackground.ignoresSafeArea()
             )
-            .navigationTitle("Rate this bar")
+            .navigationTitle(String(localized: "Rate this bar"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button(String(localized: "Cancel")) {
                         dismiss()
                     }
                 }

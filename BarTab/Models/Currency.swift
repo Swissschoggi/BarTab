@@ -16,15 +16,15 @@ enum Currency: String, CaseIterable, Identifiable, Codable {
 
     var displayName: String {
         switch self {
-        case .chf: return "Swiss Franc"
-        case .eur: return "Euro"
-        case .usd: return "US Dollar"
-        case .gbp: return "British Pound"
-        case .sek: return "Swedish Krona"
-        case .nok: return "Norwegian Krone"
-        case .dkk: return "Danish Krone"
-        case .pln: return "Polish Zloty"
-        case .czk: return "Czech Koruna"
+        case .chf: return String(localized: "Swiss Franc")
+        case .eur: return String(localized: "Euro")
+        case .usd: return String(localized: "US Dollar")
+        case .gbp: return String(localized: "British Pound")
+        case .sek: return String(localized: "Swedish Krona")
+        case .nok: return String(localized: "Norwegian Krone")
+        case .dkk: return String(localized: "Danish Krone")
+        case .pln: return String(localized: "Polish Zloty")
+        case .czk: return String(localized: "Czech Koruna")
         }
     }
 

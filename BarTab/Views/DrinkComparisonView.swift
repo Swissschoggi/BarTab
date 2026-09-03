@@ -32,7 +32,7 @@ struct DrinkComparisonView: View {
                         Image(systemName: "barchart.xaxis.2")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
-                        Text("No comparisons found")
+                        Text(String(localized: "No comparisons found"))
                             .font(.barTabBody)
                             .foregroundColor(.secondary)
                     }
@@ -40,7 +40,7 @@ struct DrinkComparisonView: View {
                     .padding(.vertical, 40)
                     .barTabCard()
                 } else {
-                    Text("\(results.count) bars have this drink")
+                    Text(String(localized: "\(results.count) bars have this drink"))
                         .font(.barTabSmall)
                         .foregroundColor(.barTabSecondary)
 
@@ -75,7 +75,7 @@ struct DrinkComparisonView: View {
                                         .fontWeight(.bold)
                                         .foregroundColor(.barTabPrimary)
 
-                                    Text("\(result.summary.confidence)% confidence")
+                                    Text(String(localized: "\(result.summary.confidence)% confidence"))
                                         .font(.barTabTiny)
                                         .foregroundColor(.barTabSecondary)
                                 }
@@ -91,7 +91,7 @@ struct DrinkComparisonView: View {
             .padding(.vertical, 20)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Compare Prices")
+        .navigationTitle(String(localized: "Compare Prices"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedBar) { bar in
             NavigationView {

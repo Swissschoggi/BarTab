@@ -33,7 +33,7 @@ struct MyBarsView: View {
                     HStack {
 
                         Text(
-                            "\(myBars.count) \(myBars.count == 1 ? "bar" : "bars")"
+                            String(localized: "\(myBars.count) \(myBars.count == 1 ? "bar" : "bars")")
                         )
                         .font(.barTabBody)
                         .foregroundColor(.secondary)
@@ -62,7 +62,7 @@ struct MyBarsView: View {
                                         editingBar = bar
                                     } label: {
                                         Label(
-                                            "Edit",
+                                            String(localized: "Edit"),
                                             systemImage: "pencil"
                                         )
                                     }
@@ -77,7 +77,7 @@ struct MyBarsView: View {
                                         }
                                     } label: {
                                         Label(
-                                            "Delete",
+                                            String(localized: "Delete"),
                                             systemImage: "trash"
                                         )
                                     }
@@ -95,7 +95,7 @@ struct MyBarsView: View {
             Color.barTabBackground
                 .ignoresSafeArea()
         )
-        .navigationTitle("My Bars")
+        .navigationTitle(String(localized: "My Bars"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $editingBar) { bar in
             EditBarView(bar: bar)
@@ -132,12 +132,12 @@ struct MyBarsView: View {
                 )
             }
 
-            Text("No bars yet")
+            Text(String(localized: "No bars yet"))
                 .font(.barTabHeading)
                 .fontWeight(.semibold)
 
             Text(
-                "Bars you add will appear here."
+                String(localized: "Bars you add will appear here.")
             )
             .font(.barTabBody)
             .foregroundColor(.secondary)
@@ -218,7 +218,7 @@ struct MyBarsView: View {
                         }
 
                         Label(
-                            "\(summaries.count) \(summaries.count == 1 ? "drink" : "drinks")",
+                            String(localized: "\(summaries.count) \(summaries.count == 1 ? "drink" : "drinks")"),
                             systemImage: "mug.fill"
                         )
                     }
@@ -268,7 +268,7 @@ struct MyBarsView: View {
                     if summaries.count > visibleSummaries.count {
 
                         Text(
-                            "And \(summaries.count - visibleSummaries.count) more…"
+                            String(localized: "And \(summaries.count - visibleSummaries.count) more…")
                         )
                         .font(.barTabSmall)
                         .foregroundColor(.secondary)

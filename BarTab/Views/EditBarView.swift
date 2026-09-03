@@ -28,38 +28,38 @@ struct EditBarView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Bar name")) {
-                    TextField("Bar name", text: $name)
+                Section(header: Text(String(localized: "Bar name"))) {
+                    TextField(String(localized: "Bar name"), text: $name)
                 }
 
-                Section(header: Text("Address")) {
-                    TextField("Address", text: $address)
+                Section(header: Text(String(localized: "Address"))) {
+                    TextField(String(localized: "Address"), text: $address)
                 }
 
-                Section(header: Text("Details")) {
+                Section(header: Text(String(localized: "Details"))) {
                     Toggle(isOn: $smokingFriendly) {
-                        Label("Smoking friendly", systemImage: "smoke.fill")
+                        Label(String(localized: "Smoking friendly"), systemImage: "smoke.fill")
                     }
                     .tint(.barTabPrimary)
 
                     Toggle(isOn: $outdoorSeating) {
-                        Label("Outdoor seating", systemImage: "sun.max.fill")
+                        Label(String(localized: "Outdoor seating"), systemImage: "sun.max.fill")
                     }
                     .tint(.barTabPrimary)
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Edit Bar")
+            .navigationTitle(String(localized: "Edit Bar"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button(String(localized: "Cancel")) {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
+                    Button(String(localized: "Save")) {
                         Task { await save() }
                     }
                     .disabled(isSaving || !canSave)
@@ -97,7 +97,7 @@ struct EditBarView: View {
         )
 
         HapticEngine.success()
-        toastCenter.show("Bar updated", kind: .success)
+        toastCenter.show(String(localized: "Bar updated"), kind: .success)
         dismiss()
     }
 }

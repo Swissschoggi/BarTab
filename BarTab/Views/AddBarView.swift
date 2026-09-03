@@ -37,7 +37,7 @@ struct AddBarView: View {
                         .foregroundColor(.barTabPrimary)
 
                     TextField(
-                        "Search for a bar or place",
+                        String(localized: "Search for a bar or place"),
                         text: Binding(
                             get: {
                                 searchService.query
@@ -142,12 +142,12 @@ struct AddBarView: View {
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
-                        Text("Find your bar")
+                        Text(String(localized: "Find your bar"))
                             .font(.barTabHeading)
                             .fontWeight(.semibold)
 
                         Text(
-                            "Search for a bar, pub, cafe or other place."
+                            String(localized: "Search for a bar, pub, cafe or other place.")
                         )
                         .font(.barTabBody)
                         .multilineTextAlignment(.center)
@@ -180,7 +180,7 @@ struct AddBarView: View {
                                         systemName: "mappin.and.ellipse"
                                     )
 
-                                    Text("Adjust location")
+                                    Text(String(localized: "Adjust location"))
 
                                     Spacer()
 
@@ -196,7 +196,7 @@ struct AddBarView: View {
                                 addBar()
                             } label: {
 
-                                Text("Add Bar")
+                                Text(String(localized: "Add Bar"))
                                     .font(.barTabHeading)
                                     .frame(maxWidth: .infinity)
                                     .padding()
@@ -213,7 +213,7 @@ struct AddBarView: View {
                 Color.barTabBackground
                     .ignoresSafeArea()
             )
-            .navigationTitle("Add a Bar")
+            .navigationTitle(String(localized: "Add a Bar"))
             .navigationBarTitleDisplayMode(.inline)
 
 
@@ -225,15 +225,15 @@ struct AddBarView: View {
             }
 
             .alert(
-                "Bar may already exist",
+                String(localized: "Bar may already exist"),
                 isPresented: $showingDuplicateWarning
             ) {
 
-                Button("Add Anyway") {
+                Button(String(localized: "Add Anyway")) {
                     duplicateBars.removeAll()
                 }
 
-                Button("Cancel", role: .cancel) {
+                Button(String(localized: "Cancel"), role: .cancel) {
                     clearSelection()
                 }
 
@@ -241,7 +241,7 @@ struct AddBarView: View {
 
                 VStack {
                     Text(
-                        "We found a bar nearby that may be the same place:"
+                        String(localized: "We found a bar nearby that may be the same place:")
                     )
 
                     ForEach(duplicateBars) { bar in
@@ -249,7 +249,7 @@ struct AddBarView: View {
                     }
 
                     Text(
-                        "\nPlease check before adding a duplicate."
+                        String(localized: "\nPlease check before adding a duplicate.")
                     )
                 }
             }
@@ -271,7 +271,7 @@ struct AddBarView: View {
                 )
                 .foregroundColor(.barTabPrimary)
 
-                Text("Selected place")
+                Text(String(localized: "Selected place"))
                     .font(.barTabHeading)
 
                 Spacer()
@@ -295,7 +295,7 @@ struct AddBarView: View {
 
             Toggle(isOn: $smokingFriendly) {
                 Label(
-                    "Smoking friendly",
+                    String(localized: "Smoking friendly"),
                     systemImage: "smoke.fill"
                 )
                 .foregroundColor(.primary)
@@ -306,7 +306,7 @@ struct AddBarView: View {
 
             Toggle(isOn: $outdoorSeating) {
                 Label(
-                    "Outdoor seating",
+                    String(localized: "Outdoor seating"),
                     systemImage: "sun.max.fill"
                 )
                 .foregroundColor(.primary)
@@ -356,7 +356,7 @@ struct AddBarView: View {
                 let item = response?.mapItems.first
             else {
                 DispatchQueue.main.async {
-                    toastCenter.show("Could not find location", kind: .error)
+                    toastCenter.show(String(localized: "Could not find location"), kind: .error)
                 }
                 return
             }
@@ -431,7 +431,7 @@ struct AddBarView: View {
         guard let user = userSession.currentUser else {
 
             toastCenter.show(
-                "You must be logged in to add a bar.",
+                String(localized: "You must be logged in to add a bar."),
                 kind: .error
             )
             return
@@ -440,7 +440,7 @@ struct AddBarView: View {
         guard let coordinate = selectedCoordinate else {
 
             toastCenter.show(
-                "Please select a location.",
+                String(localized: "Please select a location."),
                 kind: .error
             )
             return
@@ -459,7 +459,7 @@ struct AddBarView: View {
         guard !trimmedName.isEmpty else {
 
             toastCenter.show(
-                "Please select a place.",
+                String(localized: "Please select a place."),
                 kind: .error
             )
             return
@@ -477,7 +477,7 @@ struct AddBarView: View {
 
             guard let saved else {
                 toastCenter.show(
-                    "Could not save the bar",
+                    String(localized: "Could not save the bar"),
                     kind: .error
                 )
                 return

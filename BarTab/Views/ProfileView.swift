@@ -118,24 +118,24 @@ struct ProfileView: View {
                 .environmentObject(userSession)
         }
         .confirmationDialog(
-            "Log out?",
+            String(localized: "Log out?"),
             isPresented: $showingLogoutConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Log out", role: .destructive) {
+            Button(String(localized: "Log out"), role: .destructive) {
                 HapticEngine.impact()
                 withAnimation(.easeInOut(duration: 0.3)) {
                     userSession.logout()
                 }
                 toastCenter.show(
-                    "You've been logged out.",
+                    String(localized: "You've been logged out."),
                     kind: .info
                 )
             }
 
-            Button("Cancel", role: .cancel) {}
+            Button(String(localized: "Cancel"), role: .cancel) {}
         } message: {
-            Text("You'll need to sign in again to add bars, prices and ratings.")
+            Text(String(localized: "You'll need to sign in again to add bars, prices and ratings."))
         }
         .onChange(of: selectedAvatarItem) { item in
             guard let item else { return }
@@ -151,10 +151,10 @@ struct ProfileView: View {
         VStack(alignment: .leading, spacing: 6) {
 
             BarTabScreenHeader(
-                title: "Me",
+                title: String(localized: "Me"),
                 subtitle: currentUser == nil
-                    ? "Sign in to manage your contributions."
-                    : "Your BarTab profile."
+                    ? String(localized: "Sign in to manage your contributions.")
+                    : String(localized: "Your BarTab profile.")
             )
 
             if let fetchedAt = barRepository.lastFetchedAt {
@@ -189,7 +189,7 @@ struct ProfileView: View {
                         selection: $selectedAvatarItem,
                         matching: .images
                     ) {
-                        Text(isUploadingAvatar ? "Uploading…" : "Change photo")
+                        Text(isUploadingAvatar ? String(localized: "Uploading…") : String(localized: "Change photo"))
                             .font(.barTabSmall)
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabPrimary)
@@ -223,7 +223,7 @@ struct ProfileView: View {
                             .font(.barTabTiny)
                             .foregroundColor(.barTabSecondary)
                     } else {
-                        Text("Max level reached!")
+                        Text(String(localized: "Max level reached!"))
                             .font(.barTabTiny)
                             .foregroundColor(.barTabAccent)
                     }
@@ -256,19 +256,19 @@ struct ProfileView: View {
     private var activitySection: some View {
         VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
 
-            Text("Your activity")
+            Text(String(localized: "Your activity"))
                 .font(.barTabHeading)
 
             HStack(spacing: BarTabSpacing.sm) {
                 statisticCard(
                     value: myPrices.count,
-                    title: "Drinks",
+                    title: String(localized: "Drinks"),
                     icon: "mug.fill"
                 )
 
                 statisticCard(
                     value: myBars.count,
-                    title: "Bars",
+                    title: String(localized: "Bars"),
                     icon: "building.2.fill"
                 )
             }
@@ -299,8 +299,8 @@ struct ProfileView: View {
                     .padding(.leading, BarTabSpacing.md)
 
                 navigationRow(
-                    title: "Badges",
-                    subtitle: "Your achievements",
+                    title: String(localized: "Badges"),
+                    subtitle: String(localized: "Your achievements"),
                     icon: "rosette"
                 ) {
                     BadgeGridView(
@@ -317,7 +317,7 @@ struct ProfileView: View {
     @ViewBuilder
     private var savedSection: some View {
         VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-            Text("Saved")
+            Text(String(localized: "Saved"))
                 .font(.barTabHeading)
 
             VStack(spacing: 0) {
@@ -340,8 +340,8 @@ struct ProfileView: View {
                 }
 
                 navigationRow(
-                    title: "Price Alerts",
-                    subtitle: "Get notified on price changes",
+                    title: String(localized: "Price Alerts"),
+                    subtitle: String(localized: "Get notified on price changes"),
                     icon: "bell.fill"
                 ) {
                     PriceAlertListView()
@@ -360,7 +360,7 @@ struct ProfileView: View {
 
             VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
 
-                Text("Admin")
+                Text(String(localized: "Admin"))
                     .font(.barTabHeading)
 
                 navigationRow(
@@ -394,7 +394,7 @@ struct ProfileView: View {
     @ViewBuilder
     private var socialSection: some View {
         VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-            Text("Social")
+            Text(String(localized: "Social"))
                 .font(.barTabHeading)
 
             socialRows
@@ -405,8 +405,8 @@ struct ProfileView: View {
     private var socialRows: some View {
         VStack(spacing: 0) {
             navigationRow(
-                title: "Friends",
-                subtitle: "Find people, requests and following",
+                title: String(localized: "Friends"),
+                subtitle: String(localized: "Find people, requests and following"),
                 icon: "person.2.fill"
             ) {
                 FriendsView()
@@ -417,8 +417,8 @@ struct ProfileView: View {
                 .padding(.leading, BarTabSpacing.md)
 
             navigationRow(
-                title: "Activity",
-                subtitle: "See what friends are drinking",
+                title: String(localized: "Activity"),
+                subtitle: String(localized: "See what friends are drinking"),
                 icon: "list.bullet.rectangle"
             ) {
                 ActivityFeedView()
@@ -429,8 +429,8 @@ struct ProfileView: View {
                 .padding(.leading, BarTabSpacing.md)
 
             navigationRow(
-                title: "Groups",
-                subtitle: "Plan nights out",
+                title: String(localized: "Groups"),
+                subtitle: String(localized: "Plan nights out"),
                 icon: "person.3.fill"
             ) {
                 GroupPlanningView()
@@ -443,7 +443,7 @@ struct ProfileView: View {
     private var accountSection: some View {
         VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
 
-            Text("Account")
+            Text(String(localized: "Account"))
                 .font(.barTabHeading)
 
             Button {
@@ -453,7 +453,7 @@ struct ProfileView: View {
                     Image(systemName: "gearshape.fill")
                         .foregroundColor(.barTabPrimary)
 
-                    Text("Settings")
+                    Text(String(localized: "Settings"))
                         .foregroundColor(.primary)
 
                     Spacer()
@@ -472,7 +472,7 @@ struct ProfileView: View {
                     Image(systemName: "trophy.fill")
                         .foregroundColor(.barTabAccent)
 
-                    Text("Leaderboard")
+                    Text(String(localized: "Leaderboard"))
                         .foregroundColor(.primary)
 
                     Spacer()
@@ -491,7 +491,7 @@ struct ProfileView: View {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                         .foregroundColor(.barTabDanger)
 
-                    Text("Log out")
+                    Text(String(localized: "Log out"))
                         .foregroundColor(.barTabDanger)
 
                     Spacer()
@@ -509,18 +509,18 @@ struct ProfileView: View {
                 .font(.barTabEmptyIconLarge)
                 .foregroundColor(.barTabPrimary)
 
-            Text("You're not signed in")
+            Text(String(localized: "You're not signed in"))
                 .font(.barTabHeading)
                 .fontWeight(.semibold)
 
-            Text("Sign in to add bars, report drinks and keep track of your contributions.")
+            Text(String(localized: "Sign in to add bars, report drinks and keep track of your contributions."))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
 
             Button {
                 showingLogin = true
             } label: {
-                Text("Sign In")
+                Text(String(localized: "Sign In"))
                     .font(.barTabHeading)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -583,13 +583,13 @@ struct ProfileView: View {
                 guard let data = try await item.loadTransferable(type: Data.self),
                       let image = UIImage(data: data) else {
                     isUploadingAvatar = false
-                    toastCenter.show("That photo couldn't be loaded.", kind: .error)
+                    toastCenter.show(String(localized: "That photo couldn't be loaded."), kind: .error)
                     return
                 }
 
                 try await userSession.updateAvatar(image: image)
                 isUploadingAvatar = false
-                toastCenter.show("Profile photo updated", kind: .success)
+                toastCenter.show(String(localized: "Profile photo updated"), kind: .success)
             } catch {
                 isUploadingAvatar = false
                 toastCenter.showError(error)
@@ -599,7 +599,7 @@ struct ProfileView: View {
 
     private func statisticCard(
         value: Int,
-        title: LocalizedStringKey,
+        title: String,
         icon: String
     ) -> some View {
 
@@ -681,9 +681,9 @@ struct FriendsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Picker("Tab", selection: $tab) {
+            Picker(String(localized: "Tab"), selection: $tab) {
                 ForEach(Tab.allCases, id: \.self) { t in
-                    Text(t.rawValue).tag(t)
+                    Text(String(localized: t.rawValue)).tag(t)
                 }
             }
             .pickerStyle(.segmented)
@@ -700,7 +700,7 @@ struct FriendsView: View {
             }
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Friends")
+        .navigationTitle(String(localized: "Friends"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -32,7 +32,7 @@ struct MyContributionsView: View {
                     HStack {
 
                         Text(
-                            "\(myPrices.count) \(myPrices.count == 1 ? "contribution" : "contributions")"
+                            String(localized: "\(myPrices.count) \(myPrices.count == 1 ? "contribution" : "contributions")")
                         )
                         .font(.barTabBody)
                         .foregroundColor(.secondary)
@@ -66,7 +66,7 @@ struct MyContributionsView: View {
                                         }
                                     } label: {
                                         Label(
-                                            "Delete",
+                                            String(localized: "Delete"),
                                             systemImage: "trash"
                                         )
                                     }
@@ -75,7 +75,7 @@ struct MyContributionsView: View {
                                         editingPrice = price
                                     } label: {
                                         Label(
-                                            "Edit",
+                                            String(localized: "Edit"),
                                             systemImage: "pencil"
                                         )
                                     }
@@ -94,7 +94,7 @@ struct MyContributionsView: View {
             Color.barTabBackground
                 .ignoresSafeArea()
         )
-        .navigationTitle("My Contributions")
+        .navigationTitle(String(localized: "My Contributions"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $editingPrice) { price in
             if let bar = barRepository.getBar(id: price.barID) {
@@ -133,12 +133,12 @@ struct MyContributionsView: View {
                 )
             }
 
-            Text("No contributions yet")
+            Text(String(localized: "No contributions yet"))
                 .font(.barTabHeading)
                 .fontWeight(.semibold)
 
             Text(
-                "Drinks you add to bars will appear here."
+                String(localized: "Drinks you add to bars will appear here.")
             )
             .font(.barTabBody)
             .foregroundColor(.secondary)
@@ -271,7 +271,7 @@ struct MyContributionsView: View {
                         systemName: "mappin.slash"
                     )
 
-                    Text("Bar no longer available")
+                    Text(String(localized: "Bar no longer available"))
                         .font(.barTabSmall)
                 }
                 .foregroundColor(.secondary)

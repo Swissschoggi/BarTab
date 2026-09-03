@@ -19,10 +19,10 @@ struct AllAttributesSheet: View {
                         Image(systemName: "info.circle")
                             .font(.system(size: 40, weight: .light))
                             .foregroundColor(.barTabSecondary)
-                        Text("No attribute reports yet")
+                        Text(String(localized: "No attribute reports yet"))
                             .font(.barTabHeading)
                             .foregroundColor(.barTabText)
-                        Text("Be the first to report on this bar's amenities!")
+                        Text(String(localized: "Be the first to report on this bar's amenities!"))
                             .font(.barTabBody)
                             .foregroundColor(.barTabSecondary)
                             .multilineTextAlignment(.center)
@@ -42,11 +42,11 @@ struct AllAttributesSheet: View {
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("All Attributes")
+            .navigationTitle(String(localized: "All Attributes"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button(String(localized: "Done")) { dismiss() }
                         .foregroundColor(.barTabPrimary)
                 }
             }
@@ -108,7 +108,7 @@ private struct AttributeRow: View {
                                 .foregroundColor(.barTabSecondary)
                         }
                     } else {
-                        Text("No reports yet")
+                        Text(String(localized: "No reports yet"))
                             .font(.barTabCaption)
                             .foregroundColor(.barTabSecondary)
                     }

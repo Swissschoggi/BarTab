@@ -43,12 +43,11 @@ struct RequestBrandSheet: View {
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
-                        Text("Request sent")
+                        Text(String(localized: "Request sent"))
                             .font(.barTabHeading)
 
                         Text(
-                            "We'll review \"\(trimmedName)\" and "
-                            + "add it if it's a good fit."
+                            String(localized: "We'll review \"\(trimmedName)\" and add it if it's a good fit.")
                         )
                         .font(.barTabBody)
                         .foregroundColor(.secondary)
@@ -59,24 +58,24 @@ struct RequestBrandSheet: View {
 
                 } else {
 
-                    Text("Requesting a \(drink.displayName.lowercased()) brand")
+                    Text(String(localized: "Requesting a \(drink.displayName.lowercased()) brand"))
                         .font(.barTabBody)
                         .foregroundColor(.secondary)
 
-                    TextField("Brand name", text: $name)
+                    TextField(String(localized: "Brand name"), text: $name)
                         .textFieldStyle(.roundedBorder)
                         .autocorrectionDisabled()
 
                     if !trimmedName.isEmpty && trimmedName.count > InputValidator.maxBrandNameLength {
-                        Text("Name must be \(InputValidator.maxBrandNameLength) characters or fewer.")
+                        Text(String(localized: "Name must be \(InputValidator.maxBrandNameLength) characters or fewer."))
                             .font(.barTabSmall)
                             .foregroundColor(.barTabWarning)
                     } else if !trimmedName.isEmpty && alreadyExists {
-                        Text("That brand is already in the list.")
+                        Text(String(localized: "That brand is already in the list."))
                             .font(.barTabSmall)
                             .foregroundColor(.barTabWarning)
                     } else if !trimmedName.isEmpty && alreadyPending {
-                        Text("You've already requested this brand.")
+                        Text(String(localized: "You've already requested this brand."))
                             .font(.barTabSmall)
                             .foregroundColor(.barTabWarning)
                     }
@@ -86,7 +85,7 @@ struct RequestBrandSheet: View {
                     Button {
                         submit()
                     } label: {
-                        Text("Send request")
+                        Text(String(localized: "Send request"))
                             .font(.barTabHeading)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -104,11 +103,11 @@ struct RequestBrandSheet: View {
             .background(
                 Color.barTabBackground.ignoresSafeArea()
             )
-            .navigationTitle("Request a brand")
+            .navigationTitle(String(localized: "Request a brand"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button(String(localized: "Cancel")) {
                         dismiss()
                     }
                 }

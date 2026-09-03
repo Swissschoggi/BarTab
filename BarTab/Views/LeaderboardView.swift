@@ -30,9 +30,9 @@ struct LeaderboardView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                Picker("Scope", selection: $scope) {
+                Picker(String(localized: "Scope"), selection: $scope) {
                     ForEach(Scope.allCases, id: \.self) { s in
-                        Text(s.rawValue).tag(s)
+                        Text(String(localized: s.rawValue)).tag(s)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -48,11 +48,11 @@ struct LeaderboardView: View {
                                     .font(.barTabDisplay)
                                     .foregroundColor(.barTabSecondary)
 
-                                Text(scope == .local ? "No contributors nearby yet" : "No contributors yet")
+                                Text(scope == .local ? String(localized: "No contributors nearby yet") : String(localized: "No contributors yet"))
                                     .font(.barTabBody)
                                     .foregroundColor(.barTabSecondary)
 
-                                Text("Be the first to add drinks and bars!")
+                                Text(String(localized: "Be the first to add drinks and bars!"))
                                     .font(.barTabSmall)
                                     .foregroundColor(.barTabSecondary)
                             }
@@ -115,7 +115,7 @@ struct LeaderboardView: View {
                 }
             }
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Leaderboard")
+            .navigationTitle(String(localized: "Leaderboard"))
             .navigationBarTitleDisplayMode(.inline)
         }
         .task {
@@ -157,12 +157,12 @@ struct LeaderboardView: View {
             let isSelf = isCurrentUser(userId)
             let name: String = {
                 if isSelf {
-                    return userSession.currentUser?.username ?? "You"
+                    return userSession.currentUser?.username ?? String(localized: "You")
                 }
                 if let cached = displayNameCache[userId] {
                     return cached
                 }
-                return "Contributor"
+                return String(localized: "Contributor")
             }()
             return LeaderboardEntry(
                 id: userId.uuidString,

@@ -16,15 +16,15 @@ struct FindUsersView: View {
             VStack(alignment: .leading, spacing: 16) {
 
                 BarTabScreenHeader(
-                    title: "Find Friends",
-                    subtitle: "Search by username to send a follow request."
+                    title: String(localized: "Find Friends"),
+                    subtitle: String(localized: "Search by username to send a follow request.")
                 )
 
                 HStack(spacing: BarTabSpacing.sm) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.barTabSecondary)
 
-                    TextField("Search username…", text: $query)
+                    TextField(String(localized: "Search username…"), text: $query)
                         .textFieldStyle(.plain)
                         .onSubmit {
                             guard !query.trimmingCharacters(in: .whitespaces).isEmpty else { return }
@@ -61,10 +61,10 @@ struct FindUsersView: View {
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
-                        Text("No users found")
+                        Text(String(localized: "No users found"))
                             .font(.barTabHeading)
 
-                        Text("Try a different search term.")
+                        Text(String(localized: "Try a different search term."))
                             .font(.barTabBody)
                             .foregroundColor(.secondary)
                     }
@@ -88,7 +88,7 @@ struct FindUsersView: View {
             .padding(.vertical, 20)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Find Friends")
+        .navigationTitle(String(localized: "Find Friends"))
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -97,13 +97,13 @@ struct FindUsersView: View {
             UserAvatarView(urlString: profile.avatar_url, displayName: profile.display_name)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(profile.display_name ?? "User")
+                Text(profile.display_name ?? String(localized: "User"))
                     .font(.barTabBody)
                     .fontWeight(.medium)
                     .foregroundColor(.barTabText)
 
                 if profile.is_admin {
-                    Text("Admin")
+                    Text(String(localized: "Admin"))
                         .font(.barTabTiny)
                         .foregroundColor(.barTabAccent)
                 }

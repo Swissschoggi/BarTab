@@ -70,7 +70,7 @@ struct DrinkRatingSheet: View {
 
                             Text(String(format: "%.1f", data.average))
                                 .font(.barTabHeading)
-                                + Text(" from \(data.count) \(data.count == 1 ? "rating" : "ratings")")
+                                + Text(String(localized: " from \(data.count) \(data.count == 1 ? "rating" : "ratings")"))
                                 .font(.barTabSmall)
                                 .foregroundColor(.secondary)
                         }
@@ -78,7 +78,7 @@ struct DrinkRatingSheet: View {
                         .padding()
                         .barTabCard()
                     } else {
-                        Text("No ratings yet   be the first!")
+                        Text(String(localized: "No ratings yet   be the first!"))
                             .font(.barTabBody)
                             .foregroundColor(.secondary)
                             .frame(maxWidth: .infinity)
@@ -88,7 +88,7 @@ struct DrinkRatingSheet: View {
 
                     // Your rating
                     VStack(spacing: BarTabSpacing.sm) {
-                        Text("Your rating")
+                        Text(String(localized: "Your rating"))
                             .font(.barTabHeading)
 
                         HStack(spacing: 16) {
@@ -113,10 +113,10 @@ struct DrinkRatingSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(String(localized: "Cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(String(localized: "Save")) {
                         HapticEngine.impact()
                         Task {
                             guard let user = userSession.currentUser else { return }

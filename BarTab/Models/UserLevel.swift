@@ -12,11 +12,11 @@ enum UserLevel: Int, CaseIterable, Identifiable {
 
     var name: String {
         switch self {
-        case .newcomer: return "Newcomer"
-        case .regular: return "Regular"
-        case .contributor: return "Contributor"
-        case .expert: return "Expert"
-        case .legend: return "Legend"
+        case .newcomer: return String(localized: "Newcomer")
+        case .regular: return String(localized: "Regular")
+        case .contributor: return String(localized: "Contributor")
+        case .expert: return String(localized: "Expert")
+        case .legend: return String(localized: "Legend")
         }
     }
 

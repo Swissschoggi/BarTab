@@ -354,8 +354,8 @@ private struct DeepLinkBarView: View {
             } else {
                 unavailableView(
                     icon: "mappin.slash",
-                    title: "Bar not found",
-                    message: "This bar may have been removed."
+                    title: String(localized: "Bar not found"),
+                    message: String(localized: "This bar may have been removed.")
                 )
             }
         }
@@ -377,7 +377,7 @@ private struct DeepLinkBarView: View {
                 .font(.barTabBody)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-            Button("Close") { dismiss() }
+            Button(String(localized: "Close")) { dismiss() }
                 .buttonStyle(.bordered)
         }
         .padding()
@@ -416,13 +416,13 @@ private struct DeepLinkGroupView: View {
                     Image(systemName: "person.3.fill")
                         .font(.barTabEmptyIcon)
                         .foregroundColor(.barTabPrimary)
-                    Text("Group not found")
+                    Text(String(localized: "Group not found"))
                         .font(.barTabHeading)
-                    Text("You may not be a member of this group.")
+                    Text(String(localized: "You may not be a member of this group."))
                         .font(.barTabBody)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
-                    Button("Close") { dismiss() }
+                    Button(String(localized: "Close")) { dismiss() }
                         .buttonStyle(.bordered)
                 }
                 .padding()

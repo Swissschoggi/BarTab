@@ -12,8 +12,8 @@ struct FollowRequestsView: View {
             VStack(alignment: .leading, spacing: 16) {
 
                 BarTabScreenHeader(
-                    title: "Follow Requests",
-                    subtitle: "People who want to follow you."
+                    title: String(localized: "Follow Requests"),
+                    subtitle: String(localized: "People who want to follow you.")
                 )
 
                 if isLoading {
@@ -26,10 +26,10 @@ struct FollowRequestsView: View {
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
 
-                        Text("No pending requests")
+                        Text(String(localized: "No pending requests"))
                             .font(.barTabHeading)
 
-                        Text("When someone follows you, their request will appear here.")
+                        Text(String(localized: "When someone follows you, their request will appear here."))
                             .font(.barTabBody)
                             .foregroundColor(.secondary)
                     }
@@ -53,7 +53,7 @@ struct FollowRequestsView: View {
             .padding(.vertical, 20)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
-        .navigationTitle("Follow Requests")
+        .navigationTitle(String(localized: "Follow Requests"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await loadRequests() }
     }
@@ -66,12 +66,12 @@ struct FollowRequestsView: View {
             UserAvatarView(urlString: profile?.avatar_url, displayName: profile?.display_name)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(profile?.display_name ?? "User")
+                Text(profile?.display_name ?? String(localized: "User"))
                     .font(.barTabBody)
                     .fontWeight(.medium)
                     .foregroundColor(.barTabText)
 
-                Text("wants to follow you")
+                Text(String(localized: "wants to follow you"))
                     .font(.barTabSmall)
                     .foregroundColor(.secondary)
             }
@@ -82,7 +82,7 @@ struct FollowRequestsView: View {
                 Button {
                     Task { await approve(request: request) }
                 } label: {
-                    Text("Accept")
+                    Text(String(localized: "Accept"))
                         .font(.barTabBody)
                         .fontWeight(.semibold)
                         .frame(width: 64, height: 32)
@@ -95,7 +95,7 @@ struct FollowRequestsView: View {
                 Button {
                     Task { await reject(request: request) }
                 } label: {
-                    Text("Decline")
+                    Text(String(localized: "Decline"))
                         .font(.barTabBody)
                         .fontWeight(.semibold)
                         .frame(width: 64, height: 32)

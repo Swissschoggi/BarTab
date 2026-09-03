@@ -22,12 +22,12 @@ struct BarHopView: View {
                             Image(systemName: "figure.walk.circle.fill")
                                 .font(.barTabTitle)
                                 .foregroundColor(.barTabPrimary)
-                            Text("Bar Hop Generator")
+                            Text(String(localized: "Bar Hop Generator"))
                                 .font(.barTabStat)
                                 .foregroundColor(.barTabText)
                         }
 
-                        Text("Let BarTab curate a 3-stop walking crawl featuring great drink deals near you.")
+                        Text(String(localized: "Let BarTab curate a 3-stop walking crawl featuring great drink deals near you."))
                             .font(.barTabCaption)
                             .foregroundColor(.barTabSecondary)
                     }
@@ -39,14 +39,14 @@ struct BarHopView: View {
                                 .font(.barTabEmptyIconLarge)
                                 .foregroundColor(.barTabPrimary.opacity(0.6))
 
-                            Text("Ready for a night out?")
+                            Text(String(localized: "Ready for a night out?"))
                                 .font(.barTabHeading)
                                 .foregroundColor(.barTabText)
 
                             Button {
                                 generateRoute()
                             } label: {
-                                Text("Generate Route")
+                                Text(String(localized: "Generate Route"))
                                     .barTabPrimaryButton()
                             }
                             .padding(.horizontal, 40)
@@ -57,13 +57,13 @@ struct BarHopView: View {
                     } else {
                         VStack(alignment: .leading, spacing: 16) {
                             HStack {
-                                Text("Your Crawl Route")
+                                Text(String(localized: "Your Crawl Route"))
                                     .font(.barTabHeading)
                                     .foregroundColor(.barTabText)
 
                                 Spacer()
 
-                                Button("Shuffle") {
+                                Button(String(localized: "Shuffle")) {
                                     generateRoute()
                                 }
                                 .font(.barTabCaption)
@@ -120,7 +120,7 @@ struct BarHopView: View {
                             Button {
                                 generateRoute()
                             } label: {
-                                Text("Try Another Route")
+                                Text(String(localized: "Try Another Route"))
                                     .barTabPrimaryButton()
                             }
                             .padding(.top, 8)
@@ -131,11 +131,11 @@ struct BarHopView: View {
                 .padding(16)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle("Bar Hop")
+            .navigationTitle(String(localized: "Bar Hop"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") {
+                    Button(String(localized: "Done")) {
                         dismiss()
                     }
                 }

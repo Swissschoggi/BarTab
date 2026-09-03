@@ -150,6 +150,9 @@ struct BarView: View {
                     .padding(.bottom, 32)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
+            .refreshable {
+                syncFromRepository()
+            }
             .navigationTitle(currentBar.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -262,18 +265,18 @@ struct BarView: View {
                         ok = await barRepository.checkIn(bar: currentBar, user: user)
                         if ok {
                             HapticEngine.success()
-                            toastCenter.show("You're here have fun! 🍻", kind: .success)
+                            toastCenter.show(String(localized: "You're here have fun! 🍻"), kind: .success)
                         }
                     }
 
                     if !ok {
-                        toastCenter.show("Couldn't update right now", kind: .error)
+                        toastCenter.show(String(localized: "Couldn't update right now"), kind: .error)
                     }
                 }
             } label: {
                 HStack(spacing: 7) {
                     Image(systemName: hasCheckedIn ? "checkmark.circle.fill" : "figure.walk")
-                    Text(hasCheckedIn ? "You're here" : "I'm here")
+                    Text(hasCheckedIn ? String(localized: "You're here") : String(localized: "I'm here"))
 
                     if busyCount > 0 {
                         Text("· \(busyCount)")
@@ -305,7 +308,7 @@ struct BarView: View {
             } label: {
                 HStack(spacing: 7) {
                     Image(systemName: "plus")
-                    Text("Add price")
+                    Text(String(localized: "Add price"))
                 }
                 .font(.barTabSmall)
                 .fontWeight(.semibold)
@@ -358,7 +361,7 @@ struct BarView: View {
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "star")
-                    Text("Rate")
+                    Text(String(localized: "Rate"))
                 }
                 .font(.barTabTiny)
                 .fontWeight(.semibold)
@@ -402,7 +405,7 @@ struct BarView: View {
                                 .clipShape(Capsule())
                         }
                     } else {
-                        Text("Unknown")
+                        Text(String(localized: "Unknown"))
                             .font(.barTabTiny)
                             .foregroundColor(.barTabSecondary)
                     }
@@ -419,7 +422,7 @@ struct BarView: View {
                 .overlay(
                     Capsule().stroke(
                         attribute.consensusValue != nil
-                        ? Color.barTabCardBorder
+                        ? Color.barTabPrimary.opacity(0.3)
                         : Color.barTabCardBorder,
                         lineWidth: 0.5
                     )
@@ -445,7 +448,7 @@ struct BarView: View {
         } label: {
             HStack(spacing: 7) {
                 Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                Text("Directions")
+                Text(String(localized: "Directions"))
                     .fontWeight(.medium)
                 Spacer()
                 Image(systemName: "arrow.up.right")
@@ -463,7 +466,7 @@ struct BarView: View {
     private var menuSection: some View {
         VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Menu")
+                Text(String(localized: "Menu"))
                     .font(.barTabHeading)
                     .fontWeight(.bold)
 
@@ -624,7 +627,7 @@ struct BarView: View {
                             .frame(height: 110)
                             .padding(.top, 2)
                     } else {
-                        Text("One reported price")
+                        Text(String(localized: "One reported price"))
                             .font(.barTabTiny)
                             .foregroundColor(.barTabSecondary)
                     }
@@ -638,7 +641,7 @@ struct BarView: View {
                             ratingDrinkGroup = group
                             showingDrinkRating = true
                         } label: {
-                            Label("Rate", systemImage: myDrinkRatingIcon(for: group))
+                            Label(String(localized: "Rate"), systemImage: myDrinkRatingIcon(for: group))
                                 .font(.barTabTiny)
                                 .fontWeight(.semibold)
                         }
@@ -647,7 +650,7 @@ struct BarView: View {
                             alertDrinkGroup = group
                             showingPriceAlert = true
                         } label: {
-                            Label("Alert", systemImage: "bell")
+                            Label(String(localized: "Alert"), systemImage: "bell")
                                 .font(.barTabTiny)
                                 .fontWeight(.semibold)
                         }
@@ -658,14 +661,14 @@ struct BarView: View {
                             Button {
                                 comparisonGroup = group
                             } label: {
-                                Label("Compare prices", systemImage: "barchart.xaxis.2")
+                                Label(String(localized: "Compare prices"), systemImage: "barchart.xaxis.2")
                             }
 
                             Button {
                                 pendingReportGroup = group
                                 showingPriceReport = true
                             } label: {
-                                Label("Report price", systemImage: "exclamationmark.circle")
+                                Label(String(localized: "Report price"), systemImage: "exclamationmark.circle")
                             }
 
                             if let user = userSession.currentUser, user.isAdmin {
@@ -673,7 +676,7 @@ struct BarView: View {
                                     pendingDeleteGroup = group
                                     showingDeleteGroupConfirmation = true
                                 } label: {
-                                    Label("Delete all", systemImage: "trash")
+                                    Label(String(localized: "Delete all"), systemImage: "trash")
                                 }
                             }
                         } label: {
@@ -694,7 +697,7 @@ struct BarView: View {
             Button {
                 comparisonGroup = group
             } label: {
-                Label("Compare prices", systemImage: "barchart.xaxis.2")
+                Label(String(localized: "Compare prices"), systemImage: "barchart.xaxis.2")
             }
         }
     }
@@ -755,18 +758,18 @@ struct BarView: View {
                             ok = await barRepository.unverifyPrice(price, user: user)
                             if ok {
                                 HapticEngine.lightTap()
-                                toastCenter.show("Verification removed", kind: .info)
+                                toastCenter.show(String(localized: "Verification removed"), kind: .info)
                             }
                         } else {
                             ok = await barRepository.verifyPrice(price, user: user)
                             if ok {
                                 HapticEngine.lightTap()
-                                toastCenter.show("Thanks for confirming this price!", kind: .success)
+                                toastCenter.show(String(localized: "Thanks for confirming this price!"), kind: .success)
                             }
                         }
 
                         if !ok {
-                            toastCenter.show("Couldn't update right now", kind: .error)
+                            toastCenter.show(String(localized: "Couldn't update right now"), kind: .error)
                         }
                     }
                 } label: {
@@ -779,8 +782,8 @@ struct BarView: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel(
                     hasVerified
-                        ? "Remove your verification"
-                        : "Confirm this price is still accurate"
+                        ? String(localized: "Remove your verification")
+                        : String(localized: "Confirm this price is still accurate")
                 )
             }
 
@@ -794,7 +797,7 @@ struct BarView: View {
                         .foregroundColor(.barTabDanger)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Delete price")
+                .accessibilityLabel(String(localized: "Delete price"))
             }
         }
         .padding(.horizontal, 10)
@@ -814,7 +817,7 @@ struct BarView: View {
                     }
                 } label: {
                     Label(
-                        hasVerified ? "Remove my verification" : "Confirm this price",
+                        hasVerified ? String(localized: "Remove my verification") : String(localized: "Confirm this price"),
                         systemImage: hasVerified ? "xmark.circle" : "checkmark.circle"
                     )
                 }
@@ -825,7 +828,7 @@ struct BarView: View {
                     pendingDeletePrice = price
                     showingDeletePriceConfirmation = true
                 } label: {
-                    Label("Delete my price", systemImage: "trash")
+                    Label(String(localized: "Delete my price"), systemImage: "trash")
                 }
             }
         }
@@ -833,11 +836,11 @@ struct BarView: View {
 
     private var emptyPricesView: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("No prices yet")
+            Text(String(localized: "No prices yet"))
                 .font(.barTabBody)
                 .fontWeight(.semibold)
 
-            Text("Be the first to add a drink price at this bar.")
+            Text(String(localized: "Be the first to add a drink price at this bar."))
                 .font(.barTabSmall)
                 .foregroundColor(.barTabSecondary)
 
@@ -845,7 +848,7 @@ struct BarView: View {
                 Button {
                     showingAddPrice = true
                 } label: {
-                    Text("Add the first price")
+                    Text(String(localized: "Add the first price"))
                         .font(.barTabSmall)
                         .fontWeight(.semibold)
                         .foregroundColor(.barTabPrimary)
@@ -867,7 +870,7 @@ struct BarView: View {
                 } label: {
                     Image(systemName: "xmark")
                 }
-                .accessibilityLabel("Close")
+                .accessibilityLabel(String(localized: "Close"))
             }
         }
 
@@ -877,12 +880,13 @@ struct BarView: View {
                 withAnimation(.easeInOut(duration: 0.2)) {
                     barRepository.toggleFavorite(currentBar)
                 }
+                HapticEngine.lightTap()
             } label: {
                 Image(systemName: isFavorited ? "heart.fill" : "heart")
                     .foregroundColor(.barTabPrimary)
             }
             .accessibilityLabel(
-                isFavorited ? "Remove from favorites" : "Add to favorites"
+                isFavorited ? String(localized: "Remove from favorites") : String(localized: "Add to favorites")
             )
 
             Menu {
@@ -891,14 +895,14 @@ struct BarView: View {
                     subject: Text(currentBar.name),
                     message: Text(shareText)
                 ) {
-                    Label("Share Bar", systemImage: "square.and.arrow.up")
+                    Label(String(localized: "Share Bar"), systemImage: "square.and.arrow.up")
                 }
 
                 Button {
                     handleBarReportTap()
                 } label: {
                     Label(
-                        hasReported ? "Bar Reported" : "Report Bar",
+                        hasReported ? String(localized: "Bar Reported") : String(localized: "Report Bar"),
                         systemImage: hasReported ? "flag.fill" : "flag"
                     )
                 }
@@ -909,20 +913,20 @@ struct BarView: View {
                     Button {
                         showingEditBar = true
                     } label: {
-                        Label("Edit Bar", systemImage: "pencil")
+                        Label(String(localized: "Edit Bar"), systemImage: "pencil")
                     }
 
                     Button(role: .destructive) {
                         showingDeleteBarConfirmation = true
                     } label: {
-                        Label("Delete Bar", systemImage: "trash")
+                        Label(String(localized: "Delete Bar"), systemImage: "trash")
                     }
                 }
             } label: {
                 Image(systemName: "ellipsis")
                     .foregroundColor(.barTabSecondary)
             }
-            .accessibilityLabel("More options")
+            .accessibilityLabel(String(localized: "More options"))
         }
     }
 
@@ -996,7 +1000,7 @@ struct BarView: View {
                 .environmentObject(toastCenter)
             }
             .confirmationDialog(
-                "Report this bar?",
+                String(localized: "Report this bar?"),
                 isPresented: $showingBarReport,
                 titleVisibility: .visible
             ) {
@@ -1005,12 +1009,12 @@ struct BarView: View {
                         reportBar(reason: reason)
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String(localized: "Cancel"), role: .cancel) {}
             } message: {
-                Text("Tell us why this bar looks wrong.")
+                Text(String(localized: "Tell us why this bar looks wrong."))
             }
             .confirmationDialog(
-                "Report this drink?",
+                String(localized: "Report this drink?"),
                 isPresented: $showingPriceReport,
                 titleVisibility: .visible
             ) {
@@ -1020,47 +1024,47 @@ struct BarView: View {
                         reportPriceGroup(group, reason: reason)
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String(localized: "Cancel"), role: .cancel) {}
             } message: {
-                Text("Tell us why this drink looks wrong.")
+                Text(String(localized: "Tell us why this drink looks wrong."))
             }
             .confirmationDialog(
-                "Delete this bar?",
+                String(localized: "Delete this bar?"),
                 isPresented: $showingDeleteBarConfirmation,
                 titleVisibility: .visible
             ) {
-                Button("Delete", role: .destructive) {
+                Button(String(localized: "Delete"), role: .destructive) {
                     deleteBar()
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String(localized: "Cancel"), role: .cancel) {}
             } message: {
-                Text("This removes the bar and all of its drinks. This can't be undone.")
+                Text(String(localized: "This removes the bar and all of its drinks. This can't be undone."))
             }
             .confirmationDialog(
-                "Delete this drink entry?",
+                String(localized: "Delete this drink entry?"),
                 isPresented: $showingDeletePriceConfirmation,
                 titleVisibility: .visible
             ) {
-                Button("Delete", role: .destructive) {
+                Button(String(localized: "Delete"), role: .destructive) {
                     guard let price = pendingDeletePrice else { return }
                     deletePrice(price)
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String(localized: "Cancel"), role: .cancel) {}
             } message: {
-                Text("This removes this drink entry. This can't be undone.")
+                Text(String(localized: "This removes this drink entry. This can't be undone."))
             }
             .confirmationDialog(
-                "Delete this drink?",
+                String(localized: "Delete this drink?"),
                 isPresented: $showingDeleteGroupConfirmation,
                 titleVisibility: .visible
             ) {
-                Button("Delete", role: .destructive) {
+                Button(String(localized: "Delete"), role: .destructive) {
                     guard let group = pendingDeleteGroup else { return }
                     deleteGroup(group)
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String(localized: "Cancel"), role: .cancel) {}
             } message: {
-                Text("This removes all entries for this drink at this bar. This can't be undone.")
+                Text(String(localized: "This removes all entries for this drink at this bar. This can't be undone."))
             }
             .sheet(isPresented: $showingAttributeDetail) {
                 if let attr = selectedAttribute,
@@ -1132,7 +1136,8 @@ struct BarView: View {
     private func reportBar(reason: ReportReason) {
         guard let user = userSession.currentUser else { return }
         barRepository.reportBar(currentBar, reason: reason, reportedBy: user)
-        toastCenter.show("Reported   thanks for helping keep BarTab accurate.", kind: .success)
+        HapticEngine.success()
+        toastCenter.show(String(localized: "Reported — thanks for helping keep BarTab accurate."), kind: .success)
     }
 
     private func reportPriceGroup(_ group: PriceGroup, reason: ReportReason) {
@@ -1146,11 +1151,13 @@ struct BarView: View {
             reason: reason,
             reportedBy: user
         )
-        toastCenter.show("Reported   thanks for helping keep BarTab accurate.", kind: .success)
+        HapticEngine.success()
+        toastCenter.show(String(localized: "Reported — thanks for helping keep BarTab accurate."), kind: .success)
     }
 
     private func deleteBar() {
         guard let user = userSession.currentUser else { return }
+        HapticEngine.warning()
         Task {
             await barRepository.deleteBar(currentBar, createdBy: user)
             dismiss()
@@ -1159,6 +1166,7 @@ struct BarView: View {
 
     private func deletePrice(_ price: Price) {
         guard let user = userSession.currentUser else { return }
+        HapticEngine.warning()
         Task {
             await barRepository.deletePrice(price, reportedBy: user)
         }
@@ -1166,6 +1174,7 @@ struct BarView: View {
 
     private func deleteGroup(_ group: PriceGroup) {
         guard let user = userSession.currentUser else { return }
+        HapticEngine.warning()
         Task {
             await barRepository.deletePriceGroup(
                 for: currentBar,

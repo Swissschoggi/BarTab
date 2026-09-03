@@ -35,50 +35,50 @@ struct SetAlertSheet: View {
 
                     if let brand {
                         HStack {
-                            Text("Brand")
+                            Text(String(localized: "Brand"))
                             Spacer()
                             Text(brand)
                                 .foregroundColor(.secondary)
                         }
                     }
                 } header: {
-                    Text("Alert for")
+                    Text(String(localized: "Alert for"))
                 }
 
                 Section {
                     HStack {
                         Text(Currency.defaultCurrency.symbol)
-                        TextField("Any price", text: $targetPrice)
+                        TextField(String(localized: "Any price"), text: $targetPrice)
                             .keyboardType(.decimalPad)
                     }
 
                     if let price = Double(targetPrice.replacingOccurrences(of: ",", with: ".")), price < 0 {
-                        Text("Price cannot be negative.")
+                        Text(String(localized: "Price cannot be negative."))
                             .font(.barTabSmall)
                             .foregroundColor(.barTabDanger)
                     } else if let price = Double(targetPrice.replacingOccurrences(of: ",", with: ".")), price == 0 {
-                        Text("Price must be greater than zero, or leave empty for any price.")
+                        Text(String(localized: "Price must be greater than zero, or leave empty for any price."))
                             .font(.barTabSmall)
                             .foregroundColor(.barTabDanger)
                     } else {
-                        Text("Leave empty to be alerted on any new price. Set a value to be notified when the price drops to or below it.")
+                        Text(String(localized: "Leave empty to be alerted on any new price. Set a value to be notified when the price drops to or below it."))
                             .font(.barTabSmall)
                             .foregroundColor(.secondary)
                     }
                 } header: {
-                    Text("Target price")
+                    Text(String(localized: "Target price"))
                 }
             }
-            .navigationTitle("Price Alert")
+            .navigationTitle(String(localized: "Price Alert"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button(String(localized: "Cancel")) {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Set") {
+                    Button(String(localized: "Set")) {
                         Task { await createAlert() }
                     }
                     .disabled(isSaving)
@@ -100,7 +100,7 @@ struct SetAlertSheet: View {
                 targetPrice: price
             )
             HapticEngine.success()
-            toastCenter.show("Alert set", kind: .success)
+            toastCenter.show(String(localized: "Alert set"), kind: .success)
             dismiss()
         } catch {
             toastCenter.showError(error)
