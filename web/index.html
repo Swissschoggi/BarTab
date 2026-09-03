@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="BarTab — Know what you're paying" />
+  <meta property="og:title" content="BarTab  Know what you're paying" />
   <meta property="og:description" content="Find bars, compare drink prices and discover the best deals around you." />
   <meta property="og:image" content="https://bartap.info/og.png" />
   <meta property="og:url" content="https://bartap.info/" />
@@ -16,7 +16,7 @@
   <!-- Leaflet CSS for Map Preview -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
-  <title>BarTab — Know what you're paying</title>
+  <title>BarTab Know what you're paying</title>
 </head>
 <body>
 
@@ -28,6 +28,7 @@
       </div>   
       <div class="nav-links">
         <a href="#map">Map</a>
+        <a href="#calculator">Estimator</a>
         <a href="#features">Features</a>
         <a href="#how">How it works</a>
         <a href="privacy.html">Privacy</a>
@@ -41,10 +42,10 @@
       <div>
         <span class="eyebrow">🥂 Crowdsourced drink prices</span>
         <h1>Know what you're <span class="grad">paying</span> before you go.</h1>
-        <p>BarTab shows real drink prices at bars near you — reported by people who were actually there. Compare, save, and never overpay for a pint again.</p>
+        <p>BarTab shows real drink prices at bars near you reported by people who were actually there. Compare, save, and never overpay for a pint again.</p>
         <div class="hero-actions">
           <a class="button" href="#map">Explore Map</a>
-          <a class="button secondary" href="privacy.html">We respect your data</a>
+          <a class="button secondary" href="#calculator">Estimate Bar Tab</a>
         </div>
       </div>
 
@@ -76,15 +77,15 @@
   <!-- Animated Stats Section -->
   <section class="container stats">
     <div class="stat reveal">
-      <div class="num" id="stat-bars" data-value="0">—</div>
+      <div class="num" id="stat-bars" data-value="0"></div>
       <div class="label">Bars mapped</div>
     </div>
     <div class="stat reveal">
-      <div class="num" id="stat-prices" data-value="0">—</div>
+      <div class="num" id="stat-prices" data-value="0"></div>
       <div class="label">Prices reported</div>
     </div>
     <div class="stat reveal">
-      <div class="num" id="stat-contributors" data-value="0">—</div>
+      <div class="num" id="stat-contributors" data-value="0"></div>
       <div class="label">Contributors</div>
     </div>
   </section>
@@ -97,6 +98,36 @@
       <p>Interactive preview of crowdsourced drink prices mapped in real-time.</p>
     </div>
     <div id="map-container" class="reveal"></div>
+  </section>
+
+  <!-- Night Out Bar Tab Estimator Feature -->
+  <section id="calculator" class="container">
+    <div class="section-head reveal">
+      <span class="tag">Interactive Tool</span>
+      <h2>Night Out Estimator</h2>
+      <p>Estimate your round or night out total before setting foot in the bar.</p>
+    </div>
+    <div class="calc-card reveal">
+      <div class="calc-grid">
+        <div class="calc-group">
+          <label for="drink-type">Drink Type</label>
+          <select id="drink-type" class="calc-input">
+            <option value="6.50">Pint of Beer (~CHF 6.50)</option>
+            <option value="15.00">Cocktail (~CHF 15.00)</option>
+            <option value="8.00">Glass of Wine (~CHF 8.00)</option>
+            <option value="5.00">Shot (~CHF 5.00)</option>
+          </select>
+        </div>
+        <div class="calc-group">
+          <label for="drink-count">Number of Drinks</label>
+          <input type="number" id="drink-count" class="calc-input" value="3" min="1" max="50" />
+        </div>
+      </div>
+      <div class="calc-result">
+        <div class="desc">Estimated Bar Tab</div>
+        <div class="total" id="calc-total">CHF 19.50</div>
+      </div>
+    </div>
   </section>
 
   <section id="features" class="container">
@@ -114,7 +145,7 @@
       <div class="feature reveal">
         <div class="icon">💰</div>
         <h3>Compare drink prices</h3>
-        <p>See what a beer, wine or cocktail actually costs — reported by real people.</p>
+        <p>See what a beer, wine or cocktail actually costs  reported by real people.</p>
       </div>
       <div class="feature reveal">
         <div class="icon">👯</div>
@@ -158,7 +189,7 @@
       <div class="step reveal">
         <div class="n">3</div>
         <h3>Report what you paid</h3>
-        <p>Add the price you saw — keep the map fresh for everyone.</p>
+        <p>Add the price you saw  keep the map fresh for everyone.</p>
       </div>
     </div>
   </section>
@@ -246,7 +277,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Intersection Observer for scroll animations
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
@@ -262,7 +292,6 @@
       document.querySelectorAll('.reveal, .stats').forEach((el) => observer.observe(el));
     });
 
-    // Supabase Configuration
     const SUPABASE_URL = 'https://xdyewakhzjnmpzhzhehl.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkeWV3YWtoempubXB6aHpoZWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwODc2MjksImV4cCI6MjEwMjY2MzYyOX0.nAZASYlhS3OBFc-mBSUVenGUTuzfMZgcbt9eBhc4Dm4';
 
@@ -290,7 +319,6 @@
       }[c]));
     }
 
-    // Number Ticking Animation
     function animateStats() {
       const elements = ['stat-bars', 'stat-prices', 'stat-contributors'];
       elements.forEach(id => {
@@ -340,7 +368,6 @@
       } catch (e) {}
     }
 
-    // Render cards inside mock phone based on selected drink filter
     function renderPhoneCards() {
       const container = document.getElementById('bar-cards');
       if (!container) return;
@@ -396,7 +423,6 @@
       } catch (e) {}
     }
 
-    // Interactive Phone Filter Event Handlers
     document.querySelectorAll('.phone-filter').forEach(button => {
       button.addEventListener('click', (e) => {
         document.querySelectorAll('.phone-filter').forEach(b => b.classList.remove('active'));
@@ -406,12 +432,10 @@
       });
     });
 
-    // Initialize Interactive Leaflet Map Preview
     function initMap(data) {
       const mapContainer = document.getElementById('map-container');
       if (!mapContainer) return;
 
-      // Default centered location (e.g., Zurich / Central Europe fallback)
       const map = L.map('map-container').setView([47.3769, 8.5417], 13);
 
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -437,6 +461,23 @@
       if (bounds.length > 0) {
         map.fitBounds(bounds, { padding: [30, 30] });
       }
+    }
+
+    // Estimator Calculation Logic
+    const drinkTypeSelect = document.getElementById('drink-type');
+    const drinkCountInput = document.getElementById('drink-count');
+    const calcTotalEl = document.getElementById('calc-total');
+
+    function updateEstimator() {
+      const price = parseFloat(drinkTypeSelect.value) || 0;
+      const count = parseInt(drinkCountInput.value) || 0;
+      const total = price * count;
+      calcTotalEl.textContent = 'CHF ' + total.toFixed(2);
+    }
+
+    if (drinkTypeSelect && drinkCountInput) {
+      drinkTypeSelect.addEventListener('change', updateEstimator);
+      drinkCountInput.addEventListener('input', updateEstimator);
     }
 
     loadStats();
