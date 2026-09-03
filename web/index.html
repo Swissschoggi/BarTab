@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="BarTab  Know what you're paying" />
+  <meta property="og:title" content="BarTab — Know what you're paying" />
   <meta property="og:description" content="Find bars, compare drink prices and discover the best deals around you." />
   <meta property="og:image" content="https://bartap.info/og.png" />
   <meta property="og:url" content="https://bartap.info/" />
@@ -13,8 +13,10 @@
 
   <meta name="apple-itunes-app" content="app-id=0000000000" />
 
+  <!-- Leaflet CSS for Map Preview -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
-  <title>BarTab  Know what you're paying</title>
+  <title>BarTab — Know what you're paying</title>
 </head>
 <body>
 
@@ -25,6 +27,7 @@
         BarTab
       </div>   
       <div class="nav-links">
+        <a href="#map">Map</a>
         <a href="#features">Features</a>
         <a href="#how">How it works</a>
         <a href="privacy.html">Privacy</a>
@@ -38,16 +41,27 @@
       <div>
         <span class="eyebrow">🥂 Crowdsourced drink prices</span>
         <h1>Know what you're <span class="grad">paying</span> before you go.</h1>
-        <p>BarTab shows real drink prices at bars near you  reported by people who were actually there. Compare, save, and never overpay for a pint again.</p>
+        <p>BarTab shows real drink prices at bars near you — reported by people who were actually there. Compare, save, and never overpay for a pint again.</p>
         <div class="hero-actions">
-          <a class="button" href="#how">See how it works</a>
+          <a class="button" href="#map">Explore Map</a>
           <a class="button secondary" href="privacy.html">We respect your data</a>
         </div>
       </div>
 
+      <!-- Glassmorphic Interactive Phone Mockup -->
       <div class="phone reveal">
         <div class="notch"></div>
-        <div class="app-title">Live prices · from the community</div>
+        <div class="app-header">
+          <div class="app-title">Live prices near you</div>
+          <div class="app-sub">Tap filters to test live menu</div>
+        </div>
+
+        <div class="phone-filters">
+          <button class="phone-filter active" data-type="all">All</button>
+          <button class="phone-filter" data-type="beer">🍺 Beer</button>
+          <button class="phone-filter" data-type="cocktail">🍸 Cocktails</button>
+          <button class="phone-filter" data-type="wine">🍷 Wine</button>
+        </div>
 
         <div id="bar-cards">
           <div class="pcard">
@@ -59,19 +73,30 @@
     </div>
   </header>
 
+  <!-- Animated Stats Section -->
   <section class="container stats">
     <div class="stat reveal">
-      <div class="num" id="stat-bars">—</div>
+      <div class="num" id="stat-bars" data-value="0">—</div>
       <div class="label">Bars mapped</div>
     </div>
     <div class="stat reveal">
-      <div class="num" id="stat-prices">—</div>
+      <div class="num" id="stat-prices" data-value="0">—</div>
       <div class="label">Prices reported</div>
     </div>
     <div class="stat reveal">
-      <div class="num" id="stat-contributors">—</div>
+      <div class="num" id="stat-contributors" data-value="0">—</div>
       <div class="label">Contributors</div>
     </div>
+  </section>
+
+  <!-- Interactive Map Section -->
+  <section id="map" class="container map-section">
+    <div class="section-head reveal">
+      <span class="tag">Live Explorer</span>
+      <h2>Explore bars around you</h2>
+      <p>Interactive preview of crowdsourced drink prices mapped in real-time.</p>
+    </div>
+    <div id="map-container" class="reveal"></div>
   </section>
 
   <section id="features" class="container">
@@ -89,7 +114,7 @@
       <div class="feature reveal">
         <div class="icon">💰</div>
         <h3>Compare drink prices</h3>
-        <p>See what a beer, wine or cocktail actually costs reported by real people.</p>
+        <p>See what a beer, wine or cocktail actually costs — reported by real people.</p>
       </div>
       <div class="feature reveal">
         <div class="icon">👯</div>
@@ -133,7 +158,7 @@
       <div class="step reveal">
         <div class="n">3</div>
         <h3>Report what you paid</h3>
-        <p>Add the price you saw keep the map fresh for everyone.</p>
+        <p>Add the price you saw — keep the map fresh for everyone.</p>
       </div>
     </div>
   </section>
@@ -216,23 +241,28 @@
     </div>
   </footer>
 
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Intersection Observer for scroll animations
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add('visible');
+            if (e.target.classList.contains('stats')) {
+              animateStats();
+            }
             observer.unobserve(e.target);
           }
         });
       }, { threshold: 0.1 });
 
-      document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+      document.querySelectorAll('.reveal, .stats').forEach((el) => observer.observe(el));
     });
-  </script>
 
-  <script>
-    // Live stats pulled straight from Supabase (public anon access).
+    // Supabase Configuration
     const SUPABASE_URL = 'https://xdyewakhzjnmpzhzhehl.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkeWV3YWtoempubXB6aHpoZWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwODc2MjksImV4cCI6MjEwMjY2MzYyOX0.nAZASYlhS3OBFc-mBSUVenGUTuzfMZgcbt9eBhc4Dm4';
 
@@ -241,44 +271,6 @@
       Authorization: 'Bearer ' + SUPABASE_KEY
     };
 
-    function fmt(n) {
-      return n.toLocaleString('en-US');
-    }
-
-    async function fetchCount(table, column) {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/' + table + '?select=' + column, { headers: HEADERS });
-      if (!res.ok) return null;
-      const rows = await res.json();
-      return rows.length;
-    }
-
-    function setStat(id, value) {
-      if (value == null) return;
-      document.getElementById(id).textContent = fmt(value);
-    }
-
-    async function loadStats() {
-      try {
-        const bars = await fetchCount('bars', 'id');
-        setStat('stat-bars', bars);
-
-        const prices = await fetchCount('prices', 'id');
-        setStat('stat-prices', prices);
-
-        const res = await fetch(SUPABASE_URL + '/rest/v1/prices?select=reported_by', { headers: HEADERS });
-        if (res.ok) {
-          const rows = await res.json();
-          const contributors = new Set(rows.map(r => r.reported_by)).size;
-          setStat('stat-contributors', contributors);
-        }
-      } catch (e) {
-        // keep the "—" placeholders on failure
-      }
-    }
-
-    loadStats();
-
-    // Fill the phone mockup with real bars + prices.
     const DRINK_META = {
       beer:      { icon: '🍺', label: 'Beer' },
       wine:      { icon: '🍷', label: 'Wine' },
@@ -289,57 +281,165 @@
       other:     { icon: '🥂', label: 'Drink' }
     };
 
+    let allPricesData = [];
+    let activeFilter = 'all';
+
     function esc(s) {
       return String(s).replace(/[&<>"']/g, (c) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
       }[c]));
     }
 
-    async function loadBars() {
+    // Number Ticking Animation
+    function animateStats() {
+      const elements = ['stat-bars', 'stat-prices', 'stat-contributors'];
+      elements.forEach(id => {
+        const el = document.getElementById(id);
+        const target = parseInt(el.getAttribute('data-value') || '0', 10);
+        if (!target) return;
+        
+        let current = 0;
+        const duration = 1500;
+        const stepTime = 20;
+        const steps = duration / stepTime;
+        const increment = target / steps;
+
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            el.textContent = target.toLocaleString('en-US');
+            clearInterval(timer);
+          } else {
+            el.textContent = Math.floor(current).toLocaleString('en-US');
+          }
+        }, stepTime);
+      });
+    }
+
+    async function fetchCount(table, column) {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/' + table + '?select=' + column, { headers: HEADERS });
+      if (!res.ok) return null;
+      const rows = await res.json();
+      return rows.length;
+    }
+
+    async function loadStats() {
+      try {
+        const bars = await fetchCount('bars', 'id');
+        if (bars !== null) document.getElementById('stat-bars').setAttribute('data-value', bars);
+
+        const prices = await fetchCount('prices', 'id');
+        if (prices !== null) document.getElementById('stat-prices').setAttribute('data-value', prices);
+
+        const res = await fetch(SUPABASE_URL + '/rest/v1/prices?select=reported_by', { headers: HEADERS });
+        if (res.ok) {
+          const rows = await res.json();
+          const contributors = new Set(rows.map(r => r.reported_by)).size;
+          document.getElementById('stat-contributors').setAttribute('data-value', contributors);
+        }
+      } catch (e) {}
+    }
+
+    // Render cards inside mock phone based on selected drink filter
+    function renderPhoneCards() {
       const container = document.getElementById('bar-cards');
       if (!container) return;
 
+      const filtered = activeFilter === 'all' 
+        ? allPricesData 
+        : allPricesData.filter(p => p.drink === activeFilter);
+
+      const picks = [];
+      const seen = new Set();
+      for (const p of filtered) {
+        const name = p.bars && p.bars.name;
+        if (!name || seen.has(name)) continue;
+        seen.add(name);
+        picks.push(p);
+        if (picks.length === 3) break;
+      }
+
+      if (!picks.length) {
+        container.innerHTML = '<div class="pcard"><div><div class="name">No prices found</div></div></div>';
+        return;
+      }
+
+      container.innerHTML = picks.map((p) => {
+        const meta = DRINK_META[p.drink] || DRINK_META.other;
+        const amt = Number(p.amount).toFixed(2);
+        return (
+          '<div class="pcard">' +
+            '<div class="ic">' + meta.icon + '</div>' +
+            '<div>' +
+              '<div class="name">' + esc(p.bars.name) + '</div>' +
+              '<div class="sub">' + meta.label + '</div>' +
+            '</div>' +
+            '<div class="price">' +
+              '<div class="amt">' + esc(p.currency) + ' ' + amt + '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join('');
+    }
+
+    async function loadBars() {
       try {
         const res = await fetch(
-          SUPABASE_URL + '/rest/v1/prices?select=amount,currency,drink,bars(name)&order=reported_at.desc&limit=24',
+          SUPABASE_URL + '/rest/v1/prices?select=amount,currency,drink,bars(name,latitude,longitude)&order=reported_at.desc&limit=40',
           { headers: HEADERS }
         );
         if (!res.ok) return;
 
-        const rows = await res.json();
-        const seen = new Set();
-        const picks = [];
-        for (const r of rows) {
-          const name = r.bars && r.bars.name;
-          if (!name || seen.has(name)) continue;
-          seen.add(name);
-          picks.push(r);
-          if (picks.length === 3) break;
-        }
+        allPricesData = await res.json();
+        renderPhoneCards();
+        initMap(allPricesData);
+      } catch (e) {}
+    }
 
-        if (!picks.length) return;
+    // Interactive Phone Filter Event Handlers
+    document.querySelectorAll('.phone-filter').forEach(button => {
+      button.addEventListener('click', (e) => {
+        document.querySelectorAll('.phone-filter').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeFilter = e.target.getAttribute('data-type');
+        renderPhoneCards();
+      });
+    });
 
-        container.innerHTML = picks.map((p) => {
+    // Initialize Interactive Leaflet Map Preview
+    function initMap(data) {
+      const mapContainer = document.getElementById('map-container');
+      if (!mapContainer) return;
+
+      // Default centered location (e.g., Zurich / Central Europe fallback)
+      const map = L.map('map-container').setView([47.3769, 8.5417], 13);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(map);
+
+      const bounds = [];
+      data.forEach(p => {
+        if (p.bars && p.bars.latitude && p.bars.longitude) {
+          const lat = p.bars.latitude;
+          const lng = p.bars.longitude;
+          bounds.push([lat, lng]);
+
           const meta = DRINK_META[p.drink] || DRINK_META.other;
-          const amt = Number(p.amount).toFixed(2);
-          return (
-            '<div class="pcard">' +
-              '<div class="ic">' + meta.icon + '</div>' +
-              '<div>' +
-                '<div class="name">' + esc(p.bars.name) + '</div>' +
-                '<div class="sub">' + meta.label + '</div>' +
-              '</div>' +
-              '<div class="price">' +
-                '<div class="amt">' + esc(p.currency) + ' ' + amt + '</div>' +
-              '</div>' +
-            '</div>'
-          );
-        }).join('');
-      } catch (e) {
-        // leave the "Loading bars…" placeholder
+          L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup(`<h4>${esc(p.bars.name)}</h4><p>${meta.icon} ${esc(p.currency)} ${Number(p.amount).toFixed(2)}</p>`);
+        }
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [30, 30] });
       }
     }
 
+    loadStats();
     loadBars();
   </script>
 
