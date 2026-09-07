@@ -683,7 +683,7 @@ struct FriendsView: View {
         VStack(spacing: 0) {
             Picker(String(localized: "Tab"), selection: $tab) {
                 ForEach(Tab.allCases, id: \.self) { t in
-                    Text(String(localized: t.rawValue)).tag(t)
+                    Text(t.rawValue).tag(t)
                 }
             }
             .pickerStyle(.segmented)
