@@ -5,6 +5,7 @@ struct MapView: View {
     @EnvironmentObject private var locationService: LocationService
 
     @State private var showingAddBar = false
+    @State private var showingBarHop = false
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
@@ -84,6 +85,18 @@ struct MapView: View {
                 .accessibilityLabel("Add bar")
 
                 Button {
+                    showingBarHop = true
+                } label: {
+                    Image(systemName: "figure.walk.circle.fill")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(.barTabPrimary)
+                        .frame(width: 44, height: 44)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                }
+                .accessibilityLabel("Bar hop")
+
+                Button {
                     centerOnUser()
                 } label: {
                     Image(systemName: "location.fill")
@@ -120,9 +133,15 @@ struct MapView: View {
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
                     .environmentObject(toastCenter)
+                    .environmentObject(locationService)
             }
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showingBarHop) {
+            BarHopView()
+                .environmentObject(barRepository)
+                .environmentObject(locationService)
         }
         .sheet(isPresented: $showingAddBar) {
             AddBarView(onBarAdded: { bar in

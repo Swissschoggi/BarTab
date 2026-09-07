@@ -43,7 +43,6 @@ struct NearbyView: View {
     @State private var showingLocationSearch = false
     @State private var showingLocationSheet = false
     @State private var displayMode: DisplayMode = .bars
-    @State private var isRefreshing = false
 
     // Drink search state
     @State private var searchText = ""
@@ -1049,9 +1048,6 @@ struct NearbyView: View {
     }
 
     private func refreshBars() async {
-        isRefreshing = true
-        defer { isRefreshing = false }
-
         await barRepository.fetchAllData()
         HapticEngine.lightTap()
     }

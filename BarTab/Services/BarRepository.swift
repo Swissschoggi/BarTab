@@ -476,14 +476,6 @@ final class BarRepository: ObservableObject {
         ratings(for: bar).reduce(0) { $0 + $1.ambience.count }
     }
 
-    /// Average wine-quality rating and how many people rated it, or
-    /// nil if nobody has rated this bar's wine yet.
-    func averageWineQuality(for bar: Bar) -> (average: Double, count: Int)? {
-        let values = ratings(for: bar).compactMap { $0.wineQuality }
-        guard !values.isEmpty else { return nil }
-        return (Double(values.reduce(0, +)) / Double(values.count), values.count)
-    }
-
     func myRating(for bar: Bar, by user: User) -> BarRating? {
         ratings(for: bar).first { $0.ratedBy == user.id }
     }

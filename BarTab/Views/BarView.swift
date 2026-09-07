@@ -46,6 +46,7 @@ struct BarView: View {
     @State private var cachedReports: [ContentReport] = []
     @State private var cachedDrinkRatings: [DrinkRating] = []
     @State private var cachedBarRatings: [BarRating] = []
+    @State private var priceTrendData: [CGFloat] = []
 
     init(bar: Bar, allowsDismissal: Bool = false) {
         self.bar = bar
@@ -76,6 +77,7 @@ struct BarView: View {
         cachedReports = barRepository.reports
         cachedDrinkRatings = barRepository.drinkRatings
         cachedBarRatings = barRepository.barRatings
+        priceTrendData = computePriceTrend()
         if let user = userSession.currentUser {
             hasReported = barRepository.reports.contains {
                 $0.targetID == bar.id.uuidString
@@ -83,6 +85,12 @@ struct BarView: View {
                 && $0.reportedBy == user.id
             }
         }
+    }
+
+    private func computePriceTrend() -> [CGFloat] {
+        let sorted = prices.sorted { $0.reportedAt < $1.reportedAt }
+        let last10 = Array(sorted.suffix(10))
+        return last10.map { NSDecimalNumber(decimal: $0.amount).floatValue }
     }
 
     private struct PriceGroup: Identifiable {
@@ -212,6 +220,8 @@ struct BarView: View {
                         .foregroundColor(.barTabSecondary)
                     Text(priceLevel)
                         .fontWeight(.semibold)
+                    Text(priceLevelTitle(priceLevel))
+                        .foregroundColor(.barTabSecondary)
                 }
 
                 Spacer()
@@ -241,6 +251,32 @@ struct BarView: View {
                     }
                 }
                 .padding(.top, 2)
+            }
+
+            if !priceTrendData.isEmpty {
+                HStack(spacing: 8) {
+                    SparklineView(
+                        dataPoints: priceTrendData,
+                        lineWidth: 1.5,
+                        lineColor: .barTabPrimary,
+                        fillColor: .barTabPrimary.opacity(0.08)
+                    )
+                    .frame(width: 60, height: 24)
+
+                    if let latest = priceTrendData.last, let first = priceTrendData.first {
+                        let diff = latest - first
+                        if diff > 0.5 {
+                            Image(systemName: "arrow.up.right")
+                                .font(.barTabTiny)
+                                .foregroundColor(.red)
+                        } else if diff < -0.5 {
+                            Image(systemName: "arrow.down.right")
+                                .font(.barTabTiny)
+                                .foregroundColor(.green)
+                        }
+                    }
+                }
+                .padding(.top, 4)
             }
         }
     }

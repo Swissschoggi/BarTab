@@ -21,6 +21,45 @@ final class SupabaseAuthService {
 
     private let sessionAccount = "session"
 
+    /// One-time random tokens for the OAuth / password-reset deep
+    /// links. Without this, `bartab://auth/callback#access_token=…`
+    /// and `bartab://reset-password#access_token=…` are accepted
+    /// from ANY source — not just the browser sheet we opened —
+    /// because `.onOpenURL` fires for any app or website that gets
+    /// the person to tap a `bartab://…` link. An attacker can host
+    /// their own Supabase session's tokens in such a link; opening it
+    /// would silently sign the victim into the attacker's BarTab
+    /// account (login CSRF), and anything the victim then does in
+    /// the app — prices, check-ins, group chats — lands in an
+    /// account the attacker controls. Generating an unguessable
+    /// state value before we start the flow, sending it out in
+    /// `redirect_to`, and requiring it to come back unchanged closes
+    /// that off: an attacker can't predict it, so a link they craft
+    /// on their own can't pass the check.
+    private static var pendingOAuthState: String?
+
+    private static func makeAndStoreState() -> String {
+        let state = randomNonceString(length: 24)
+        pendingOAuthState = state
+        return state
+    }
+
+    /// Validates and consumes the pending state. Single-use: cleared
+    /// whether or not it matches, so a captured/replayed callback
+    /// URL can't be reused.
+    private static func consumeValidState(from url: URL) -> Bool {
+        defer { pendingOAuthState = nil }
+
+        guard let expected = pendingOAuthState else { return false }
+
+        let queryState = URLComponents(
+            url: url,
+            resolvingAgainstBaseURL: false
+        )?.queryItems?.first { $0.name == "state" }?.value
+
+        return queryState == expected
+    }
+
     struct AuthUser: Codable, Identifiable {
         let id: UUID
         let email: String
@@ -252,18 +291,24 @@ final class SupabaseAuthService {
     }
 
     func resetPassword(email: String) async throws {
+        let state = Self.makeAndStoreState()
         let body: [String: String] = [
             "email": email,
-            "redirect_to": "bartab://reset-password"
+            "redirect_to": "bartab://reset-password?state=\(state)"
         ]
         _ = try await performAuth(endpoint: "recover", body: body)
     }
 
     /// Handles the deep link redirect after a password reset.
     /// Parses access_token and refresh_token from the URL fragment
-    /// and saves the new session.
+    /// and saves the new session. Requires the `state` value this
+    /// device generated when `resetPassword(email:)` was called, so
+    /// an unsolicited `bartab://reset-password#access_token=…` link
+    /// (crafted by an attacker with their own tokens) can't sign this
+    /// device into the attacker's account — see `pendingOAuthState`.
     func handleResetPasswordCallback(_ url: URL) async -> Bool {
         guard url.host == "reset-password",
+              Self.consumeValidState(from: url),
               let fragment = url.fragment else { return false }
 
         var params: [String: String] = [:]
@@ -304,11 +349,13 @@ final class SupabaseAuthService {
             resolvingAgainstBaseURL: false
         )
 
+        let state = makeAndStoreState()
+
         components?.queryItems = [
             URLQueryItem(name: "provider", value: "google"),
             URLQueryItem(
                 name: "redirect_to",
-                value: "\(SupabaseConfig.oauthCallbackScheme)://auth/callback"
+                value: "\(SupabaseConfig.oauthCallbackScheme)://auth/callback?state=\(state)"
             )
         ]
 
@@ -321,6 +368,12 @@ final class SupabaseAuthService {
     func handleGoogleCallback(_ callbackURL: URL) async throws -> AuthSession {
 
         guard callbackURL.scheme == SupabaseConfig.oauthCallbackScheme else {
+            throw AuthError.invalidCallbackURL
+        }
+
+        // Reject any callback we didn't ourselves ask for — see the
+        // comment on `pendingOAuthState` for why this matters.
+        guard Self.consumeValidState(from: callbackURL) else {
             throw AuthError.invalidCallbackURL
         }
 

@@ -9,6 +9,7 @@ struct GroupPlanningView: View {
     @State private var groups: [BarGroup] = []
     @State private var isLoading = true
     @State private var showingCreateGroup = false
+    @State private var refreshError: String?
 
     var body: some View {
         ScrollView {
@@ -18,6 +19,13 @@ struct GroupPlanningView: View {
                     title: String(localized: "Groups"),
                     subtitle: String(localized: "Plan where to go with friends.")
                 )
+
+                if let refreshError {
+                    Text(refreshError)
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabDanger)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
 
                 Button {
                     showingCreateGroup = true
@@ -123,8 +131,12 @@ struct GroupPlanningView: View {
     private func loadGroups() async {
         do {
             groups = try await SupabaseClient.shared.fetchGroups()
+            refreshError = nil
         } catch {
             toastCenter.showError(error)
+            if !groups.isEmpty {
+                refreshError = String(localized: "Couldn't refresh. Showing earlier groups.")
+            }
         }
         isLoading = false
     }

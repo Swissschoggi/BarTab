@@ -82,6 +82,22 @@ final class AuthTokenStore {
     }
 }
 
+extension CharacterSet {
+    /// Deliberately much stricter than `.urlQueryAllowed`, which still
+    /// permits `&`, `=`, `+`, `,`, `(`, `)`, `*` — all of which are
+    /// meaningful delimiters in a URL query string and/or in PostgREST's
+    /// filter syntax (`&` separates params, `,` separates values inside
+    /// `in.()` and multi-column `select`/`order`, `(`/`)` group `or=`/
+    /// `and=` filters, `*` is the select wildcard). Only alphanumerics
+    /// plus a small set of punctuation that carries no such meaning are
+    /// allowed through; everything else is percent-encoded.
+    static let urlQueryValueAllowed: CharacterSet = {
+        var set = CharacterSet.alphanumerics
+        set.insert(charactersIn: "-_.")
+        return set
+    }()
+}
+
 /// Thin Supabase REST (PostgREST + Auth + Storage) client.
 ///
 /// The URL and anon key come from Supabase Dashboard -> Settings -> API.
@@ -205,6 +221,27 @@ final class SupabaseClient {
         }
 
         return request
+    }
+
+    /// Percent-encodes a value of unknown/user-controlled origin so it
+    /// can be safely embedded inside a PostgREST query string.
+    ///
+    /// Endpoint strings elsewhere in this file are built by string
+    /// interpolation, e.g. `"profiles?id=eq.\(userID.uuidString)"`.
+    /// That's safe for UUIDs, enum raw values, etc. — anything drawn
+    /// from a closed, known-safe set of characters. It is NOT safe
+    /// for arbitrary text a person typed (search boxes, free-text
+    /// fields): characters like `&`, `=`, `#`, `%`, and space are
+    /// significant in a URL query string, so unescaped user text can
+    /// inject extra query parameters or override existing ones
+    /// (e.g. widening a filter, or dropping the `id=neq.<me>`
+    /// exclusion in a search query) — a PostgREST filter-injection
+    /// bug. Always pass free-text values through this before
+    /// interpolating them into an `endpoint` string.
+    private func percentEncoded(_ value: String) -> String {
+        value.addingPercentEncoding(
+            withAllowedCharacters: .urlQueryValueAllowed
+        ) ?? ""
     }
 
     private func perform(
@@ -1074,7 +1111,21 @@ final class SupabaseClient {
 
     func searchUsers(query: String) async throws -> [ProfileDTO] {
         let myID = try requireUserID().uuidString
-        let wildcard = "%25\(query)%25"
+
+        // Escape the ilike wildcard characters *within* the search text
+        // itself, so typing "%" or "_" searches for a literal percent
+        // sign / underscore instead of matching everything.
+        let escaped = query
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "%", with: "\\%")
+            .replacingOccurrences(of: "_", with: "\\_")
+
+        // Percent-encode the (now ilike-escaped) text before it goes
+        // anywhere near the URL — see percentEncoded(_:) for why this
+        // step is required for any free-text value.
+        let safeQuery = percentEncoded(escaped)
+        let wildcard = "%25\(safeQuery)%25"
+
         let endpoint = "profiles?id=neq.\(myID)&display_name=ilike.\(wildcard)&select=*&limit=20"
         let request = try makeRequest(endpoint: endpoint)
         let data = try await performAuthorized(request)

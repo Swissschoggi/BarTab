@@ -5,21 +5,30 @@ struct ActivityFeedView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
+    @EnvironmentObject private var locationService: LocationService
 
     @State private var items: [ActivityItem] = []
     @State private var isLoading = true
     @State private var userCache: [UUID: String] = [:]
     @State private var avatarCache: [UUID: String] = [:]
     @State private var selectedBar: Bar?
+    @State private var refreshError: String?
 
     var body: some View {
         ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.md) {
+            VStack(alignment: .leading, spacing: BarTabSpacing.md) {
 
                 BarTabScreenHeader(
-                    title: "Activity",
-                    subtitle: "See what your friends are drinking."
+                    title: String(localized: "Activity"),
+                    subtitle: String(localized: "See what your friends are drinking.")
                 )
+
+                if let refreshError {
+                    Text(refreshError)
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabDanger)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
 
                 if isLoading {
                     ProgressView()
@@ -66,6 +75,7 @@ struct ActivityFeedView: View {
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
                     .environmentObject(toastCenter)
+                    .environmentObject(locationService)
             }
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
@@ -177,8 +187,12 @@ struct ActivityFeedView: View {
                     }
                 }
             }
+            refreshError = nil
         } catch {
             toastCenter.showError(error)
+            if !items.isEmpty {
+                refreshError = String(localized: "Couldn't refresh. Showing earlier activity.")
+            }
         }
         isLoading = false
     }
