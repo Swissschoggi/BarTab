@@ -75,10 +75,6 @@
 		BRTA00013060000100000034 /* AvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000031 /* AvatarService.swift */; };
 		BRTA00013060000100000036 /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000035 /* HapticEngine.swift */; };
 		BRTA00013060000100000038 /* DrinkRatingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000037 /* DrinkRatingSheet.swift */; };
-		BRTA00013070000100000020 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000020 /* en.lproj */; };
-		BRTA00013070000100000021 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000021 /* de.lproj */; };
-		BRTA00013070000100000022 /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000022 /* fr.lproj */; };
-		BRTA00013070000100000023 /* it.lproj in Resources */ = {isa = PBXBuildFile; fileRef = BRTA00013060000100000023 /* it.lproj */; };
 		BRTA00014000000000000050 /* Follow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000040 /* Follow.swift */; };
 		BRTA00014000000000000051 /* BarGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000041 /* BarGroup.swift */; };
 		BRTA00014000000000000052 /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000042 /* Poll.swift */; };
@@ -106,6 +102,7 @@
 		BRTA0002A000000000000010 /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0002A000000000000011 /* FollowingListView.swift */; };
 		D89F6316A443377571D44C4B /* UserAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */; };
 		02E883B584264DE1852498CD /* SparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CB8A35804940678B268157 /* SparklineView.swift */; };
+		BRTA00013070000100000024 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000002D /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -190,10 +187,6 @@
 		BRTA0001306000010000001B /* ServingMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServingMethod.swift; sourceTree = "<group>"; };
 		BRTA0001306000010000001D /* DrinkRating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkRating.swift; sourceTree = "<group>"; };
 		BRTA0001306000010000001F /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
-		BRTA00013060000100000020 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
-		BRTA00013060000100000021 /* de.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = de.lproj; sourceTree = "<group>"; };
-		BRTA00013060000100000022 /* fr.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fr.lproj; sourceTree = "<group>"; };
-		BRTA00013060000100000023 /* it.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = it.lproj; sourceTree = "<group>"; };
 		BRTA00013060000100000025 /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
 		BRTA00013060000100000028 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		BRTA0001306000010000002A /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
@@ -230,6 +223,7 @@
 		BRTA0002A000000000000011 /* FollowingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingListView.swift; sourceTree = "<group>"; };
 		BRTA999999999999000000000001 /* BarAttribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarAttribute.swift; sourceTree = "<group>"; };
 		64CB8A35804940678B268157 /* SparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklineView.swift; sourceTree = "<group>"; };
+		BRTA0001306000010000002D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -289,11 +283,8 @@
 				AEF036183034F91400BDA1CC /* Views */,
 				AE7839663034F16A00F1555E /* BarTabApp.swift */,
 				AE78396A3034F16B00F1555E /* Assets.xcassets */,
+				BRTA0001306000010000002D /* Localizable.xcstrings */,
 				BRTA00013060000100000024 /* Resources */,
-				BRTA00013060000100000020 /* en.lproj */,
-				BRTA00013060000100000021 /* de.lproj */,
-				BRTA00013060000100000022 /* fr.lproj */,
-				BRTA00013060000100000023 /* it.lproj */,
 				AEF036603035D00000BDA1CC /* BarTab.entitlements */,
 				BRTA00013060000100000032 /* Info.plist */,
 				AE78396C3034F16B00F1555E /* Preview Content */,
@@ -575,10 +566,7 @@
 				AE7839973034F4E700F1555E /* README.md in Resources */,
 				AE78396E3034F16B00F1555E /* Preview Assets.xcassets in Resources */,
 				AE78396B3034F16B00F1555E /* Assets.xcassets in Resources */,
-				BRTA00013070000100000020 /* en.lproj in Resources */,
-				BRTA00013070000100000021 /* de.lproj in Resources */,
-				BRTA00013070000100000022 /* fr.lproj in Resources */,
-				BRTA00013070000100000023 /* it.lproj in Resources */,
+				BRTA00013070000100000024 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
