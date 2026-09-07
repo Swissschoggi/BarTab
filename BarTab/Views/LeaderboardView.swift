@@ -32,7 +32,7 @@ struct LeaderboardView: View {
             VStack(spacing: 0) {
                 Picker(String(localized: "Scope"), selection: $scope) {
                     ForEach(Scope.allCases, id: \.self) { s in
-                        Text(String(localized: s.rawValue)).tag(s)
+                        Text(s.rawValue).tag(s)
                     }
                 }
                 .pickerStyle(.segmented)
