@@ -90,7 +90,7 @@ struct BarView: View {
     private func computePriceTrend() -> [CGFloat] {
         let sorted = prices.sorted { $0.reportedAt < $1.reportedAt }
         let last10 = Array(sorted.suffix(10))
-        return last10.map { NSDecimalNumber(decimal: $0.amount).floatValue }
+        return last10.map { CGFloat(NSDecimalNumber(decimal: $0.amount).floatValue) }
     }
 
     private struct PriceGroup: Identifiable {
