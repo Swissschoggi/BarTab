@@ -594,7 +594,7 @@
         try {
           const res = await fetch(WAITLIST_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { ...HEADERS, 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, token })
           });
           const data = await res.json().catch(() => ({}));
