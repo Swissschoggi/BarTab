@@ -101,6 +101,31 @@ nav {
   color: var(--text);
 }
 
+/* Mobile nav toggle button (hidden on desktop, shown via media query) */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  margin: 0 auto;
+  background: var(--text);
+  border-radius: 1px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
 /* Hero centered layout */
 .hero .eyebrow {
   display: inline-flex;
@@ -777,6 +802,15 @@ footer .links a + a {
   pointer-events: none;
 }
 
+/* Hero headline */
+.hero h1 {
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
 /* Hero centered layout */
 .hero-center {
   text-align: center;
@@ -930,6 +964,38 @@ footer .links a + a {
     font-size: 38px;
   }
 
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    background: rgba(26, 22, 19, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 0.5px solid var(--border);
+    padding: 8px 24px 16px;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a {
+    padding: 12px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .nav-links a:last-child {
+    border-bottom: none;
+  }
+
   .legal-card {
     padding: 20px 22px;
   }
@@ -1011,4 +1077,121 @@ footer .links a + a {
 
 .feature-row:hover {
   background: rgba(201, 162, 39, 0.04);
+}
+
+/* Skip-to-content link (visually hidden until focused) */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 200;
+  background: var(--primary-deep);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+/* Waitlist form */
+.waitlist {
+  max-width: 420px;
+  margin: 28px auto 0;
+}
+
+.waitlist-row {
+  display: flex;
+  gap: 10px;
+}
+
+.waitlist input[type="email"] {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface-elevated);
+  border: 0.5px solid var(--border);
+  color: var(--text);
+  padding: 14px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.waitlist input[type="email"]::placeholder {
+  color: var(--muted);
+}
+
+.waitlist input[type="email"]:focus {
+  border-color: var(--primary);
+}
+
+/* Honeypot field: kept off-screen and invisible to humans */
+.waitlist .hp-field {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.waitlist .cf-turnstile {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.waitlist-msg {
+  min-height: 22px;
+  margin-top: 12px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.waitlist-msg.success {
+  color: var(--success);
+}
+
+.waitlist-msg.error {
+  color: var(--primary);
+}
+
+.waitlist-note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .waitlist-row {
+    flex-direction: column;
+  }
+
+  .waitlist-row .button {
+    justify-content: center;
+  }
+}
+
+/* Reduced motion: disable animations/transitions for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
