@@ -4,10 +4,21 @@
 // This function is the only writer, using the service-role key. Every request
 // must first pass a server-side Cloudflare Turnstile check, and per-IP rate
 // limiting caps how many submissions one address can make.
+//
+// After a new signup is stored, a welcome email is sent via Brevo's
+// transactional API (free tier: 300 emails/day). If BREVO_API_KEY is not set,
+// email sending is skipped and the signup still succeeds.
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const TURNSTILE_SECRET = Deno.env.get("TURNSTILE_SECRET")!;
+
+// Brevo (https://brevo.com) — transactional email. Optional: when absent the
+// function still accepts signups, it just doesn't send the welcome email.
+const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
+const BREVO_SENDER_EMAIL = Deno.env.get("BREVO_SENDER_EMAIL") ?? "no-reply@bartap.info";
+const BREVO_SENDER_NAME = Deno.env.get("BREVO_SENDER_NAME") ?? "BarTab";
+const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
 // Comma-separated list of origins allowed to call this endpoint. Browsers
 // enforce CORS, so requests from any other origin won't be able to read the
@@ -98,6 +109,55 @@ async function insertEmail(email: string): Promise<boolean> {
   return res.status === 201;
 }
 
+async function emailExists(email: string): Promise<boolean> {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/waitlist?select=id&email=eq.${encodeURIComponent(email)}&limit=1`,
+    {
+      headers: {
+        apikey: SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+      },
+    }
+  );
+  if (!res.ok) return false;
+  const rows = (await res.json()) as unknown[];
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+async function sendWelcomeEmail(email: string): Promise<void> {
+  if (!BREVO_API_KEY) return;
+
+  const subject = "You're on the BarTab list 🍻";
+  const textContent =
+    "Thanks for signing up for BarTab — you're on the list.\n\n" +
+    "We'll email you the moment BarTab is ready where you are. " +
+    "No spam, just the good stuff.\n\n— The BarTab team";
+
+  const htmlContent =
+    `<p>Thanks for signing up for <strong>BarTab</strong> you're on the list.</p>` +
+    `<p>We'll email you the moment BarTab is ready where you are. No spam, just the good stuff.</p>` +
+    `<p>&mdash; The BarTab team</p>`;
+
+  try {
+    await fetch(BREVO_API_URL, {
+      method: "POST",
+      headers: {
+        "api-key": BREVO_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
+        to: [{ email }],
+        subject,
+        htmlContent,
+        textContent,
+      }),
+    });
+  } catch {
+    // Best-effort: a failed welcome email must not fail the signup itself.
+  }
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
   const cors = corsHeaders(origin);
@@ -144,9 +204,17 @@ Deno.serve(async (req) => {
     return json({ error: "Captcha verification failed. Please try again." }, 400, cors);
   }
 
+  // Check for a duplicate first, so the welcome email is only sent for a
+  // brand-new signup (re-submitting the same address won't re-send email).
+  const alreadyExists = await emailExists(email);
+
   const result = await insertEmail(email);
   if (!result) {
     return json({ error: "Something went wrong. Please try again." }, 500, cors);
+  }
+
+  if (!alreadyExists) {
+    await sendWelcomeEmail(email);
   }
 
   // Same success response whether it's a new signup or a duplicate, so the
