@@ -180,7 +180,7 @@
       <h2>Everything you need for a night out</h2>
       <p>Nothing you don't. No feed, no ads  just prices and the people who found them.</p>
     </div>
-    <div class="feature-rows reveal">
+    <div class="feature-rows reveal stagger-children">
       <div class="feature-row">
         <div class="f-name"><span class="f-icon">📍</span> Find bars nearby</div>
         <p>Map and list views, filtered by distance, vibe and whether they've got outdoor seating.</p>
@@ -309,6 +309,7 @@
       <div class="links">
         <a href="privacy.html">Privacy Policy</a>
         <a href="terms.html">Terms of Service</a>
+        <a href="mailto:support@bartap.info">Contact</a>
       </div>
       <div>© 2026 BarTab. All rights reserved.</div>
     </div>
@@ -340,7 +341,7 @@
         });
       }, { threshold: 0.1 });
 
-      document.querySelectorAll('.reveal, .stats').forEach((el) => observer.observe(el));
+      document.querySelectorAll('.reveal, .stats, .stagger-children').forEach((el) => observer.observe(el));
 
       // Mobile nav toggle
       const navToggle = document.getElementById('nav-toggle');
