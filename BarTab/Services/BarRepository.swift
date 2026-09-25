@@ -14,6 +14,7 @@ final class BarRepository: ObservableObject {
     @Published private(set) var brandRequests: [BrandRequest] = []
     @Published private(set) var priceVerifications: [PriceVerification] = []
     @Published private(set) var barCheckins: [BarCheckin] = []
+    @Published private(set) var barVisits: [BarVisit] = []
     @Published private(set) var defaultCurrency: Currency = Currency.defaultCurrency
 
     // MARK: - Attribute Reports
@@ -86,6 +87,7 @@ final class BarRepository: ObservableObject {
         async let fetchedReports = SupabaseClient.shared.fetchContentReports()
         async let fetchedVerifications = SupabaseClient.shared.fetchPriceVerifications()
         async let fetchedCheckins = SupabaseClient.shared.fetchBarCheckins()
+        async let fetchedBarVisits = SupabaseClient.shared.fetchBarVisits()
         async let fetchedAttributeReports = SupabaseClient.shared.fetchAllAttributeReports()
 
         if let bars = try? await fetchedBars {
@@ -112,6 +114,9 @@ final class BarRepository: ObservableObject {
         }
         if let checkins = try? await fetchedCheckins {
             self.barCheckins = checkins
+        }
+        if let visits = try? await fetchedBarVisits {
+            self.barVisits = visits
         }
         if let attributeReports = try? await fetchedAttributeReports {
             self.attributeReports = attributeReports
@@ -1153,6 +1158,31 @@ final class BarRepository: ObservableObject {
         } else {
             barCheckins.append(checkin)
         }
+
+        // Stamp the passport (best-effort; a failed stamp shouldn't
+        // undo the check-in itself).
+        if let _ = try? await SupabaseClient.shared.recordBarVisit(barID: bar.id) {
+            if let index = barVisits.firstIndex(where: { $0.barID == bar.id && $0.userID == user.id }) {
+                let existing = barVisits[index]
+                barVisits[index] = BarVisit(
+                    userID: existing.userID,
+                    barID: existing.barID,
+                    firstVisitedAt: existing.firstVisitedAt,
+                    lastVisitedAt: Date(),
+                    visitCount: existing.visitCount + 1
+                )
+            } else {
+                barVisits.append(BarVisit(
+                    userID: user.id,
+                    barID: bar.id,
+                    firstVisitedAt: Date(),
+                    lastVisitedAt: Date(),
+                    visitCount: 1
+                ))
+            }
+        }
+
+        checkPassportBadges(for: user)
         return true
     }
 
@@ -1165,6 +1195,27 @@ final class BarRepository: ObservableObject {
 
         barCheckins.removeAll { $0.barID == bar.id && $0.userID == user.id }
         return true
+    }
+
+    // MARK: - Beer passport
+
+    /// The user's passport stamps, newest visit first.
+    func barVisits(for user: User) -> [BarVisit] {
+        barVisits.filter { $0.userID == user.id }
+            .sorted { $0.lastVisitedAt > $1.lastVisitedAt }
+    }
+
+    /// Distinct bars the user has visited.
+    func distinctBarVisitCount(for user: User) -> Int {
+        barVisits.filter { $0.userID == user.id }.count
+    }
+
+    private func checkPassportBadges(for user: User) {
+        let count = distinctBarVisitCount(for: user)
+        let newBadges = BadgeService.shared.checkVisitBadges(visitCount: count)
+        for badge in newBadges {
+            toastCenter?.show("Badge earned: \(badge.name)", kind: .success)
+        }
     }
 
     // MARK: - Bar Attribute Reports

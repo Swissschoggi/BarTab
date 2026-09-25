@@ -103,6 +103,13 @@
 		D89F6316A443377571D44C4B /* UserAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */; };
 		02E883B584264DE1852498CD /* SparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CB8A35804940678B268157 /* SparklineView.swift */; };
 		BRTA00013070000100000024 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BRTA0001306000010000002D /* Localizable.xcstrings */; };
+		BRTA00014000000000000069 /* GroupEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000068 /* GroupEvent.swift */; };
+		BRTA0001400000000000006B /* NightOutCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001400000000000006A /* NightOutCard.swift */; };
+		BRTA0001400000000000006D /* PlanNightOutSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001400000000000006C /* PlanNightOutSheet.swift */; };
+		BRTA0001400000000000006F /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA0001400000000000006E /* WidgetSnapshot.swift */; };
+		BRTA00014000000000000071 /* WidgetSnapshotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000070 /* WidgetSnapshotService.swift */; };
+		BRTA00014000000000000073 /* BarVisit.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000072 /* BarVisit.swift */; };
+		BRTA00014000000000000075 /* PassportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000074 /* PassportView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -224,6 +231,13 @@
 		BRTA999999999999000000000001 /* BarAttribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarAttribute.swift; sourceTree = "<group>"; };
 		64CB8A35804940678B268157 /* SparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklineView.swift; sourceTree = "<group>"; };
 		BRTA0001306000010000002D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		BRTA00014000000000000068 /* GroupEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupEvent.swift; sourceTree = "<group>"; };
+		BRTA0001400000000000006A /* NightOutCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightOutCard.swift; sourceTree = "<group>"; };
+		BRTA0001400000000000006C /* PlanNightOutSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanNightOutSheet.swift; sourceTree = "<group>"; };
+		BRTA0001400000000000006E /* WidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshot.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000070 /* WidgetSnapshotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotService.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000072 /* BarVisit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarVisit.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000074 /* PassportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassportView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -376,6 +390,9 @@
 				BRTA0002A00000000000000B /* BadgeGridView.swift */,
 				BRTA0002A00000000000000D /* DrinkComparisonView.swift */,
 				5FAAFB5B7BF0B34FEE99FD9B /* UserAvatarView.swift */,
+				BRTA0001400000000000006A /* NightOutCard.swift */,
+				BRTA0001400000000000006C /* PlanNightOutSheet.swift */,
+				BRTA00014000000000000074 /* PassportView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -399,6 +416,8 @@
 				BRTA00013060000100000035 /* HapticEngine.swift */,
 				BRTA0002A000000000000001 /* PriceAlertService.swift */,
 				BRTA0002A000000000000009 /* BadgeService.swift */,
+				BRTA0001400000000000006E /* WidgetSnapshot.swift */,
+				BRTA00014000000000000070 /* WidgetSnapshotService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -432,6 +451,8 @@
 				BRTA00014000000000000043 /* PriceAlert.swift */,
 				BRTA00014000000000000044 /* ActivityItem.swift */,
 				BRTA0002A000000000000007 /* Badge.swift */,
+				BRTA00014000000000000068 /* GroupEvent.swift */,
+				BRTA00014000000000000072 /* BarVisit.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -680,6 +701,13 @@
 				BRTA0002A00000000000000C /* BadgeGridView.swift in Sources */,
 				BRTA0002A00000000000000E /* DrinkComparisonView.swift in Sources */,
 				D89F6316A443377571D44C4B /* UserAvatarView.swift in Sources */,
+				BRTA00014000000000000069 /* GroupEvent.swift in Sources */,
+				BRTA0001400000000000006B /* NightOutCard.swift in Sources */,
+				BRTA0001400000000000006D /* PlanNightOutSheet.swift in Sources */,
+				BRTA0001400000000000006F /* WidgetSnapshot.swift in Sources */,
+				BRTA00014000000000000071 /* WidgetSnapshotService.swift in Sources */,
+				BRTA00014000000000000073 /* BarVisit.swift in Sources */,
+				BRTA00014000000000000075 /* PassportView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

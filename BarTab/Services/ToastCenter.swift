@@ -65,6 +65,15 @@ final class ToastCenter: ObservableObject {
     }
 
     func showError(_ error: Error) {
+        // Task cancellation (e.g. a SwiftUI `.task` being torn down when
+        // the view disappears) surfaces as CancellationError or
+        // URLError.cancelled. Those aren't real failures, so don't
+        // flash an error toast for them.
+        if error is CancellationError { return }
+        if let urlError = error as? URLError, urlError.code == .cancelled {
+            return
+        }
+
         show(
             FriendlyError.message(for: error),
             kind: .error,

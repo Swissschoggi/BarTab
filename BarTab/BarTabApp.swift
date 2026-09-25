@@ -32,6 +32,7 @@ struct BarTabApp: App {
                 .barTabToast(center: toastCenter)
                 .task {
                     await barRepository.fetchAllData()
+                    await WidgetSnapshotService.refresh(barRepository: barRepository, locationService: locationService)
                 }
                 .onReceive(userSession.$currentUser) { user in
                     guard user != nil else { return }

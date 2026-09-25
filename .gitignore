@@ -3,3 +3,4 @@ xcuserdata/
 *.xcuserstate
 supabase_migrations/
 .supabase_migrations.sql
+WIDGET_SETUP.md

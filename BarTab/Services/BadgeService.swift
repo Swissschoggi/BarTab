@@ -110,12 +110,28 @@ final class BadgeService {
         return newlyEarned
     }
 
+    func checkVisitBadges(visitCount: Int) -> [Badge] {
+        var newlyEarned: [Badge] = []
+        var earned = earnedBadgeIDs
+
+        for badge in Badge.visitBadges {
+            if !earned.contains(badge.id) && visitCount >= badge.threshold {
+                earned.insert(badge.id)
+                newlyEarned.append(badge)
+            }
+        }
+
+        earnedBadgeIDs = earned
+        return newlyEarned
+    }
+
     func earnedBadges() -> [Badge] {
         let earned = earnedBadgeIDs
-        return (Badge.allMilestones + Badge.streakBadges).filter { earned.contains($0.id) }
+        return (Badge.allMilestones + Badge.streakBadges + Badge.visitBadges)
+            .filter { earned.contains($0.id) }
     }
 
     func allBadges() -> [Badge] {
-        Badge.allMilestones + Badge.streakBadges
+        Badge.allMilestones + Badge.streakBadges + Badge.visitBadges
     }
 }

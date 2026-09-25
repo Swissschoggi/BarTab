@@ -7,11 +7,14 @@ struct GroupDetailView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
+    @EnvironmentObject private var locationService: LocationService
     @Environment(\.dismiss) private var dismiss
 
     @State private var members: [GroupMember] = []
     @State private var polls: [Poll] = []
+    @State private var events: [GroupEvent] = []
     @State private var showingNewPoll = false
+    @State private var showingNewEvent = false
     @State private var showingInvite = false
     @State private var isLoading = true
     @State private var shareItems: [Any] = []
@@ -19,6 +22,7 @@ struct GroupDetailView: View {
     @State private var showingLeaveConfirmation = false
     @State private var showingDeleteConfirmation = false
     @State private var pendingClosePoll: Poll?
+    @State private var pendingDeleteEvent: GroupEvent?
 
     private var isAdmin: Bool {
         guard let userID = userSession.currentUser?.id else { return false }
@@ -72,6 +76,47 @@ struct GroupDetailView: View {
                             }
                         }
                         .barTabCard()
+
+                        // Nights out section header
+                        HStack {
+                            Text(String(localized: "Nights out"))
+                                .font(.barTabHeading)
+                            Spacer()
+                            Button {
+                                showingNewEvent = true
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "plus")
+                                    Text(String(localized: "Plan"))
+                                        .fontWeight(.semibold)
+                                }
+                                .font(.barTabBody)
+                                .foregroundColor(.barTabPrimary)
+                            }
+                        }
+
+                        if events.isEmpty {
+                            VStack(spacing: BarTabSpacing.sm) {
+                                Image(systemName: "figure.walk.circle")
+                                    .font(.barTabEmptyIcon)
+                                    .foregroundColor(.barTabPrimary)
+                                Text(String(localized: "No nights out yet"))
+                                    .font(.barTabBody)
+                                    .foregroundColor(.barTabSecondary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 30)
+                            .barTabCard()
+                        } else {
+                            ForEach(events) { event in
+                                NightOutCard(event: event, onDelete: {
+                                    pendingDeleteEvent = event
+                                })
+                                    .environmentObject(barRepository)
+                                    .environmentObject(userSession)
+                                    .environmentObject(toastCenter)
+                            }
+                        }
 
                         // Polls section header
                         HStack {
@@ -155,6 +200,18 @@ struct GroupDetailView: View {
                         .environmentObject(userSession)
                         .environmentObject(toastCenter)
                 }
+                .sheet(isPresented: $showingNewEvent) {
+                    PlanNightOutSheet(group: group)
+                        .environmentObject(barRepository)
+                        .environmentObject(userSession)
+                        .environmentObject(toastCenter)
+                        .environmentObject(locationService)
+                }
+                .onChange(of: showingNewEvent) { isPresented in
+                    if !isPresented {
+                        Task { await loadEvents() }
+                    }
+                }
                 .onChange(of: showingNewPoll) { isPresented in
                     if !isPresented {
                         Task { await loadPolls() }
@@ -201,6 +258,19 @@ struct GroupDetailView: View {
                 } message: {
                     Text(String(localized: "No more votes will be accepted."))
                 }
+                .confirmationDialog(String(localized: "Delete this night out?"), isPresented: Binding(
+                    get: { pendingDeleteEvent != nil },
+                    set: { if !$0 { pendingDeleteEvent = nil } }
+                ), titleVisibility: .visible) {
+                    Button(String(localized: "Delete"), role: .destructive) {
+                        if let event = pendingDeleteEvent {
+                            Task { await deleteEvent(event) }
+                        }
+                    }
+                    Button(String(localized: "Cancel"), role: .cancel) {}
+                } message: {
+                    Text(String(localized: "The crawl and RSVPs will be lost."))
+                }
                 .refreshable {
                     await loadData()
                 }
@@ -228,6 +298,7 @@ struct GroupDetailView: View {
         }
 
         await loadPolls()
+        await loadEvents()
 
         let userIDs = members.map(\.userID)
         if !userIDs.isEmpty {
@@ -247,6 +318,25 @@ struct GroupDetailView: View {
     private func loadPolls() async {
         do {
             polls = try await SupabaseClient.shared.fetchPolls(groupID: group.id)
+        } catch {
+            toastCenter.showError(error)
+        }
+    }
+
+    private func loadEvents() async {
+        do {
+            events = try await SupabaseClient.shared.fetchEvents(groupID: group.id)
+        } catch {
+            toastCenter.showError(error)
+        }
+    }
+
+    private func deleteEvent(_ event: GroupEvent) async {
+        do {
+            try await SupabaseClient.shared.deleteEvent(event.id)
+            events.removeAll { $0.id == event.id }
+            HapticEngine.lightTap()
+            pendingDeleteEvent = nil
         } catch {
             toastCenter.showError(error)
         }

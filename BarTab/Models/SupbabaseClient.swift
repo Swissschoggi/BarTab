@@ -610,6 +610,29 @@ final class SupabaseClient {
         _ = try await performAuthorized(request)
     }
 
+    // MARK: - Beer passport (bar visits)
+
+    /// Fetches the current user's beer-passport stamps.
+    func fetchBarVisits() async throws -> [BarVisit] {
+        let request = try makeRequest(
+            endpoint: "bar_visits?select=*&order=last_visited_at.desc"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([BarVisit].self, from: data)
+    }
+
+    /// Stamps a bar in the passport (or bumps the counter on a repeat
+    /// visit) via the `record_bar_visit` RPC.
+    func recordBarVisit(barID: UUID) async throws {
+        let body: [String: String] = ["p_bar_id": barID.uuidString]
+        var request = try makeRequest(
+            endpoint: "rpc/record_bar_visit",
+            method: "POST"
+        )
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        _ = try await performAuthorized(request)
+    }
+
     // MARK: - Bar Ratings
 
     /// Fetch every ambience/wine rating, mapped to domain BarRating models
@@ -1431,6 +1454,123 @@ final class SupabaseClient {
             method: "DELETE"
         )
         _ = try await performAuthorized(request)
+    }
+
+    // MARK: - Nights out
+
+    /// Creates a "night out" event in a group and returns it.
+    func createEvent(
+        groupID: UUID,
+        title: String,
+        startsAt: Date?
+    ) async throws -> GroupEvent {
+        struct EventBody: Codable {
+            let group_id: UUID
+            let title: String
+            let starts_at: Date?
+            let created_by: UUID
+        }
+
+        let body = EventBody(
+            group_id: groupID,
+            title: title,
+            starts_at: startsAt,
+            created_by: try requireUserID()
+        )
+
+        var request = try makeRequest(endpoint: "group_events", method: "POST")
+        request.setValue("return=representation", forHTTPHeaderField: "Prefer")
+        request.httpBody = try encoder.encode(body)
+
+        let data = try await performAuthorized(request)
+        let rows = try decoder.decode([GroupEvent].self, from: data)
+        guard let event = rows.first else {
+            throw SupabaseError(statusCode: 200, message: "Failed to create night out")
+        }
+        return event
+    }
+
+    /// Fetches a group's nights out, newest first.
+    func fetchEvents(groupID: UUID) async throws -> [GroupEvent] {
+        let request = try makeRequest(
+            endpoint: "group_events?group_id=eq.\(groupID.uuidString)&select=*&order=created_at.desc"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([GroupEvent].self, from: data)
+    }
+
+    /// Deletes a night out (cascade removes its crawl + RSVPs).
+    func deleteEvent(_ eventID: UUID) async throws {
+        let request = try makeRequest(
+            endpoint: "group_events?id=eq.\(eventID.uuidString)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    /// Replaces an event's crawl with a new ordered list of bars.
+    func replaceCrawlStops(eventID: UUID, barIDs: [UUID]) async throws {
+        var deleteRequest = try makeRequest(
+            endpoint: "event_crawl_stops?event_id=eq.\(eventID.uuidString)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(deleteRequest)
+
+        for (index, barID) in barIDs.enumerated() {
+            struct StopBody: Codable {
+                let event_id: UUID
+                let bar_id: UUID
+                let position: Int
+            }
+
+            var request = try makeRequest(endpoint: "event_crawl_stops", method: "POST")
+            request.httpBody = try encoder.encode(
+                StopBody(event_id: eventID, bar_id: barID, position: index)
+            )
+            _ = try await performAuthorized(request)
+        }
+    }
+
+    /// Fetches an event's crawl stops in order.
+    func fetchCrawlStops(eventID: UUID) async throws -> [CrawlStop] {
+        let request = try makeRequest(
+            endpoint: "event_crawl_stops?event_id=eq.\(eventID.uuidString)&select=*&order=position.asc"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([CrawlStop].self, from: data)
+    }
+
+    /// Records the current user's "I'm going" for an event.
+    func rsvp(eventID: UUID) async throws {
+        struct RSVPBody: Codable {
+            let event_id: UUID
+            let user_id: UUID
+        }
+
+        var request = try makeRequest(endpoint: "event_rsvps", method: "POST")
+        request.httpBody = try encoder.encode(
+            RSVPBody(event_id: eventID, user_id: try requireUserID())
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    /// Removes the current user's "I'm going" for an event.
+    func unrsvp(eventID: UUID) async throws {
+        let myID = try requireUserID().uuidString
+        let request = try makeRequest(
+            endpoint: "event_rsvps?event_id=eq.\(eventID.uuidString)&user_id=eq.\(myID)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    /// Fetches an event's RSVPs.
+    func fetchRSVPs(eventID: UUID) async throws -> [EventRSVP] {
+        let request = try makeRequest(
+            endpoint: "event_rsvps?event_id=eq.\(eventID.uuidString)&select=*"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([EventRSVP].self, from: data)
     }
 
     func fetchProfileNamesByIDs(_ ids: [UUID]) async throws -> [UUID: String] {

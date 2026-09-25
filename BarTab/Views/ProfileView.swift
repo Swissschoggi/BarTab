@@ -309,6 +309,21 @@ struct ProfileView: View {
                         streak: BadgeService.shared.currentStreak
                     )
                 }
+
+                Divider()
+                    .foregroundColor(.barTabCardBorder)
+                    .padding(.leading, BarTabSpacing.md)
+
+                navigationRow(
+                    title: String(localized: "Passport"),
+                    subtitle: String(localized: "Bars you've visited"),
+                    icon: "book.closed.fill"
+                ) {
+                    PassportView()
+                        .environmentObject(barRepository)
+                        .environmentObject(userSession)
+                        .environmentObject(toastCenter)
+                }
             }
             .barTabCard()
         }

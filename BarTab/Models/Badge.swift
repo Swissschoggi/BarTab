@@ -106,4 +106,23 @@ struct Badge: Identifiable, Equatable {
             kind: .streak
         ),
     ]
+
+    static let visitBadges: [Badge] = [
+        Badge(
+            id: "bar_hopper",
+            name: String(localized: "Bar Hopper"),
+            description: String(localized: "Visit 5 different bars"),
+            icon: "figure.walk",
+            threshold: 5,
+            kind: .milestone
+        ),
+        Badge(
+            id: "local_legend",
+            name: String(localized: "Local Legend"),
+            description: String(localized: "Visit 25 different bars"),
+            icon: "building.columns.fill",
+            threshold: 25,
+            kind: .milestone
+        ),
+    ]
 }

@@ -15,11 +15,26 @@ final class LocationService: NSObject, ObservableObject {
 
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+
+        // If permission was already granted in a previous session,
+        // `didChangeAuthorization` won't fire again, so kick off
+        // updates right away.
+        let status = locationManager.authorizationStatus
+        if status == .authorizedWhenInUse || status == .authorizedAlways {
+            startUpdatingLocation()
+        }
     }
 
 
     func requestPermission() {
-        locationManager.requestWhenInUseAuthorization()
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse, .authorizedAlways:
+            startUpdatingLocation()
+        default:
+            break
+        }
     }
 
 

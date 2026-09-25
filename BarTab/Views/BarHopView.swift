@@ -50,6 +50,14 @@ struct BarHopView: View {
                                     .barTabPrimaryButton()
                             }
                             .padding(.horizontal, 40)
+
+                            if locationService.location == nil {
+                                Text(String(localized: "Enable location access to find bars near you."))
+                                    .font(.barTabCaption)
+                                    .foregroundColor(.barTabSecondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 20)
+                            }
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 40)
@@ -131,6 +139,9 @@ struct BarHopView: View {
                 .padding(16)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
+            .onAppear {
+                locationService.requestPermission()
+            }
             .navigationTitle(String(localized: "Bar Hop"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -150,16 +161,17 @@ struct BarHopView: View {
             return
         }
 
-        if let userLocation = locationService.location {
-            let sorted = allBars.sorted {
-                let d0 = DistanceService.distance(from: userLocation, to: $0)
-                let d1 = DistanceService.distance(from: userLocation, to: $1)
-                return d0 < d1
-            }
-            let nearby = sorted.prefix(10)
-            selectedRoute = Array(nearby.shuffled().prefix(3))
-        } else {
-            selectedRoute = Array(allBars.shuffled().prefix(3))
+        guard let userLocation = locationService.location else {
+            locationService.requestPermission()
+            return
         }
+
+        let sorted = allBars.sorted {
+            let d0 = DistanceService.distance(from: userLocation, to: $0)
+            let d1 = DistanceService.distance(from: userLocation, to: $1)
+            return d0 < d1
+        }
+        let nearby = sorted.prefix(10)
+        selectedRoute = Array(nearby.shuffled().prefix(3))
     }
 }
