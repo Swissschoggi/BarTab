@@ -44,17 +44,17 @@ struct BarHopView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    heroBanner
-                    originMenu
+                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                    locationSection
 
                     if selectedRoute.isEmpty {
                         emptyState
                     } else {
-                        routeContent
+                        routeSection
                     }
                 }
-                .padding(16)
+                .padding(.horizontal, BarTabSpacing.md)
+                .padding(.vertical, BarTabSpacing.md)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
             .onAppear {
@@ -85,82 +85,78 @@ struct BarHopView: View {
         }
     }
 
-    // MARK: - Subviews
+    // MARK: - Location
 
-    private var heroBanner: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                Image(systemName: "figure.walk.circle.fill")
-                    .font(.barTabTitle)
-                    .foregroundColor(.barTabPrimary)
-                Text(String(localized: "Bar Hop Generator"))
-                    .font(.barTabStat)
-                    .foregroundColor(.barTabText)
-            }
-
-            Text(String(localized: "Let BarTab curate a 3-stop walking crawl featuring great drink deals near you."))
+    private var locationSection: some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+            Text(String(localized: "LOCATION"))
                 .font(.barTabCaption)
                 .foregroundColor(.barTabSecondary)
-        }
-        .barTabCard()
-    }
 
-    private var originMenu: some View {
-        Menu {
-            Button {
-                crawlOrigin = nil
-                originName = ""
-            } label: {
-                Label(String(localized: "My location"), systemImage: "location.fill")
-            }
-
-            Button {
-                showingLocationPicker = true
-            } label: {
-                Label(String(localized: "Choose a place…"), systemImage: "mappin.and.ellipse")
-            }
-        } label: {
-            HStack(spacing: 10) {
-                Image(systemName: crawlOrigin == nil ? "location.fill" : "mappin.circle.fill")
-                    .font(.barTabBody)
-                    .foregroundColor(.barTabPrimary)
-
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(String(localized: "Searching near"))
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabSecondary)
-                    Text(originLabel)
-                        .font(.barTabBodySemibold)
-                        .foregroundColor(.barTabText)
-                        .lineLimit(1)
+            FlowLayout(spacing: BarTabSpacing.xs) {
+                originPill(
+                    title: String(localized: "My location"),
+                    icon: "location.fill",
+                    isSelected: crawlOrigin == nil
+                ) {
+                    crawlOrigin = nil
+                    originName = ""
                 }
 
-                Spacer()
-
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                originPill(
+                    title: crawlOrigin == nil ? String(localized: "Choose a place…") : originLabel,
+                    icon: crawlOrigin == nil ? "mappin.and.ellipse" : "mappin.circle.fill",
+                    isSelected: crawlOrigin != nil
+                ) {
+                    showingLocationPicker = true
+                }
             }
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, BarTabSpacing.sm)
-            .background(Color.barTabCardFill)
-            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
-            )
         }
     }
 
+    private func originPill(
+        title: String,
+        icon: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.barTabCaption)
+                Text(title)
+                    .font(.barTabCaption)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, BarTabSpacing.sm)
+            .padding(.vertical, 8)
+            .background(isSelected ? Color.barTabPrimary : Color.barTabSurface)
+            .foregroundColor(isSelected ? .white : .barTabText)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(isSelected ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Empty state
+
     private var emptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "map.fill")
+        VStack(spacing: BarTabSpacing.md) {
+            Image(systemName: "figure.walk.circle.fill")
                 .font(.barTabEmptyIconLarge)
                 .foregroundColor(.barTabPrimary.opacity(0.6))
 
-            Text(String(localized: "Ready for a night out?"))
+            Text(String(localized: "Plan your crawl"))
                 .font(.barTabHeading)
                 .foregroundColor(.barTabText)
+
+            Text(String(localized: "BarTab will pick three bars within walking distance and draw the route."))
+                .font(.barTabSmall)
+                .foregroundColor(.barTabSecondary)
+                .multilineTextAlignment(.center)
 
             Button {
                 generateRoute()
@@ -168,104 +164,105 @@ struct BarHopView: View {
                 Text(String(localized: "Generate Route"))
                     .barTabPrimaryButton()
             }
-            .padding(.horizontal, 40)
-
-            if originLocation == nil {
-                Text(String(localized: "Enable location access or pick a place to find bars."))
-                    .font(.barTabCaption)
-                    .foregroundColor(.barTabSecondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 20)
-            }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
         .barTabCard()
     }
 
-    private var routeContent: some View {
-        VStack(alignment: .leading, spacing: 16) {
+    // MARK: - Route
+
+    private var routeSection: some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
             HStack {
-                Text(String(localized: "Your Crawl Route"))
-                    .font(.barTabHeading)
-                    .foregroundColor(.barTabText)
+                Text(String(localized: "YOUR CRAWL"))
+                    .font(.barTabCaption)
+                    .foregroundColor(.barTabSecondary)
 
                 Spacer()
 
-                Button(String(localized: "Shuffle")) {
+                Button {
                     generateRoute()
+                } label: {
+                    Label(String(localized: "Shuffle"), systemImage: "shuffle")
+                        .barTabPillButton()
                 }
-                .font(.barTabCaption)
-                .foregroundColor(.barTabPrimary)
+                .buttonStyle(.plain)
             }
 
-            ForEach(Array(selectedRoute.enumerated()), id: \.element.id) { index, bar in
-                routeRow(index: index, bar: bar)
+            VStack(spacing: 0) {
+                ForEach(Array(selectedRoute.enumerated()), id: \.element.id) { index, bar in
+                    routeRow(index: index, bar: bar)
+
+                    if index < selectedRoute.count - 1 {
+                        Divider()
+                            .foregroundColor(.barTabCardBorder)
+                            .padding(.leading, 58)
+                    }
+                }
             }
+            .background(
+                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                    .fill(Color.barTabCardFill)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            )
+
+            Button {
+                showingRouteMap = true
+            } label: {
+                Label(String(localized: "Show Route on Map"), systemImage: "map.fill")
+                    .barTabPrimaryButton()
+            }
+            .padding(.top, BarTabSpacing.xs)
 
             Button {
                 generateRoute()
             } label: {
                 Text(String(localized: "Try Another Route"))
-                    .barTabPrimaryButton()
-            }
-            .padding(.top, 8)
-
-            Button {
-                showingRouteMap = true
-            } label: {
-                Label(String(localized: "Show route on map"), systemImage: "map.fill")
                     .barTabSecondaryButton()
             }
         }
-        .barTabCard()
     }
 
     private func routeRow(index: Int, bar: Bar) -> some View {
-        HStack(alignment: .top, spacing: BarTabSpacing.sm) {
+        HStack(spacing: BarTabSpacing.sm) {
             ZStack {
                 Circle()
                     .fill(Color.barTabPrimary)
-                    .frame(width: 32, height: 32)
+                    .frame(width: 30, height: 30)
                 Text("\(index + 1)")
                     .font(.barTabBodySemibold)
                     .foregroundColor(.white)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(bar.name)
                     .font(.barTabBodySemibold)
                     .foregroundColor(.barTabText)
+                    .lineLimit(1)
 
                 Text(bar.address)
                     .font(.barTabCaption)
                     .foregroundColor(.barTabSecondary)
-
-                if let popular = barRepository.popularAmbience(for: bar) {
-                    HStack(spacing: 4) {
-                        Image(systemName: popular.icon)
-                            .font(.barTabTiny)
-                        Text(popular.displayName)
-                            .font(.barTabTiny)
-                    }
-                    .foregroundColor(.barTabPrimary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Color.barTabPrimary.opacity(0.08))
-                    .clipShape(Capsule())
-                    .padding(.top, 4)
-                }
+                    .lineLimit(1)
             }
 
             Spacer()
+
+            if let popular = barRepository.popularAmbience(for: bar) {
+                HStack(spacing: 3) {
+                    Image(systemName: popular.icon)
+                        .font(.barTabTiny)
+                    Text(popular.displayName)
+                        .font(.barTabTiny)
+                }
+                .barTabPillButton()
+            }
         }
-        .padding(12)
-        .background(Color.barTabCardFill)
-        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
-        )
+        .padding(.horizontal, BarTabSpacing.md)
+        .padding(.vertical, BarTabSpacing.sm)
     }
 
     private func generateRoute() {
@@ -373,6 +370,11 @@ private struct CrawlMapRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ map: MKMapView, context: Context) {
+        // Only recompute when the stops actually change.
+        let ids = stops.map(\.id)
+        guard context.coordinator.stopIDs != ids else { return }
+        context.coordinator.stopIDs = ids
+
         map.removeOverlays(map.overlays)
         map.removeAnnotations(map.annotations)
 
@@ -395,18 +397,69 @@ private struct CrawlMapRepresentable: UIViewRepresentable {
             return
         }
 
-        var coordinates = stops.map { $0.coordinate }
-        let polyline = MKPolyline(coordinates: &coordinates, count: coordinates.count)
-        map.addOverlay(polyline)
-
+        // Fit the straight-line extent right away so the map isn't blank,
+        // then refine to the real walking routes as they arrive.
+        var coords = stops.map { $0.coordinate }
+        let roughExtent = MKPolyline(coordinates: &coords, count: coords.count)
         map.setVisibleMapRect(
-            polyline.boundingMapRect,
+            roughExtent.boundingMapRect,
             edgePadding: UIEdgeInsets(top: 80, left: 40, bottom: 80, right: 40),
-            animated: true
+            animated: false
         )
+
+        context.coordinator.fetchWalkingRoutes(for: stops, on: map)
     }
 
     final class Coordinator: NSObject, MKMapViewDelegate {
+
+        var stopIDs: [UUID] = []
+
+        private var remainingLegs = 0
+        private var routesRect = MKMapRect.null
+
+        /// Requests real walking directions between each pair of
+        /// consecutive stops and draws them as route polylines.
+        func fetchWalkingRoutes(for stops: [Bar], on map: MKMapView) {
+            remainingLegs = stops.count - 1
+            routesRect = MKMapRect.null
+
+            for index in 0..<(stops.count - 1) {
+                let from = stops[index]
+                let to = stops[index + 1]
+
+                let request = MKDirections.Request()
+                request.source = MKMapItem(placemark: MKPlacemark(coordinate: from.coordinate))
+                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: to.coordinate))
+                request.transportType = .walking
+                request.requestsAlternateRoutes = false
+
+                let directions = MKDirections(request: request)
+                directions.calculate { [weak self] response, _ in
+                    guard let self else { return }
+
+                    DispatchQueue.main.async {
+                        self.remainingLegs -= 1
+
+                        if let route = response?.routes.first {
+                            map.addOverlay(route.polyline, level: .aboveRoads)
+
+                            self.routesRect = self.routesRect.isNull
+                                ? route.polyline.boundingMapRect
+                                : self.routesRect.union(route.polyline.boundingMapRect)
+                        }
+
+                        if self.remainingLegs == 0 && !self.routesRect.isNull {
+                            map.setVisibleMapRect(
+                                self.routesRect,
+                                edgePadding: UIEdgeInsets(top: 80, left: 40, bottom: 80, right: 40),
+                                animated: true
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             guard let polyline = overlay as? MKPolyline else {
                 return MKOverlayRenderer(overlay: overlay)
@@ -420,7 +473,6 @@ private struct CrawlMapRepresentable: UIViewRepresentable {
                 alpha: 1
             )
             renderer.lineWidth = 4
-            renderer.lineDashPattern = [0, 8]
             return renderer
         }
     }

@@ -775,18 +775,34 @@ struct HereNowView: View {
                 emptyState
             } else {
                 ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(presence) { group in
-                            presenceRow(group)
-                            if group.id != presence.last?.id {
-                                Divider()
-                                    .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, 64)
+                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                        HStack {
+                            Text(String(localized: "OUT NOW"))
+                                .font(.barTabCaption)
+                                .foregroundColor(.barTabSecondary)
+                            Spacer()
+                        }
+
+                        VStack(spacing: 0) {
+                            ForEach(presence) { group in
+                                presenceRow(group)
+                                if group.id != presence.last?.id {
+                                    Divider()
+                                        .foregroundColor(.barTabCardBorder)
+                                        .padding(.leading, 68)
+                                }
                             }
                         }
+                        .background(
+                            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                                .fill(Color.barTabCardFill)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        )
                     }
-                    .barTabCard()
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, BarTabSpacing.md)
                 }
             }
         }
@@ -847,8 +863,7 @@ struct HereNowView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(group.bar.name)
-                        .font(.barTabBody)
-                        .fontWeight(.semibold)
+                        .font(.barTabBodySemibold)
                         .foregroundColor(.barTabText)
                         .lineLimit(1)
 
@@ -862,13 +877,11 @@ struct HereNowView: View {
 
                 if let location = locationService.location {
                     Text(DistanceService.formattedDistance(from: location, to: group.bar))
-                        .font(.barTabCaption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.barTabPrimary)
+                        .barTabPillButton()
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.vertical, BarTabSpacing.sm)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
