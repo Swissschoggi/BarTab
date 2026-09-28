@@ -34,6 +34,13 @@ struct BarHopView: View {
         return String(localized: "My location")
     }
 
+    /// An `Equatable` snapshot of the chosen origin so `.onChange` can
+    /// observe it (`CLLocationCoordinate2D` isn't `Equatable`).
+    private var crawlOriginKey: String {
+        guard let crawlOrigin else { return "my-location" }
+        return "\(crawlOrigin.latitude),\(crawlOrigin.longitude)"
+    }
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -73,7 +80,7 @@ struct BarHopView: View {
             )
             .environmentObject(locationService)
         }
-        .onChange(of: crawlOrigin) { _ in
+        .onChange(of: crawlOriginKey) { _ in
             generateRoute()
         }
     }
