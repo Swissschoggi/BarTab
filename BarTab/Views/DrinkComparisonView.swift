@@ -29,7 +29,7 @@ struct DrinkComparisonView: View {
 
                 if results.isEmpty {
                     VStack(spacing: BarTabSpacing.sm) {
-                        Image(systemName: "barchart.xaxis.2")
+                        Image(systemName: "chart.bar.xaxis")
                             .font(.barTabEmptyIcon)
                             .foregroundColor(.barTabPrimary)
                         Text(String(localized: "No comparisons found"))

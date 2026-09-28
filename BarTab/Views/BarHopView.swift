@@ -1,5 +1,7 @@
 import SwiftUI
 import CoreLocation
+import MapKit
+import UIKit
 
 /// Generates a fun 3-bar walking crawl route with estimated drink savings.
 struct BarHopView: View {
@@ -10,6 +12,7 @@ struct BarHopView: View {
 
     @State private var selectedRoute: [Bar] = []
     @State private var isGenerating = false
+    @State private var showingRouteMap = false
 
     var body: some View {
         NavigationView {
@@ -132,6 +135,13 @@ struct BarHopView: View {
                                     .barTabPrimaryButton()
                             }
                             .padding(.top, 8)
+
+                            Button {
+                                showingRouteMap = true
+                            } label: {
+                                Label(String(localized: "Show route on map"), systemImage: "map.fill")
+                                    .barTabSecondaryButton()
+                            }
                         }
                         .barTabCard()
                     }
@@ -152,6 +162,9 @@ struct BarHopView: View {
                 }
             }
         }
+        .sheet(isPresented: $showingRouteMap) {
+            CrawlRouteView(stops: selectedRoute)
+        }
     }
 
     private func generateRoute() {
@@ -166,12 +179,135 @@ struct BarHopView: View {
             return
         }
 
-        let sorted = allBars.sorted {
-            let d0 = DistanceService.distance(from: userLocation, to: $0)
-            let d1 = DistanceService.distance(from: userLocation, to: $1)
-            return d0 < d1
+        let nearby = barRepository.nearbyBars(
+            coordinate: userLocation.coordinate,
+            radius: BarRepository.walkingCrawlRadius
+        )
+        .sorted {
+            DistanceService.distance(from: userLocation, to: $0)
+                < DistanceService.distance(from: userLocation, to: $1)
         }
-        let nearby = sorted.prefix(10)
-        selectedRoute = Array(nearby.shuffled().prefix(3))
+        selectedRoute = Array(nearby.prefix(10).shuffled().prefix(3))
+    }
+}
+
+// MARK: - Crawl route map
+
+/// Renders the generated crawl as a numbered route on a map, with a
+/// one-tap shortcut into walking directions in Maps.
+struct CrawlRouteView: View {
+
+    let stops: [Bar]
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationView {
+            CrawlMapRepresentable(stops: stops)
+                .ignoresSafeArea()
+                .navigationTitle(String(localized: "Your Crawl"))
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(String(localized: "Done")) {
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            openWalkingDirections()
+                        } label: {
+                            Label(String(localized: "Directions"), systemImage: "arrow.triangle.turn.up.right.diamond")
+                        }
+                        .disabled(stops.count < 2)
+                    }
+                }
+        }
+    }
+
+    private func openWalkingDirections() {
+        guard stops.count >= 2 else { return }
+
+        let items = stops.map { bar -> MKMapItem in
+            let item = MKMapItem(
+                placemark: MKPlacemark(coordinate: bar.coordinate)
+            )
+            item.name = bar.name
+            return item
+        }
+
+        let options: [String: Any] = [
+            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking
+        ]
+        MKMapItem.openMaps(with: items, launchOptions: options)
+    }
+}
+
+private struct CrawlMapRepresentable: UIViewRepresentable {
+
+    let stops: [Bar]
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIView(context: Context) -> MKMapView {
+        let map = MKMapView()
+        map.delegate = context.coordinator
+        map.showsUserLocation = true
+        return map
+    }
+
+    func updateUIView(_ map: MKMapView, context: Context) {
+        map.removeOverlays(map.overlays)
+        map.removeAnnotations(map.annotations)
+
+        for (index, bar) in stops.enumerated() {
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = bar.coordinate
+            annotation.title = "\(index + 1). \(bar.name)"
+            map.addAnnotation(annotation)
+        }
+
+        guard stops.count >= 2 else {
+            if let first = stops.first {
+                let region = MKCoordinateRegion(
+                    center: first.coordinate,
+                    latitudinalMeters: 800,
+                    longitudinalMeters: 800
+                )
+                map.setRegion(region, animated: true)
+            }
+            return
+        }
+
+        var coordinates = stops.map { $0.coordinate }
+        let polyline = MKPolyline(coordinates: &coordinates, count: coordinates.count)
+        map.addOverlay(polyline)
+
+        map.setVisibleMapRect(
+            polyline.boundingMapRect,
+            edgePadding: UIEdgeInsets(top: 80, left: 40, bottom: 80, right: 40),
+            animated: true
+        )
+    }
+
+    final class Coordinator: NSObject, MKMapViewDelegate {
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            guard let polyline = overlay as? MKPolyline else {
+                return MKOverlayRenderer(overlay: overlay)
+            }
+
+            let renderer = MKPolylineRenderer(polyline: polyline)
+            renderer.strokeColor = UIColor(
+                red: 0x6B / 255,
+                green: 0x27 / 255,
+                blue: 0x37 / 255,
+                alpha: 1
+            )
+            renderer.lineWidth = 4
+            renderer.lineDashPattern = [0, 8]
+            return renderer
+        }
     }
 }

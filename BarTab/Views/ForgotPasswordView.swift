@@ -20,7 +20,7 @@ struct ForgotPasswordView: View {
 
                 if didSend {
                     VStack(spacing: BarTabSpacing.sm) {
-                        Image(systemName: "envelope.badge.checkmark")
+                        Image(systemName: "envelope.badge")
                             .font(.barTabEmptyIconLarge)
                             .foregroundColor(.barTabAccent)
 

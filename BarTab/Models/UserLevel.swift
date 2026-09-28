@@ -24,7 +24,7 @@ enum UserLevel: Int, CaseIterable, Identifiable {
         switch self {
         case .newcomer: return "leaf.fill"
         case .regular: return "star.fill"
-        case .contributor: return "rosette.fill"
+        case .contributor: return "rosette"
         case .expert: return "crown.fill"
         case .legend: return "sparkles"
         }

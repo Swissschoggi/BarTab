@@ -689,6 +689,7 @@ struct FriendsView: View {
     private enum Tab: String, CaseIterable {
         case find = "Find"
         case requests = "Requests"
+        case here = "Here now"
         case following = "Following"
     }
 
@@ -710,6 +711,8 @@ struct FriendsView: View {
                 FindUsersView()
             case .requests:
                 FollowRequestsView()
+            case .here:
+                HereNowView()
             case .following:
                 FollowingListView()
             }
@@ -717,5 +720,174 @@ struct FriendsView: View {
         .background(Color.barTabBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Friends"))
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// Shows which of your friends are currently checked in at a bar,
+/// grouped by bar and ordered by distance from you.
+struct HereNowView: View {
+
+    @EnvironmentObject private var barRepository: BarRepository
+    @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var locationService: LocationService
+    @EnvironmentObject private var toastCenter: ToastCenter
+
+    @State private var followingIDs: Set<UUID> = []
+    @State private var profiles: [UUID: ProfileDTO] = [:]
+    @State private var isLoading = true
+    @State private var selectedBar: Bar?
+
+    private struct FriendPresence: Identifiable {
+        let bar: Bar
+        let profiles: [ProfileDTO]
+        var id: UUID { bar.id }
+    }
+
+    private var presence: [FriendPresence] {
+        var byBar: [UUID: [ProfileDTO]] = [:]
+
+        for checkin in barRepository.freshCheckins() {
+            guard followingIDs.contains(checkin.userID),
+                  let bar = barRepository.getBar(id: checkin.barID),
+                  let profile = profiles[checkin.userID] else { continue }
+            byBar[bar.id, default: []].append(profile)
+        }
+
+        return byBar.compactMap { barID, people in
+            guard let bar = barRepository.getBar(id: barID) else { return nil }
+            return FriendPresence(bar: bar, profiles: people)
+        }
+        .sorted { lhs, rhs in
+            guard let location = locationService.location else {
+                return lhs.profiles.count > rhs.profiles.count
+            }
+            return DistanceService.distance(from: location, to: lhs.bar)
+                < DistanceService.distance(from: location, to: rhs.bar)
+        }
+    }
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if presence.isEmpty {
+                emptyState
+            } else {
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(presence) { group in
+                            presenceRow(group)
+                            if group.id != presence.last?.id {
+                                Divider()
+                                    .foregroundColor(.barTabCardBorder)
+                                    .padding(.leading, 64)
+                            }
+                        }
+                    }
+                    .barTabCard()
+                    .padding(.horizontal, 16)
+                }
+            }
+        }
+        .background(Color.barTabBackground.ignoresSafeArea())
+        .task {
+            await load()
+        }
+        .sheet(item: $selectedBar) { bar in
+            NavigationView {
+                BarView(bar: bar, allowsDismissal: true)
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+                    .environmentObject(toastCenter)
+                    .environmentObject(locationService)
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: BarTabSpacing.sm) {
+            Image(systemName: "figure.walk")
+                .font(.barTabEmptyIcon)
+                .foregroundColor(.barTabPrimary)
+
+            Text(String(localized: "Nobody's out right now"))
+                .font(.barTabBody)
+                .fontWeight(.medium)
+
+            Text(String(localized: "When friends check in at a bar, they'll show up here."))
+                .font(.barTabSmall)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+        .barTabCard()
+    }
+
+    private func presenceRow(_ group: FriendPresence) -> some View {
+        Button {
+            HapticEngine.lightTap()
+            selectedBar = group.bar
+        } label: {
+            HStack(spacing: 12) {
+                HStack(spacing: -10) {
+                    ForEach(group.profiles.prefix(3)) { profile in
+                        UserAvatarView(
+                            urlString: profile.avatar_url,
+                            displayName: profile.display_name,
+                            size: 34
+                        )
+                        .overlay(Circle().stroke(Color.barTabBackground, lineWidth: 2))
+                    }
+                }
+                .frame(width: 58, alignment: .leading)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(group.bar.name)
+                        .font(.barTabBody)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabText)
+
+                    Text(group.profiles.count == 1
+                         ? String(localized: "\(group.profiles.first?.display_name ?? "A friend") is here")
+                         : String(localized: "\(group.profiles.count) friends here"))
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabSecondary)
+                }
+
+                Spacer()
+
+                if let location = locationService.location {
+                    Text(DistanceService.formattedDistance(from: location, to: group.bar))
+                        .font(.barTabCaption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabPrimary)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func load() async {
+        guard userSession.currentUser != nil else {
+            isLoading = false
+            return
+        }
+        do {
+            let ids = try await SupabaseClient.shared.fetchFollowing()
+            followingIDs = Set(ids)
+            if !ids.isEmpty {
+                profiles = try await SupabaseClient.shared.fetchProfilesByIDs(ids)
+            }
+        } catch {
+            toastCenter.showError(error)
+        }
+        isLoading = false
     }
 }

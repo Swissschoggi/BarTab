@@ -20,9 +20,9 @@ enum ServingMethod: String, Codable, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
-        case .tap: return "faucet.fill"
-        case .bottle: return "takeoutbag.and.cup.and.straw.fill"
-        case .can: return "can.fill"
+        case .tap: return "spigot.fill"
+        case .bottle: return "waterbottle.fill"
+        case .can: return "cylinder.fill"
         case .glass: return "wineglass.fill"
         }
     }

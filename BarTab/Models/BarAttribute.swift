@@ -52,12 +52,12 @@ enum BarAttributeKey: String, CaseIterable, Identifiable {
         case .toilets: return "toilet.fill"
         case .music: return "music.note"
         case .liveMusic: return "music.mic"
-        case .poolTable: return "circle.hexagongrid.fill"
+        case .poolTable: return "circle.grid.3x3.fill"
         case .darts: return "target"
         case .tableFootball: return "figure.soccer"
         case .tvSports: return "tv.fill"
         case .food: return "fork.knife"
-        case .outdoorSmoking: return "sun.max.fill"
+        case .outdoorSmoking: return "wind"
         }
     }
 

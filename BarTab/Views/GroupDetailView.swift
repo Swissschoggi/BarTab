@@ -164,7 +164,7 @@ struct GroupDetailView: View {
                             Button {
                                 showingLeaveConfirmation = true
                             } label: {
-                                Label(String(localized: "Leave Group"), systemImage: "rectangle.right.and.line.left")
+                                Label(String(localized: "Leave Group"), systemImage: "rectangle.portrait.and.arrow.right")
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.plain)

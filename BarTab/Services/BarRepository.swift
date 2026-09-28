@@ -739,6 +739,11 @@ final class BarRepository: ObservableObject {
         bars.first { $0.id == id }
     }
 
+    /// Bars within this distance are considered part of a walkable crawl.
+    /// Crawls only pull from bars inside this radius so a night out can't
+    /// span from Berlin to Phnom Penh.
+    static let walkingCrawlRadius: CLLocationDistance = 3000
+
     func nearbyBars(
         coordinate: CLLocationCoordinate2D,
         radius: CLLocationDistance
@@ -1136,6 +1141,30 @@ final class BarRepository: ObservableObject {
 
     func hasUserCheckedIn(barID: UUID, userID: UUID) -> Bool {
         activeCheckins.contains { $0.barID == barID && $0.userID == userID }
+    }
+
+    /// Fresh ("here now") check-ins across all users, newest first.
+    /// The "Who's here now" view filters these down to friends.
+    func freshCheckins() -> [BarCheckin] {
+        activeCheckins.sorted { $0.createdAt > $1.createdAt }
+    }
+
+    /// Bars that share an ambience style with the given bar, ordered by
+    /// how many styles they have in common (most similar first).
+    func similarBars(to bar: Bar, limit: Int = 6) -> [Bar] {
+        let styles = Set(ambienceStyles(for: bar))
+        guard !styles.isEmpty else { return [] }
+
+        return bars
+            .filter { $0.id != bar.id && !isBarAutoHidden($0) }
+            .map { candidate in
+                let shared = Set(ambienceStyles(for: candidate)).intersection(styles).count
+                return (candidate, shared)
+            }
+            .filter { $0.1 > 0 }
+            .sorted { $0.1 > $1.1 }
+            .prefix(limit)
+            .map { $0.0 }
     }
 
     func checkIn(bar: Bar, user: User) async -> Bool {

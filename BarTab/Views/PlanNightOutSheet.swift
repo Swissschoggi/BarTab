@@ -110,15 +110,21 @@ struct PlanNightOutSheet: View {
             return
         }
 
-        if let userLocation = locationService.location {
-            let sorted = allBars.sorted {
-                DistanceService.distance(from: userLocation, to: $0)
-                    < DistanceService.distance(from: userLocation, to: $1)
-            }
-            crawlBars = Array(sorted.prefix(10).shuffled().prefix(3))
-        } else {
+        guard let userLocation = locationService.location else {
             crawlBars = Array(allBars.shuffled().prefix(3))
+            return
         }
+
+        let nearby = barRepository.nearbyBars(
+            coordinate: userLocation.coordinate,
+            radius: BarRepository.walkingCrawlRadius
+        )
+        .sorted {
+            DistanceService.distance(from: userLocation, to: $0)
+                < DistanceService.distance(from: userLocation, to: $1)
+        }
+
+        crawlBars = Array(nearby.prefix(10).shuffled().prefix(3))
     }
 
     private func create() async {

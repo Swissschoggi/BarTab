@@ -195,9 +195,93 @@ struct BarView: View {
 
             menuSection
 
+            if !similarBars.isEmpty {
+                similarBarsSection
+                    .padding(.top, BarTabSpacing.lg)
+            }
+
             directionsButton
                 .padding(.top, BarTabSpacing.lg)
         }
+    }
+
+    // MARK: - Similar bars
+
+    private var similarBars: [Bar] {
+        barRepository.similarBars(to: currentBar)
+    }
+
+    private var similarBarsSection: some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+            Text(String(localized: "Bars like this"))
+                .font(.barTabHeading)
+                .foregroundColor(.barTabText)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: BarTabSpacing.sm) {
+                    ForEach(similarBars) { bar in
+                        NavigationLink {
+                            BarView(bar: bar, allowsDismissal: false)
+                                .environmentObject(barRepository)
+                                .environmentObject(userSession)
+                                .environmentObject(toastCenter)
+                                .environmentObject(locationService)
+                        } label: {
+                            similarBarCard(bar)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
+    private func similarBarCard(_ bar: Bar) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: "wineglass.fill")
+                    .font(.barTabTiny)
+                    .foregroundColor(.barTabPrimary)
+                Text(bar.name)
+                    .font(.barTabBodySemibold)
+                    .foregroundColor(.barTabText)
+                    .lineLimit(1)
+            }
+
+            Text(bar.address)
+                .font(.barTabTiny)
+                .foregroundColor(.barTabSecondary)
+                .lineLimit(1)
+
+            if let location = locationService.location {
+                Text(DistanceService.formattedDistance(from: location, to: bar))
+                    .font(.barTabTiny)
+                    .foregroundColor(.barTabAccent)
+            }
+
+            let shared = sharedAmbienceCount(with: bar)
+            if shared > 0 {
+                Text(shared == 1
+                     ? String(localized: "1 shared vibe")
+                     : String(localized: "\(shared) shared vibes"))
+                    .font(.barTabTiny)
+                    .foregroundColor(.barTabSecondary)
+            }
+        }
+        .frame(width: 160, alignment: .leading)
+        .padding(BarTabSpacing.sm)
+        .background(Color.barTabCardFill)
+        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+        )
+    }
+
+    private func sharedAmbienceCount(with bar: Bar) -> Int {
+        let mine = Set(ambienceStyles)
+        let theirs = Set(barRepository.ambienceStyles(for: bar))
+        return mine.intersection(theirs).count
     }
 
     // MARK: - Header
@@ -697,7 +781,7 @@ struct BarView: View {
                             Button {
                                 comparisonGroup = group
                             } label: {
-                                Label(String(localized: "Compare prices"), systemImage: "barchart.xaxis.2")
+                                Label(String(localized: "Compare prices"), systemImage: "chart.bar.xaxis")
                             }
 
                             Button {
@@ -733,7 +817,7 @@ struct BarView: View {
             Button {
                 comparisonGroup = group
             } label: {
-                Label(String(localized: "Compare prices"), systemImage: "barchart.xaxis.2")
+                Label(String(localized: "Compare prices"), systemImage: "chart.bar.xaxis")
             }
         }
     }

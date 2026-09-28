@@ -30,10 +30,10 @@ enum AmbienceStyle: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .cozy: return "flame.fill"
         case .modern: return "sparkles"
-        case .elegant: return "star.circle.fill"
-        case .casual: return "cup.and.saucer.fill"
+        case .elegant: return "diamond.fill"
+        case .casual: return "chair.lounge.fill"
         case .rustic: return "leaf.fill"
-        case .trendy: return "bolt.heart.fill"
+        case .trendy: return "star.fill"
         case .lively: return "music.note"
         case .chill: return "moon.fill"
         }

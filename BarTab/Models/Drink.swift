@@ -15,9 +15,9 @@ enum Drink: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .beer: return "mug.fill"
         case .wine: return "wineglass.fill"
-        case .cocktail: return "cocktail.fill"
+        case .cocktail: return "bubbles.and.sparkles.fill"
         case .shot: return "drop.fill"
-        case .softDrink: return "mug.fill"
+        case .softDrink: return "takeoutbag.and.cup.and.straw.fill"
         case .coffee: return "cup.and.saucer.fill"
         case .other: return "questionmark"
         }

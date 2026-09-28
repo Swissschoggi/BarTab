@@ -11,7 +11,7 @@ struct MainTabView: View {
         var icon: String {
             switch self {
             case .map: return "map.fill"
-            case .nearby: return "safari.fill"
+            case .nearby: return "location.magnifyingglass"
             case .groups: return "person.3.fill"
             case .profile: return "person.fill"
             }
