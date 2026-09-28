@@ -38,176 +38,13 @@ struct BarHopView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "figure.walk.circle.fill")
-                                .font(.barTabTitle)
-                                .foregroundColor(.barTabPrimary)
-                            Text(String(localized: "Bar Hop Generator"))
-                                .font(.barTabStat)
-                                .foregroundColor(.barTabText)
-                        }
-
-                        Text(String(localized: "Let BarTab curate a 3-stop walking crawl featuring great drink deals near you."))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
-                    }
-                    .barTabCard()
-
-                    Menu {
-                        Button {
-                            crawlOrigin = nil
-                            originName = ""
-                        } label: {
-                            Label(String(localized: "My location"), systemImage: "location.fill")
-                        }
-
-                        Button {
-                            showingLocationPicker = true
-                        } label: {
-                            Label(String(localized: "Choose a place…"), systemImage: "mappin.and.ellipse")
-                        }
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: crawlOrigin == nil ? "location.fill" : "mappin.circle.fill")
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabPrimary)
-
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(String(localized: "Searching near"))
-                                    .font(.barTabTiny)
-                                    .foregroundColor(.barTabSecondary)
-                                Text(originLabel)
-                                    .font(.barTabBodySemibold)
-                                    .foregroundColor(.barTabText)
-                                    .lineLimit(1)
-                            }
-
-                            Spacer()
-
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(.barTabTiny)
-                                .foregroundColor(.barTabSecondary)
-                        }
-                        .padding(.horizontal, BarTabSpacing.md)
-                        .padding(.vertical, BarTabSpacing.sm)
-                        .background(Color.barTabCardFill)
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
-                        )
-                    }
+                    heroBanner
+                    originMenu
 
                     if selectedRoute.isEmpty {
-                        VStack(spacing: 16) {
-                            Image(systemName: "map.fill")
-                                .font(.barTabEmptyIconLarge)
-                                .foregroundColor(.barTabPrimary.opacity(0.6))
-
-                            Text(String(localized: "Ready for a night out?"))
-                                .font(.barTabHeading)
-                                .foregroundColor(.barTabText)
-
-                            Button {
-                                generateRoute()
-                            } label: {
-                                Text(String(localized: "Generate Route"))
-                                    .barTabPrimaryButton()
-                            }
-                            .padding(.horizontal, 40)
-
-                            if originLocation == nil {
-                                Text(String(localized: "Enable location access or pick a place to find bars."))
-                                    .font(.barTabCaption)
-                                    .foregroundColor(.barTabSecondary)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 20)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
-                        .barTabCard()
+                        emptyState
                     } else {
-                        VStack(alignment: .leading, spacing: 16) {
-                            HStack {
-                                Text(String(localized: "Your Crawl Route"))
-                                    .font(.barTabHeading)
-                                    .foregroundColor(.barTabText)
-
-                                Spacer()
-
-                                Button(String(localized: "Shuffle")) {
-                                    generateRoute()
-                                }
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabPrimary)
-                            }
-
-                            ForEach(Array(selectedRoute.enumerated()), id: \.element.id) { index, bar in
-                                HStack(alignment: .top, spacing: BarTabSpacing.sm) {
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color.barTabPrimary)
-                                            .frame(width: 32, height: 32)
-                                        Text("\(index + 1)")
-                                            .font(.barTabBodySemibold)
-                                            .foregroundColor(.white)
-                                    }
-
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(bar.name)
-                                            .font(.barTabBodySemibold)
-                                            .foregroundColor(.barTabText)
-
-                                        Text(bar.address)
-                                            .font(.barTabCaption)
-                                            .foregroundColor(.barTabSecondary)
-
-                                        if let popular = barRepository.popularAmbience(for: bar) {
-                                            HStack(spacing: 4) {
-                                                Image(systemName: popular.icon)
-                                                    .font(.barTabTiny)
-                                                Text(popular.displayName)
-                                                    .font(.barTabTiny)
-                                            }
-                                            .foregroundColor(.barTabPrimary)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 2)
-                                            .background(Color.barTabPrimary.opacity(0.08))
-                                            .clipShape(Capsule())
-                                            .padding(.top, 4)
-                                        }
-                                    }
-
-                                    Spacer()
-                                }
-                                .padding(12)
-                                .background(Color.barTabCardFill)
-                                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                                        .stroke(Color.barTabCardBorder, lineWidth: 0.5)
-                                )
-                            }
-
-                            Button {
-                                generateRoute()
-                            } label: {
-                                Text(String(localized: "Try Another Route"))
-                                    .barTabPrimaryButton()
-                            }
-                            .padding(.top, 8)
-
-                            Button {
-                                showingRouteMap = true
-                            } label: {
-                                Label(String(localized: "Show route on map"), systemImage: "map.fill")
-                                    .barTabSecondaryButton()
-                            }
-                        }
-                        .barTabCard()
+                        routeContent
                     }
                 }
                 .padding(16)
@@ -239,6 +76,189 @@ struct BarHopView: View {
         .onChange(of: crawlOrigin) { _ in
             generateRoute()
         }
+    }
+
+    // MARK: - Subviews
+
+    private var heroBanner: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "figure.walk.circle.fill")
+                    .font(.barTabTitle)
+                    .foregroundColor(.barTabPrimary)
+                Text(String(localized: "Bar Hop Generator"))
+                    .font(.barTabStat)
+                    .foregroundColor(.barTabText)
+            }
+
+            Text(String(localized: "Let BarTab curate a 3-stop walking crawl featuring great drink deals near you."))
+                .font(.barTabCaption)
+                .foregroundColor(.barTabSecondary)
+        }
+        .barTabCard()
+    }
+
+    private var originMenu: some View {
+        Menu {
+            Button {
+                crawlOrigin = nil
+                originName = ""
+            } label: {
+                Label(String(localized: "My location"), systemImage: "location.fill")
+            }
+
+            Button {
+                showingLocationPicker = true
+            } label: {
+                Label(String(localized: "Choose a place…"), systemImage: "mappin.and.ellipse")
+            }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: crawlOrigin == nil ? "location.fill" : "mappin.circle.fill")
+                    .font(.barTabBody)
+                    .foregroundColor(.barTabPrimary)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(String(localized: "Searching near"))
+                        .font(.barTabTiny)
+                        .foregroundColor(.barTabSecondary)
+                    Text(originLabel)
+                        .font(.barTabBodySemibold)
+                        .foregroundColor(.barTabText)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.barTabTiny)
+                    .foregroundColor(.barTabSecondary)
+            }
+            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.vertical, BarTabSpacing.sm)
+            .background(Color.barTabCardFill)
+            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            )
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "map.fill")
+                .font(.barTabEmptyIconLarge)
+                .foregroundColor(.barTabPrimary.opacity(0.6))
+
+            Text(String(localized: "Ready for a night out?"))
+                .font(.barTabHeading)
+                .foregroundColor(.barTabText)
+
+            Button {
+                generateRoute()
+            } label: {
+                Text(String(localized: "Generate Route"))
+                    .barTabPrimaryButton()
+            }
+            .padding(.horizontal, 40)
+
+            if originLocation == nil {
+                Text(String(localized: "Enable location access or pick a place to find bars."))
+                    .font(.barTabCaption)
+                    .foregroundColor(.barTabSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+        .barTabCard()
+    }
+
+    private var routeContent: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text(String(localized: "Your Crawl Route"))
+                    .font(.barTabHeading)
+                    .foregroundColor(.barTabText)
+
+                Spacer()
+
+                Button(String(localized: "Shuffle")) {
+                    generateRoute()
+                }
+                .font(.barTabCaption)
+                .foregroundColor(.barTabPrimary)
+            }
+
+            ForEach(Array(selectedRoute.enumerated()), id: \.element.id) { index, bar in
+                routeRow(index: index, bar: bar)
+            }
+
+            Button {
+                generateRoute()
+            } label: {
+                Text(String(localized: "Try Another Route"))
+                    .barTabPrimaryButton()
+            }
+            .padding(.top, 8)
+
+            Button {
+                showingRouteMap = true
+            } label: {
+                Label(String(localized: "Show route on map"), systemImage: "map.fill")
+                    .barTabSecondaryButton()
+            }
+        }
+        .barTabCard()
+    }
+
+    private func routeRow(index: Int, bar: Bar) -> some View {
+        HStack(alignment: .top, spacing: BarTabSpacing.sm) {
+            ZStack {
+                Circle()
+                    .fill(Color.barTabPrimary)
+                    .frame(width: 32, height: 32)
+                Text("\(index + 1)")
+                    .font(.barTabBodySemibold)
+                    .foregroundColor(.white)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(bar.name)
+                    .font(.barTabBodySemibold)
+                    .foregroundColor(.barTabText)
+
+                Text(bar.address)
+                    .font(.barTabCaption)
+                    .foregroundColor(.barTabSecondary)
+
+                if let popular = barRepository.popularAmbience(for: bar) {
+                    HStack(spacing: 4) {
+                        Image(systemName: popular.icon)
+                            .font(.barTabTiny)
+                        Text(popular.displayName)
+                            .font(.barTabTiny)
+                    }
+                    .foregroundColor(.barTabPrimary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(Color.barTabPrimary.opacity(0.08))
+                    .clipShape(Capsule())
+                    .padding(.top, 4)
+                }
+            }
+
+            Spacer()
+        }
+        .padding(12)
+        .background(Color.barTabCardFill)
+        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+        )
     }
 
     private func generateRoute() {
