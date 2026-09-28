@@ -18,6 +18,25 @@ struct PlanNightOutSheet: View {
     @State private var date = Date()
     @State private var crawlBars: [Bar] = []
     @State private var isSaving = false
+    @State private var showingLocationPicker = false
+
+    /// A user-chosen crawl origin. `nil` means "my current location".
+    @State private var crawlOrigin: CLLocationCoordinate2D?
+    @State private var originName: String = ""
+
+    private var originLocation: CLLocation? {
+        if let crawlOrigin {
+            return CLLocation(latitude: crawlOrigin.latitude, longitude: crawlOrigin.longitude)
+        }
+        return locationService.location
+    }
+
+    private var originLabel: String {
+        if crawlOrigin != nil {
+            return originName.isEmpty ? String(localized: "Chosen place") : originName
+        }
+        return String(localized: "My location")
+    }
 
     private var canCreate: Bool {
         !titleText.trimmingCharacters(in: .whitespaces).isEmpty && !isSaving
@@ -43,6 +62,29 @@ struct PlanNightOutSheet: View {
                 }
 
                 Section {
+                    Menu {
+                        Button {
+                            crawlOrigin = nil
+                            originName = ""
+                        } label: {
+                            Label(String(localized: "My location"), systemImage: "location.fill")
+                        }
+
+                        Button {
+                            showingLocationPicker = true
+                        } label: {
+                            Label(String(localized: "Choose a place…"), systemImage: "mappin.and.ellipse")
+                        }
+                    } label: {
+                        HStack {
+                            Label(String(localized: "Searching near"), systemImage: crawlOrigin == nil ? "location.fill" : "mappin.circle.fill")
+                            Spacer()
+                            Text(originLabel)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+
                     if crawlBars.isEmpty {
                         Button {
                             generateCrawl()
@@ -101,6 +143,13 @@ struct PlanNightOutSheet: View {
                 locationService.requestPermission()
             }
         }
+        .sheet(isPresented: $showingLocationPicker) {
+            LocationPickerView(
+                selectedCoordinate: $crawlOrigin,
+                address: $originName
+            )
+            .environmentObject(locationService)
+        }
     }
 
     private func generateCrawl() {
@@ -110,7 +159,7 @@ struct PlanNightOutSheet: View {
             return
         }
 
-        guard let userLocation = locationService.location else {
+        guard let userLocation = originLocation else {
             crawlBars = Array(allBars.shuffled().prefix(3))
             return
         }
@@ -122,6 +171,14 @@ struct PlanNightOutSheet: View {
         .sorted {
             DistanceService.distance(from: userLocation, to: $0)
                 < DistanceService.distance(from: userLocation, to: $1)
+        }
+
+        guard nearby.count >= 3 else {
+            toastCenter.show(
+                String(localized: "Not enough bars nearby to build a crawl."),
+                kind: .info
+            )
+            return
         }
 
         crawlBars = Array(nearby.prefix(10).shuffled().prefix(3))

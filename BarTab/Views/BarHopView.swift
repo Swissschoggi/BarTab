@@ -7,19 +7,38 @@ import UIKit
 struct BarHopView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
-    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var locationService: LocationService
+    @EnvironmentObject private var toastCenter: ToastCenter
+    @Environment(\.dismiss) private var dismiss
 
     @State private var selectedRoute: [Bar] = []
     @State private var isGenerating = false
     @State private var showingRouteMap = false
+    @State private var showingLocationPicker = false
+
+    /// A user-chosen crawl origin. `nil` means "my current location".
+    @State private var crawlOrigin: CLLocationCoordinate2D?
+    @State private var originName: String = ""
+
+    private var originLocation: CLLocation? {
+        if let crawlOrigin {
+            return CLLocation(latitude: crawlOrigin.latitude, longitude: crawlOrigin.longitude)
+        }
+        return locationService.location
+    }
+
+    private var originLabel: String {
+        if crawlOrigin != nil {
+            return originName.isEmpty ? String(localized: "Chosen place") : originName
+        }
+        return String(localized: "My location")
+    }
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
 
-                    // Hero banner
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
                             Image(systemName: "figure.walk.circle.fill")
@@ -35,6 +54,51 @@ struct BarHopView: View {
                             .foregroundColor(.barTabSecondary)
                     }
                     .barTabCard()
+
+                    Menu {
+                        Button {
+                            crawlOrigin = nil
+                            originName = ""
+                        } label: {
+                            Label(String(localized: "My location"), systemImage: "location.fill")
+                        }
+
+                        Button {
+                            showingLocationPicker = true
+                        } label: {
+                            Label(String(localized: "Choose a place…"), systemImage: "mappin.and.ellipse")
+                        }
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: crawlOrigin == nil ? "location.fill" : "mappin.circle.fill")
+                                .font(.barTabBody)
+                                .foregroundColor(.barTabPrimary)
+
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(String(localized: "Searching near"))
+                                    .font(.barTabTiny)
+                                    .foregroundColor(.barTabSecondary)
+                                Text(originLabel)
+                                    .font(.barTabBodySemibold)
+                                    .foregroundColor(.barTabText)
+                                    .lineLimit(1)
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.barTabTiny)
+                                .foregroundColor(.barTabSecondary)
+                        }
+                        .padding(.horizontal, BarTabSpacing.md)
+                        .padding(.vertical, BarTabSpacing.sm)
+                        .background(Color.barTabCardFill)
+                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        )
+                    }
 
                     if selectedRoute.isEmpty {
                         VStack(spacing: 16) {
@@ -54,8 +118,8 @@ struct BarHopView: View {
                             }
                             .padding(.horizontal, 40)
 
-                            if locationService.location == nil {
-                                Text(String(localized: "Enable location access to find bars near you."))
+                            if originLocation == nil {
+                                Text(String(localized: "Enable location access or pick a place to find bars."))
                                     .font(.barTabCaption)
                                     .foregroundColor(.barTabSecondary)
                                     .multilineTextAlignment(.center)
@@ -165,6 +229,16 @@ struct BarHopView: View {
         .sheet(isPresented: $showingRouteMap) {
             CrawlRouteView(stops: selectedRoute)
         }
+        .sheet(isPresented: $showingLocationPicker) {
+            LocationPickerView(
+                selectedCoordinate: $crawlOrigin,
+                address: $originName
+            )
+            .environmentObject(locationService)
+        }
+        .onChange(of: crawlOrigin) { _ in
+            generateRoute()
+        }
     }
 
     private func generateRoute() {
@@ -174,8 +248,12 @@ struct BarHopView: View {
             return
         }
 
-        guard let userLocation = locationService.location else {
+        guard let userLocation = originLocation else {
             locationService.requestPermission()
+            toastCenter.show(
+                String(localized: "Enable location access or choose a place to generate a route."),
+                kind: .info
+            )
             return
         }
 
@@ -187,6 +265,15 @@ struct BarHopView: View {
             DistanceService.distance(from: userLocation, to: $0)
                 < DistanceService.distance(from: userLocation, to: $1)
         }
+
+        guard nearby.count >= 3 else {
+            toastCenter.show(
+                String(localized: "Not enough bars within walking distance yet."),
+                kind: .info
+            )
+            return
+        }
+
         selectedRoute = Array(nearby.prefix(10).shuffled().prefix(3))
     }
 }

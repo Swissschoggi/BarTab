@@ -142,6 +142,7 @@ struct MapView: View {
             BarHopView()
                 .environmentObject(barRepository)
                 .environmentObject(locationService)
+                .environmentObject(toastCenter)
         }
         .sheet(isPresented: $showingAddBar) {
             AddBarView(onBarAdded: { bar in

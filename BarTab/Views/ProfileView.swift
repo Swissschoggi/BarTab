@@ -833,29 +833,29 @@ struct HereNowView: View {
             selectedBar = group.bar
         } label: {
             HStack(spacing: 12) {
-                HStack(spacing: -10) {
-                    ForEach(group.profiles.prefix(3)) { profile in
+                HStack(spacing: -8) {
+                    ForEach(Array(group.profiles.prefix(3))) { profile in
                         UserAvatarView(
                             urlString: profile.avatar_url,
                             displayName: profile.display_name,
                             size: 34
                         )
-                        .overlay(Circle().stroke(Color.barTabBackground, lineWidth: 2))
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color.barTabCardFill, lineWidth: 2))
                     }
                 }
-                .frame(width: 58, alignment: .leading)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(group.bar.name)
                         .font(.barTabBody)
                         .fontWeight(.semibold)
                         .foregroundColor(.barTabText)
+                        .lineLimit(1)
 
-                    Text(group.profiles.count == 1
-                         ? String(localized: "\(group.profiles.first?.display_name ?? "A friend") is here")
-                         : String(localized: "\(group.profiles.count) friends here"))
+                    Text(friendsSummary(group))
                         .font(.barTabSmall)
                         .foregroundColor(.barTabSecondary)
+                        .lineLimit(1)
                 }
 
                 Spacer()
@@ -872,6 +872,22 @@ struct HereNowView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+
+    private func friendsSummary(_ group: FriendPresence) -> String {
+        let names = group.profiles.compactMap { $0.display_name }
+        switch names.count {
+        case 0:
+            return group.profiles.count == 1
+                ? String(localized: "A friend is here")
+                : String(localized: "\(group.profiles.count) friends here")
+        case 1:
+            return String(localized: "\(names[0]) is here")
+        case 2:
+            return String(localized: "\(names[0]) and \(names[1]) are here")
+        default:
+            return String(localized: "\(names[0]), \(names[1]) +\(names.count - 2) more")
+        }
     }
 
     private func load() async {
