@@ -240,7 +240,7 @@ struct CreatePollSheet: View {
 
 struct CreatePollSheet_Previews: PreviewProvider {
     static var previews: some View {
-        CreatePollSheet(group: BarGroup(id: UUID(), name: "Test Group", createdAt: Date(), createdBy: UUID()))
+        CreatePollSheet(group: BarGroup(id: UUID(), name: "Test Group", createdBy: UUID(), createdAt: Date()))
             .environmentObject(BarRepository())
             .environmentObject(UserSession())
             .environmentObject(ToastCenter())

@@ -19,6 +19,7 @@ struct PlanNightOutSheet: View {
     @State private var crawlBars: [Bar] = []
     @State private var isSaving = false
     @State private var showingLocationPicker = false
+    @State private var showingRouteMap = false
 
     /// A user-chosen crawl origin. `nil` means "my current location".
     @State private var crawlOrigin: CLLocationCoordinate2D?
@@ -342,9 +343,20 @@ struct PlanNightOutSheet: View {
     }
 }
 
+// MARK: - Subviews
+
+private func selectorGroup<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+        Text(title)
+            .font(.barTabCaption)
+            .foregroundColor(.barTabSecondary)
+        content()
+    }
+}
+
 struct PlanNightOutSheet_Previews: PreviewProvider {
     static var previews: some View {
-        PlanNightOutSheet(group: BarGroup(id: UUID(), name: "Test Group", createdAt: Date(), createdBy: UUID()))
+        PlanNightOutSheet(group: BarGroup(id: UUID(), name: "Test Group", createdBy: UUID(), createdAt: Date()))
             .environmentObject(BarRepository())
             .environmentObject(UserSession())
             .environmentObject(ToastCenter())
