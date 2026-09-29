@@ -774,35 +774,38 @@ struct HereNowView: View {
             } else if presence.isEmpty {
                 emptyState
             } else {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-                        HStack {
-                            Text(String(localized: "OUT NOW"))
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabSecondary)
-                            Spacer()
-                        }
+                GeometryReader { geo in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                            HStack {
+                                Text(String(localized: "OUT NOW"))
+                                    .font(.barTabCaption)
+                                    .foregroundColor(.barTabSecondary)
+                                Spacer()
+                            }
 
-                        VStack(spacing: 0) {
-                            ForEach(presence) { group in
-                                presenceRow(group)
-                                if group.id != presence.last?.id {
-                                    Divider()
-                                        .foregroundColor(.barTabCardBorder)
-                                        .padding(.leading, 68)
+                            VStack(spacing: 0) {
+                                ForEach(presence) { group in
+                                    presenceRow(group)
+                                    if group.id != presence.last?.id {
+                                        Divider()
+                                            .foregroundColor(.barTabCardBorder)
+                                            .padding(.leading, 68)
+                                    }
                                 }
                             }
+                            .background(
+                                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                                    .fill(Color.barTabCardFill)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                            )
                         }
-                        .background(
-                            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                                .fill(Color.barTabCardFill)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
-                        )
+                        .padding(.horizontal, BarTabSpacing.md)
+                        .frame(minHeight: geo.size.height - 120)
                     }
-                    .padding(.horizontal, BarTabSpacing.md)
                 }
             }
         }

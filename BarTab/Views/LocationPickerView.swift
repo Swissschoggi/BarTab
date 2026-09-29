@@ -13,19 +13,12 @@ struct LocationPickerView: View {
 
     @EnvironmentObject private var locationService: LocationService
 
-    @State private var region =
-        MKCoordinateRegion(
-            center:
-                CLLocationCoordinate2D(
-                    latitude: 47.3769,
-                    longitude: 8.5417
-                ),
-            span:
-                MKCoordinateSpan(
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01
-                )
-        )
+    @State private var region = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 47.3769, longitude: 8.5417),
+        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+    )
+
+    @State private var hasCenteredOnUser = false
 
     var body: some View {
 
@@ -124,6 +117,16 @@ struct LocationPickerView: View {
                                 )
                         )
                 }
+            }
+            .onReceive(locationService.$location) { location in
+                guard let location = location, !hasCenteredOnUser else { return }
+                withAnimation {
+                    region = MKCoordinateRegion(
+                        center: location.coordinate,
+                        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                    )
+                }
+                hasCenteredOnUser = true
             }
         }
     }

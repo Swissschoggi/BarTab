@@ -38,69 +38,62 @@ struct CreatePollSheet: View {
 
     var body: some View {
         NavigationView {
-            Form {
-                Section {
-                    TextField(String(localized: "What are we deciding?"), text: $pollTitle)
-                        .textInputAutocapitalization(.sentences)
-                } header: {
-                    Text(String(localized: "Poll question"))
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
-                Section {
-                    ForEach(0..<optionTexts.count, id: \.self) { index in
-                        VStack(alignment: .leading, spacing: 6) {
-                            TextField(String(localized: "Option \(index + 1)"), text: $optionTexts[index])
-                                .textInputAutocapitalization(.words)
+                    // Question Section
+                    selectorGroup(title: String(localized: "QUESTION")) {
+                        TextField(String(localized: "What are we deciding?"), text: $pollTitle)
+                            .textInputAutocapitalization(.sentences)
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, BarTabSpacing.md)
+                            .background(Color.barTabSurface)
+                            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                            )
+                    }
 
-                            if let barID = optionBarIDs[index],
-                               let bar = barRepository.getBar(id: barID) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "mappin.circle.fill")
-                                        .font(.barTabTiny)
-                                        .foregroundColor(.barTabPrimary)
-                                    Text(bar.name)
-                                        .font(.barTabSmall)
-                                        .foregroundColor(.barTabPrimary)
-                                    Spacer()
-                                    Button {
-                                        optionBarIDs[index] = nil
-                                    } label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .font(.barTabSmall)
-                                            .foregroundColor(.barTabSecondary)
-                                    }
-                                }
-                                .padding(.horizontal, 4)
-                            } else {
-                                Button {
-                                    barPickerIndex = index
-                                    showingBarPicker = true
-                                } label: {
-                                    Label(String(localized: "Link a bar"), systemImage: "mappin.and.ellipse")
-                                        .font(.barTabSmall)
-                                        .foregroundColor(.barTabSecondary)
-                                }
+                    // Options Section
+                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                        HStack {
+                            Text(String(localized: "OPTIONS"))
+                                .font(.barTabCaption)
+                                .foregroundColor(.barTabSecondary)
+                            Spacer()
+                        }
+
+                        VStack(spacing: BarTabSpacing.sm) {
+                            ForEach(0..<optionTexts.count, id: \.self) { index in
+                                optionRow(index: index)
+                            }
+
+                            Button {
+                                optionTexts.append("")
+                                optionBarIDs.append(nil)
+                            } label: {
+                                Label(String(localized: "Add option"), systemImage: "plus")
+                                    .barTabSecondaryButton()
                             }
                         }
                     }
+                    .barTabCard()
 
-                    Button {
-                        optionTexts.append("")
-                        optionBarIDs.append(nil)
-                    } label: {
-                        Label(String(localized: "Add option"), systemImage: "plus")
-                    }
-                } header: {
-                    Text(String(localized: "Options"))
-                } footer: {
                     if filledOptionCount < 2 {
                         Text(String(localized: "Add at least 2 options to create a poll."))
+                            .font(.barTabCaption)
                             .foregroundColor(.barTabDanger)
                     } else {
                         Text(String(localized: "Add bars, drinks, or whatever you're deciding on. Link bars to show their location in the poll."))
+                            .font(.barTabCaption)
+                            .foregroundColor(.barTabSecondary)
                     }
                 }
+                .padding(.horizontal, BarTabSpacing.md)
+                .padding(.vertical, BarTabSpacing.md)
             }
+            .background(Color.barTabBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "New Poll"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -155,6 +148,67 @@ struct CreatePollSheet: View {
         }
     }
 
+    // MARK: - Subviews
+
+    private func selectorGroup<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+            Text(title)
+                .font(.barTabCaption)
+                .foregroundColor(.barTabSecondary)
+            content()
+        }
+    }
+
+    private func optionRow(index: Int) -> some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+            TextField(String(localized: "Option \(index + 1)"), text: $optionTexts[index])
+                .textInputAutocapitalization(.words)
+                .padding(.vertical, 12)
+                .padding(.horizontal, BarTabSpacing.md)
+                .background(Color.barTabSurface)
+                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                        .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                )
+
+            HStack(spacing: 8) {
+                if let barID = optionBarIDs[index],
+                   let bar = barRepository.getBar(id: barID) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "mappin.circle.fill")
+                            .font(.barTabTiny)
+                            .foregroundColor(.barTabPrimary)
+                        Text(bar.name)
+                            .font(.barTabSmall)
+                            .foregroundColor(.barTabPrimary)
+                        Spacer()
+                        Button {
+                            optionBarIDs[index] = nil
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.barTabSmall)
+                                .foregroundColor(.barTabSecondary)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.barTabPrimary.opacity(0.1))
+                    .clipShape(Capsule())
+                } else {
+                    Button {
+                        barPickerIndex = index
+                        showingBarPicker = true
+                    } label: {
+                        Label(String(localized: "Link a bar"), systemImage: "mappin.and.ellipse")
+                            .font(.barTabSmall)
+                            .foregroundColor(.barTabSecondary)
+                    }
+                }
+            }
+        }
+    }
+
     private func createPoll() async {
         let title = pollTitle.trimmingCharacters(in: .whitespaces)
         let texts = optionTexts
@@ -181,5 +235,14 @@ struct CreatePollSheet: View {
             toastCenter.showError(error)
         }
         isSaving = false
+    }
+}
+
+struct CreatePollSheet_Previews: PreviewProvider {
+    static var previews: some View {
+        CreatePollSheet(group: BarGroup(id: UUID(), name: "Test Group", createdAt: Date(), createdBy: UUID()))
+            .environmentObject(BarRepository())
+            .environmentObject(UserSession())
+            .environmentObject(ToastCenter())
     }
 }
