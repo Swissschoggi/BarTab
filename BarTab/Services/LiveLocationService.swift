@@ -27,8 +27,9 @@ final class LiveLocationService: ObservableObject {
         guard !isSharing, SupabaseClient.shared.currentUserID != nil else { return }
         isSharing = true
         updateTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            guard let self else { return }
             Task { @MainActor in
-                await self?.pushLocationToSupabase()
+                await self.pushLocationToSupabase()
             }
         }
         updateTimer?.fire()
@@ -45,8 +46,9 @@ final class LiveLocationService: ObservableObject {
         // TODO: Use Supabase Realtime to subscribe to live_locations table
         // For now, poll every 60 seconds
         Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            guard let self else { return }
             Task { @MainActor in
-                await self?.fetchFriendsLocations()
+                await self.fetchFriendsLocations()
             }
         }.fire()
     }
