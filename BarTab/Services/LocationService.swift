@@ -10,21 +10,21 @@ final class LocationService: NSObject, ObservableObject {
 
     @Published private(set) var location: CLLocation?
 
-    var authorizationStatus: CLAuthorizationStatus {
-        locationManager.authorizationStatus
-    }
+    /// Published so views (e.g. the onboarding permission button) can
+    /// flip to "Location enabled ✓" the moment the user grants access.
+    @Published private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined
 
     override init() {
         super.init()
 
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        authorizationStatus = locationManager.authorizationStatus
 
         // If permission was already granted in a previous session,
         // `didChangeAuthorization` won't fire again, so kick off
         // updates right away.
-        let status = locationManager.authorizationStatus
-        if status == .authorizedWhenInUse || status == .authorizedAlways {
+        if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
             startUpdatingLocation()
         }
     }
@@ -67,6 +67,10 @@ extension LocationService: CLLocationManagerDelegate {
         _ manager: CLLocationManager,
         didChangeAuthorization status: CLAuthorizationStatus
     ) {
+        DispatchQueue.main.async {
+            self.authorizationStatus = status
+        }
+
         switch status {
         case .authorizedWhenInUse, .authorizedAlways:
             startUpdatingLocation()

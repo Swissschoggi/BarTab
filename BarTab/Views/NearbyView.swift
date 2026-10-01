@@ -529,6 +529,13 @@ struct NearbyView: View {
                             .fontWeight(.semibold)
                             .foregroundColor(.barTabAccent)
                     }
+
+                    if servesFavoriteDrinks(bar) {
+                        Image(systemName: "heart.fill")
+                            .font(.barTabTiny)
+                            .foregroundColor(.barTabDanger)
+                            .accessibilityLabel(Text(String(localized: "Serves your favorite drinks")))
+                    }
                 }
 
                 Text(bar.address)
@@ -553,6 +560,16 @@ struct NearbyView: View {
         .padding(.horizontal, BarTabSpacing.md)
         .padding(.vertical, BarTabSpacing.xs)
         .contentShape(Rectangle())
+    }
+
+    /// Whether the bar has a price for any of the drinks the user picked
+    /// during onboarding (shown as a heart on the row).
+    private func servesFavoriteDrinks(_ bar: Bar) -> Bool {
+        let interests = userSession.drinkInterests
+        guard !interests.isEmpty else { return false }
+        return barRepository.getPrices(for: bar).contains {
+            interests.contains($0.drink)
+        }
     }
 
     // MARK: - Price filters

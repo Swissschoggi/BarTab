@@ -158,6 +158,18 @@ struct ActivityFeedView: View {
 
                 Spacer()
 
+                if matchesTaste(item) {
+                    Text(String(localized: "For you"))
+                        .font(.barTabTiny)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabAccent)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(Color.barTabAccent.opacity(0.15))
+                        .clipShape(Capsule())
+                        .padding(.top, 4)
+                }
+
                 if item.barID != nil {
                     Image(systemName: "chevron.right")
                         .font(.barTabTiny)
@@ -175,7 +187,12 @@ struct ActivityFeedView: View {
         guard let user = userSession.currentUser else { return }
         do {
             let following = try await SupabaseClient.shared.fetchFollowing()
-            items = try await SupabaseClient.shared.fetchActivityFeed(followingIDs: following)
+            let fetched = try await SupabaseClient.shared.fetchActivityFeed(followingIDs: following)
+
+            // Personalize: items matching the drink interests saved in
+            // onboarding float to the top, recency preserved within each
+            // group.
+            items = rankedForYou(fetched)
 
             // Batch-fetch all unique usernames + avatar URLs
             let userIDs = Set(items.map(\.userID))
@@ -195,6 +212,35 @@ struct ActivityFeedView: View {
             }
         }
         isLoading = false
+    }
+
+    // MARK: - Personalization
+
+    private func rankedForYou(_ items: [ActivityItem]) -> [ActivityItem] {
+        guard !userSession.drinkInterests.isEmpty else { return items }
+        let matching = items.filter(matchesTaste)
+        guard matching.count != items.count else { return items }
+        let rest = items.filter { !matchesTaste($0) }
+        return matching + rest
+    }
+
+    /// True when the item involves one of the user's favorite drinks —
+    /// either directly (price/drink report) or at a bar that serves one.
+    private func matchesTaste(_ item: ActivityItem) -> Bool {
+        let interests = userSession.drinkInterests
+        guard !interests.isEmpty else { return false }
+
+        switch item.kind {
+        case .priceReport(_, let drink, _, _), .drinkRating(_, let drink, _):
+            return Drink(rawValue: drink).map(interests.contains) ?? false
+
+        case .barRating, .barCreated:
+            guard let barID = item.barID,
+                  let bar = barRepository.getBar(id: barID) else { return false }
+            return barRepository.getPrices(for: bar).contains {
+                interests.contains($0.drink)
+            }
+        }
     }
 
     private func username(for userID: UUID) -> String {

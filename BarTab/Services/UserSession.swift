@@ -8,6 +8,11 @@ final class UserSession: ObservableObject {
 
     @Published private(set) var currentUser: User?
 
+    /// The signed-in user's drink tastes (saved during onboarding).
+    /// The activity feed ranks matching items first and Discover marks
+    /// bars that serve these drinks.
+    @Published private(set) var drinkInterests: Set<Drink> = []
+
     private let authService = SupabaseAuthService()
 
     init() {
@@ -118,6 +123,7 @@ final class UserSession: ObservableObject {
 
         authService.clearSession()
         currentUser = nil
+        drinkInterests = []
     }
 
     /// Permanently deletes the signed-in user's account and all their data.
@@ -132,6 +138,7 @@ final class UserSession: ObservableObject {
 
         authService.clearSession()
         currentUser = nil
+        drinkInterests = []
     }
 
     // MARK: - Account updates
@@ -254,6 +261,20 @@ final class UserSession: ObservableObject {
         )
     }
 
+    /// Refreshes `drinkInterests` from the profiles table. Called after
+    /// sign-in/restore and whenever onboarding saves new picks.
+    func refreshDrinkInterests(userID: UUID? = nil) async {
+        guard let userID = userID ?? currentUser?.id else { return }
+        if let interests = try? await SupabaseClient.shared.fetchDrinkInterests(userID: userID) {
+            drinkInterests = Set(interests)
+        }
+    }
+
+    /// Optimistically applies locally chosen interests (onboarding).
+    func setDrinkInterests(_ interests: Set<Drink>) {
+        drinkInterests = interests
+    }
+
     private func refreshAdminStatus(
         from session: SupabaseAuthService.AuthSession
     ) async {
@@ -278,12 +299,18 @@ final class UserSession: ObservableObject {
             fallbackUsername: fallbackUsername
         )
 
-        return User(
+        let user = User(
             id: session.user.id,
             username: profile.username,
             createdAt: session.user.createdAt,
             isAdmin: profile.isAdmin,
             avatarURL: profile.avatarURL
         )
+
+        Task { [weak self] in
+            await self?.refreshDrinkInterests(userID: user.id)
+        }
+
+        return user
     }
 }

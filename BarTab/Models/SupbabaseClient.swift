@@ -1021,6 +1021,27 @@ final class SupabaseClient {
         _ = try await performAuthorized(httpRequest)
     }
 
+    /// Reads the drink interests saved during onboarding so the feed
+    /// and Discover can be personalized around them.
+    func fetchDrinkInterests(
+        userID: UUID
+    ) async throws -> [Drink] {
+
+        struct InterestsRow: Codable {
+            let drink_interests: [String]?
+        }
+
+        let request = try makeRequest(
+            endpoint: "profiles?select=drink_interests&id=eq.\(userID.uuidString)"
+        )
+
+        let data = try await performAuthorized(request)
+        let rows = try decoder.decode([InterestsRow].self, from: data)
+
+        return (rows.first?.drink_interests ?? [])
+            .compactMap(Drink.init(rawValue:))
+    }
+
     // MARK: - Storage (avatars)
 
     /// Uploads JPEG data to the public `avatars` bucket under the
