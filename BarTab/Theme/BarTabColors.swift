@@ -1,6 +1,27 @@
 import SwiftUI
 import UIKit
 
+extension UIColor {
+
+    /// Dynamic burgundy backing `Color.barTabPrimary`.
+    /// Use this where UIKit needs a tint color (navigation bar back arrows, bar buttons).
+    static let barTabPrimaryTint = UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(
+                red: 0xD4 / 255,
+                green: 0x89 / 255,
+                blue: 0x9A / 255,
+                alpha: 1
+            )
+            : UIColor(
+                red: 0x6B / 255,
+                green: 0x27 / 255,
+                blue: 0x37 / 255,
+                alpha: 1
+            )
+    }
+}
+
 extension Color {
 
     private static func barTabAdaptive(
@@ -18,20 +39,7 @@ extension Color {
 
     // MARK: - Primary (burgundy)
 
-    static let barTabPrimary = barTabAdaptive(
-        light: UIColor(
-            red: 0x6B / 255,
-            green: 0x27 / 255,
-            blue: 0x37 / 255,
-            alpha: 1
-        ),
-        dark: UIColor(
-            red: 0xD4 / 255,
-            green: 0x89 / 255,
-            blue: 0x9A / 255,
-            alpha: 1
-        )
-    )
+    static let barTabPrimary = Color(.barTabPrimaryTint)
 
     // MARK: - Accent (gold)
 

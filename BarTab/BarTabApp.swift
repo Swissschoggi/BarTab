@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import Combine
 import UserNotifications
 
@@ -20,9 +21,31 @@ struct BarTabApp: App {
         LanguageManager.shared.applyOnLaunch()
         ReportNotificationService.configure()
         PushNotificationService.shared.configure()
+        Self.configureBackArrow()
         Task {
             await ExchangeRateService.shared.fetchRates()
         }
+    }
+
+    /// Swaps the system back chevron for a custom burgundy arrow on
+    /// every navigation bar in the app.
+    private static func configureBackArrow() {
+        let configuration = UIImage.SymbolConfiguration(
+            pointSize: 17,
+            weight: .semibold
+        )
+        let backArrow = UIImage(
+            systemName: "arrow.left",
+            withConfiguration: configuration
+        )?
+        .withRenderingMode(.alwaysTemplate)
+
+        let navigationBar = UINavigationBar.appearance()
+        navigationBar.backIndicatorImage = backArrow
+        navigationBar.backIndicatorTransitionMaskImage = backArrow
+        navigationBar.tintColor = .barTabPrimaryTint
+
+        UIBarButtonItem.appearance().tintColor = .barTabPrimaryTint
     }
 
     var body: some Scene {
