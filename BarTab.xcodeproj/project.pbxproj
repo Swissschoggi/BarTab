@@ -110,6 +110,8 @@
 		BRTA00014000000000000071 /* WidgetSnapshotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000070 /* WidgetSnapshotService.swift */; };
 		BRTA00014000000000000073 /* BarVisit.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000072 /* BarVisit.swift */; };
 		BRTA00014000000000000075 /* PassportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000074 /* PassportView.swift */; };
+		BRTA00014000000000000076 /* PushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000077 /* PushNotificationService.swift */; };
+		BRTA00014000000000000078 /* LiveLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRTA00014000000000000079 /* LiveLocationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -238,6 +240,8 @@
 		BRTA00014000000000000070 /* WidgetSnapshotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotService.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000072 /* BarVisit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarVisit.swift; sourceTree = "<group>"; };
 		BRTA00014000000000000074 /* PassportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassportView.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000077 /* PushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationService.swift; sourceTree = "<group>"; };
+		BRTA00014000000000000079 /* LiveLocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveLocationService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -418,6 +422,8 @@
 				BRTA0002A000000000000009 /* BadgeService.swift */,
 				BRTA0001400000000000006E /* WidgetSnapshot.swift */,
 				BRTA00014000000000000070 /* WidgetSnapshotService.swift */,
+				BRTA00014000000000000077 /* PushNotificationService.swift */,
+				BRTA00014000000000000079 /* LiveLocationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -708,6 +714,8 @@
 				BRTA00014000000000000071 /* WidgetSnapshotService.swift in Sources */,
 				BRTA00014000000000000073 /* BarVisit.swift in Sources */,
 				BRTA00014000000000000075 /* PassportView.swift in Sources */,
+				BRTA00014000000000000076 /* PushNotificationService.swift in Sources */,
+				BRTA00014000000000000078 /* LiveLocationService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

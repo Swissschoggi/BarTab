@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 
 /// Shared Supabase project credentials.
 /// Replace with your project details from
@@ -610,6 +611,64 @@ final class SupabaseClient {
         _ = try await performAuthorized(request)
     }
 
+    // MARK: - Live location sharing
+
+    /// Upserts the current user's live location (one row per user).
+    func upsertLiveLocation(
+        userID: UUID,
+        coordinate: CLLocationCoordinate2D,
+        accuracy: Double
+    ) async throws {
+        struct Body: Codable {
+            let user_id: UUID
+            let latitude: Double
+            let longitude: Double
+            let accuracy: Double
+            let updated_at: Date
+        }
+
+        let body = Body(
+            user_id: userID,
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude,
+            accuracy: accuracy,
+            updated_at: Date()
+        )
+
+        var request = try makeRequest(
+            endpoint: "live_locations?on_conflict=user_id",
+            method: "POST"
+        )
+        request.setValue(
+            "resolution=merge-duplicates,return=representation",
+            forHTTPHeaderField: "Prefer"
+        )
+        request.httpBody = try encoder.encode(body)
+        _ = try await performAuthorized(request)
+    }
+
+    /// Removes the current user's shared live location.
+    func deleteLiveLocation(userID: UUID) async throws {
+        let request = try makeRequest(
+            endpoint: "live_locations?user_id=eq.\(userID.uuidString)",
+            method: "DELETE"
+        )
+        _ = try await performAuthorized(request)
+    }
+
+    /// Fetches live locations for the people the given user follows.
+    func fetchLiveLocations(for userID: UUID) async throws -> [LiveLocation] {
+        let followingIDs = try await fetchFollowing()
+        guard !followingIDs.isEmpty else { return [] }
+
+        let idList = followingIDs.map(\.uuidString).joined(separator: ",")
+        let request = try makeRequest(
+            endpoint: "live_locations?user_id=in.(\(idList))&select=*"
+        )
+        let data = try await performAuthorized(request)
+        return try decoder.decode([LiveLocationDTO].self, from: data).map(\.toDomain)
+    }
+
     // MARK: - Beer passport (bar visits)
 
     /// Fetches the current user's beer-passport stamps.
@@ -929,6 +988,35 @@ final class SupabaseClient {
         )
         httpRequest.httpBody = try JSONEncoder().encode(
             ["avatar_url": avatarURL]
+        )
+        _ = try await performAuthorized(httpRequest)
+    }
+
+    func updateDeviceToken(
+        userID: UUID,
+        token: String
+    ) async throws {
+        var httpRequest = try makeRequest(
+            endpoint: "profiles?id=eq.\(userID.uuidString)",
+            method: "PATCH"
+        )
+        httpRequest.httpBody = try JSONEncoder().encode(
+            ["apns_device_token": token]
+        )
+        _ = try await performAuthorized(httpRequest)
+    }
+
+    func updateProfileInterests(
+        userID: UUID,
+        interests: [Drink]
+    ) async throws {
+        let interestStrings = interests.map { $0.rawValue }
+        var httpRequest = try makeRequest(
+            endpoint: "profiles?id=eq.\(userID.uuidString)",
+            method: "PATCH"
+        )
+        httpRequest.httpBody = try JSONEncoder().encode(
+            ["drink_interests": interestStrings]
         )
         _ = try await performAuthorized(httpRequest)
     }

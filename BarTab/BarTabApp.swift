@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import UserNotifications
 
 @main
 struct BarTabApp: App {
@@ -9,11 +10,16 @@ struct BarTabApp: App {
     @StateObject private var languageManager = LanguageManager.shared
     @StateObject private var toastCenter = ToastCenter()
     @StateObject private var locationService = LocationService.shared
+    @StateObject private var liveLocationService = LiveLocationService.shared
     @StateObject private var deepLinkRouter = DeepLinkRouter()
+    @StateObject private var pushNotificationService = PushNotificationService.shared
+
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     init() {
         LanguageManager.shared.applyOnLaunch()
         ReportNotificationService.configure()
+        PushNotificationService.shared.configure()
         Task {
             await ExchangeRateService.shared.fetchRates()
         }
@@ -27,6 +33,7 @@ struct BarTabApp: App {
                 .environmentObject(languageManager)
                 .environmentObject(toastCenter)
                 .environmentObject(locationService)
+                .environmentObject(liveLocationService)
                 .environmentObject(deepLinkRouter)
                 .environment(\.locale, languageManager.currentLocale)
                 .barTabToast(center: toastCenter)
@@ -57,11 +64,7 @@ struct BarTabApp: App {
     }
 
     private func handleDeepLink(_ url: URL) async {
-        // App scheme (bartab://)   OAuth callbacks only.
         if url.scheme == SupabaseConfig.oauthCallbackScheme {
-
-            // Password reset callback: bartab://reset-password#access_token=...
-            // or bartab://#access_token=... (when redirect_to is just the site URL)
             if url.host == "reset-password" || url.host == nil || url.host == "" {
                 if url.fragment?.contains("access_token") == true {
                     let success = await SupabaseAuthService().handleResetPasswordCallback(url)
@@ -73,29 +76,21 @@ struct BarTabApp: App {
                     return
                 }
             }
-
-            // Google OAuth callback: bartab://auth/callback#access_token=...
             if url.host == "auth/callback" {
                 try? await userSession.signInWithGoogle(callbackURL: url)
                 return
             }
         }
 
-        // Share links   both `bartab://bar/<id>` and
-        // `https://bartap.info/bar/<id>` (and group equivalents).
         guard let destination = parseShareLink(url) else { return }
-
         await MainActor.run {
             deepLinkRouter.destination = destination
         }
     }
 
-    /// Parses a bar/group share link from either the app scheme or the
-    /// Universal Link host.
     private func parseShareLink(
         _ url: URL
     ) -> DeepLinkRouter.Destination? {
-
         let isApp = url.scheme == SupabaseConfig.oauthCallbackScheme
         let isWeb = url.scheme == "https" && url.host == DeepLink.host
         guard isApp || isWeb else { return nil }
@@ -105,11 +100,9 @@ struct BarTabApp: App {
         let idString: String?
 
         if isApp {
-            // bartab://bar/<id>
             type = url.host
             idString = components.last
         } else {
-            // https://bartap.info/bar/<id>
             guard components.count >= 3 else { return nil }
             type = components[components.count - 2]
             idString = components.last
@@ -130,9 +123,27 @@ struct BarTabApp: App {
     }
 }
 
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        PushNotificationService.shared.didRegisterForRemoteNotifications(withDeviceToken: deviceToken)
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        PushNotificationService.shared.didFailToRegisterForRemoteNotificationsWithError(error)
+    }
+}
+
 /// Routes share deep links to the relevant screen.
 @MainActor
 final class DeepLinkRouter: ObservableObject {
+
+    static let shared = DeepLinkRouter()
 
     enum Destination: Identifiable, Equatable {
         case bar(UUID)
@@ -147,4 +158,19 @@ final class DeepLinkRouter: ObservableObject {
     }
 
     @Published var destination: Destination?
+
+    /// Parses a `bartab://bar/<id>` or `bartab://group/<id>` URL.
+    static func parse(url: URL) -> Destination? {
+        guard url.scheme == SupabaseConfig.oauthCallbackScheme else { return nil }
+
+        let type = url.host
+        let idString = url.pathComponents.last
+        guard let idString, let id = UUID(uuidString: idString) else { return nil }
+
+        switch type {
+        case "bar": return .bar(id)
+        case "group": return .group(id)
+        default: return nil
+        }
+    }
 }

@@ -443,3 +443,23 @@ struct AttributeConsensusDTO: Codable {
     }
 }
 
+// MARK: - Live location DTO
+
+struct LiveLocationDTO: Codable {
+    let user_id: UUID
+    let latitude: Double
+    let longitude: Double
+    let accuracy: Double
+    let updated_at: Date
+
+    var toDomain: LiveLocation {
+        LiveLocation(
+            userID: user_id,
+            latitude: latitude,
+            longitude: longitude,
+            accuracy: accuracy,
+            updatedAt: updated_at
+        )
+    }
+}
+

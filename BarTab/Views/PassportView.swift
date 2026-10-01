@@ -1,16 +1,13 @@
 import SwiftUI
 
-/// The "beer passport": a stamp collection of every distinct bar the
-/// user has checked into, newest visit first.
+/// The "beer passport": a Flighty-style collection of every distinct bar
+/// the user has checked into — hero stat, milestone progress and a
+/// timeline of stamps.
 struct PassportView: View {
 
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var toastCenter: ToastCenter
-
-    private let columns = [
-        GridItem(.adaptive(minimum: 100), spacing: 12)
-    ]
 
     private var currentUser: User? {
         userSession.currentUser
@@ -21,148 +18,313 @@ struct PassportView: View {
         return barRepository.barVisits(for: user)
     }
 
+    // MARK: - Derived stats
+
+    private var totalDistinct: Int {
+        visits.count
+    }
+
+    private var totalCheckIns: Int {
+        visits.reduce(0) { $0 + $1.visitCount }
+    }
+
+    private var mostVisitedBarName: String {
+        guard let top = visits.max(by: { $0.visitCount < $1.visitCount }) else { return "—" }
+        return barRepository.getBar(id: top.barID)?.name ?? "—"
+    }
+
+    private var firstVisitDate: Date? {
+        visits.map(\.firstVisitedAt).min()
+    }
+
+    private let milestones = [5, 10, 25, 50, 100, 250]
+
+    private var nextMilestone: Int? {
+        milestones.first { $0 > totalDistinct }
+    }
+
+    private var milestoneProgress: Double {
+        guard let next = nextMilestone else { return 1 }
+        let previous = milestones.filter { $0 <= totalDistinct }.max() ?? 0
+        let span = Double(next - previous)
+        guard span > 0 else { return 1 }
+        return Double(totalDistinct - previous) / span
+    }
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
-                if let user = currentUser {
-                    headerCard(user: user)
+                if currentUser != nil {
+                    heroCard
+
+                    if !visits.isEmpty {
+                        statsRow
+                    }
 
                     if visits.isEmpty {
                         emptyState
                     } else {
-                        Text(String(localized: "Stamps"))
-                            .font(.barTabHeading)
-                            .foregroundColor(.barTabText)
-
-                        LazyVGrid(columns: columns, spacing: 12) {
-                            ForEach(visits) { visit in
-                                if let bar = barRepository.getBar(id: visit.barID) {
-                                    NavigationLink {
-                                        BarView(bar: bar)
-                                            .environmentObject(barRepository)
-                                            .environmentObject(userSession)
-                                            .environmentObject(toastCenter)
-                                    } label: {
-                                        stampCard(bar: bar, visit: visit)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        }
+                        timelineSection
                     }
                 } else {
                     signedOutState
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 20)
+            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.vertical, BarTabSpacing.md)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Passport"))
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    // MARK: - Header
+    // MARK: - Hero
 
-    private func headerCard(user: User) -> some View {
-        let count = barRepository.distinctBarVisitCount(for: user)
+    private var heroCard: some View {
+        HStack(alignment: .center, spacing: BarTabSpacing.lg) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(String(localized: "PASSPORT"))
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .tracking(2)
+                    .foregroundColor(.white.opacity(0.7))
 
-        return HStack(spacing: 12) {
-            Image(systemName: "book.closed.fill")
-                .font(.barTabTitle)
-                .foregroundColor(.barTabPrimary)
+                Text("\(totalDistinct)")
+                    .font(.system(size: 56, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(String(localized: "\(count) \(count == 1 ? "bar" : "bars") visited"))
-                    .font(.barTabHeading)
-                    .foregroundColor(.barTabText)
-                Text(String(localized: "Check in at a bar to collect a stamp."))
-                    .font(.barTabSmall)
-                    .foregroundColor(.barTabSecondary)
+                Text(totalDistinct == 1
+                     ? String(localized: "bar visited")
+                     : String(localized: "bars visited"))
+                    .font(.barTabBodySemibold)
+                    .foregroundColor(.white.opacity(0.9))
+
+                if let next = nextMilestone {
+                    Text(String(localized: "\(next - totalDistinct) to go for \(next)"))
+                        .font(.barTabCaption)
+                        .foregroundColor(.white.opacity(0.75))
+                }
             }
 
-            Spacer()
+            Spacer(minLength: 0)
+
+            progressRing
         }
-        .padding(16)
-        .barTabCard()
+        .padding(BarTabSpacing.lg)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(red: 0x3E / 255, green: 0x14 / 255, blue: 0x20 / 255),
+                    Color.barTabAccent
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.sheet, style: .continuous))
     }
 
-    // MARK: - Stamp
+    private var progressRing: some View {
+        ZStack {
+            Circle()
+                .stroke(Color.white.opacity(0.2), lineWidth: 7)
 
-    private func stampCard(bar: Bar, visit: BarVisit) -> some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .fill(Color.barTabPrimary.opacity(0.08))
-                    .frame(width: 56, height: 56)
+            Circle()
+                .trim(from: 0, to: milestoneProgress)
+                .stroke(
+                    Color.white,
+                    style: StrokeStyle(lineWidth: 7, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
 
-                Circle()
-                    .stroke(
-                        Color.barTabPrimary.opacity(0.5),
-                        style: StrokeStyle(lineWidth: 2, dash: [4, 3])
-                    )
-                    .frame(width: 56, height: 56)
-
-                Text(String(bar.name.prefix(1)).uppercased())
-                    .font(.barTabHeading)
-                    .foregroundColor(.barTabPrimary)
+            VStack(spacing: 0) {
+                Text(nextMilestone.map { "\($0)" } ?? "★")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                Text(String(localized: "stamps"))
+                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .foregroundColor(.white.opacity(0.7))
             }
+        }
+        .frame(width: 82, height: 82)
+    }
 
-            Text(bar.name)
-                .font(.barTabSmall)
-                .fontWeight(.semibold)
+    // MARK: - Stats
+
+    private var statsRow: some View {
+        HStack(spacing: BarTabSpacing.sm) {
+            statCard(value: "\(totalCheckIns)", label: String(localized: "Check-ins"))
+            statCard(value: mostVisitedBarName, label: String(localized: "Most visited"), isText: true)
+            statCard(value: firstVisitText, label: String(localized: "Since"), isText: true)
+        }
+    }
+
+    private var firstVisitText: String {
+        guard let date = firstVisitDate else { return "—" }
+        return date.formatted(.dateTime.month(.abbreviated).year())
+    }
+
+    private func statCard(
+        value: String,
+        label: String,
+        isText: Bool = false
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(value)
+                .font(isText ? .barTabCaption : .barTabStat)
+                .fontWeight(isText ? .semibold : .bold)
                 .foregroundColor(.barTabText)
                 .lineLimit(1)
+                .minimumScaleFactor(0.7)
 
-            if visit.visitCount > 1 {
-                Text(String(localized: "\(visit.visitCount) visits"))
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabPrimary)
-            }
-
-            Text(visit.lastVisitedAt.relativeFormatted)
+            Text(label)
                 .font(.barTabTiny)
                 .foregroundColor(.barTabSecondary)
-                .lineLimit(1)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, BarTabSpacing.sm)
-        .padding(.horizontal, 6)
-        .background(
-            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                .fill(Color.barTabCardFill)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
-        )
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .barTabCard(padding: BarTabSpacing.sm)
+    }
+
+    // MARK: - Timeline
+
+    private var timelineSection: some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+            Text(String(localized: "Stamps"))
+                .font(.barTabHeading)
+                .foregroundColor(.barTabText)
+
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(visits.enumerated()), id: \.element.id) { index, visit in
+                    if let bar = barRepository.getBar(id: visit.barID) {
+                        NavigationLink {
+                            BarView(bar: bar)
+                                .environmentObject(barRepository)
+                                .environmentObject(userSession)
+                                .environmentObject(toastCenter)
+                        } label: {
+                            timelineRow(
+                                bar: bar,
+                                visit: visit,
+                                isLast: index == visits.count - 1
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
+    private func timelineRow(
+        bar: Bar,
+        visit: BarVisit,
+        isLast: Bool
+    ) -> some View {
+        HStack(alignment: .top, spacing: BarTabSpacing.md) {
+            // Marker + connecting line
+            VStack(spacing: 0) {
+                stampMarker(bar: bar)
+
+                if !isLast {
+                    Rectangle()
+                        .fill(Color.barTabCardBorder)
+                        .frame(width: 2)
+                        .frame(height: 56)
+                }
+            }
+
+            // Content
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: BarTabSpacing.sm) {
+                    Text(bar.name)
+                        .font(.barTabBodySemibold)
+                        .foregroundColor(.barTabText)
+                        .lineLimit(1)
+
+                    Spacer()
+
+                    if visit.visitCount > 1 {
+                        Text("×\(visit.visitCount)")
+                            .font(.barTabTiny)
+                            .fontWeight(.bold)
+                            .foregroundColor(.barTabPrimary)
+                            .padding(.horizontal, BarTabSpacing.xs)
+                            .padding(.vertical, 3)
+                            .background(Capsule().fill(Color.barTabPrimary.opacity(0.12)))
+                    }
+                }
+
+                HStack(spacing: BarTabSpacing.xs) {
+                    if let ambience = barRepository.popularAmbience(for: bar) {
+                        Image(systemName: ambience.icon)
+                            .font(.barTabTiny)
+                        Text(ambience.displayName)
+                            .font(.barTabTiny)
+                    }
+
+                    Text("·")
+                        .font(.barTabTiny)
+
+                    Text(visit.lastVisitedAt.relativeFormatted)
+                        .font(.barTabTiny)
+                }
+                .foregroundColor(.barTabSecondary)
+            }
+            .padding(.bottom, BarTabSpacing.lg)
+        }
+    }
+
+    private func stampMarker(bar: Bar) -> some View {
+        ZStack {
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [.barTabPrimary, .barTabAccent],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 44, height: 44)
+
+            Circle()
+                .stroke(
+                    Color.barTabCardFill,
+                    style: StrokeStyle(lineWidth: 2, dash: [3, 3])
+                )
+                .frame(width: 36, height: 36)
+
+            Text(String(bar.name.prefix(1)).uppercased())
+                .font(.barTabHeading)
+                .foregroundColor(.white)
+        }
     }
 
     // MARK: - Empty / signed out
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: BarTabSpacing.sm) {
             Image(systemName: "ticket")
-                .font(.barTabEmptyIcon)
-                .foregroundColor(.barTabPrimary.opacity(0.6))
+                .font(.barTabEmptyIconLarge)
+                .foregroundColor(.barTabPrimary.opacity(0.5))
 
             Text(String(localized: "No stamps yet"))
-                .font(.barTabBody)
-                .fontWeight(.medium)
+                .font(.barTabBodySemibold)
                 .foregroundColor(.barTabText)
 
             Text(String(localized: "Head to a bar and tap \"I'm here\" to start your collection."))
-                .font(.barTabSmall)
+                .font(.barTabCaption)
                 .foregroundColor(.barTabSecondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
+        .padding(.vertical, BarTabSpacing.xl)
+        .barTabCard()
     }
 
     private var signedOutState: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: BarTabSpacing.sm) {
             Image(systemName: "book.closed")
                 .font(.barTabEmptyIcon)
                 .foregroundColor(.barTabPrimary.opacity(0.6))
@@ -172,6 +334,6 @@ struct PassportView: View {
                 .foregroundColor(.barTabText)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
+        .padding(.vertical, BarTabSpacing.xl)
     }
 }

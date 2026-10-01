@@ -31,6 +31,7 @@ struct MainTabView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @EnvironmentObject private var toastCenter: ToastCenter
     @EnvironmentObject private var deepLinkRouter: DeepLinkRouter
+    @EnvironmentObject private var locationService: LocationService
 
     @State private var selectedTab: Tab = .map
     @State private var showingOnboarding = false
@@ -129,12 +130,15 @@ struct MainTabView: View {
                 .ignoresSafeArea()
         )
         .onAppear {
-            if !UserDefaults.standard.bool(forKey: "hasSeenOnboarding") {
+            if !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
                 showingOnboarding = true
             }
         }
         .sheet(isPresented: $showingOnboarding) {
             OnboardingView()
+                .environmentObject(userSession)
+                .environmentObject(locationService)
+                .environmentObject(toastCenter)
         }
         .sheet(item: $deepLinkRouter.destination) { destination in
             switch destination {

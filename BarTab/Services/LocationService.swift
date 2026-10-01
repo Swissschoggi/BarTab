@@ -10,6 +10,10 @@ final class LocationService: NSObject, ObservableObject {
 
     @Published private(set) var location: CLLocation?
 
+    var authorizationStatus: CLAuthorizationStatus {
+        locationManager.authorizationStatus
+    }
+
     override init() {
         super.init()
 
