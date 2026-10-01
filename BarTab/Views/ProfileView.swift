@@ -721,7 +721,7 @@ struct FriendsView: View {
         .navigationTitle(String(localized: "Friends"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Color.barTabBackground, for: .navigationBar)
-        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
     }
 }
 
