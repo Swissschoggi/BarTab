@@ -43,12 +43,12 @@ struct PassportView: View {
         milestones.first { $0 > totalDistinct }
     }
 
-    private var milestoneProgress: Double {
+    private var milestoneProgress: CGFloat {
         guard let next = nextMilestone else { return 1 }
         let previous = milestones.filter { $0 <= totalDistinct }.max() ?? 0
-        let span = Double(next - previous)
+        let span = CGFloat(next - previous)
         guard span > 0 else { return 1 }
-        return Double(totalDistinct - previous) / span
+        return CGFloat(totalDistinct - previous) / span
     }
 
     var body: some View {

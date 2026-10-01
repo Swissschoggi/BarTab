@@ -50,12 +50,7 @@ struct MapView: View {
 
             Map(coordinateRegion: $region, annotationItems: mapItems) { item in
                 MapAnnotation(coordinate: item.coordinate) {
-                    switch item {
-                    case .bar(let bar):
-                        barAnnotation(bar)
-                    case .friend(let friend):
-                        friendAnnotation(friend)
-                    }
+                    annotationContent(for: item)
                 }
             }
             .ignoresSafeArea()
@@ -216,6 +211,16 @@ struct MapView: View {
 
     // MARK: - Annotations
 
+    @ViewBuilder
+    private func annotationContent(for item: MapItem) -> some View {
+        switch item {
+        case .bar(let bar):
+            barAnnotation(bar)
+        case .friend(let friend):
+            friendAnnotation(friend)
+        }
+    }
+
     private func barAnnotation(_ bar: Bar) -> some View {
         Button {
             HapticEngine.lightTap()
@@ -334,29 +339,19 @@ private struct FriendLocationView: View {
             .padding(.horizontal, BarTabSpacing.md)
 
             if !friend.isStale {
-                Map(coordinateRegion: .constant(MKCoordinateRegion(
-                    center: friend.coordinate,
-                    span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-                )))
-                .frame(height: 200)
+                ZStack {
+                    Map(coordinateRegion: .constant(MKCoordinateRegion(
+                        center: friend.coordinate,
+                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                    )))
+                    .frame(height: 200)
+
+                    Circle()
+                        .fill(Color.barTabAccent)
+                        .frame(width: 18, height: 18)
+                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                }
                 .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
-                .overlay(
-                    MapAnnotation(coordinate: friend.coordinate) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.barTabAccent)
-                                .frame(width: 36, height: 36)
-                            Circle()
-                                .fill(Color.white)
-                                .frame(width: 24, height: 24)
-                                .overlay(
-                                    Image(systemName: "person.fill")
-                                        .font(.system(size: 10, weight: .bold))
-                                        .foregroundColor(.barTabAccent)
-                                )
-                        }
-                    }
-                )
                 .padding(.horizontal, BarTabSpacing.md)
             }
 
