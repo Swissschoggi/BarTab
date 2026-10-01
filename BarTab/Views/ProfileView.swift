@@ -720,6 +720,8 @@ struct FriendsView: View {
         .background(Color.barTabBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Friends"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Color.barTabBackground, for: .navigationBar)
+        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
     }
 }
 
@@ -767,47 +769,37 @@ struct HereNowView: View {
     }
 
     var body: some View {
-        Group {
-            if isLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if presence.isEmpty {
-                emptyState
-            } else {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-                        HStack {
-                            Text(String(localized: "OUT NOW"))
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabSecondary)
-                            Spacer()
-                        }
-                        .padding(.horizontal, BarTabSpacing.md)
-
-                        VStack(spacing: 0) {
-                            ForEach(presence) { group in
-                                presenceRow(group)
-                                if group.id != presence.last?.id {
-                                    Divider()
-                                        .foregroundColor(.barTabCardBorder)
-                                        .padding(.leading, 68)
-                                }
-                            }
-                        }
-                        .background(
-                            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                                .fill(Color.barTabCardFill)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
-                        )
-                        .padding(.horizontal, BarTabSpacing.md)
+        GeometryReader { geo in
+            ScrollView {
+                VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    HStack {
+                        Text(String(localized: "OUT NOW"))
+                            .font(.barTabCaption)
+                            .foregroundColor(.barTabSecondary)
+                        Spacer()
                     }
-                    .padding(.vertical, BarTabSpacing.md)
+                    .padding(.horizontal, BarTabSpacing.md)
+
+                    if isLoading {
+                        HStack(spacing: 10) {
+                            ProgressView()
+                            Text(String(localized: "Checking who's out…"))
+                                .font(.barTabSmall)
+                                .foregroundColor(.barTabSecondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, BarTabSpacing.md)
+                        .padding(.vertical, BarTabSpacing.xs)
+                    } else if presence.isEmpty {
+                        emptyState(minHeight: geo.size.height - 68)
+                    } else {
+                        presenceList(minHeight: geo.size.height - 68)
+                    }
                 }
-                .background(Color.barTabBackground.ignoresSafeArea())
+                .padding(.vertical, BarTabSpacing.md)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .background(Color.barTabBackground.ignoresSafeArea())
         }
         .background(Color.barTabBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Here now"))
@@ -828,7 +820,7 @@ struct HereNowView: View {
         }
     }
 
-    private var emptyState: some View {
+    private func emptyState(minHeight: CGFloat) -> some View {
         VStack(spacing: BarTabSpacing.sm) {
             Image(systemName: "figure.walk")
                 .font(.barTabEmptyIcon)
@@ -843,9 +835,40 @@ struct HereNowView: View {
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
-        .barTabCard()
+        .padding(.top, 36)
+        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .top)
+        .background(
+            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                .fill(Color.barTabCardFill)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+        )
+        .padding(.horizontal, BarTabSpacing.md)
+    }
+
+    private func presenceList(minHeight: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            ForEach(presence) { group in
+                presenceRow(group)
+                if group.id != presence.last?.id {
+                    Divider()
+                        .foregroundColor(.barTabCardBorder)
+                        .padding(.leading, 68)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .top)
+        .background(
+            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                .fill(Color.barTabCardFill)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+        )
+        .padding(.horizontal, BarTabSpacing.md)
     }
 
     private func presenceRow(_ group: FriendPresence) -> some View {

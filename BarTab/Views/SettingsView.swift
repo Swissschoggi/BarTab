@@ -355,6 +355,37 @@ struct SettingsView: View {
                     }
                     .barTabCard()
 
+                    // Onboarding
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "sparkles")
+                                .font(.barTabBody)
+                                .foregroundColor(.barTabPrimary)
+                            Text(String(localized: "Onboarding"))
+                                .font(.barTabBody)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.barTabText)
+                        }
+
+                        VStack(spacing: 0) {
+                            Button {
+                                UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+                                toastCenter.show(
+                                    String(localized: "Restart BarTab to replay onboarding"),
+                                    kind: .success
+                                )
+                            } label: {
+                                settingsRow(
+                                    icon: "arrow.counterclockwise",
+                                    iconColor: .barTabAccent,
+                                    title: String(localized: "Replay Onboarding"),
+                                    value: ""
+                                )
+                            }
+                        }
+                    }
+                    .barTabCard()
+
                     // Support the Dev
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
