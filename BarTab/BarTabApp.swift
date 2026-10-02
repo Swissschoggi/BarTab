@@ -21,15 +21,15 @@ struct BarTabApp: App {
         LanguageManager.shared.applyOnLaunch()
         ReportNotificationService.configure()
         PushNotificationService.shared.configure()
-        Self.configureBackArrow()
+        Self.configureNavigationBars()
         Task {
             await ExchangeRateService.shared.fetchRates()
         }
     }
 
-    /// Swaps the system back chevron for a custom burgundy arrow on
-    /// every navigation bar in the app.
-    private static func configureBackArrow() {
+    /// Custom burgundy back arrow and themed background for every
+    /// navigation bar in the app.
+    private static func configureNavigationBars() {
         let configuration = UIImage.SymbolConfiguration(
             pointSize: 17,
             weight: .semibold
@@ -40,10 +40,17 @@ struct BarTabApp: App {
         )?
         .withRenderingMode(.alwaysTemplate)
 
+        let barAppearance = UINavigationBarAppearance()
+        barAppearance.configureWithOpaqueBackground()
+        barAppearance.backgroundColor = .barTabBackgroundTint
+
         let navigationBar = UINavigationBar.appearance()
         navigationBar.backIndicatorImage = backArrow
         navigationBar.backIndicatorTransitionMaskImage = backArrow
         navigationBar.tintColor = .barTabPrimaryTint
+        navigationBar.standardAppearance = barAppearance
+        navigationBar.scrollEdgeAppearance = barAppearance
+        navigationBar.compactAppearance = barAppearance
 
         UIBarButtonItem.appearance().tintColor = .barTabPrimaryTint
     }

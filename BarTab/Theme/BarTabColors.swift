@@ -20,6 +20,24 @@ extension UIColor {
                 alpha: 1
             )
     }
+
+    /// Dynamic warm cream backing `Color.barTabBackground`.
+    /// Use this where UIKit needs the app background color (navigation bar backgrounds).
+    static let barTabBackgroundTint = UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(
+                red: 0x1A / 255,
+                green: 0x16 / 255,
+                blue: 0x13 / 255,
+                alpha: 1
+            )
+            : UIColor(
+                red: 0xF7 / 255,
+                green: 0xF1 / 255,
+                blue: 0xE3 / 255,
+                alpha: 1
+            )
+    }
 }
 
 extension Color {
@@ -60,20 +78,7 @@ extension Color {
 
     // MARK: - Background (warm cream)
 
-    static let barTabBackground = barTabAdaptive(
-        light: UIColor(
-            red: 0xF7 / 255,
-            green: 0xF1 / 255,
-            blue: 0xE3 / 255,
-            alpha: 1
-        ),
-        dark: UIColor(
-            red: 0x1A / 255,
-            green: 0x16 / 255,
-            blue: 0x13 / 255,
-            alpha: 1
-        )
-    )
+    static let barTabBackground = Color(.barTabBackgroundTint)
 
     // MARK: - Text (warm charcoal)
 

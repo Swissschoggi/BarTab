@@ -66,7 +66,7 @@ struct MyBarsView: View {
                                             systemImage: "pencil"
                                         )
                                     }
-                                    .tint(.blue)
+                                    .tint(.barTabPrimary)
 
                                     Button(role: .destructive) {
                                         Task {
