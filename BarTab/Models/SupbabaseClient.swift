@@ -16,6 +16,10 @@ enum SupabaseConfig {
     /// Deep-link scheme used as the OAuth redirect target
     /// (Google sign-in). Must match CFBundleURLTypes in Info.plist.
     static let oauthCallbackScheme = "bartab"
+
+    /// Stripe publishable key for the tip jar. Set to your `pk_test_…`
+    /// (development) or `pk_live_…` (production) key from the Stripe Dashboard.
+    static let stripePublishableKey = ""
 }
 
 /// Builds shareable deep links that open BarTab to a specific screen.

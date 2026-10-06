@@ -15,7 +15,15 @@ final class UserSession: ObservableObject {
 
     private let authService = SupabaseAuthService()
 
+    private static let interestsDefaultsKey = "drinkInterests"
+
     init() {
+
+        // Seed from the local cache so Discover/Activity can personalize
+        // before (or without) a backend sync.
+        if let saved = UserDefaults.standard.stringArray(forKey: Self.interestsDefaultsKey) {
+            drinkInterests = Set(saved.compactMap(Drink.init(rawValue:)))
+        }
 
         guard let session = authService.restoreSession() else {
             return
@@ -267,12 +275,15 @@ final class UserSession: ObservableObject {
         guard let userID = userID ?? currentUser?.id else { return }
         if let interests = try? await SupabaseClient.shared.fetchDrinkInterests(userID: userID) {
             drinkInterests = Set(interests)
+            UserDefaults.standard.set(interests.map(\.rawValue), forKey: Self.interestsDefaultsKey)
         }
     }
 
-    /// Optimistically applies locally chosen interests (onboarding).
+    /// Optimistically applies locally chosen interests (onboarding) and
+    /// caches them on-device so they survive sign-out and cold launches.
     func setDrinkInterests(_ interests: Set<Drink>) {
         drinkInterests = interests
+        UserDefaults.standard.set(interests.map(\.rawValue), forKey: Self.interestsDefaultsKey)
     }
 
     private func refreshAdminStatus(

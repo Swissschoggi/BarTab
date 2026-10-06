@@ -67,10 +67,13 @@ struct OnboardingView: View {
     private func completeOnboarding() {
         UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
 
-        guard let user = userSession.currentUser,
-              !selectedInterests.isEmpty else { return }
+        guard !selectedInterests.isEmpty else { return }
 
+        // Always save locally so Discover/Activity can personalize even
+        // before the user signs in.
         userSession.setDrinkInterests(selectedInterests)
+
+        guard let user = userSession.currentUser else { return }
 
         Task {
             do {

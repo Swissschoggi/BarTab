@@ -226,14 +226,28 @@ struct NearbyView: View {
         priceResults.min { comparisonValue($0.summary) < comparisonValue($1.summary) }?.summary.id
     }
 
+    /// Bars to consider for deals/heroes: nearby when a location is known,
+    /// otherwise every bar (mirrors how the Drinks results fall back).
+    private var consideredBars: [Bar] {
+        let bars: [Bar]
+        if let coordinate = originCoordinate {
+            bars = barRepository.nearbyBars(coordinate: coordinate, radius: radiusMeters)
+        } else {
+            bars = barRepository.getBars()
+        }
+        return bars
+            .filter { !outdoorOnly || $0.outdoorSeating }
+            .filter { !barRepository.isBarAutoHidden($0) }
+    }
+
     /// Cheapest drink anywhere in range (ignoring drink filters), surfaced
     /// as the "best deal" hero at the top of Discover.
     private var bestDeal: (bar: Bar, summary: PriceSummary)? {
         var best: (bar: Bar, summary: PriceSummary)?
-        for result in nearbyBars {
-            for summary in barRepository.getPriceSummaries(for: result.bar) {
+        for bar in consideredBars {
+            for summary in barRepository.getPriceSummaries(for: bar) {
                 if best == nil || summary.convertedAmount < best!.summary.convertedAmount {
-                    best = (result.bar, summary)
+                    best = (bar, summary)
                 }
             }
         }
@@ -247,10 +261,10 @@ struct NearbyView: View {
         guard !interests.isEmpty else { return [] }
 
         var results: [(bar: Bar, summary: PriceSummary)] = []
-        for result in nearbyBars {
-            for summary in barRepository.getPriceSummaries(for: result.bar)
+        for bar in consideredBars {
+            for summary in barRepository.getPriceSummaries(for: bar)
             where interests.contains(summary.drink) {
-                results.append((result.bar, summary))
+                results.append((bar, summary))
             }
         }
         return results
