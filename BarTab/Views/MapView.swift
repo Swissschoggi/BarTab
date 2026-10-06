@@ -18,12 +18,12 @@ struct MapView: View {
 
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(
-            latitude: 47.3769,
-            longitude: 8.5417
+            latitude: 46.8182,
+            longitude: 8.2275
         ),
         span: MKCoordinateSpan(
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01
+            latitudeDelta: 3.0,
+            longitudeDelta: 3.0
         )
     )
 
@@ -110,6 +110,10 @@ struct MapView: View {
                 .accessibilityLabel("Center on my location")
             }
             .padding()
+
+            locationBanner
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .padding(.top, 8)
         }
         .onAppear {
             locationService.requestPermission()
@@ -226,32 +230,94 @@ struct MapView: View {
             HapticEngine.lightTap()
             selectedBar = bar
         } label: {
-            VStack(spacing: 2) {
+            VStack(spacing: 3) {
 
-                if let level = barRepository.priceLevel(for: bar) {
-                    Text(level)
-                        .font(.system(size: 8, weight: .bold))
+                if let price = cheapestPrice(for: bar) {
+                    Text("\(Currency.defaultCurrency.symbol) \(price.formattedAmount)")
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.white)
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 1)
-                        .background(Color.barTabAccent)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(Color.barTabPrimary)
                         .clipShape(Capsule())
+                        .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
                 }
 
                 Image(systemName: "wineglass.fill")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundColor(.white)
-                    .frame(width: 32, height: 32)
+                    .frame(width: 42, height: 42)
                     .background(Color.barTabPrimary)
                     .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous)
+                            .stroke(Color.white.opacity(0.9), lineWidth: 1.5)
+                    )
 
                 Image(systemName: "triangle.fill")
-                    .font(.system(size: 6))
+                    .font(.system(size: 9))
                     .foregroundColor(.barTabPrimary)
                     .rotationEffect(.degrees(180))
             }
         }
         .accessibilityLabel("\(bar.name), \(bar.address)")
+    }
+
+    private func cheapestPrice(for bar: Bar) -> Decimal? {
+        barRepository.getPriceSummaries(for: bar)
+            .min { NSDecimalNumber(decimal: $0.convertedAmount).doubleValue
+                < NSDecimalNumber(decimal: $1.convertedAmount).doubleValue
+            }?
+            .convertedAmount
+    }
+
+    // MARK: - Location banner
+
+    private var locationBanner: some View {
+        let status = locationService.authorizationStatus
+
+        return HStack(spacing: 10) {
+            if status == .denied || status == .restricted {
+                Image(systemName: "location.slash.fill")
+                    .font(.barTabCaption)
+                    .foregroundColor(.barTabWarning)
+
+                Text(String(localized: "Location access is off"))
+                    .font(.barTabBodySemibold)
+                    .foregroundColor(.barTabText)
+
+                Spacer(minLength: 8)
+
+                Button {
+                    UIApplication.shared.open(
+                        URL(string: UIApplication.openSettingsURLString)!
+                    )
+                } label: {
+                    Text(String(localized: "Enable"))
+                        .font(.barTabCaption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.barTabPrimary)
+                        .clipShape(Capsule())
+                }
+            } else if locationService.location == nil {
+                ProgressView()
+                    .controlSize(.small)
+
+                Text(String(localized: "Locating you…"))
+                    .font(.barTabBodySemibold)
+                    .foregroundColor(.barTabText)
+
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(.regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+        .padding(.horizontal, 12)
     }
 
     private func friendAnnotation(_ friend: LiveLocation) -> some View {

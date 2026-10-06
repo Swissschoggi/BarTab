@@ -48,6 +48,7 @@ struct NearbyView: View {
     @State private var searchText = ""
     @State private var selectedDrinks: Set<Drink> = [.beer]
     @State private var selectedSizes: Set<DrinkSize> = [.fiveDeciliters]
+    @State private var hasSeededDrinks = false
     @State private var selectedBrand: String?
     @State private var selectedAmbience: Set<AmbienceStyle> = []
     @State private var outdoorOnly = false
@@ -225,6 +226,39 @@ struct NearbyView: View {
         priceResults.min { comparisonValue($0.summary) < comparisonValue($1.summary) }?.summary.id
     }
 
+    /// Cheapest drink anywhere in range (ignoring drink filters), surfaced
+    /// as the "best deal" hero at the top of Discover.
+    private var bestDeal: (bar: Bar, summary: PriceSummary)? {
+        var best: (bar: Bar, summary: PriceSummary)?
+        for result in nearbyBars {
+            for summary in barRepository.getPriceSummaries(for: result.bar) {
+                if best == nil || summary.convertedAmount < best!.summary.convertedAmount {
+                    best = (result.bar, summary)
+                }
+            }
+        }
+        return best
+    }
+
+    /// Drink deals near you that match the interests picked in onboarding,
+    /// cheapest first — the basis of the "For you" carousel.
+    private var forYouResults: [(bar: Bar, summary: PriceSummary)] {
+        let interests = userSession.drinkInterests
+        guard !interests.isEmpty else { return [] }
+
+        var results: [(bar: Bar, summary: PriceSummary)] = []
+        for result in nearbyBars {
+            for summary in barRepository.getPriceSummaries(for: result.bar)
+            where interests.contains(summary.drink) {
+                results.append((result.bar, summary))
+            }
+        }
+        return results
+            .sorted { comparisonValue($0.summary) < comparisonValue($1.summary) }
+            .prefix(8)
+            .map { $0 }
+    }
+
     /// Comparison value for "cheapest"/"best deal": the raw price in the
     /// default currency, so results reflect what you'd actually pay.
     private func comparisonValue(_ summary: PriceSummary) -> Double {
@@ -250,6 +284,14 @@ struct NearbyView: View {
                     trailingValue: formattedRadius
                 ) {
                     showingLocationSheet = true
+                }
+
+                if let deal = bestDeal {
+                    bestDealCard(deal)
+                }
+
+                if !forYouResults.isEmpty {
+                    forYouSection
                 }
 
                     // Segment control
@@ -281,6 +323,10 @@ struct NearbyView: View {
             .toolbar(.hidden, for: .navigationBar)
             .onAppear {
                 locationService.requestPermission()
+                seedDrinksFromInterests(userSession.drinkInterests)
+            }
+            .onChange(of: userSession.drinkInterests) { interests in
+                seedDrinksFromInterests(interests)
             }
             .sheet(isPresented: $showingLocationSearch) {
                 LocationSearchSheet { name, coordinate in
@@ -570,6 +616,161 @@ struct NearbyView: View {
         return barRepository.getPrices(for: bar).contains {
             interests.contains($0.drink)
         }
+    }
+
+    /// Seeds the "Drinks" filter from the interests chosen during onboarding,
+    /// so Discover defaults to the drinks the user actually drinks.
+    private func seedDrinksFromInterests(_ interests: Set<Drink>) {
+        guard !hasSeededDrinks else { return }
+        let valid = interests.filter { $0 != .other }
+        guard !valid.isEmpty else { return }
+        selectedDrinks = valid
+        hasSeededDrinks = true
+    }
+
+    /// Whether a price summary matches the user's drink interests.
+    private func isForYou(_ summary: PriceSummary) -> Bool {
+        userSession.drinkInterests.contains(summary.drink)
+    }
+
+    // MARK: - Best deal hero
+
+    private func bestDealCard(_ deal: (bar: Bar, summary: PriceSummary)) -> some View {
+        NavigationLink(
+            destination: BarView(bar: deal.bar)
+                .environmentObject(barRepository)
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
+        ) {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous)
+                        .fill(Color.white.opacity(0.15))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: "sparkles")
+                        .font(.barTabHeading)
+                        .foregroundColor(.white)
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(String(localized: "Best deal near you"))
+                        .font(.barTabTiny)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white.opacity(0.85))
+
+                    Text(deal.bar.name)
+                        .font(.barTabBodySemibold)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+
+                    Text("\(deal.summary.drink.displayName) \u{00B7} \(deal.summary.size.displayName)")
+                        .font(.barTabSmall)
+                        .foregroundColor(.white.opacity(0.85))
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 8)
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("\(Currency.defaultCurrency.symbol) \(deal.summary.convertedAmount.formattedAmount)")
+                        .font(.barTabStat)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+
+                    Image(systemName: "chevron.right")
+                        .font(.barTabTiny)
+                        .foregroundColor(.white.opacity(0.85))
+                }
+            }
+            .padding(BarTabSpacing.md)
+            .background(
+                LinearGradient(
+                    colors: [Color.barTabPrimary, Color.barTabPrimary.opacity(0.85)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+            .shadow(color: Color.barTabPrimary.opacity(0.25), radius: 8, y: 4)
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - For you
+
+    private var forYouSection: some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+            HStack(spacing: 6) {
+                Image(systemName: "sparkles")
+                    .font(.barTabHeading)
+                    .foregroundColor(.barTabPrimary)
+
+                Text(String(localized: "For you"))
+                    .font(.barTabHeading)
+                    .foregroundColor(.barTabText)
+
+                Spacer()
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: BarTabSpacing.sm) {
+                    ForEach(forYouResults, id: \.summary.id) { result in
+                        forYouCard(result)
+                    }
+                }
+            }
+        }
+    }
+
+    private func forYouCard(_ result: (bar: Bar, summary: PriceSummary)) -> some View {
+        NavigationLink(
+            destination: BarView(bar: result.bar)
+                .environmentObject(barRepository)
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
+        ) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    Image(systemName: result.summary.drink.icon)
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabPrimary)
+
+                    Text(result.summary.drink.displayName)
+                        .font(.barTabBodySemibold)
+                        .foregroundColor(.barTabText)
+
+                    Text("\u{00B7}")
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabSecondary)
+
+                    Text(result.summary.size.displayName)
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabSecondary)
+                }
+                .lineLimit(1)
+
+                Text(result.bar.name)
+                    .font(.barTabSmall)
+                    .foregroundColor(.barTabSecondary)
+                    .lineLimit(1)
+
+                Text("\(Currency.defaultCurrency.symbol) \(result.summary.convertedAmount.formattedAmount)")
+                    .font(.barTabStat)
+                    .foregroundColor(.barTabPrimary)
+            }
+            .padding(BarTabSpacing.md)
+            .frame(width: 150, height: 116, alignment: .topLeading)
+            .background(
+                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                    .fill(Color.barTabCardFill)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Price filters
@@ -929,6 +1130,17 @@ struct NearbyView: View {
             Spacer(minLength: BarTabSpacing.xs)
 
             VStack(alignment: .trailing, spacing: 4) {
+                if isForYou(summary) {
+                    Text(String(localized: "For you"))
+                        .font(.barTabTiny)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.barTabPrimary)
+                        .clipShape(Capsule())
+                }
+
                 if isBestDeal {
                     Text(String(localized: "Best deal"))
                         .font(.barTabTiny)

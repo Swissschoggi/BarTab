@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// A lightweight toast message shown at the top of the screen  
 /// a friendlier replacement for raw system alerts.
@@ -257,11 +258,13 @@ private struct ToastOverlay: View {
     }
 }
 
-struct BarTabToastModifier: ViewModifier {
-    @ObservedObject var toastCenter: ToastCenter
+/// Renders the toast inside the dedicated `ToastWindowController` window.
+private struct ToastHostView: View {
 
-    func body(content: Content) -> some View {
-        content.overlay(alignment: .top) {
+    @EnvironmentObject private var toastCenter: ToastCenter
+
+    var body: some View {
+        VStack(spacing: 0) {
             if let toast = toastCenter.currentToast {
                 ToastOverlay(toast: toast)
                     .environmentObject(toastCenter)
@@ -270,11 +273,58 @@ struct BarTabToastModifier: ViewModifier {
                         .move(edge: .top)
                             .combined(with: .opacity)
                     )
-                    .onTapGesture {
-                        toastCenter.clear()
-                    }
-                    .zIndex(999)
             }
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .animation(
+            .spring(response: 0.35, dampingFraction: 0.8),
+            value: toastCenter.currentToast
+        )
+    }
+}
+
+/// Hosts the toast in its own transparent `UIWindow` raised above sheets,
+/// so toasts stay visible while any modal is presented.
+@MainActor
+final class ToastWindowController {
+
+    static let shared = ToastWindowController()
+
+    private var window: UIWindow?
+
+    private init() {}
+
+    func show(center: ToastCenter) {
+        guard window == nil else { return }
+
+        let host = UIHostingController(
+            rootView: ToastHostView().environmentObject(center)
+        )
+        host.view.backgroundColor = .clear
+        host.view.isOpaque = false
+
+        let scene = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first
+
+        let window = scene.map { UIWindow(windowScene: $0) }
+            ?? UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = host
+        window.windowLevel = .alert + 1
+        window.backgroundColor = .clear
+        window.isUserInteractionEnabled = false
+        window.isHidden = false
+        self.window = window
+    }
+}
+
+struct BarTabToastModifier: ViewModifier {
+    @ObservedObject var toastCenter: ToastCenter
+
+    func body(content: Content) -> some View {
+        content.onAppear {
+            ToastWindowController.shared.show(center: toastCenter)
         }
     }
 }
