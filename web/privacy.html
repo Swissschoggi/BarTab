@@ -6,6 +6,7 @@
   <title>Privacy Policy &mdash; BarTab</title>
   <meta name="description" content="How BarTab collects, uses, and protects your data. Prices people report, not personal data we sell." />
   <meta name="theme-color" content="#1A1613" />
+  <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://bartap.info/privacy.html" />
 
   <meta property="og:type" content="website" />
@@ -13,11 +14,14 @@
   <meta property="og:title" content="Privacy Policy &mdash; BarTab" />
   <meta property="og:description" content="How BarTab collects, uses, and protects your data. Prices people report, not personal data we sell." />
   <meta property="og:url" content="https://bartap.info/privacy.html" />
-  <meta property="og:image" content="https://bartap.info/og.png" />
+  <meta property="og:image" content="https://bartap.info/og-privacy.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Privacy Policy &mdash; BarTab" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Privacy Policy &mdash; BarTab" />
   <meta name="twitter:description" content="How BarTab collects, uses, and protects your data." />
-  <meta name="twitter:image" content="https://bartap.info/og.png" />
+  <meta name="twitter:image" content="https://bartap.info/og-privacy.png" />
 
   <link rel="icon" href="favicon.ico" sizes="48x48" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
@@ -26,95 +30,143 @@
 </head>
 <body>
 
-  <div class="container">
-    <nav>
-      <div class="logo">
-        <a href="/">
-          <img src="logo.png" alt="BarTab Logo" class="mark-img" width="32" height="32" />
-          BarTab
-        </a>
-      </div>
-      <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="terms.html">Terms</a>
-      </div>
-    </nav>
+  <div class="nav-wrap">
+    <div class="container">
+      <nav aria-label="Main">
+        <div class="logo">
+          <a href="/">
+            <img src="logo.png" alt="" class="mark-img" width="28" height="28" />
+            BarTab
+          </a>
+        </div>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="nav-links" id="nav-links">
+          <a href="/">Home</a>
+          <a href="privacy.html" aria-current="page">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a class="nav-cta" href="/#join">Get notified</a>
+        </div>
+      </nav>
+    </div>
   </div>
 
-  <main class="container legal-content">
+  <main class="container legal-wrap" id="main">
     <div class="legal-header">
       <h1>Privacy Policy</h1>
       <p class="last-updated">Last updated: 23 September 2026</p>
     </div>
 
-    <section class="legal-card">
+    <aside class="toc" aria-label="On this page"></aside>
+
+    <div class="legal-body">
+    <section class="legal-sec lead" id="s1">
       <h2>1. The short version</h2>
       <p>BarTab runs on prices people report, not on personal data we sell. We collect what we need to run your account, show you nearby bars, and keep the price map trustworthy and not much beyond that. The sections below spell out exactly what that means.</p>
     </section>
 
-    <section class="legal-card">
+    <section class="legal-sec" id="s2">
       <h2>2. Information we collect</h2>
       <ul>
-        <li><strong>Account information:</strong> your email address and authentication credentials, handled through Supabase. We don't ask for your real name, and your profile can use a handle instead.</li>
+        <li><strong>Account information:</strong> your email address and authentication credentials, handled through Supabase. We don’t ask for your real name, and your profile can use a handle instead.</li>
         <li><strong>Waitlist signups:</strong> if you join the waitlist on our website, we store the email address you give us so we can let you know when BarTab is available where you are. You can ask us to remove it at any time.</li>
-        <li><strong>Location data:</strong> with your permission, we use precise location to show nearby venues and to verify you were reasonably close to a bar when you submit a price. We don't keep a running history of everywhere you've been &mdash; a submission stores the bar it was tied to, not a trail of your movements.</li>
-        <li><strong>User submissions:</strong> prices, "still accurate?" confirmations, venue reports, and any group or poll content you create.</li>
-        <li><strong>Device and usage information:</strong> basic technical data (app version, crash logs, coarse device type) that helps us fix bugs. We don't use this to build an advertising profile.</li>
+        <li><strong>Location data:</strong> with your permission, we use precise location to show nearby venues and to verify you were reasonably close to a bar when you submit a price. We don’t keep a running history of everywhere you’ve been &mdash; a submission stores the bar it was tied to, not a trail of your movements.</li>
+        <li><strong>User submissions:</strong> prices, “still accurate?” confirmations, venue reports, and any group or poll content you create.</li>
+        <li><strong>Device and usage information:</strong> basic technical data (app version, crash logs, coarse device type) that helps us fix bugs. We don’t use this to build an advertising profile.</li>
       </ul>
     </section>
 
-    <section class="legal-card">
+    <section class="legal-sec" id="s3">
       <h2>3. How we use your data</h2>
-      <p>Your data is processed to run the app: authenticating you, displaying and verifying crowdsourced prices, powering follows, groups and price alerts, and keeping the platform working as intended. We don't sell personal data, and we don't run ads inside BarTab.</p>
+      <p>Your data is processed to run the app: authenticating you, displaying and verifying crowdsourced prices, powering follows, groups and price alerts, and keeping the platform working as intended. We don’t sell personal data, and we don’t run ads inside BarTab.</p>
     </section>
 
-    <section class="legal-card">
+    <section class="legal-sec" id="s4">
       <h2>4. Data storage and third parties</h2>
       <ul>
         <li><strong>Supabase:</strong> handles authentication and database storage, protected by Row-Level Security policies that scope what any given request can read or write.</li>
-        <li><strong>Apple Maps (MapKit):</strong> powers the in-app map. Map requests don't carry your account identifiers.</li>
+        <li><strong>Apple Maps (MapKit):</strong> powers the in-app map. Map requests don’t carry your account identifiers.</li>
         <li><strong>Cloudflare:</strong> runs the Turnstile challenge on our website to block automated signups.</li>
         <li><strong>Brevo:</strong> sends the transactional email that confirms a waitlist signup.</li>
       </ul>
-      <p>We don't sell data to advertisers or data brokers, and we vet any processor before working with them.</p>
+      <p>We don’t sell data to advertisers or data brokers, and we vet any processor before working with them.</p>
     </section>
 
-    <section class="legal-card">
+    <section class="legal-sec" id="s5">
       <h2>5. How long we keep data</h2>
-      <p>Price reports and venue data stay on the platform indefinitely, since the whole point is a running history the community can check against. They aren't tied to your identity once your account is deleted. Account information is deleted when you close your account, aside from what we're legally required to retain.</p>
+      <p>Price reports and venue data stay on the platform indefinitely, since the whole point is a running history the community can check against. They aren’t tied to your identity once your account is deleted. Account information is deleted when you close your account, aside from what we’re legally required to retain.</p>
     </section>
 
-    <section class="legal-card">
+    <section class="legal-sec" id="s6">
       <h2>6. Your rights (GDPR &amp; Swiss FADP)</h2>
-      <p>You can inspect, export, correct, or permanently delete your account and associated personal data at any time, either from account settings in the app or by contacting us directly. If you're in the EU or Switzerland, you also have the right to lodge a complaint with your local data protection authority.</p>
+      <p>You can inspect, export, correct, or permanently delete your account and associated personal data at any time, either from account settings in the app or by contacting us directly. If you’re in the EU or Switzerland, you also have the right to lodge a complaint with your local data protection authority.</p>
     </section>
 
-    <section class="legal-card">
-      <h2>7. Children's privacy</h2>
-      <p>BarTab deals with alcohol pricing and isn't intended for anyone under the legal drinking age in their country. We don't knowingly collect data from minors, and we'll delete any account we learn belongs to one.</p>
+    <section class="legal-sec" id="s7">
+      <h2>7. Children’s privacy</h2>
+      <p>BarTab deals with alcohol pricing and isn’t intended for anyone under the legal drinking age in their country. We don’t knowingly collect data from minors, and we’ll delete any account we learn belongs to one.</p>
     </section>
 
-    <section class="legal-card">
+    <section class="legal-sec" id="s8">
       <h2>8. Changes to this policy</h2>
-      <p>If we make a material change to how we handle your data, we'll update the date at the top of this page and, where the change is significant, let you know in the app before it takes effect.</p>
+      <p>If we make a material change to how we handle your data, we’ll update the date at the top of this page and, where the change is significant, let you know in the app before it takes effect.</p>
     </section>
 
-    <section class="legal-card">
+    <section class="legal-sec" id="s9">
       <h2>9. Contact</h2>
       <p>For privacy questions or data requests, reach us at <a href="mailto:support@bartap.info">support@bartap.info</a>.</p>
     </section>
+    </div>
   </main>
 
   <footer>
     <div class="container">
-      <div class="links">
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
-        <a href="mailto:support@bartap.info">Contact</a>
+      <div class="row">
+        <div class="links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="mailto:support@bartap.info">Contact</a>
+        </div>
+        <div>© 2026 BarTab. All rights reserved.</div>
       </div>
-      <div>© 2026 BarTab. All rights reserved.</div>
+      <span class="wordmark" aria-hidden="true">BarTab</span>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var toggle = document.getElementById('nav-toggle'), links = document.getElementById('nav-links');
+      if (toggle && links) {
+        toggle.addEventListener('click', function () {
+          var open = links.classList.toggle('open');
+          toggle.setAttribute('aria-expanded', String(open));
+        });
+      }
+      // Build the table of contents from the section headings
+      var secs = document.querySelectorAll('.legal-sec'), toc = document.querySelector('.toc');
+      if (!secs.length || !toc) return;
+      var ol = document.createElement('ol'), map = {};
+      secs.forEach(function (s) {
+        var li = document.createElement('li'), a = document.createElement('a');
+        a.href = '#' + s.id; a.textContent = s.querySelector('h2').textContent;
+        li.appendChild(a); ol.appendChild(li); map[s.id] = a;
+      });
+      var label = document.createElement('p'); label.textContent = 'On this page';
+      toc.appendChild(label); toc.appendChild(ol);
+      map[secs[0].id].classList.add('active');
+      if (!('IntersectionObserver' in window)) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            Object.keys(map).forEach(function (k) { map[k].classList.remove('active'); });
+            map[e.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-96px 0px -65% 0px' });
+      secs.forEach(function (s) { io.observe(s); });
+    })();
+  </script>
 
 </body>
 </html>
