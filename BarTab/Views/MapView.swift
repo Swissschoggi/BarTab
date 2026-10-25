@@ -128,7 +128,7 @@ struct MapView: View {
             }
         }
         .sheet(item: $selectedBar) { bar in
-            NavigationView {
+            NavigationStack {
                 BarView(bar: bar, allowsDismissal: true)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)
@@ -139,7 +139,7 @@ struct MapView: View {
             .presentationDragIndicator(.visible)
         }
         .sheet(item: $selectedFriend) { friend in
-            NavigationView {
+            NavigationStack {
                 FriendLocationView(friend: friend)
                     .environmentObject(userSession)
                     .environmentObject(barRepository)

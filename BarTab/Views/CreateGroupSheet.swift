@@ -11,7 +11,7 @@ struct CreateGroupSheet: View {
     @State private var isSaving = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     TextField(String(localized: "Group name"), text: $groupName)

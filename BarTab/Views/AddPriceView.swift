@@ -69,7 +69,7 @@ struct AddPriceView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
                     
@@ -241,6 +241,7 @@ struct AddPriceView: View {
                 .padding(.vertical, BarTabSpacing.md)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle(editingPrice != nil ? "Edit Price" : "New Price")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -44,7 +44,7 @@ struct PlanNightOutSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 

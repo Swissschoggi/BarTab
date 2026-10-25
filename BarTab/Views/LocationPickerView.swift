@@ -22,7 +22,7 @@ struct LocationPickerView: View {
 
     var body: some View {
 
-        NavigationView {
+        NavigationStack {
 
             ZStack {
 

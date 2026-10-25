@@ -67,7 +67,7 @@ struct ProfileView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
 
             ScrollView {
 
@@ -808,7 +808,7 @@ struct HereNowView: View {
             await load()
         }
         .sheet(item: $selectedBar) { bar in
-            NavigationView {
+            NavigationStack {
                 BarView(bar: bar, allowsDismissal: true)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)

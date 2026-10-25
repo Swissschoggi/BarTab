@@ -70,7 +70,7 @@ struct ActivityFeedView: View {
             await loadFeed()
         }
         .sheet(item: $selectedBar) { bar in
-            NavigationView {
+            NavigationStack {
                 BarView(bar: bar, allowsDismissal: true)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)

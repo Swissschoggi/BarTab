@@ -27,7 +27,7 @@ struct AddBarView: View {
     @State private var outdoorSeating = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
 
 
@@ -213,6 +213,7 @@ struct AddBarView: View {
                 Color.barTabBackground
                     .ignoresSafeArea()
             )
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle(String(localized: "Add a Bar"))
             .navigationBarTitleDisplayMode(.inline)
 

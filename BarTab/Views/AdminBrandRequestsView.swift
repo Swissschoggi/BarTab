@@ -183,7 +183,7 @@ struct AdminBrandRequestsView: View {
 
 struct AdminBrandRequestsView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
+        NavigationStack {
             AdminBrandRequestsView()
                 .environmentObject(BarRepository())
                 .environmentObject(UserSession())

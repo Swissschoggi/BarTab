@@ -282,7 +282,7 @@ struct NearbyView: View {
     // MARK: - Body
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
             VStack(alignment: .leading, spacing: BarTabSpacing.md) {
 
@@ -331,6 +331,7 @@ struct NearbyView: View {
                 .padding(.bottom, 30)
             }
             .background(Color.barTabBackground.ignoresSafeArea())
+            .scrollDismissesKeyboard(.immediately)
             .refreshable {
                 await refreshBars()
             }
@@ -370,7 +371,7 @@ struct NearbyView: View {
     // info bar — keeps the scroll content focused on results.
 
     private var locationSheet: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
@@ -1314,7 +1315,7 @@ private struct LocationSearchSheet: View {
     @StateObject private var searchService = PlaceSearchService()
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 HStack(spacing: BarTabSpacing.sm) {
                     Image(systemName: "magnifyingglass")

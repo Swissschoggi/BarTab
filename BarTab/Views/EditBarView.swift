@@ -26,7 +26,7 @@ struct EditBarView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section(header: Text(String(localized: "Bar name"))) {
                     TextField(String(localized: "Bar name"), text: $name)

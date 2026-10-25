@@ -48,9 +48,16 @@ struct LoginView: View {
 
     @State private var oauthPresenter = OAuthPresentationAnchorProvider()
 
+    private enum Field: Hashable {
+        case email
+        case password
+        case confirmPassword
+    }
+
+    @FocusState private var focusedField: Field?
     var body: some View {
 
-        NavigationView {
+        NavigationStack {
 
             ScrollView {
 
@@ -161,7 +168,9 @@ struct LoginView: View {
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .textFieldStyle(BarTabFieldStyle())
-                        }
+                            .focused($focusedField, equals: .email)
+                            .submitLabel(.next)
+                            .onSubmit { focusedField = .password }                        }
 
                         VStack(
                             alignment: .leading,
@@ -182,6 +191,15 @@ struct LoginView: View {
                                     )
                                     .textInputAutocapitalization(.never)
                                     .autocorrectionDisabled()
+                                    .focused($focusedField, equals: .password)
+                                    .submitLabel(mode == .createAccount ? .next : .done)
+                                    .onSubmit {
+                                        if mode == .createAccount {
+                                            focusedField = .confirmPassword
+                                        } else {
+                                            focusedField = nil
+                                        }
+                                    }
                                 } else {
                                     SecureField(
                                         mode == .createAccount
@@ -189,6 +207,15 @@ struct LoginView: View {
                                         : String(localized: "Your password"),
                                         text: $password
                                     )
+                                    .focused($focusedField, equals: .password)
+                                    .submitLabel(mode == .createAccount ? .next : .done)
+                                    .onSubmit {
+                                        if mode == .createAccount {
+                                            focusedField = .confirmPassword
+                                        } else {
+                                            focusedField = nil
+                                        }
+                                    }
                                 }
 
                                 Button {
@@ -235,11 +262,17 @@ struct LoginView: View {
                                         )
                                         .textInputAutocapitalization(.never)
                                         .autocorrectionDisabled()
+                                        .focused($focusedField, equals: .confirmPassword)
+                                        .submitLabel(.done)
+                                        .onSubmit { focusedField = nil }
                                     } else {
                                         SecureField(
                                             String(localized: "Repeat your password"),
                                             text: $confirmPassword
                                         )
+                                        .focused($focusedField, equals: .confirmPassword)
+                                        .submitLabel(.done)
+                                        .onSubmit { focusedField = nil }
                                     }
 
                                     Button {
@@ -309,6 +342,7 @@ struct LoginView: View {
                 .padding(24)
             }
             .background(Color.barTabBackground)
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle(String(localized: "Sign In"))
             .navigationBarTitleDisplayMode(.inline)
         }

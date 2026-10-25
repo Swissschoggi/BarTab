@@ -29,7 +29,7 @@ struct SettingsView: View {
     ]
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
@@ -603,7 +603,7 @@ private struct TipJarSheet: View {
     private let tips: [Int] = [300, 500, 1000]
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: BarTabSpacing.lg) {
                 Spacer()
 
@@ -759,7 +759,7 @@ private struct EditUsernameSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     HStack(spacing: BarTabSpacing.sm) {
@@ -900,7 +900,7 @@ private struct ChangePasswordSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
@@ -1019,7 +1019,7 @@ private struct DeleteAccountSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 22) {
 
                 ZStack {

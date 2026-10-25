@@ -286,7 +286,7 @@ struct MyContributionsView_Previews: PreviewProvider {
 
     static var previews: some View {
 
-        NavigationView {
+        NavigationStack {
 
             MyContributionsView()
                 .environmentObject(

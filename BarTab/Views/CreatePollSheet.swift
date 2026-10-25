@@ -37,7 +37,7 @@ struct CreatePollSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
@@ -110,7 +110,7 @@ struct CreatePollSheet: View {
                 }
             }
             .sheet(isPresented: $showingBarPicker) {
-                NavigationView {
+                NavigationStack {
                     List {
                         TextField(String(localized: "Search bars..."), text: $barSearchQuery)
                             .textInputAutocapitalization(.never)

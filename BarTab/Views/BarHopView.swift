@@ -42,7 +42,7 @@ struct BarHopView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
                     locationSection
@@ -313,7 +313,7 @@ struct CrawlRouteView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             CrawlMapRepresentable(stops: stops)
                 .ignoresSafeArea()
                 .navigationTitle(String(localized: "Your Crawl"))

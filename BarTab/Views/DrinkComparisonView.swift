@@ -94,7 +94,7 @@ struct DrinkComparisonView: View {
         .navigationTitle(String(localized: "Compare Prices"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedBar) { bar in
-            NavigationView {
+            NavigationStack {
                 BarView(bar: bar, allowsDismissal: true)
                     .environmentObject(barRepository)
                     .environmentObject(userSession)

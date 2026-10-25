@@ -105,7 +105,7 @@ struct MainTabView: View {
                     NearbyView()
 
                 case .groups:
-                    NavigationView {
+                    NavigationStack {
                         GroupPlanningView()
                     }
 
@@ -343,7 +343,7 @@ private struct DeepLinkBarView: View {
     @State private var didTryFetch = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             if let bar = barRepository.getBar(id: barID) {
                 BarView(bar: bar, allowsDismissal: true)
                     .environmentObject(barRepository)
@@ -403,7 +403,7 @@ private struct DeepLinkGroupView: View {
     @State private var didTryFetch = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             if let group {
                 GroupDetailView(group: group)
                     .environmentObject(barRepository)

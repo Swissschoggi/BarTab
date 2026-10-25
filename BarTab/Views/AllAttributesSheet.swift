@@ -12,7 +12,7 @@ struct AllAttributesSheet: View {
     var body: some View {
         let attributes = barRepository.allAttributeConsensus(for: bar, currentUser: currentUser)
 
-        NavigationView {
+        NavigationStack {
             List {
                 if attributes.isEmpty {
                     VStack(spacing: BarTabSpacing.md) {

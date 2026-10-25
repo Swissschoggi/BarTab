@@ -16,7 +16,7 @@ struct SetAlertSheet: View {
     @State private var isSaving = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     HStack {

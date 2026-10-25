@@ -83,6 +83,7 @@ struct ForgotPasswordView: View {
             .padding(.vertical, 24)
         }
         .background(Color.barTabBackground.ignoresSafeArea())
+        .scrollDismissesKeyboard(.immediately)
         .navigationTitle(String(localized: "Reset Password"))
         .navigationBarTitleDisplayMode(.inline)
     }

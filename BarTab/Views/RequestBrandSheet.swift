@@ -33,7 +33,7 @@ struct RequestBrandSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
 
                 if didSubmit {

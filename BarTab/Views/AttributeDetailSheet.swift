@@ -38,7 +38,7 @@ struct AttributeDetailSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 VStack(spacing: BarTabSpacing.md) {
                     Image(systemName: attribute.key.icon)

@@ -17,7 +17,7 @@ struct RateBarSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(alignment: .leading, spacing: 28) {
 
                 VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
