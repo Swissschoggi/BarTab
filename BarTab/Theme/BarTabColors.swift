@@ -238,4 +238,20 @@ extension Color {
     static let barTabGradientStart = barTabPrimary
 
     static let barTabGradientEnd = barTabAccent
+
+    // MARK: - Semantic tokens (modern design-system aliases)
+    // Web/shadcn-style semantic names mapped onto the BarTab palette so
+    // components can be expressed in background/foreground/primary/muted/
+    // accent/border terms, matching the cross-platform design language.
+
+    static let background = barTabBackground
+    static let foreground = barTabText
+    static let primary = barTabPrimary
+    static let muted = barTabSecondary
+    static let accent = barTabAccent
+    static let border = barTabCardBorder
+    static let surface = barTabSurface
+    static let danger = barTabDanger
+    static let success = barTabSuccess
+    static let warning = barTabWarning
 }

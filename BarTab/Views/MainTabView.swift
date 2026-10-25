@@ -170,6 +170,7 @@ struct MainTabView: View {
                         tabLabel(tab: tab, isSelected: false)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityAddTraits(tab == selectedTab ? .isSelected : [])
                 }
             }
 

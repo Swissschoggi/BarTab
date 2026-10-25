@@ -85,11 +85,13 @@ struct BarTabScreenHeader: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.barTabDisplay)
+                .tracking(-0.4)
                 .foregroundColor(.barTabText)
 
             Text(subtitle)
                 .font(.barTabBody)
                 .foregroundColor(.barTabSecondary)
+                .lineSpacing(4)
         }
         .padding(.top, BarTabSpacing.xs)
     }
@@ -203,6 +205,7 @@ struct BarTabSectionHeader: View {
         HStack {
             Text(title)
                 .font(.barTabHeading)
+                .tracking(-0.2)
                 .foregroundColor(.barTabText)
 
             Spacer()
@@ -450,15 +453,18 @@ struct EmptyStateView: View {
             Image(systemName: icon)
                 .font(.barTabEmptyIcon)
                 .foregroundColor(.barTabPrimary.opacity(0.5))
+                .accessibilityHidden(true)
 
             Text(title)
                 .font(.barTabBodySemibold)
+                .tracking(-0.2)
                 .foregroundColor(.barTabText)
 
             Text(message)
                 .font(.barTabCaption)
                 .foregroundColor(.barTabSecondary)
                 .multilineTextAlignment(.center)
+                .lineSpacing(3)
                 .padding(.horizontal, BarTabSpacing.lg)
         }
         .frame(maxWidth: .infinity)
