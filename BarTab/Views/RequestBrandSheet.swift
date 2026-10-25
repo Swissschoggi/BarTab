@@ -34,75 +34,89 @@ struct RequestBrandSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 20) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
-                if didSubmit {
+                    if didSubmit {
 
-                    VStack(spacing: BarTabSpacing.sm) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.barTabEmptyIcon)
-                            .foregroundColor(.barTabPrimary)
+                        VStack(spacing: BarTabSpacing.sm) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.barTabEmptyIcon)
+                                .foregroundColor(.barTabPrimary)
 
-                        Text(String(localized: "Request sent"))
-                            .font(.barTabHeading)
+                            Text(String(localized: "Request sent"))
+                                .font(.barTabHeading)
 
-                        Text(
-                            String(localized: "We'll review \"\(trimmedName)\" and add it if it's a good fit.")
+                            Text(
+                                String(localized: "We'll review \"\(trimmedName)\" and add it if it's a good fit.")
+                            )
+                            .font(.barTabBody)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, BarTabSpacing.lg)
+                        .barTabCard()
+
+                    } else {
+
+                        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                            Text(String(localized: "REQUESTING A \(drink.displayName.uppercased()) BRAND"))
+                                .font(.barTabCaption)
+                                .foregroundColor(.barTabSecondary)
+
+                            Text(String(localized: "Requesting a \(drink.displayName.lowercased()) brand"))
+                                .font(.barTabBody)
+                                .foregroundColor(.barTabSecondary)
+
+                            TextField(String(localized: "Brand name"), text: $name)
+                                .autocorrectionDisabled()
+                                .font(.barTabBody)
+                                .foregroundColor(.barTabText)
+                                .padding(.vertical, BarTabSpacing.xs)
+                        }
+                        .padding(BarTabSpacing.md)
+                        .background(Color.barTabCardFill)
+                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
                         )
-                        .font(.barTabBody)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
+
+                        if !trimmedName.isEmpty && trimmedName.count > InputValidator.maxBrandNameLength {
+                            Text(String(localized: "Name must be \(InputValidator.maxBrandNameLength) characters or fewer."))
+                                .font(.barTabSmall)
+                                .foregroundColor(.barTabWarning)
+                        } else if !trimmedName.isEmpty && alreadyExists {
+                            Text(String(localized: "That brand is already in the list."))
+                                .font(.barTabSmall)
+                                .foregroundColor(.barTabWarning)
+                        } else if !trimmedName.isEmpty && alreadyPending {
+                            Text(String(localized: "You've already requested this brand."))
+                                .font(.barTabSmall)
+                                .foregroundColor(.barTabWarning)
+                        }
+
+                        Button {
+                            submit()
+                        } label: {
+                            Text(String(localized: "Send request"))
+                        }
+                        .barTabPrimaryButton()
+                        .padding(.top, BarTabSpacing.xs)
+                        .disabled(
+                            trimmedName.isEmpty
+                            || trimmedName.count > InputValidator.maxBrandNameLength
+                            || alreadyExists
+                            || alreadyPending
+                        )
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 30)
-
-                } else {
-
-                    Text(String(localized: "Requesting a \(drink.displayName.lowercased()) brand"))
-                        .font(.barTabBody)
-                        .foregroundColor(.secondary)
-
-                    TextField(String(localized: "Brand name"), text: $name)
-                        .textFieldStyle(.roundedBorder)
-                        .autocorrectionDisabled()
-
-                    if !trimmedName.isEmpty && trimmedName.count > InputValidator.maxBrandNameLength {
-                        Text(String(localized: "Name must be \(InputValidator.maxBrandNameLength) characters or fewer."))
-                            .font(.barTabSmall)
-                            .foregroundColor(.barTabWarning)
-                    } else if !trimmedName.isEmpty && alreadyExists {
-                        Text(String(localized: "That brand is already in the list."))
-                            .font(.barTabSmall)
-                            .foregroundColor(.barTabWarning)
-                    } else if !trimmedName.isEmpty && alreadyPending {
-                        Text(String(localized: "You've already requested this brand."))
-                            .font(.barTabSmall)
-                            .foregroundColor(.barTabWarning)
-                    }
-
-                    Spacer()
-
-                    Button {
-                        submit()
-                    } label: {
-                        Text(String(localized: "Send request"))
-                            .font(.barTabHeading)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .barTabPrimaryButton()
-                    }
-                    .disabled(
-                        trimmedName.isEmpty
-                        || trimmedName.count > InputValidator.maxBrandNameLength
-                        || alreadyExists
-                        || alreadyPending
-                    )
                 }
+                .padding(.horizontal, BarTabSpacing.md)
+                .padding(.vertical, BarTabSpacing.md)
             }
-            .padding()
-            .background(
-                Color.barTabBackground.ignoresSafeArea()
-            )
+            .background(Color.barTabBackground.ignoresSafeArea())
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle(String(localized: "Request a brand"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -110,6 +124,7 @@ struct RequestBrandSheet: View {
                     Button(String(localized: "Cancel")) {
                         dismiss()
                     }
+                    .foregroundColor(.barTabPrimary)
                 }
             }
         }

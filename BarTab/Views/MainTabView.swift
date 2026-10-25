@@ -35,6 +35,7 @@ struct MainTabView: View {
 
     @State private var selectedTab: Tab = .map
     @State private var showingOnboarding = false
+    @State private var firstPriceBar: Bar? = nil
 
     // Swipeable tab bar state
     @State private var tabBarWidth: CGFloat = 0
@@ -139,6 +140,23 @@ struct MainTabView: View {
                 .environmentObject(userSession)
                 .environmentObject(locationService)
                 .environmentObject(toastCenter)
+                .environmentObject(barRepository)
+        }
+        .onChange(of: barRepository.bars) { _ in
+            guard firstPriceBar == nil else { return }
+            guard let idString = UserDefaults.standard.string(forKey: "pendingFirstPriceBarID"),
+                  let id = UUID(uuidString: idString),
+                  let bar = barRepository.getBar(id: id) else { return }
+            firstPriceBar = bar
+            UserDefaults.standard.removeObject(forKey: "pendingFirstPriceBarID")
+        }
+        .sheet(item: $firstPriceBar) { bar in
+            NavigationStack {
+                AddPriceView(bar: bar)
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+                    .environmentObject(toastCenter)
+            }
         }
         .sheet(item: $deepLinkRouter.destination) { destination in
             switch destination {

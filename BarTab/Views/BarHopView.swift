@@ -20,6 +20,9 @@ struct BarHopView: View {
     @State private var crawlOrigin: CLLocationCoordinate2D?
     @State private var originName: String = ""
 
+    /// Drink + size the cheapest route is optimised for.
+    @State private var selectedDrink: Drink = .beer
+    @State private var selectedSize: DrinkSize = .fiveDeciliters
     private var originLocation: CLLocation? {
         if let crawlOrigin {
             return CLLocation(latitude: crawlOrigin.latitude, longitude: crawlOrigin.longitude)
@@ -45,6 +48,7 @@ struct BarHopView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                    drinkSection
                     locationSection
 
                     if selectedRoute.isEmpty {
@@ -60,9 +64,8 @@ struct BarHopView: View {
             .onAppear {
                 locationService.requestPermission()
             }
-            .navigationTitle(String(localized: "Bar Hop"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
+            .navigationTitle(String(localized: "Cheapest Route"))
+            .navigationBarTitleDisplayMode(.inline)            .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "Done")) {
                         dismiss()
@@ -82,6 +85,91 @@ struct BarHopView: View {
         }
         .onChange(of: crawlOriginKey) { _ in
             generateRoute()
+        }
+        .onChange(of: selectedDrink) { _ in
+            if !availableSizes.contains(selectedSize) {
+                selectedSize = availableSizes.first ?? .fiveDeciliters
+            }
+            selectedRoute = []
+        }
+    }
+
+    // MARK: - Drink
+
+    private var drinkSection: some View {
+        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+            Text(String(localized: "CHEAPEST FOR"))
+                .font(.barTabCaption)
+                .foregroundColor(.barTabSecondary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: BarTabSpacing.xs) {
+                    ForEach(Drink.allCases.filter { $0 != .other }, id: \.self) { drink in
+                        Button {
+                            selectedDrink = drink
+                            selectedRoute = []
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: drink.icon)
+                                    .font(.barTabTiny)
+                                Text(drink.displayName)
+                                    .font(.barTabCaption)
+                            }
+                            .padding(.horizontal, BarTabSpacing.sm)
+                            .padding(.vertical, 8)
+                            .background(selectedDrink == drink ? Color.barTabPrimary : Color.barTabSurface)
+                            .foregroundColor(selectedDrink == drink ? .white : .barTabText)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule().stroke(selectedDrink == drink ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: BarTabSpacing.xs) {
+                    ForEach(availableSizes, id: \.self) { size in
+                        Button {
+                            selectedSize = size
+                            selectedRoute = []
+                        } label: {
+                            Text(size.displayName)
+                                .font(.barTabCaption)
+                                .padding(.horizontal, BarTabSpacing.sm)
+                                .padding(.vertical, 8)
+                                .background(selectedSize == size ? Color.barTabPrimary : Color.barTabSurface)
+                                .foregroundColor(selectedSize == size ? .white : .barTabText)
+                                .clipShape(Capsule())
+                                .overlay(
+                                    Capsule().stroke(selectedSize == size ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
+    private var availableSizes: [DrinkSize] {
+        switch selectedDrink {
+        case .beer:
+            return [.twentyCentiliters, .twentyFiveCentiliters, .thirtyThreeCentiliters, .fiveDeciliters, .bottle]
+        case .wine:
+            return [.oneDeciliter, .twoDeciliters, .threeDeciliters, .glass, .bottle]
+        case .cocktail:
+            return [.glass]
+        case .shot:
+            return [.shot]
+        case .softDrink:
+            return [.twentyCentiliters, .twentyFiveCentiliters, .thirtyThreeCentiliters, .fiftyCentiliters, .bottle]
+        case .coffee:
+            return [.oneDeciliter, .twoDeciliters, .threeDeciliters, .glass]
+        case .other:
+            return DrinkSize.allCases.filter { $0 != .other }
         }
     }
 
@@ -153,7 +241,7 @@ struct BarHopView: View {
                 .font(.barTabHeading)
                 .foregroundColor(.barTabText)
 
-            Text(String(localized: "BarTab will pick three bars within walking distance and draw the route."))
+            Text(String(localized: "BarTab will find the cheapest bars for your drink within walking distance and draw the route."))
                 .font(.barTabSmall)
                 .foregroundColor(.barTabSecondary)
                 .multilineTextAlignment(.center)
@@ -247,6 +335,13 @@ struct BarHopView: View {
                     .font(.barTabCaption)
                     .foregroundColor(.barTabSecondary)
                     .lineLimit(1)
+
+                if let price = cheapestPrice(for: bar) {
+                    Text("\(Currency.defaultCurrency.symbol)\(price.formattedAmount)")
+                        .font(.barTabCaption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.barTabPrimary)
+                }
             }
 
             Spacer()
@@ -266,12 +361,6 @@ struct BarHopView: View {
     }
 
     private func generateRoute() {
-        let allBars = barRepository.bars
-        guard allBars.count >= 3 else {
-            selectedRoute = allBars
-            return
-        }
-
         guard let userLocation = originLocation else {
             locationService.requestPermission()
             toastCenter.show(
@@ -281,24 +370,64 @@ struct BarHopView: View {
             return
         }
 
+        // Candidate bars that actually serve the chosen drink/size,
+        // ranked by price (cheapest first).
         let nearby = barRepository.nearbyBars(
             coordinate: userLocation.coordinate,
             radius: BarRepository.walkingCrawlRadius
         )
-        .sorted {
-            DistanceService.distance(from: userLocation, to: $0)
-                < DistanceService.distance(from: userLocation, to: $1)
+
+        var candidates: [(bar: Bar, price: Decimal)] = []
+        for bar in nearby {
+            guard !barRepository.isBarAutoHidden(bar) else { continue }
+            let summaries = barRepository.getPriceSummaries(for: bar)
+            if let summary = summaries.first(where: {
+                $0.drink == selectedDrink && $0.size == selectedSize
+            }) {
+                candidates.append((bar: bar, price: summary.convertedAmount))
+            }
         }
 
-        guard nearby.count >= 3 else {
+        candidates.sort { a, b in
+            if a.price != b.price { return a.price < b.price }
+            return DistanceService.distance(from: userLocation, to: a.bar)
+                < DistanceService.distance(from: userLocation, to: b.bar)
+        }
+
+        // Take the cheapest handful, then order them into a sensible
+        // walking order (nearest-neighbour) so the route isn't zig-zag.
+        let cheapest = Array(candidates.prefix(5))
+        guard cheapest.count >= 2 else {
             toastCenter.show(
-                String(localized: "Not enough bars within walking distance yet."),
+                String(localized: "Not enough bars nearby serve this drink yet."),
                 kind: .info
             )
             return
         }
 
-        selectedRoute = Array(nearby.prefix(10).shuffled().prefix(3))
+        var ordered: [Bar] = []
+        var remaining = cheapest.map(\.bar)
+        var current: CLLocation = userLocation
+        while !remaining.isEmpty {
+            let next = remaining.min { a, b in
+                DistanceService.distance(from: current, to: a)
+                    < DistanceService.distance(from: current, to: b)
+            }!
+            ordered.append(next)
+            remaining.removeAll { $0.id == next.id }
+            current = CLLocation(
+                latitude: next.coordinate.latitude,
+                longitude: next.coordinate.longitude
+            )
+        }
+
+        selectedRoute = Array(ordered.prefix(4))
+    }
+
+    private func cheapestPrice(for bar: Bar) -> Decimal? {
+        barRepository.getPriceSummaries(for: bar)
+            .first { $0.drink == selectedDrink && $0.size == selectedSize }?
+            .convertedAmount
     }
 }
 

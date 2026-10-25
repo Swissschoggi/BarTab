@@ -27,43 +27,92 @@ struct EditBarView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section(header: Text(String(localized: "Bar name"))) {
-                    TextField(String(localized: "Bar name"), text: $name)
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
 
-                Section(header: Text(String(localized: "Address"))) {
-                    TextField(String(localized: "Address"), text: $address)
-                }
+                    // Name card
+                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                        Text(String(localized: "BAR NAME"))
+                            .font(.barTabCaption)
+                            .foregroundColor(.barTabSecondary)
 
-                Section(header: Text(String(localized: "Details"))) {
-                    Toggle(isOn: $smokingFriendly) {
-                        Label(String(localized: "Smoking friendly"), systemImage: "smoke.fill")
+                        TextField(String(localized: "Bar name"), text: $name)
+                            .font(.barTabBody)
+                            .foregroundColor(.barTabText)
                     }
-                    .tint(.barTabPrimary)
+                    .padding(BarTabSpacing.md)
+                    .background(Color.barTabCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                    )
 
-                    Toggle(isOn: $outdoorSeating) {
-                        Label(String(localized: "Outdoor seating"), systemImage: "sun.max.fill")
+                    // Address card
+                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                        Text(String(localized: "ADDRESS"))
+                            .font(.barTabCaption)
+                            .foregroundColor(.barTabSecondary)
+
+                        TextField(String(localized: "Address"), text: $address)
+                            .font(.barTabBody)
+                            .foregroundColor(.barTabText)
                     }
-                    .tint(.barTabPrimary)
+                    .padding(BarTabSpacing.md)
+                    .background(Color.barTabCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                    )
+
+                    // Details card
+                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                        Text(String(localized: "DETAILS"))
+                            .font(.barTabCaption)
+                            .foregroundColor(.barTabSecondary)
+
+                        Toggle(isOn: $smokingFriendly) {
+                            Label(String(localized: "Smoking friendly"), systemImage: "smoke.fill")
+                        }
+                        .tint(.barTabPrimary)
+
+                        Toggle(isOn: $outdoorSeating) {
+                            Label(String(localized: "Outdoor seating"), systemImage: "sun.max.fill")
+                        }
+                        .tint(.barTabPrimary)
+                    }
+                    .padding(BarTabSpacing.md)
+                    .background(Color.barTabCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                    )
+
+                    Button {
+                        Task { await save() }
+                    } label: {
+                        Text(String(localized: "Save Bar"))
+                    }
+                    .barTabPrimaryButton()
+                    .padding(.top, BarTabSpacing.xs)
+                    .disabled(isSaving || !canSave)
+                    .opacity(canSave ? 1 : 0.5)
                 }
+                .padding(.horizontal, BarTabSpacing.md)
+                .padding(.vertical, BarTabSpacing.md)
             }
-            .scrollContentBackground(.hidden)
             .background(Color.barTabBackground.ignoresSafeArea())
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle(String(localized: "Edit Bar"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "Cancel")) {
                         dismiss()
                     }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(String(localized: "Save")) {
-                        Task { await save() }
-                    }
-                    .disabled(isSaving || !canSave)
-                    .opacity(canSave ? 1 : 0.5)
+                    .foregroundColor(.barTabPrimary)
                 }
             }
         }

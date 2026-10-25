@@ -8,12 +8,23 @@ struct OnboardingView: View {
     @EnvironmentObject private var userSession: UserSession
     @EnvironmentObject private var locationService: LocationService
     @EnvironmentObject private var toastCenter: ToastCenter
+    @EnvironmentObject private var barRepository: BarRepository
     @Environment(\.dismiss) private var dismiss
 
     @State private var page = 0
     @State private var selectedInterests: Set<Drink> = []
 
     private let pages = OnboardingPage.allCases
+
+    private var nearestBar: Bar? {
+        guard let location = locationService.location else { return nil }
+        return barRepository.bars
+            .filter { !barRepository.isBarAutoHidden($0) }
+            .min { a, b in
+                DistanceService.distance(from: location, to: a)
+                    < DistanceService.distance(from: location, to: b)
+            }
+    }
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -219,8 +230,44 @@ private enum OnboardingPage: CaseIterable {
                 title: title,
                 subtitle: subtitle
             ) {
-                OnboardingPrimaryButton(title: String(localized: "Start exploring")) {
-                    onDone()
+                VStack(spacing: BarTabSpacing.sm) {
+                    if let bar = nearestBar {
+                        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                            Text(String(localized: "Nearest bar to you"))
+                                .font(.barTabCaption)
+                                .foregroundColor(.barTabSecondary)
+                            Text(bar.name)
+                                .font(.barTabBodySemibold)
+                                .foregroundColor(.barTabText)
+                            Text(bar.address)
+                                .font(.barTabSmall)
+                                .foregroundColor(.barTabSecondary)
+                                .lineLimit(1)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(BarTabSpacing.md)
+                        .barTabCard()
+                    }
+
+                    OnboardingPrimaryButton(
+                        title: nearestBar != nil
+                            ? String(localized: "Add your first price")
+                            : String(localized: "Start exploring")
+                    ) {
+                        if let bar = nearestBar {
+                            UserDefaults.standard.set(
+                                bar.id.uuidString,
+                                forKey: "pendingFirstPriceBarID"
+                            )
+                        }
+                        onDone()
+                    }
+
+                    if nearestBar != nil {
+                        OnboardingSecondaryButton(title: String(localized: "Skip for now")) {
+                            onDone()
+                        }
+                    }
                 }
             }
         }

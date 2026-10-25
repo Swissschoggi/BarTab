@@ -12,29 +12,56 @@ struct CreateGroupSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    TextField(String(localized: "Group name"), text: $groupName)
-                        .textInputAutocapitalization(.words)
-                } header: {
-                    Text(String(localized: "Name your group"))
-                } footer: {
+            ScrollView {
+                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+
+                    // Name entry card
+                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                        Text(String(localized: "GROUP NAME"))
+                            .font(.barTabCaption)
+                            .foregroundColor(.barTabSecondary)
+
+                        TextField(String(localized: "Group name"), text: $groupName)
+                            .textInputAutocapitalization(.words)
+                            .font(.barTabBody)
+                            .foregroundColor(.barTabText)
+                            .padding(.vertical, BarTabSpacing.xs)
+                    }
+                    .padding(BarTabSpacing.md)
+                    .background(Color.barTabCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
+                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                    )
+
                     Text(String(localized: "Friends you invite can create polls and vote on where to go."))
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabSecondary)
+
+                    // Create action
+                    Button {
+                        Task { await createGroup() }
+                    } label: {
+                        Text(String(localized: "Create Group"))
+                    }
+                    .barTabPrimaryButton()
+                    .padding(.top, BarTabSpacing.xs)
+                    .disabled(groupName.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
                 }
+                .padding(.horizontal, BarTabSpacing.md)
+                .padding(.vertical, BarTabSpacing.md)
             }
+            .background(Color.barTabBackground.ignoresSafeArea())
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle(String(localized: "New Group"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "Cancel")) {
                         dismiss()
                     }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(String(localized: "Create")) {
-                        Task { await createGroup() }
-                    }
-                    .disabled(groupName.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
+                    .foregroundColor(.barTabPrimary)
                 }
             }
         }
