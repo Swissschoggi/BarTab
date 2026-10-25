@@ -142,7 +142,7 @@ struct MainTabView: View {
                 .environmentObject(toastCenter)
                 .environmentObject(barRepository)
         }
-        .onChange(of: barRepository.bars) { _ in
+        .onChange(of: barRepository.bars.map(\.id)) { _ in
             guard firstPriceBar == nil else { return }
             guard let idString = UserDefaults.standard.string(forKey: "pendingFirstPriceBarID"),
                   let id = UUID(uuidString: idString),
