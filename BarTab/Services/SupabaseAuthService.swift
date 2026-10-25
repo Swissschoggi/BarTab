@@ -535,8 +535,8 @@ final class SupabaseAuthService {
                 userID: userID
             )
 
-            let name = profile.display_name?.isEmpty == false
-                ? profile.display_name!
+            let name = (profile.display_name?.isEmpty == false)
+                ? (profile.display_name ?? fallbackUsername)
                 : fallbackUsername
 
             return ProfileInfo(

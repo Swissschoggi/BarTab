@@ -30,7 +30,19 @@ struct OnboardingView: View {
         ZStack(alignment: .topTrailing) {
             Color.barTabBackground.ignoresSafeArea()
 
-            TabView(selection: $page) {
+            VStack(spacing: 0) {
+                // Progress indicator
+                ProgressView(value: Double(page + 1), total: Double(pages.count))
+                    .tint(.barTabPrimary)
+                    .padding(.horizontal, BarTabSpacing.lg)
+                    .padding(.top, BarTabSpacing.sm)
+
+                Text(String(localized: "Step \(page + 1) of \(pages.count)"))
+                    .font(.barTabCaption)
+                    .foregroundColor(.barTabSecondary)
+                    .padding(.top, BarTabSpacing.xs)
+
+                TabView(selection: $page) {
                 ForEach(pages.indices, id: \.self) { index in
                     pages[index].view(
                         page: $page,
@@ -44,6 +56,7 @@ struct OnboardingView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
+            }
 
             if page < pages.count - 1 {
                 skipButton

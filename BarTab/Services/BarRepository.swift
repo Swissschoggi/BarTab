@@ -270,6 +270,14 @@ final class BarRepository: ObservableObject {
             self.prices.append(price)
             recomputePriceLevels()
             checkBadgesAfterContribution(for: user)
+
+            let myPriceCount = prices.filter { $0.reportedBy == user.id }.count
+            if myPriceCount == 1 {
+                toastCenter?.show(
+                    String(localized: "First price added! 🎉 You're helping the community."),
+                    kind: .success
+                )
+            }
             return true
         } catch {
             toastCenter?.showError(error)

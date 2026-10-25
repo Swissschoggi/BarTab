@@ -289,9 +289,9 @@ struct MapView: View {
                 Spacer(minLength: 8)
 
                 Button {
-                    UIApplication.shared.open(
-                        URL(string: UIApplication.openSettingsURLString)!
-                    )
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
                 } label: {
                     Text(String(localized: "Enable"))
                         .font(.barTabCaption)

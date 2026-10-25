@@ -21,10 +21,23 @@ struct BarTabApp: App {
         LanguageManager.shared.applyOnLaunch()
         ReportNotificationService.configure()
         PushNotificationService.shared.configure()
+        Self.configureURLCache()
         Self.configureNavigationBars()
         Task {
             await ExchangeRateService.shared.fetchRates()
         }
+    }
+
+    /// Configure a shared URL cache so avatar images and other
+    /// network resources are cached on disk, improving scroll
+    /// performance and reducing data usage.
+    private static func configureURLCache() {
+        let cache = URLCache(
+            memoryCapacity: 50 * 1024 * 1024,
+            diskCapacity: 200 * 1024 * 1024,
+            diskPath: "BarTabURLCache"
+        )
+        URLCache.shared = cache
     }
 
     /// Custom burgundy back arrow and themed background for every

@@ -406,9 +406,9 @@ struct NearbyView: View {
                                     .foregroundColor(.barTabSecondary)
 
                                 Button {
-                                    UIApplication.shared.open(
-                                        URL(string: UIApplication.openSettingsURLString)!
-                                    )
+                                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                                        UIApplication.shared.open(url)
+                                    }
                                 } label: {
                                     Text(String(localized: "Open Settings"))
                                         .font(.barTabSmall)
