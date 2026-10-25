@@ -374,18 +374,21 @@ private struct FriendLocationView: View {
     @EnvironmentObject private var barRepository: BarRepository
     @Environment(\.dismiss) private var dismiss
 
+    @State private var displayName: String?
+    @State private var avatarURL: String?
+
     var body: some View {
         VStack(spacing: BarTabSpacing.md) {
             HStack(spacing: 12) {
                 UserAvatarView(
-                    urlString: nil,
-                    displayName: nil,
+                    urlString: avatarURL,
+                    displayName: displayName,
                     size: 50
                 )
                 .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(String(localized: "Friend"))
+                    Text(displayName ?? String(localized: "Friend"))
                         .font(.barTabHeading)
                         .foregroundColor(.barTabText)
 
@@ -424,6 +427,16 @@ private struct FriendLocationView: View {
             Spacer()
         }
         .padding(.vertical, BarTabSpacing.md)
+        .task {
+            await loadProfile()
+        }
+    }
+
+    private func loadProfile() async {
+        if let profile = try? await SupabaseClient.shared.fetchProfile(userID: friend.userID) {
+            displayName = profile.display_name
+            avatarURL = profile.avatar_url
+        }
     }
 
     private func nearestBar() -> Bar? {

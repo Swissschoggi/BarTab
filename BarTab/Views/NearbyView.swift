@@ -523,6 +523,16 @@ struct NearbyView: View {
                     title: "No location yet",
                     message: "Allow location access, or search for a place to look near."
                 )
+            } else if barRepository.bars.isEmpty {
+                VStack(spacing: BarTabSpacing.sm) {
+                    ProgressView()
+                    Text(String(localized: "Loading bars…"))
+                        .font(.barTabSmall)
+                        .foregroundColor(.barTabSecondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+                .barTabCard()
             } else if nearbyBars.isEmpty {
                 emptyState(
                     icon: "mappin.slash",

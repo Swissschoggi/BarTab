@@ -9,11 +9,15 @@ final class LiveLocationService: ObservableObject {
     @Published private(set) var friendsLocations: [UUID: LiveLocation] = [:]
     @Published private(set) var isSharing = false
 
+    private static let sharingKey = "com.bartab.liveLocationSharing"
+
     private var updateTimer: Timer?
     private var cancellables = Set<AnyCancellable>()
     private let locationService = LocationService.shared
 
     private init() {
+        isSharing = UserDefaults.standard.bool(forKey: Self.sharingKey)
+
         locationService.$location
             .compactMap { $0 }
             .throttle(for: 10, scheduler: RunLoop.main, latest: true)
@@ -21,11 +25,29 @@ final class LiveLocationService: ObservableObject {
                 self?.handleLocationUpdate(location)
             }
             .store(in: &cancellables)
+
+        if isSharing {
+            startTimer()
+        }
     }
 
     func startSharing() {
         guard !isSharing, SupabaseClient.shared.currentUserID != nil else { return }
         isSharing = true
+        UserDefaults.standard.set(true, forKey: Self.sharingKey)
+        startTimer()
+    }
+
+    func stopSharing() {
+        isSharing = false
+        UserDefaults.standard.set(false, forKey: Self.sharingKey)
+        updateTimer?.invalidate()
+        updateTimer = nil
+        Task { await clearLocationFromSupabase() }
+    }
+
+    private func startTimer() {
+        updateTimer?.invalidate()
         updateTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             guard let self else { return }
             Task { @MainActor in
@@ -33,13 +55,6 @@ final class LiveLocationService: ObservableObject {
             }
         }
         updateTimer?.fire()
-    }
-
-    func stopSharing() {
-        isSharing = false
-        updateTimer?.invalidate()
-        updateTimer = nil
-        Task { await clearLocationFromSupabase() }
     }
 
     func subscribeToFriends() {
