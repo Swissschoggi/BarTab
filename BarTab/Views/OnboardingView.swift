@@ -36,6 +36,7 @@ struct OnboardingView: View {
                         page: $page,
                         locationService: locationService,
                         selectedInterests: $selectedInterests,
+                        nearestBar: nearestBar,
                         onDone: { dismiss() }
                     )
                     .tag(index)
@@ -104,16 +105,12 @@ struct OnboardingView: View {
 
 private enum OnboardingPage: CaseIterable {
     case welcome
-    case location
-    case notifications
     case interests
     case done
 
     var title: String {
         switch self {
         case .welcome: return String(localized: "Welcome to BarTab")
-        case .location: return String(localized: "Find bars near you")
-        case .notifications: return String(localized: "Never miss a deal")
         case .interests: return String(localized: "What do you drink?")
         case .done: return String(localized: "You're all set!")
         }
@@ -122,8 +119,6 @@ private enum OnboardingPage: CaseIterable {
     var subtitle: String {
         switch self {
         case .welcome: return String(localized: "Your pocket guide to drink prices, crawls & friends.")
-        case .location: return String(localized: "We'll show nearby bars, walking crawls & distance.")
-        case .notifications: return String(localized: "Get push alerts when prices drop at your favorite bars.")
         case .interests: return String(localized: "Tap your favorites so we can personalize your feed.")
         case .done: return String(localized: "Start exploring, add prices, and plan nights out.")
         }
@@ -132,8 +127,6 @@ private enum OnboardingPage: CaseIterable {
     var icon: String {
         switch self {
         case .welcome: return "mug.fill"
-        case .location: return "location.fill"
-        case .notifications: return "bell.fill"
         case .interests: return "tag.fill"
         case .done: return "checkmark.circle.fill"
         }
@@ -144,6 +137,7 @@ private enum OnboardingPage: CaseIterable {
         page: Binding<Int>,
         locationService: LocationService,
         selectedInterests: Binding<Set<Drink>>,
+        nearestBar: Bar?,
         onDone: @escaping () -> Void
     ) -> some View {
         switch self {
@@ -156,61 +150,6 @@ private enum OnboardingPage: CaseIterable {
             ) {
                 OnboardingPrimaryButton(title: String(localized: "Get Started")) {
                     withAnimation { page.wrappedValue += 1 }
-                }
-            }
-
-        case .location:
-            StandardOnboardingPage(
-                icon: icon,
-                tint: .barTabPrimary,
-                title: title,
-                subtitle: subtitle
-            ) {
-                VStack(spacing: BarTabSpacing.sm) {
-                    let isAuthorized =
-                        locationService.authorizationStatus == .authorizedWhenInUse ||
-                        locationService.authorizationStatus == .authorizedAlways
-
-                    OnboardingPrimaryButton(
-                        title: isAuthorized
-                            ? String(localized: "Location enabled ✓")
-                            : String(localized: "Allow location access")
-                    ) {
-                        locationService.requestPermission()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            withAnimation { page.wrappedValue += 1 }
-                        }
-                    }
-                    .disabled(isAuthorized)
-
-                    OnboardingSecondaryButton(title: String(localized: "Skip for now")) {
-                        withAnimation { page.wrappedValue += 1 }
-                    }
-                }
-            }
-
-        case .notifications:
-            StandardOnboardingPage(
-                icon: icon,
-                tint: .barTabPrimary,
-                title: title,
-                subtitle: subtitle
-            ) {
-                VStack(spacing: BarTabSpacing.sm) {
-                    OnboardingPrimaryButton(title: String(localized: "Enable notifications")) {
-                        UNUserNotificationCenter.current().requestAuthorization(
-                            options: [.alert, .sound, .badge]
-                        ) { _, _ in
-                            DispatchQueue.main.async {
-                                UIApplication.shared.registerForRemoteNotifications()
-                                withAnimation { page.wrappedValue += 1 }
-                            }
-                        }
-                    }
-
-                    OnboardingSecondaryButton(title: String(localized: "Not now")) {
-                        withAnimation { page.wrappedValue += 1 }
-                    }
                 }
             }
 
