@@ -612,7 +612,7 @@
 
 
     // Waitlist signup -> Edge Function (server-side Turnstile + insert)
-    const WAITLIST_URL = 'https://xdyewakhzjnmpzhzhehl.supabase.co/functions/v1/waitlist';
+    const WAITLIST_URL = '/api/waitlist';
     const waitlistForm = document.getElementById('waitlist-form');
     if (waitlistForm) {
       const emailInput = document.getElementById('waitlist-email');
@@ -650,7 +650,7 @@
         try {
           const res = await fetch(WAITLIST_URL, {
             method: 'POST',
-            headers: { ...HEADERS, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, token })
           });
           const data = await res.json().catch(() => ({}));
