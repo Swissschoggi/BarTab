@@ -14,6 +14,12 @@ struct SettingsView: View {
     @State private var showingRestartAlert = false
     @State private var showingUsernameEditor = false
     @State private var showingPasswordEditor = false
+
+    private var appVersionString: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return "\(version) (\(build))"
+    }
     @State private var showingTipJar = false
     @State private var currencyExpanded = false
     @State private var languageExpanded = false
@@ -324,7 +330,7 @@ struct SettingsView: View {
                                 .font(.barTabBody)
                                 .foregroundColor(.barTabText)
                             Spacer()
-                            Text("\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"))")
+                            Text(appVersionString)
                                 .font(.barTabBody)
                                 .foregroundColor(.barTabSecondary)
                         }
