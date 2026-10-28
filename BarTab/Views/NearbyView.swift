@@ -46,6 +46,7 @@ struct NearbyView: View {
 
     // Drink search state
     @State private var searchText = ""
+    @State private var barSearchText = ""
     @State private var selectedDrinks: Set<Drink> = [.beer]
     @State private var selectedSizes: Set<DrinkSize> = [.fiveDeciliters]
     @State private var hasSeededDrinks = false
@@ -56,6 +57,7 @@ struct NearbyView: View {
     // Collapsible filter state
     @State private var filtersExpanded = false
     @State private var sortExpanded = false
+    @State private var showForYou = false
 
     enum SortOption {
         case cheapest
@@ -121,6 +123,15 @@ struct NearbyView: View {
                 (bar: bar, distance: DistanceService.distance(from: originLocation, to: bar))
             }
             .sorted { $0.distance < $1.distance }
+    }
+
+    private var filteredNearbyBars: [(bar: Bar, distance: CLLocationDistance)] {
+        let trimmed = barSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nearbyBars }
+        return nearbyBars.filter {
+            $0.bar.name.localizedCaseInsensitiveContains(trimmed)
+                || $0.bar.address.localizedCaseInsensitiveContains(trimmed)
+        }
     }
 
     // MARK: - Price search results
@@ -314,7 +325,26 @@ struct NearbyView: View {
                 }
 
                 if !forYouResults.isEmpty {
-                    forYouSection
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) { showForYou.toggle() }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: showForYou ? "sparkles" : "sparkles")
+                            Text(showForYou ? String(localized: "Hide For you") : String(localized: "Show For you"))
+                                .font(.barTabSmall)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.barTabPrimary)
+                        .padding(.horizontal, BarTabSpacing.sm)
+                        .padding(.vertical, 6)
+                        .background(Color.barTabPrimary.opacity(0.1))
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+
+                    if showForYou {
+                        forYouSection
+                    }
                 }
 
                     // Segment control
@@ -524,7 +554,9 @@ struct NearbyView: View {
 
     private var barsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            BarTabSectionHeader(title: String(localized: "Bars"), count: nearbyBars.count)
+            BarTabSectionHeader(title: String(localized: "Bars"), count: filteredNearbyBars.count)
+
+            BarTabSearchField(text: $barSearchText, placeholder: String(localized: "Search bars..."))
 
             if originCoordinate == nil {
                 emptyState(
@@ -542,7 +574,7 @@ struct NearbyView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 40)
                 .barTabCard()
-            } else if nearbyBars.isEmpty {
+            } else if filteredNearbyBars.isEmpty {
                 emptyState(
                     icon: "mappin.slash",
                     title: "No bars nearby",
@@ -550,7 +582,7 @@ struct NearbyView: View {
                 )
             } else {
                 VStack(spacing: 0) {
-                    ForEach(Array(nearbyBars.enumerated()), id: \.element.bar.id) { index, result in
+                    ForEach(Array(filteredNearbyBars.enumerated()), id: \.element.bar.id) { index, result in
                         NavigationLink(
                             destination: BarView(bar: result.bar)
                                 .environmentObject(barRepository)
@@ -561,7 +593,7 @@ struct NearbyView: View {
                         }
                         .buttonStyle(.plain)
 
-                        if index < nearbyBars.count - 1 {
+                        if index < filteredNearbyBars.count - 1 {
                             Divider().padding(.leading, BarTabSpacing.md)
                         }
                     }
@@ -1168,6 +1200,8 @@ struct NearbyView: View {
                         .font(.barTabTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(Color.barTabPrimary)
@@ -1179,6 +1213,8 @@ struct NearbyView: View {
                         .font(.barTabTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(Color.barTabAccent)
@@ -1198,6 +1234,8 @@ struct NearbyView: View {
                         .font(.barTabTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(Color.barTabWarning)

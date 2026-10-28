@@ -232,15 +232,16 @@ struct MapView: View {
         } label: {
             VStack(spacing: 3) {
 
-                if let price = cheapestPrice(for: bar) {
-                    Text("\(Currency.defaultCurrency.symbol) \(price.formattedAmount)")
+                if let summary = cheapestSummary(for: bar) {
+                    Text("\(Currency.defaultCurrency.symbol) \(summary.convertedAmount.formattedAmount)")
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.white)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 3)
-                        .background(Color.barTabPrimary)
+                        .background(summary.isStale ? Color.barTabWarning : Color.barTabPrimary)
                         .clipShape(Capsule())
                         .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
+                        .opacity(summary.isStale ? 0.75 : 1.0)
                 }
 
                 Image(systemName: "wineglass.fill")
@@ -263,12 +264,15 @@ struct MapView: View {
         .accessibilityLabel("\(bar.name), \(bar.address)")
     }
 
-    private func cheapestPrice(for bar: Bar) -> Decimal? {
+    private func cheapestSummary(for bar: Bar) -> PriceSummary? {
         barRepository.getPriceSummaries(for: bar)
             .min { NSDecimalNumber(decimal: $0.convertedAmount).doubleValue
                 < NSDecimalNumber(decimal: $1.convertedAmount).doubleValue
-            }?
-            .convertedAmount
+            }
+    }
+
+    private func cheapestPrice(for bar: Bar) -> Decimal? {
+        cheapestSummary(for: bar)?.convertedAmount
     }
 
     // MARK: - Location banner

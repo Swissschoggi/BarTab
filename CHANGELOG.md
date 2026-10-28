@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Waitlist signups now route through a same-origin Vercel function to avoid CORS
+- "For you" deals are now togglable instead of always visible
+- Discovery bars tab now supports search and mirrors the drinks experience
 
 ### Fixed
 - Waitlist duplicate email submissions no longer return HTTP 500
