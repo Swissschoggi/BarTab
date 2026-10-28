@@ -29,9 +29,8 @@ struct PassportView: View {
     }
 
     private var mostVisitedBarName: String {
-        guard let top = visits.max(by: { $0.visitCount < $1.visitCount }) else { return "—" }
-        return barRepository.getBar(id: top.barID)?.name ?? "—"
-    }
+        guard let top = visits.max(by: { $0.visitCount < $1.visitCount }) else { return "-" }
+        return barRepository.getBar(id: top.barID)?.name ?? "-"    }
 
     private var firstVisitDate: Date? {
         visits.map(\.firstVisitedAt).min()
@@ -162,7 +161,7 @@ struct PassportView: View {
     }
 
     private var firstVisitText: String {
-        guard let date = firstVisitDate else { return "—" }
+        guard let date = firstVisitDate else { return "-" }
         return date.formatted(.dateTime.month(.abbreviated).year())
     }
 

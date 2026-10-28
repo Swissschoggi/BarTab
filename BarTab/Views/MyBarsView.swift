@@ -24,7 +24,11 @@ struct MyBarsView: View {
 
             VStack(alignment: .leading, spacing: 20) {
 
-                if myBars.isEmpty {
+                if barRepository.bars.isEmpty {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 80)
+                } else if myBars.isEmpty {
 
                     emptyState
 

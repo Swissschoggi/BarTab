@@ -43,7 +43,21 @@
   <link rel="preconnect" href="https://xdyewakhzjnmpzhzhehl.supabase.co" crossorigin />
 
   <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="preload" href="style.css?v=2" as="style" />
+  <link rel="preload" href="logo.png" as="image" />
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+  <!-- Vercel Speed Insights -->
+  <script>
+    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
+
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
 
   <script type="application/ld+json">
   {
@@ -598,7 +612,7 @@
 
 
     // Waitlist signup -> Edge Function (server-side Turnstile + insert)
-    const WAITLIST_URL = 'https://xdyewakhzjnmpzhzhehl.supabase.co/functions/v1/waitlist';
+    const WAITLIST_URL = '/api/waitlist';
     const waitlistForm = document.getElementById('waitlist-form');
     if (waitlistForm) {
       const emailInput = document.getElementById('waitlist-email');
@@ -636,7 +650,7 @@
         try {
           const res = await fetch(WAITLIST_URL, {
             method: 'POST',
-            headers: { ...HEADERS, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, token })
           });
           const data = await res.json().catch(() => ({}));
