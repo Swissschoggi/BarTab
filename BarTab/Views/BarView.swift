@@ -1257,7 +1257,7 @@ struct BarView: View {
         guard let user = userSession.currentUser else { return }
         barRepository.reportBar(currentBar, reason: reason, reportedBy: user)
         HapticEngine.success()
-        toastCenter.show(String(localized: "Reported — thanks for helping keep BarTab accurate."), kind: .success)
+        toastCenter.show(String(localized: "Reported - thanks for helping keep BarTab accurate."), kind: .success)
     }
 
     private func reportPriceGroup(_ group: PriceGroup, reason: ReportReason) {
@@ -1272,7 +1272,7 @@ struct BarView: View {
             reportedBy: user
         )
         HapticEngine.success()
-        toastCenter.show(String(localized: "Reported — thanks for helping keep BarTab accurate."), kind: .success)
+        toastCenter.show(String(localized: "Reported - thanks for helping keep BarTab accurate."), kind: .success)
     }
 
     private func deleteBar() {

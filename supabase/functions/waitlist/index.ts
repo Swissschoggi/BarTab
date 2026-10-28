@@ -106,7 +106,10 @@ async function insertEmail(email: string): Promise<boolean> {
     body: JSON.stringify({ email }),
   });
 
-  return res.status === 201;
+  // A 409 means the address is already on the list (unique index on
+  // lower(email)); treat that as success so a duplicate submission never
+  // surfaces as an error. 200/204 cover PostgREST upsert variants.
+  return res.status === 201 || res.status === 200 || res.status === 204 || res.status === 409;
 }
 
 async function emailExists(email: string): Promise<boolean> {
@@ -129,14 +132,14 @@ async function sendWelcomeEmail(email: string): Promise<void> {
 
   const subject = "You're on the BarTab list 🍻";
   const textContent =
-    "Thanks for signing up for BarTab — you're on the list.\n\n" +
+    "Thanks for signing up for BarTab, you're on the list.\n\n" +
     "We'll email you the moment BarTab is ready where you are. " +
-    "No spam, just the good stuff.\n\n— The BarTab team";
+    "No spam, just the good stuff.\n\nThe BarTab team";
 
   const htmlContent =
-    `<p>Thanks for signing up for <strong>BarTab</strong> you're on the list.</p>` +
+    `<p>Thanks for signing up for <strong>BarTab</strong>, you're on the list.</p>` +
     `<p>We'll email you the moment BarTab is ready where you are. No spam, just the good stuff.</p>` +
-    `<p>&mdash; The BarTab team</p>`;
+    `<p>The BarTab team</p>`;
 
   try {
     await fetch(BREVO_API_URL, {
@@ -208,12 +211,15 @@ Deno.serve(async (req) => {
   // brand-new signup (re-submitting the same address won't re-send email).
   const alreadyExists = await emailExists(email);
 
-  const result = await insertEmail(email);
-  if (!result) {
-    return json({ error: "Something went wrong. Please try again." }, 500, cors);
-  }
-
+  // Only attempt an insert for brand-new addresses. Re-submitting an email
+  // that is already on the list is a success (no duplicate row, no repeat
+  // welcome email) — the unique index on lower(email) would otherwise make
+  // the insert return 409 and surface as a 500 to the user.
   if (!alreadyExists) {
+    const result = await insertEmail(email);
+    if (!result) {
+      return json({ error: "Something went wrong. Please try again." }, 500, cors);
+    }
     await sendWelcomeEmail(email);
   }
 
