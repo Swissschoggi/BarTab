@@ -573,10 +573,12 @@ struct NearbyView: View {
 
             BarTabSearchField(text: $barSearchText, placeholder: String(localized: "Search bars..."))
 
-            HStack(spacing: 8) {
-                barSortButton(title: "Closest", option: .closest)
-                barSortButton(title: "Name", option: .name)
-                barSortButton(title: "Busiest", option: .busiest)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    barSortButton(title: "Closest", option: .closest)
+                    barSortButton(title: "Name", option: .name)
+                    barSortButton(title: "Busiest", option: .busiest)
+                }
             }
 
             if originCoordinate == nil {
@@ -1089,11 +1091,13 @@ struct NearbyView: View {
             .foregroundColor(.barTabText)
 
             if sortExpanded {
-                HStack(spacing: 8) {
-                    sortButton(title: "Cheapest", option: .cheapest)
-                    sortButton(title: "Best value", option: .bestValue)
-                    sortButton(title: "Closest", option: .closest)
-                    sortButton(title: "Brand", option: .brand)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        sortButton(title: "Cheapest", option: .cheapest)
+                        sortButton(title: "Best value", option: .bestValue)
+                        sortButton(title: "Closest", option: .closest)
+                        sortButton(title: "Brand", option: .brand)
+                    }
                 }
             }
         }
@@ -1282,10 +1286,12 @@ struct NearbyView: View {
                 Image(systemName: option == .cheapest ? "arrow.down" : "location")
                     .font(.barTabTiny)
                 Text(title)
+                    .lineLimit(1)
             }
             .font(.barTabSmall)
             .fontWeight(.semibold)
             .foregroundColor(sortOption == option ? .white : .barTabPrimary)
+            .fixedSize(horizontal: true, vertical: false)
             .padding(.horizontal, BarTabSpacing.sm)
             .padding(.vertical, 7)
             .background(sortOption == option ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.1))
@@ -1301,6 +1307,8 @@ struct NearbyView: View {
                 .font(.barTabSmall)
                 .fontWeight(.semibold)
                 .foregroundColor(barSortOption == option ? .white : .barTabPrimary)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
                 .padding(.horizontal, BarTabSpacing.sm)
                 .padding(.vertical, 7)
                 .background(barSortOption == option ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.1))
