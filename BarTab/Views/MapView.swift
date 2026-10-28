@@ -328,7 +328,6 @@ struct MapView: View {
         .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
         .padding(.horizontal, 12))
     }
-    }
 
     private func friendAnnotation(_ friend: LiveLocation) -> some View {
         Button {
