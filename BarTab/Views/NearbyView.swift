@@ -59,6 +59,11 @@ struct NearbyView: View {
     @State private var sortExpanded = false
     @State private var showForYou = false
 
+    private enum BarSortOption {
+        case closest, name, busiest
+    }
+    @State private var barSortOption: BarSortOption = .closest
+
     enum SortOption {
         case cheapest
         case closest
@@ -127,10 +132,20 @@ struct NearbyView: View {
 
     private var filteredNearbyBars: [(bar: Bar, distance: CLLocationDistance)] {
         let trimmed = barSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nearbyBars }
-        return nearbyBars.filter {
-            $0.bar.name.localizedCaseInsensitiveContains(trimmed)
-                || $0.bar.address.localizedCaseInsensitiveContains(trimmed)
+        var results = nearbyBars
+        if !trimmed.isEmpty {
+            results = results.filter {
+                $0.bar.name.localizedCaseInsensitiveContains(trimmed)
+                    || $0.bar.address.localizedCaseInsensitiveContains(trimmed)
+            }
+        }
+        switch barSortOption {
+        case .closest:
+            return results.sorted { $0.distance < $1.distance }
+        case .name:
+            return results.sorted { $0.bar.name.localizedCaseInsensitiveCompare($1.bar.name) == .orderedAscending }
+        case .busiest:
+            return results.sorted { barRepository.busyCount(for: $0.bar.id) > barRepository.busyCount(for: $1.bar.id) }
         }
     }
 
@@ -558,6 +573,12 @@ struct NearbyView: View {
 
             BarTabSearchField(text: $barSearchText, placeholder: String(localized: "Search bars..."))
 
+            HStack(spacing: 8) {
+                barSortButton(title: "Closest", option: .closest)
+                barSortButton(title: "Name", option: .name)
+                barSortButton(title: "Busiest", option: .busiest)
+            }
+
             if originCoordinate == nil {
                 emptyState(
                     icon: "location.slash",
@@ -663,6 +684,12 @@ struct NearbyView: View {
                     .font(.barTabCaption)
                     .fontWeight(.semibold)
                     .foregroundColor(.barTabPrimary)
+
+                if barRepository.busyCount(for: bar.id) > 0 {
+                    Text(String(localized: "\(barRepository.busyCount(for: bar.id)) here"))
+                        .font(.barTabTiny)
+                        .foregroundColor(.barTabAccent)
+                }
 
                 Image(systemName: "chevron.right")
                     .font(.barTabTiny)
@@ -1263,6 +1290,21 @@ struct NearbyView: View {
             .padding(.vertical, 7)
             .background(sortOption == option ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.1))
             .clipShape(Capsule())
+        }
+    }
+
+    private func barSortButton(title: LocalizedStringKey, option: BarSortOption) -> some View {
+        Button {
+            barSortOption = option
+        } label: {
+            Text(title)
+                .font(.barTabSmall)
+                .fontWeight(.semibold)
+                .foregroundColor(barSortOption == option ? .white : .barTabPrimary)
+                .padding(.horizontal, BarTabSpacing.sm)
+                .padding(.vertical, 7)
+                .background(barSortOption == option ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.1))
+                .clipShape(Capsule())
         }
     }
 
