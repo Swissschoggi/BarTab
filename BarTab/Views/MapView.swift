@@ -280,7 +280,12 @@ struct MapView: View {
     private var locationBanner: some View {
         let status = locationService.authorizationStatus
 
-        return HStack(spacing: 10) {
+        // Nothing to show once we have a fix on the user's location.
+        if status != .denied && status != .restricted && locationService.location != nil {
+            return AnyView(EmptyView())
+        }
+
+        return AnyView(HStack(spacing: 10) {
             if status == .denied || status == .restricted {
                 Image(systemName: "location.slash.fill")
                     .font(.barTabCaption)
@@ -321,7 +326,8 @@ struct MapView: View {
         .padding(.vertical, 12)
         .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
-        .padding(.horizontal, 12)
+        .padding(.horizontal, 12))
+    }
     }
 
     private func friendAnnotation(_ friend: LiveLocation) -> some View {
