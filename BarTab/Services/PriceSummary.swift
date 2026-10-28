@@ -21,6 +21,33 @@ struct PriceSummary: Identifiable {
         reports.map(\.reportedAt).max()
     }
 
+    /// Volume in decilitres for volume-based sizes, nil otherwise.
+    var volumeInDeciliters: Double? {
+        switch size {
+        case .oneDeciliter: return 1
+        case .twoDeciliters: return 2
+        case .threeDeciliters: return 3
+        case .fiveDeciliters: return 5
+        case .twentyCentiliters: return 2
+        case .twentyFiveCentiliters: return 2.5
+        case .thirtyThreeCentiliters: return 3.3
+        case .fiftyCentiliters: return 5
+        default: return nil
+        }
+    }
+
+    /// Price per decilitre in the default currency (best value).
+    var pricePerDeciliter: Double? {
+        guard let volume = volumeInDeciliters, volume > 0 else { return nil }
+        return NSDecimalNumber(decimal: convertedAmount).doubleValue / volume
+    }
+
+    /// Whether this price is older than 30 days and should be re-verified.
+    var isStale: Bool {
+        guard let date = latestReportDate else { return true }
+        return date < Date().addingTimeInterval(-30 * 24 * 60 * 60)
+    }
+
     /// The amount converted to the user's default currency.
     var convertedAmount: Decimal {
         ExchangeRateService.shared.convert(

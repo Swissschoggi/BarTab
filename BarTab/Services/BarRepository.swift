@@ -1176,6 +1176,11 @@ final class BarRepository: ObservableObject {
     }
 
     func checkIn(bar: Bar, user: User) async -> Bool {
+        // Only allow a check-in when the user is physically near the bar.
+        guard let location = LocationService.shared.location else { return false }
+        let barLocation = CLLocation(latitude: bar.coordinate.latitude, longitude: bar.coordinate.longitude)
+        guard location.distance(from: barLocation) <= 150 else { return false }
+
         do {
             try await SupabaseClient.shared.checkIn(barID: bar.id)
         } catch {

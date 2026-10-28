@@ -382,6 +382,18 @@ struct BarView: View {
                     if hasCheckedIn {
                         ok = await barRepository.uncheckIn(bar: currentBar, user: user)
                     } else {
+                        guard let location = locationService.location else {
+                            toastCenter.show(String(localized: "Turn on location to check in"), kind: .error)
+                            return
+                        }
+                        let distance = location.distance(from: CLLocation(
+                            latitude: currentBar.coordinate.latitude,
+                            longitude: currentBar.coordinate.longitude
+                        ))
+                        guard distance <= 150 else {
+                            toastCenter.show(String(localized: "You need to be near the bar to check in"), kind: .error)
+                            return
+                        }
                         ok = await barRepository.checkIn(bar: currentBar, user: user)
                         if ok {
                             HapticEngine.success()

@@ -61,6 +61,7 @@ struct NearbyView: View {
         case cheapest
         case closest
         case brand
+        case bestValue
     }
 
     @State private var sortOption: SortOption = .cheapest
@@ -212,6 +213,8 @@ struct NearbyView: View {
         switch sortOption {
         case .cheapest:
             return results.sorted { comparisonValue($0.summary) < comparisonValue($1.summary) }
+        case .bestValue:
+            return results.sorted { (bestValue($0.summary) ?? .greatestFiniteMagnitude) < (bestValue($1.summary) ?? .greatestFiniteMagnitude) }
         case .brand:
             return results
         case .closest:
@@ -277,6 +280,12 @@ struct NearbyView: View {
     /// default currency, so results reflect what you'd actually pay.
     private func comparisonValue(_ summary: PriceSummary) -> Double {
         NSDecimalNumber(decimal: summary.convertedAmount).doubleValue
+    }
+
+    /// Price per decilitre for "best value" sorting. Returns nil for
+    /// non-volume servings so they sort last.
+    private func bestValue(_ summary: PriceSummary) -> Double? {
+        summary.pricePerDeciliter
     }
 
     // MARK: - Body
@@ -728,11 +737,9 @@ struct NearbyView: View {
                 Spacer()
             }
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: BarTabSpacing.sm) {
-                    ForEach(forYouResults, id: \.summary.id) { result in
-                        forYouCard(result)
-                    }
+            VStack(spacing: BarTabSpacing.sm) {
+                ForEach(forYouResults, id: \.summary.id) { result in
+                    forYouCard(result)
                 }
             }
         }
@@ -775,7 +782,7 @@ struct NearbyView: View {
                     .foregroundColor(.barTabPrimary)
             }
             .padding(BarTabSpacing.md)
-            .frame(width: 150, height: 116, alignment: .topLeading)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
             .background(
                 RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
                     .fill(Color.barTabCardFill)
@@ -1015,6 +1022,7 @@ struct NearbyView: View {
             if sortExpanded {
                 HStack(spacing: 8) {
                     sortButton(title: "Cheapest", option: .cheapest)
+                    sortButton(title: "Best value", option: .bestValue)
                     sortButton(title: "Closest", option: .closest)
                     sortButton(title: "Brand", option: .brand)
                 }
@@ -1174,9 +1182,21 @@ struct NearbyView: View {
                 Text(Currency.defaultCurrency.rawValue)
                     .font(.barTabTiny)
                     .foregroundColor(.barTabSecondary)
+
+                if summary.isStale {
+                    Text(String(localized: "Stale"))
+                        .font(.barTabTiny)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.barTabWarning)
+                        .clipShape(Capsule())
+                }
             }
         }
         .barTabCard()
+        .opacity(summary.isStale ? 0.72 : 1.0)
     }
 
     private func sortButton(title: LocalizedStringKey, option: SortOption) -> some View {
@@ -1201,6 +1221,7 @@ struct NearbyView: View {
     private var sortLabel: String {
         switch sortOption {
         case .cheapest: return "Cheapest"
+        case .bestValue: return "Best value"
         case .closest: return "Closest"
         case .brand: return "Brand"
         }
