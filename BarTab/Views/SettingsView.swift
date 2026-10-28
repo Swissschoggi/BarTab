@@ -324,7 +324,7 @@ struct SettingsView: View {
                                 .font(.barTabBody)
                                 .foregroundColor(.barTabText)
                             Spacer()
-                            Text("BETA")
+                            Text("\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"))")
                                 .font(.barTabBody)
                                 .foregroundColor(.barTabSecondary)
                         }
