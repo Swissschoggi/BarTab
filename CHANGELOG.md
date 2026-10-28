@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-28
+
+### Changed
+- Made "For you" deals togglable instead of always visible
+- Fixed badge wrapping in Discovery
+- Show stale prices on the map
+- Improved Bars tab search and parity with Drinks tab
+
+## [1.1.0] - 2026-10-28
+
 ### Added
 - Price alerts for saved bars
 - Live location sharing with friends
@@ -18,8 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Waitlist signups now route through a same-origin Vercel function to avoid CORS
-- "For you" deals are now togglable instead of always visible
-- Discovery bars tab now supports search and mirrors the drinks experience
 
 ### Fixed
 - Waitlist duplicate email submissions no longer return HTTP 500
