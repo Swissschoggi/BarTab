@@ -21,22 +21,22 @@ struct AdminBrandRequestsView: View {
 
                 if requests.isEmpty {
 
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
                         Image(systemName: "tag.circle")
-                            .font(.barTabEmptyIcon)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapEmptyIcon)
+                            .foregroundColor(.BartapPrimary)
 
                         Text(String(localized: "No brand requests yet"))
-                            .font(.barTabHeading)
+                            .font(.BartapHeading)
 
                         Text(String(localized: "Requests for new brands will show up here."))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .barTabCard()
+                    .BartapCard()
 
                 } else {
 
@@ -45,7 +45,7 @@ struct AdminBrandRequestsView: View {
                             String(localized: "\(barRepository.pendingBrandRequestCount) pending"),
                             systemImage: "clock"
                         )
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .foregroundColor(.secondary)
 
                         Spacer()
@@ -61,7 +61,7 @@ struct AdminBrandRequestsView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 20)
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Brand requests"))
         .navigationBarTitleDisplayMode(.inline)
         .alert(String(localized: "Delete this request?"), isPresented: $showingDeleteConfirmation) {
@@ -78,15 +78,15 @@ struct AdminBrandRequestsView: View {
     }
 
     private func requestCard(_ request: BrandRequest) -> some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
 
             HStack(spacing: 8) {
                 Image(systemName: "tag.fill")
-                    .font(.barTabBody)
-                    .foregroundColor(.barTabPrimary)
+                    .font(.BartapBody)
+                    .foregroundColor(.BartapPrimary)
 
                 Text(request.name)
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
 
                 Spacer()
 
@@ -94,20 +94,20 @@ struct AdminBrandRequestsView: View {
             }
 
             Text(request.drink.displayName)
-                .font(.barTabBody)
+                .font(.BartapBody)
                 .foregroundColor(.primary)
 
             HStack(spacing: 6) {
                 Text(String(localized: "by \(request.requestedByName)"))
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                     .foregroundColor(.secondary)
 
                 Text("\u{00B7}")
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                     .foregroundColor(.secondary)
 
                 Text(relativeDate(request.createdAt))
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                     .foregroundColor(.secondary)
 
                 Spacer()
@@ -120,9 +120,9 @@ struct AdminBrandRequestsView: View {
                         }
                     } label: {
                         Text(String(localized: "Reject"))
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .fontWeight(.semibold)
-                            .foregroundColor(.barTabDanger)
+                            .foregroundColor(.BartapDanger)
                     }
 
                     Button {
@@ -131,9 +131,9 @@ struct AdminBrandRequestsView: View {
                         }
                     } label: {
                         Text(String(localized: "Approve"))
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .fontWeight(.semibold)
-                            .foregroundColor(.barTabPrimary)
+                            .foregroundColor(.BartapPrimary)
                     }
                 } else {
                     Button {
@@ -141,14 +141,14 @@ struct AdminBrandRequestsView: View {
                         showingDeleteConfirmation = true
                     } label: {
                         Label(String(localized: "Remove"), systemImage: "trash")
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .fontWeight(.semibold)
-                            .foregroundColor(.barTabDanger)
+                            .foregroundColor(.BartapDanger)
                     }
                 }
             }
         }
-        .barTabCard()
+        .BartapCard()
     }
 
     private func statusBadge(for status: BrandRequestStatus) -> some View {
@@ -165,7 +165,7 @@ struct AdminBrandRequestsView: View {
         }()
 
         return Text(label)
-            .font(.barTabTiny)
+            .font(.BartapTiny)
             .fontWeight(.bold)
             .foregroundColor(.white)
             .padding(.horizontal, 8)

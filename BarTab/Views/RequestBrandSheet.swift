@@ -35,66 +35,66 @@ struct RequestBrandSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
 
                     if didSubmit {
 
-                        VStack(spacing: BarTabSpacing.sm) {
+                        VStack(spacing: BartapSpacing.sm) {
                             Image(systemName: "checkmark.circle.fill")
-                                .font(.barTabEmptyIcon)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapEmptyIcon)
+                                .foregroundColor(.BartapPrimary)
 
                             Text(String(localized: "Request sent"))
-                                .font(.barTabHeading)
+                                .font(.BartapHeading)
 
                             Text(
                                 String(localized: "We'll review \"\(trimmedName)\" and add it if it's a good fit.")
                             )
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, BarTabSpacing.lg)
-                        .barTabCard()
+                        .padding(.vertical, BartapSpacing.lg)
+                        .BartapCard()
 
                     } else {
 
-                        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                        VStack(alignment: .leading, spacing: BartapSpacing.xs) {
                             Text(String(localized: "REQUESTING A \(drink.displayName.uppercased()) BRAND"))
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapCaption)
+                                .foregroundColor(.BartapSecondary)
 
                             Text(String(localized: "Requesting a \(drink.displayName.lowercased()) brand"))
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapSecondary)
 
                             TextField(String(localized: "Brand name"), text: $name)
                                 .autocorrectionDisabled()
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabText)
-                                .padding(.vertical, BarTabSpacing.xs)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapText)
+                                .padding(.vertical, BartapSpacing.xs)
                         }
-                        .padding(BarTabSpacing.md)
-                        .background(Color.barTabCardFill)
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                        .padding(BartapSpacing.md)
+                        .background(Color.BartapCardFill)
+                        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
                         .overlay(
-                            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                            RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                         )
 
                         if !trimmedName.isEmpty && trimmedName.count > InputValidator.maxBrandNameLength {
                             Text(String(localized: "Name must be \(InputValidator.maxBrandNameLength) characters or fewer."))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabWarning)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapWarning)
                         } else if !trimmedName.isEmpty && alreadyExists {
                             Text(String(localized: "That brand is already in the list."))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabWarning)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapWarning)
                         } else if !trimmedName.isEmpty && alreadyPending {
                             Text(String(localized: "You've already requested this brand."))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabWarning)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapWarning)
                         }
 
                         Button {
@@ -102,8 +102,8 @@ struct RequestBrandSheet: View {
                         } label: {
                             Text(String(localized: "Send request"))
                         }
-                        .barTabPrimaryButton()
-                        .padding(.top, BarTabSpacing.xs)
+                        .BartapPrimaryButton()
+                        .padding(.top, BartapSpacing.xs)
                         .disabled(
                             trimmedName.isEmpty
                             || trimmedName.count > InputValidator.maxBrandNameLength
@@ -112,10 +112,10 @@ struct RequestBrandSheet: View {
                         )
                     }
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.md)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .scrollDismissesKeyboard(.immediately)
             .navigationTitle(String(localized: "Request a brand"))
             .navigationBarTitleDisplayMode(.inline)
@@ -124,7 +124,7 @@ struct RequestBrandSheet: View {
                     Button(String(localized: "Cancel")) {
                         dismiss()
                     }
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
                 }
             }
         }

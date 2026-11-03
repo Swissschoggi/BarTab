@@ -71,7 +71,7 @@ struct ProfileView: View {
 
             ScrollView {
 
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
 
                     headerSection
 
@@ -89,11 +89,11 @@ struct ProfileView: View {
                     }
                 }
                 .padding(.horizontal)
-                .padding(.top, BarTabSpacing.xxl)
-                .padding(.bottom, BarTabSpacing.xl)
+                .padding(.top, BartapSpacing.xxl)
+                .padding(.bottom, BartapSpacing.xl)
             }
             .background(
-                Color.barTabBackground
+                Color.BartapBackground
                     .ignoresSafeArea()
             )
             .toolbar(.hidden, for: .navigationBar)
@@ -150,17 +150,17 @@ struct ProfileView: View {
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 6) {
 
-            BarTabScreenHeader(
+            BartapScreenHeader(
                 title: String(localized: "Me"),
                 subtitle: currentUser == nil
                     ? String(localized: "Sign in to manage your contributions.")
-                    : String(localized: "Your BarTab profile.")
+                    : String(localized: "Your Bartap profile.")
             )
 
             if let fetchedAt = barRepository.lastFetchedAt {
                 Text("Data updated \(fetchedAt.relativeFormatted)")
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
                     .padding(.top, 2)
             }
         }
@@ -168,31 +168,31 @@ struct ProfileView: View {
 
     @ViewBuilder
     private func profileCard(user: User) -> some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
 
-            HStack(spacing: BarTabSpacing.sm) {
+            HStack(spacing: BartapSpacing.sm) {
 
                 avatarView(user: user)
 
                 VStack(alignment: .leading, spacing: 2) {
 
                     Text(user.username)
-                        .font(.barTabHeading)
+                        .font(.BartapHeading)
                         .fontWeight(.bold)
-                        .foregroundColor(.barTabText)
+                        .foregroundColor(.BartapText)
 
                     Text("Member since \(user.createdAt.formatted(date: .abbreviated, time: .omitted))")
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
 
                     PhotosPicker(
                         selection: $selectedAvatarItem,
                         matching: .images
                     ) {
                         Text(isUploadingAvatar ? String(localized: "Uploading…") : String(localized: "Change photo"))
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .fontWeight(.semibold)
-                            .foregroundColor(.barTabPrimary)
+                            .foregroundColor(.BartapPrimary)
                     }
                     .disabled(isUploadingAvatar)
                 }
@@ -201,65 +201,65 @@ struct ProfileView: View {
             }
 
             Divider()
-                .foregroundColor(.barTabCardBorder)
+                .foregroundColor(.BartapCardBorder)
 
             // Level + progress
             HStack(spacing: 12) {
                 Image(systemName: currentLevel.icon)
-                    .font(.barTabBody)
+                    .font(.BartapBody)
                     .foregroundColor(.white)
                     .frame(width: 32, height: 32)
-                    .background(Color.barTabAccent)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                    .background(Color.BartapAccent)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(currentLevel.name)
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .fontWeight(.semibold)
-                        .foregroundColor(.barTabText)
+                        .foregroundColor(.BartapText)
 
                     if let remaining = UserLevel.remaining(for: totalContributions) {
                         Text("\(remaining) more to next level")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSecondary)
                     } else {
                         Text(String(localized: "Max level reached!"))
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabAccent)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapAccent)
                     }
                 }
 
                 Spacer()
 
                 Text("\(totalContributions)")
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
                     .fontWeight(.bold)
-                    .foregroundColor(.barTabAccent)
+                    .foregroundColor(.BartapAccent)
             }
 
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .fill(Color.barTabPillFill)
+                        .fill(Color.BartapPillFill)
 
                     Capsule()
-                        .fill(Color.barTabAccent)
+                        .fill(Color.BartapAccent)
                         .frame(width: geometry.size.width * CGFloat(UserLevel.progress(for: totalContributions)))
                 }
             }
             .frame(height: 5)
         }
-        .barTabCard()
+        .BartapCard()
     }
 
     @ViewBuilder
     private var activitySection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
 
             Text(String(localized: "Your activity"))
-                .font(.barTabHeading)
+                .font(.BartapHeading)
 
-            HStack(spacing: BarTabSpacing.sm) {
+            HStack(spacing: BartapSpacing.sm) {
                 statisticCard(
                     value: myPrices.count,
                     title: String(localized: "Drinks"),
@@ -283,8 +283,8 @@ struct ProfileView: View {
                 }
 
                 Divider()
-                    .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, BarTabSpacing.md)
+                    .foregroundColor(.BartapCardBorder)
+                    .padding(.leading, BartapSpacing.md)
 
                 navigationRow(
                     title: String(localized: "My bars"),
@@ -295,8 +295,8 @@ struct ProfileView: View {
                 }
 
                 Divider()
-                    .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, BarTabSpacing.md)
+                    .foregroundColor(.BartapCardBorder)
+                    .padding(.leading, BartapSpacing.md)
 
                 navigationRow(
                     title: String(localized: "Badges"),
@@ -311,8 +311,8 @@ struct ProfileView: View {
                 }
 
                 Divider()
-                    .foregroundColor(.barTabCardBorder)
-                    .padding(.leading, BarTabSpacing.md)
+                    .foregroundColor(.BartapCardBorder)
+                    .padding(.leading, BartapSpacing.md)
 
                 navigationRow(
                     title: String(localized: "Passport"),
@@ -325,15 +325,15 @@ struct ProfileView: View {
                         .environmentObject(toastCenter)
                 }
             }
-            .barTabCard()
+            .BartapCard()
         }
     }
 
     @ViewBuilder
     private var savedSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
             Text(String(localized: "Saved"))
-                .font(.barTabHeading)
+                .font(.BartapHeading)
 
             VStack(spacing: 0) {
                 if !barRepository.favoriteBars.isEmpty {
@@ -349,8 +349,8 @@ struct ProfileView: View {
                         }
 
                         Divider()
-                            .foregroundColor(.barTabCardBorder)
-                            .padding(.leading, BarTabSpacing.md)
+                            .foregroundColor(.BartapCardBorder)
+                            .padding(.leading, BartapSpacing.md)
                     }
                 }
 
@@ -365,7 +365,7 @@ struct ProfileView: View {
                         .environmentObject(toastCenter)
                 }
             }
-            .barTabCard()
+            .BartapCard()
         }
     }
 
@@ -373,10 +373,10 @@ struct ProfileView: View {
     private var adminSection: some View {
         if let user = currentUser, user.isAdmin {
 
-            VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+            VStack(alignment: .leading, spacing: BartapSpacing.sm) {
 
                 Text(String(localized: "Admin"))
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
 
                 navigationRow(
                     title: String(localized: "Reported content"),
@@ -408,9 +408,9 @@ struct ProfileView: View {
 
     @ViewBuilder
     private var socialSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
             Text(String(localized: "Social"))
-                .font(.barTabHeading)
+                .font(.BartapHeading)
 
             socialRows
         }
@@ -428,8 +428,8 @@ struct ProfileView: View {
             }
 
             Divider()
-                .foregroundColor(.barTabCardBorder)
-                .padding(.leading, BarTabSpacing.md)
+                .foregroundColor(.BartapCardBorder)
+                .padding(.leading, BartapSpacing.md)
 
             navigationRow(
                 title: String(localized: "Activity"),
@@ -440,8 +440,8 @@ struct ProfileView: View {
             }
 
             Divider()
-                .foregroundColor(.barTabCardBorder)
-                .padding(.leading, BarTabSpacing.md)
+                .foregroundColor(.BartapCardBorder)
+                .padding(.leading, BartapSpacing.md)
 
             navigationRow(
                 title: String(localized: "Groups"),
@@ -451,22 +451,22 @@ struct ProfileView: View {
                 GroupPlanningView()
             }
         }
-        .barTabCard()
+        .BartapCard()
     }
 
     @ViewBuilder
     private var accountSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
 
             Text(String(localized: "Account"))
-                .font(.barTabHeading)
+                .font(.BartapHeading)
 
             Button {
                 showingSettings = true
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "gearshape.fill")
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
 
                     Text(String(localized: "Settings"))
                         .foregroundColor(.primary)
@@ -474,10 +474,10 @@ struct ProfileView: View {
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .foregroundColor(.secondary)
                 }
-                .barTabCard()
+                .BartapCard()
             }
 
             Button {
@@ -485,7 +485,7 @@ struct ProfileView: View {
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "trophy.fill")
-                        .foregroundColor(.barTabAccent)
+                        .foregroundColor(.BartapAccent)
 
                     Text(String(localized: "Leaderboard"))
                         .foregroundColor(.primary)
@@ -493,10 +493,10 @@ struct ProfileView: View {
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .foregroundColor(.secondary)
                 }
-                .barTabCard()
+                .BartapCard()
             }
 
             Button {
@@ -504,14 +504,14 @@ struct ProfileView: View {
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
-                        .foregroundColor(.barTabDanger)
+                        .foregroundColor(.BartapDanger)
 
                     Text(String(localized: "Log out"))
-                        .foregroundColor(.barTabDanger)
+                        .foregroundColor(.BartapDanger)
 
                     Spacer()
                 }
-                .barTabCard()
+                .BartapCard()
             }
         }
     }
@@ -521,11 +521,11 @@ struct ProfileView: View {
         VStack(spacing: 16) {
 
             Image(systemName: "person.crop.circle")
-                .font(.barTabEmptyIconLarge)
-                .foregroundColor(.barTabPrimary)
+                .font(.BartapEmptyIconLarge)
+                .foregroundColor(.BartapPrimary)
 
             Text(String(localized: "You're not signed in"))
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .fontWeight(.semibold)
 
             Text(String(localized: "Sign in to add bars, report drinks and keep track of your contributions."))
@@ -536,10 +536,10 @@ struct ProfileView: View {
                 showingLogin = true
             } label: {
                 Text(String(localized: "Sign In"))
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .barTabPrimaryButton()
+                    .BartapPrimaryButton()
             }
         }
         .padding(.vertical, 40)
@@ -582,10 +582,10 @@ struct ProfileView: View {
     private var placeholderAvatar: some View {
         ZStack {
             Circle()
-                .fill(Color.barTabPrimary)
+                .fill(Color.BartapPrimary)
 
             Image(systemName: "person.fill")
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .foregroundColor(.white)
         }
     }
@@ -621,23 +621,23 @@ struct ProfileView: View {
         VStack(alignment: .leading, spacing: 8) {
 
             Image(systemName: icon)
-                .font(.barTabBody)
-                .foregroundColor(.barTabPrimary)
+                .font(.BartapBody)
+                .foregroundColor(.BartapPrimary)
                 .frame(width: 28, height: 28)
-                .background(Color.barTabPrimary.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                .background(Color.BartapPrimary.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
 
             Text("\(value)")
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .fontWeight(.bold)
-                .foregroundColor(.barTabText)
+                .foregroundColor(.BartapText)
 
             Text(title)
-                .font(.barTabSmall)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapSmall)
+                .foregroundColor(.BartapSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .barTabCard()
+        .BartapCard()
     }
 
     private func navigationRow<Destination: View>(
@@ -654,31 +654,31 @@ struct ProfileView: View {
             HStack(spacing: 12) {
 
                 Image(systemName: icon)
-                    .font(.barTabBody)
-                    .foregroundColor(.barTabPrimary)
+                    .font(.BartapBody)
+                    .foregroundColor(.BartapPrimary)
                     .frame(width: 24, height: 24)
-                    .background(Color.barTabPrimary.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                    .background(Color.BartapPrimary.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 1) {
 
                     Text(title)
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .fontWeight(.medium)
-                        .foregroundColor(.barTabText)
+                        .foregroundColor(.BartapText)
 
                     Text(subtitle)
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
             }
-            .barTabCard()
+            .BartapCard()
         }
     }
 }
@@ -717,10 +717,10 @@ struct FriendsView: View {
                 FollowingListView()
             }
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Friends"))
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Color.barTabBackground, for: .navigationBar)
+        .toolbarBackground(Color.BartapBackground, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
     }
 }
@@ -771,37 +771,37 @@ struct HereNowView: View {
     var body: some View {
         GeometryReader { geo in
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                     HStack {
                         Text(String(localized: "OUT NOW"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
                         Spacer()
                     }
-                    .padding(.horizontal, BarTabSpacing.md)
+                    .padding(.horizontal, BartapSpacing.md)
 
                     if isLoading {
                         HStack(spacing: 10) {
                             ProgressView()
                             Text(String(localized: "Checking who's out…"))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, BarTabSpacing.md)
-                        .padding(.vertical, BarTabSpacing.xs)
+                        .padding(.horizontal, BartapSpacing.md)
+                        .padding(.vertical, BartapSpacing.xs)
                     } else if presence.isEmpty {
                         emptyState(minHeight: geo.size.height - 68)
                     } else {
                         presenceList(minHeight: geo.size.height - 68)
                     }
                 }
-                .padding(.vertical, BarTabSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Here now"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -821,31 +821,31 @@ struct HereNowView: View {
     }
 
     private func emptyState(minHeight: CGFloat) -> some View {
-        VStack(spacing: BarTabSpacing.sm) {
+        VStack(spacing: BartapSpacing.sm) {
             Image(systemName: "figure.walk")
-                .font(.barTabEmptyIcon)
-                .foregroundColor(.barTabPrimary)
+                .font(.BartapEmptyIcon)
+                .foregroundColor(.BartapPrimary)
 
             Text(String(localized: "Nobody's out right now"))
-                .font(.barTabBody)
+                .font(.BartapBody)
                 .fontWeight(.medium)
 
             Text(String(localized: "When friends check in at a bar, they'll show up here."))
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 36)
         .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .top)
         .background(
-            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                .fill(Color.barTabCardFill)
+            RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                .fill(Color.BartapCardFill)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
         )
-        .padding(.horizontal, BarTabSpacing.md)
+        .padding(.horizontal, BartapSpacing.md)
     }
 
     private func presenceList(minHeight: CGFloat) -> some View {
@@ -854,21 +854,21 @@ struct HereNowView: View {
                 presenceRow(group)
                 if group.id != presence.last?.id {
                     Divider()
-                        .foregroundColor(.barTabCardBorder)
+                        .foregroundColor(.BartapCardBorder)
                         .padding(.leading, 68)
                 }
             }
         }
         .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .top)
         .background(
-            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                .fill(Color.barTabCardFill)
+            RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                .fill(Color.BartapCardFill)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
         )
-        .padding(.horizontal, BarTabSpacing.md)
+        .padding(.horizontal, BartapSpacing.md)
     }
 
     private func presenceRow(_ group: FriendPresence) -> some View {
@@ -885,19 +885,19 @@ struct HereNowView: View {
                             size: 34
                         )
                         .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.barTabCardFill, lineWidth: 2))
+                        .overlay(Circle().stroke(Color.BartapCardFill, lineWidth: 2))
                     }
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(group.bar.name)
-                        .font(.barTabBodySemibold)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapBodySemibold)
+                        .foregroundColor(.BartapText)
                         .lineLimit(1)
 
                     Text(friendsSummary(group))
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
                         .lineLimit(1)
                 }
 
@@ -905,11 +905,11 @@ struct HereNowView: View {
 
                 if let location = locationService.location {
                     Text(DistanceService.formattedDistance(from: location, to: group.bar))
-                        .barTabPillButton()
+                        .BartapPillButton()
                 }
             }
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, BarTabSpacing.sm)
+            .padding(.horizontal, BartapSpacing.md)
+            .padding(.vertical, BartapSpacing.sm)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

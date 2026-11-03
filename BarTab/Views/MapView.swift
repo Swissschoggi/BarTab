@@ -55,7 +55,7 @@ struct MapView: View {
             }
             .ignoresSafeArea()
 
-            VStack(spacing: BarTabSpacing.sm) {
+            VStack(spacing: BartapSpacing.sm) {
 
                 Button {
                     showingAddBar = true
@@ -64,8 +64,8 @@ struct MapView: View {
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(width: 44, height: 44)
-                        .background(Color.barTabPrimary)
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                        .background(Color.BartapPrimary)
+                        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                 }
                 .accessibilityLabel("Add bar")
 
@@ -74,10 +74,10 @@ struct MapView: View {
                 } label: {
                     Image(systemName: "figure.walk.circle.fill")
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
                         .frame(width: 44, height: 44)
                         .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                 }
                 .accessibilityLabel("Bar hop")
 
@@ -86,13 +86,13 @@ struct MapView: View {
                 } label: {
                     Image(systemName: liveLocationService.isSharing ? "location.fill.viewfinder" : "location.slash.fill")
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(liveLocationService.isSharing ? .barTabAccent : .barTabPrimary)
+                        .foregroundColor(liveLocationService.isSharing ? .BartapAccent : .BartapPrimary)
                         .frame(width: 44, height: 44)
                         .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                         .overlay(
-                            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                                .stroke(liveLocationService.isSharing ? Color.barTabAccent : Color.clear, lineWidth: 2)
+                            RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                                .stroke(liveLocationService.isSharing ? Color.BartapAccent : Color.clear, lineWidth: 2)
                         )
                 }
                 .accessibilityLabel(liveLocationService.isSharing ? "Stop sharing location" : "Share my location")
@@ -102,10 +102,10 @@ struct MapView: View {
                 } label: {
                     Image(systemName: "location.fill")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
                         .frame(width: 44, height: 44)
                         .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                 }
                 .accessibilityLabel("Center on my location")
             }
@@ -238,7 +238,7 @@ struct MapView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 3)
-                        .background(summary.isStale ? Color.barTabWarning : Color.barTabPrimary)
+                        .background(summary.isStale ? Color.BartapWarning : Color.BartapPrimary)
                         .clipShape(Capsule())
                         .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
                         .opacity(summary.isStale ? 0.75 : 1.0)
@@ -248,16 +248,16 @@ struct MapView: View {
                     .font(.system(size: 17, weight: .medium))
                     .foregroundColor(.white)
                     .frame(width: 42, height: 42)
-                    .background(Color.barTabPrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                    .background(Color.BartapPrimary)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous)
+                        RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous)
                             .stroke(Color.white.opacity(0.9), lineWidth: 1.5)
                     )
 
                 Image(systemName: "triangle.fill")
                     .font(.system(size: 9))
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
                     .rotationEffect(.degrees(180))
             }
         }
@@ -288,12 +288,12 @@ struct MapView: View {
         return AnyView(HStack(spacing: 10) {
             if status == .denied || status == .restricted {
                 Image(systemName: "location.slash.fill")
-                    .font(.barTabCaption)
-                    .foregroundColor(.barTabWarning)
+                    .font(.BartapCaption)
+                    .foregroundColor(.BartapWarning)
 
                 Text(String(localized: "Location access is off"))
-                    .font(.barTabBodySemibold)
-                    .foregroundColor(.barTabText)
+                    .font(.BartapBodySemibold)
+                    .foregroundColor(.BartapText)
 
                 Spacer(minLength: 8)
 
@@ -303,12 +303,12 @@ struct MapView: View {
                     }
                 } label: {
                     Text(String(localized: "Enable"))
-                        .font(.barTabCaption)
+                        .font(.BartapCaption)
                         .fontWeight(.semibold)
                         .foregroundColor(.white)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(Color.barTabPrimary)
+                        .background(Color.BartapPrimary)
                         .clipShape(Capsule())
                 }
             } else if locationService.location == nil {
@@ -316,8 +316,8 @@ struct MapView: View {
                     .controlSize(.small)
 
                 Text(String(localized: "Locating you…"))
-                    .font(.barTabBodySemibold)
-                    .foregroundColor(.barTabText)
+                    .font(.BartapBodySemibold)
+                    .foregroundColor(.BartapText)
 
                 Spacer(minLength: 0)
             }
@@ -325,7 +325,7 @@ struct MapView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
         .padding(.horizontal, 12))
     }
 
@@ -336,7 +336,7 @@ struct MapView: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(Color.barTabAccent)
+                    .fill(Color.BartapAccent)
                     .frame(width: 36, height: 36)
                     .overlay(
                         Circle()
@@ -350,7 +350,7 @@ struct MapView: View {
                     .overlay(
                         Image(systemName: "person.fill")
                             .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.barTabAccent)
+                            .foregroundColor(.BartapAccent)
                     )
             }
         }
@@ -387,7 +387,7 @@ private struct FriendLocationView: View {
     @State private var avatarURL: String?
 
     var body: some View {
-        VStack(spacing: BarTabSpacing.md) {
+        VStack(spacing: BartapSpacing.md) {
             HStack(spacing: 12) {
                 UserAvatarView(
                     urlString: avatarURL,
@@ -398,23 +398,23 @@ private struct FriendLocationView: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(displayName ?? String(localized: "Friend"))
-                        .font(.barTabHeading)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapHeading)
+                        .foregroundColor(.BartapText)
 
                     Text(friend.isStale ? String(localized: "Location stale") : String(localized: "Live now"))
-                        .font(.barTabCaption)
-                        .foregroundColor(friend.isStale ? .barTabSecondary : .barTabAccent)
+                        .font(.BartapCaption)
+                        .foregroundColor(friend.isStale ? .BartapSecondary : .BartapAccent)
 
                     if let bar = nearestBar() {
                         Text("Near \(bar.name)")
-                            .font(.barTabSmall)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapSmall)
+                            .foregroundColor(.BartapSecondary)
                     }
                 }
 
                 Spacer()
             }
-            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.horizontal, BartapSpacing.md)
 
             if !friend.isStale {
                 ZStack {
@@ -425,17 +425,17 @@ private struct FriendLocationView: View {
                     .frame(height: 200)
 
                     Circle()
-                        .fill(Color.barTabAccent)
+                        .fill(Color.BartapAccent)
                         .frame(width: 18, height: 18)
                         .overlay(Circle().stroke(Color.white, lineWidth: 2))
                 }
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
-                .padding(.horizontal, BarTabSpacing.md)
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
+                .padding(.horizontal, BartapSpacing.md)
             }
 
             Spacer()
         }
-        .padding(.vertical, BarTabSpacing.md)
+        .padding(.vertical, BartapSpacing.md)
         .task {
             await loadProfile()
         }

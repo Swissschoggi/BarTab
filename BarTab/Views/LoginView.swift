@@ -67,7 +67,7 @@ struct LoginView: View {
 
                         ZStack {
                             Circle()
-                                .fill(Color.barTabPrimary)
+                                .fill(Color.BartapPrimary)
                                 .frame(width: 72, height: 72)
 
                             Image(systemName: "wineglass.fill")
@@ -75,15 +75,15 @@ struct LoginView: View {
                                 .foregroundColor(.white)
                         }
 
-                        Text(String(localized: "Welcome to BarTab"))
-                            .font(.barTabTitle)
-                            .foregroundColor(.barTabText)
+                        Text(String(localized: "Welcome to Bartap"))
+                            .font(.BartapTitle)
+                            .foregroundColor(.BartapText)
 
                         Text(
                             String(localized: "Create an account to add and manage drinks.")
                         )
-                        .font(.barTabBody)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapBody)
+                        .foregroundColor(.BartapSecondary)
                         .multilineTextAlignment(.center)
                     }
                     .padding(.top, 24)
@@ -116,7 +116,7 @@ struct LoginView: View {
                     .frame(height: 50)
                     .clipShape(
                         RoundedRectangle(
-                            cornerRadius: BarTabRadius.control,
+                            cornerRadius: BartapRadius.control,
                             style: .continuous
                         )
                     )
@@ -131,14 +131,14 @@ struct LoginView: View {
                         VStack { Divider() }
 
                         Text(String(localized: "or use an email"))
-                            .font(.barTabSmall)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapSmall)
+                            .foregroundColor(.BartapSecondary)
 
                         VStack { Divider() }
                     }
 
 
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
 
                         Picker(
                             String(localized: "Mode"),
@@ -157,8 +157,8 @@ struct LoginView: View {
                         ) {
 
                             Text(String(localized: "Email"))
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapCaption)
+                                .foregroundColor(.BartapSecondary)
 
                             TextField(
                                 String(localized: "Your email"),
@@ -167,7 +167,7 @@ struct LoginView: View {
                             .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
-                            .textFieldStyle(BarTabFieldStyle())
+                            .textFieldStyle(BartapFieldStyle())
                             .focused($focusedField, equals: .email)
                             .submitLabel(.next)
                             .onSubmit { focusedField = .password }                        }
@@ -178,8 +178,8 @@ struct LoginView: View {
                         ) {
 
                             Text(String(localized: "Password"))
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapCaption)
+                                .foregroundColor(.BartapSecondary)
 
                             HStack {
                                 if showPassword {
@@ -222,12 +222,12 @@ struct LoginView: View {
                                     showPassword.toggle()
                                 } label: {
                                     Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
-                                        .foregroundColor(.barTabSecondary)
-                                        .font(.barTabCaption)
+                                        .foregroundColor(.BartapSecondary)
+                                        .font(.BartapCaption)
                                 }
                             }
-                            .font(.barTabBody)
-                            .barTabFieldSurface()
+                            .font(.BartapBody)
+                            .BartapFieldSurface()
                         }
 
                         if mode == .signIn {
@@ -237,8 +237,8 @@ struct LoginView: View {
                                     ForgotPasswordView()
                                 } label: {
                                     Text(String(localized: "Forgot Password?"))
-                                        .font(.barTabBody)
-                                        .foregroundColor(.barTabAccent)
+                                        .font(.BartapBody)
+                                        .foregroundColor(.BartapAccent)
                                 }
                             }
                         }
@@ -251,8 +251,8 @@ struct LoginView: View {
                             ) {
 
                                 Text(String(localized: "Confirm password"))
-                                    .font(.barTabCaption)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapCaption)
+                                    .foregroundColor(.BartapSecondary)
 
                                 HStack {
                                     if showConfirmPassword {
@@ -279,12 +279,12 @@ struct LoginView: View {
                                         showConfirmPassword.toggle()
                                     } label: {
                                         Image(systemName: showConfirmPassword ? "eye.slash.fill" : "eye.fill")
-                                            .foregroundColor(.barTabSecondary)
-                                            .font(.barTabCaption)
+                                            .foregroundColor(.BartapSecondary)
+                                            .font(.BartapCaption)
                                     }
                                 }
-                                .font(.barTabBody)
-                                .barTabFieldSurface()
+                                .font(.BartapBody)
+                                .BartapFieldSurface()
                             }
                         }
                     }
@@ -302,7 +302,7 @@ struct LoginView: View {
 
                             Text(submitTitle)
                         }
-                        .barTabPrimaryButton()
+                        .BartapPrimaryButton()
                     }
                     .disabled(!canSubmit || isSubmitting || isGoogleSigningIn)
 
@@ -311,18 +311,18 @@ struct LoginView: View {
 
                         Label {
                             Text(errorMessage)
-                                .font(.barTabTiny)
+                                .font(.BartapTiny)
                                 .multilineTextAlignment(.leading)
                         } icon: {
                             Image(systemName: "exclamationmark.circle.fill")
                         }
-                        .foregroundColor(.barTabDanger)
-                        .padding(BarTabSpacing.sm)
+                        .foregroundColor(.BartapDanger)
+                        .padding(BartapSpacing.sm)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(
-                            Color.barTabDanger.opacity(0.08),
+                            Color.BartapDanger.opacity(0.08),
                             in: RoundedRectangle(
-                                cornerRadius: BarTabRadius.control,
+                                cornerRadius: BartapRadius.control,
                                 style: .continuous
                             )
                         )
@@ -331,17 +331,17 @@ struct LoginView: View {
 
 
                     Text(
-                        String(localized: "Your account lives on BarTab's server. ")
+                        String(localized: "Your account lives on Bartap's server. ")
                     )
-                    .font(.barTabSmall)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapSmall)
+                    .foregroundColor(.BartapSecondary)
                     .multilineTextAlignment(.center)
 
                     Spacer(minLength: 16)
                 }
                 .padding(24)
             }
-            .background(Color.barTabBackground)
+            .background(Color.BartapBackground)
             .scrollDismissesKeyboard(.interactively)
             .navigationTitle(String(localized: "Sign In"))
             .navigationBarTitleDisplayMode(.inline)
@@ -357,7 +357,7 @@ struct LoginView: View {
             startGoogleSignIn()
         } label: {
 
-            HStack(spacing: BarTabSpacing.sm) {
+            HStack(spacing: BartapSpacing.sm) {
 
                 if isGoogleSigningIn {
                     ProgressView()
@@ -370,24 +370,24 @@ struct LoginView: View {
                 }
 
                 Text(isGoogleSigningIn ? String(localized: "Connecting…") : String(localized: "Continue with Google"))
-                    .font(.barTabBodySemibold)
-                    .foregroundColor(.barTabText)
+                    .font(.BartapBodySemibold)
+                    .foregroundColor(.BartapText)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 50)
             .background(Color.white)
             .clipShape(
                 RoundedRectangle(
-                    cornerRadius: BarTabRadius.control,
+                    cornerRadius: BartapRadius.control,
                     style: .continuous
                 )
             )
             .overlay(
                 RoundedRectangle(
-                    cornerRadius: BarTabRadius.control,
+                    cornerRadius: BartapRadius.control,
                     style: .continuous
                 )
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
             )
         }
         .disabled(isSubmitting || isGoogleSigningIn)

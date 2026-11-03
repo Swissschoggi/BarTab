@@ -32,21 +32,21 @@ struct NightOutCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
-            HStack(alignment: .top, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
+            HStack(alignment: .top, spacing: BartapSpacing.sm) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(event.title)
-                        .font(.barTabHeading)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapHeading)
+                        .foregroundColor(.BartapText)
 
                     if let startsAt = event.startsAt {
                         HStack(spacing: 4) {
                             Image(systemName: "calendar")
-                                .font(.barTabTiny)
+                                .font(.BartapTiny)
                             Text(startsAt.formatted(date: .abbreviated, time: .shortened))
                         }
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
                     }
                 }
 
@@ -59,8 +59,8 @@ struct NightOutCard: View {
                         onDelete()
                     } label: {
                         Image(systemName: "trash")
-                            .font(.barTabSmall)
-                            .foregroundColor(.barTabDanger)
+                            .font(.BartapSmall)
+                            .foregroundColor(.BartapDanger)
                     }
                     .buttonStyle(.plain)
                 }
@@ -70,34 +70,34 @@ struct NightOutCard: View {
             if !orderedBars.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(String(localized: "The crawl"))
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .fontWeight(.semibold)
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
 
                     ForEach(Array(orderedBars.enumerated()), id: \.element.id) { index, bar in
                         HStack(spacing: 8) {
                             Text("\(index + 1)")
-                                .font(.barTabTiny)
+                                .font(.BartapTiny)
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
                                 .frame(width: 20, height: 20)
-                                .background(Color.barTabPrimary)
+                                .background(Color.BartapPrimary)
                                 .clipShape(Circle())
 
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(bar.name)
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabText)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapText)
                                 Text(bar.address)
-                                    .font(.barTabTiny)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapTiny)
+                                    .foregroundColor(.BartapSecondary)
                             }
                         }
                     }
                 }
-                .padding(BarTabSpacing.sm)
-                .background(Color.barTabSurface)
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                .padding(BartapSpacing.sm)
+                .background(Color.BartapSurface)
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
             }
 
             // Who's going
@@ -110,17 +110,17 @@ struct NightOutCard: View {
                             displayName: profile?.displayName ?? "U",
                             size: 22
                         )
-                        .overlay(Circle().stroke(Color.barTabCardFill, lineWidth: 1))
+                        .overlay(Circle().stroke(Color.BartapCardFill, lineWidth: 1))
                     }
                 }
 
                 Text(goingSummary)
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
             }
         }
         .padding(14)
-        .barTabCard()
+        .BartapCard()
         .task {
             await load()
         }
@@ -132,15 +132,15 @@ struct NightOutCard: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: isGoing ? "checkmark.circle.fill" : "circle")
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                 Text(isGoing ? String(localized: "Going") : String(localized: "I'm going"))
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                     .fontWeight(.semibold)
             }
-            .foregroundColor(isGoing ? .white : .barTabPrimary)
-            .padding(.horizontal, BarTabSpacing.sm)
+            .foregroundColor(isGoing ? .white : .BartapPrimary)
+            .padding(.horizontal, BartapSpacing.sm)
             .padding(.vertical, 6)
-            .background(isGoing ? Color.barTabSuccess : Color.barTabPrimary.opacity(0.1))
+            .background(isGoing ? Color.BartapSuccess : Color.BartapPrimary.opacity(0.1))
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)

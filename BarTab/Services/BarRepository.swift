@@ -35,7 +35,7 @@ final class BarRepository: ObservableObject {
     /// friendly banners instead of silent prints.
     private var toastCenter: ToastCenter?
 
-    private static let favoritesKey = "com.bartab.favoriteBarIDs"
+    private static let favoritesKey = "com.Bartap.favoriteBarIDs"
 
     func attachToastCenter(_ center: ToastCenter) {
         toastCenter = center

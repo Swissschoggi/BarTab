@@ -39,32 +39,32 @@ struct CreatePollSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
 
                     // Question Section
                     selectorGroup(title: String(localized: "QUESTION")) {
                         TextField(String(localized: "What are we deciding?"), text: $pollTitle)
                             .textInputAutocapitalization(.sentences)
                             .padding(.vertical, 12)
-                            .padding(.horizontal, BarTabSpacing.md)
-                            .background(Color.barTabSurface)
-                            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                            .padding(.horizontal, BartapSpacing.md)
+                            .background(Color.BartapSurface)
+                            .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                             .overlay(
-                                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                                RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                                    .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                             )
                     }
 
                     // Options Section
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                         HStack {
                             Text(String(localized: "OPTIONS"))
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapCaption)
+                                .foregroundColor(.BartapSecondary)
                             Spacer()
                         }
 
-                        VStack(spacing: BarTabSpacing.sm) {
+                        VStack(spacing: BartapSpacing.sm) {
                             ForEach(0..<optionTexts.count, id: \.self) { index in
                                 optionRow(index: index)
                             }
@@ -74,26 +74,26 @@ struct CreatePollSheet: View {
                                 optionBarIDs.append(nil)
                             } label: {
                                 Label(String(localized: "Add option"), systemImage: "plus")
-                                    .barTabSecondaryButton()
+                                    .BartapSecondaryButton()
                             }
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
 
                     if filledOptionCount < 2 {
                         Text(String(localized: "Add at least 2 options to create a poll."))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabDanger)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapDanger)
                     } else {
                         Text(String(localized: "Add bars, drinks, or whatever you're deciding on. Link bars to show their location in the poll."))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
                     }
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.md)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "New Poll"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -124,11 +124,11 @@ struct CreatePollSheet: View {
                             } label: {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(bar.name)
-                                        .font(.barTabBody)
-                                        .foregroundColor(.barTabText)
+                                        .font(.BartapBody)
+                                        .foregroundColor(.BartapText)
                                     Text(bar.address)
-                                        .font(.barTabTiny)
-                                        .foregroundColor(.barTabSecondary)
+                                        .font(.BartapTiny)
+                                        .foregroundColor(.BartapSecondary)
                                 }
                             }
                         }
@@ -151,25 +151,25 @@ struct CreatePollSheet: View {
     // MARK: - Subviews
 
     private func selectorGroup<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+        VStack(alignment: .leading, spacing: BartapSpacing.xs) {
             Text(title)
-                .font(.barTabCaption)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapCaption)
+                .foregroundColor(.BartapSecondary)
             content()
         }
     }
 
     private func optionRow(index: Int) -> some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+        VStack(alignment: .leading, spacing: BartapSpacing.xs) {
             TextField(String(localized: "Option \(index + 1)"), text: $optionTexts[index])
                 .textInputAutocapitalization(.words)
                 .padding(.vertical, 12)
-                .padding(.horizontal, BarTabSpacing.md)
-                .background(Color.barTabSurface)
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                .padding(.horizontal, BartapSpacing.md)
+                .background(Color.BartapSurface)
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                        .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                    RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                        .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                 )
 
             HStack(spacing: 8) {
@@ -177,23 +177,23 @@ struct CreatePollSheet: View {
                    let bar = barRepository.getBar(id: barID) {
                     HStack(spacing: 4) {
                         Image(systemName: "mappin.circle.fill")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapPrimary)
                         Text(bar.name)
-                            .font(.barTabSmall)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapSmall)
+                            .foregroundColor(.BartapPrimary)
                         Spacer()
                         Button {
                             optionBarIDs[index] = nil
                         } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
                         }
                     }
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color.barTabPrimary.opacity(0.1))
+                    .background(Color.BartapPrimary.opacity(0.1))
                     .clipShape(Capsule())
                 } else {
                     Button {
@@ -201,8 +201,8 @@ struct CreatePollSheet: View {
                         showingBarPicker = true
                     } label: {
                         Label(String(localized: "Link a bar"), systemImage: "mappin.and.ellipse")
-                            .font(.barTabSmall)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapSmall)
+                            .foregroundColor(.BartapSecondary)
                     }
                 }
             }

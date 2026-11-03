@@ -1869,24 +1869,24 @@
         }
       }
     },
-    "Welcome to BarTab": {
+    "Welcome to Bartap": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Willkommen bei BarTab"
+            "value": "Willkommen bei Bartap"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bienvenue sur BarTab"
+            "value": "Bienvenue sur Bartap"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Benvenuto su BarTab"
+            "value": "Benvenuto su Bartap"
           }
         }
       }
@@ -2001,24 +2001,24 @@
         }
       }
     },
-    "Your BarTab profile.": {
+    "Your Bartap profile.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dein BarTab-Profil."
+            "value": "Dein Bartap-Profil."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ton profil BarTab."
+            "value": "Ton profil Bartap."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Il tuo profilo BarTab."
+            "value": "Il tuo profilo Bartap."
           }
         }
       }
@@ -3513,24 +3513,24 @@
         }
       }
     },
-    "BarTab will pick three bars within walking distance and draw the route.": {
+    "Bartap will pick three bars within walking distance and draw the route.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "BarTab wählt drei Bars in Gehweite und zeichnet die Route."
+            "value": "Bartap wählt drei Bars in Gehweite und zeichnet die Route."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "BarTab choisit trois bars à proximité et trace l'itinéraire."
+            "value": "Bartap choisit trois bars à proximité et trace l'itinéraire."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "BarTab sceglie tre bar a portata di passo e traccia il percorso."
+            "value": "Bartap sceglie tre bar a portata di passo e traccia il percorso."
           }
         }
       }
@@ -6359,24 +6359,24 @@
         }
       }
     },
-    "If BarTab helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running.": {
+    "If Bartap helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wenn BarTab dir geholfen hat, deinen Lieblingsort zu finden, überwirf uns doch ein Trinkgeld. Jeder Dollar hilft, die App am Laufen zu halten."
+            "value": "Wenn Bartap dir geholfen hat, deinen Lieblingsort zu finden, überwirf uns doch ein Trinkgeld. Jeder Dollar hilft, die App am Laufen zu halten."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Si BarTab t'a aidé à trouver ton endroit préféré, pense à laisser un pourboire. Chaque dollar permet de maintenir l'app en ligne."
+            "value": "Si Bartap t'a aidé à trouver ton endroit préféré, pense à laisser un pourboire. Chaque dollar permet de maintenir l'app en ligne."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Se BarTab ti ha aiutato a trovare il tuo posto preferito, lascia una mancia. Ogni dollaro serve a mantenere l'app attiva."
+            "value": "Se Bartap ti ha aiutato a trovare il tuo posto preferito, lascia una mancia. Ogni dollaro serve a mantenere l'app attiva."
           }
         }
       }
@@ -9193,24 +9193,24 @@
         }
       }
     },
-    "Reported - thanks for helping keep BarTab accurate.": {
+    "Reported - thanks for helping keep Bartap accurate.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gemeldet – danke, dass du BarTab genau hältst."
+            "value": "Gemeldet – danke, dass du Bartap genau hältst."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Signalé – merci d'aider à garder BarTab précis."
+            "value": "Signalé – merci d'aider à garder Bartap précis."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Segnalato – grazie per aiutare a mantenere BarTab accurato."
+            "value": "Segnalato – grazie per aiutare a mantenere Bartap accurato."
           }
         }
       }
@@ -9281,24 +9281,24 @@
         }
       }
     },
-    "Restart BarTab to replay onboarding": {
+    "Restart Bartap to replay onboarding": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starte BarTab neu, um das Onboarding zu wiederholen"
+            "value": "Starte Bartap neu, um das Onboarding zu wiederholen"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Redémarre BarTab pour revoir l'onboarding"
+            "value": "Redémarre Bartap pour revoir l'onboarding"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Riavvia BarTab per rivedere l'onboarding"
+            "value": "Riavvia Bartap per rivedere l'onboarding"
           }
         }
       }
@@ -11945,24 +11945,24 @@
         }
       }
     },
-    "Your account lives on BarTab's server. ": {
+    "Your account lives on Bartap's server. ": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dein Konto befindet sich auf BarTabs Server."
+            "value": "Dein Konto befindet sich auf Bartaps Server."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ton compte vit sur le serveur de BarTab."
+            "value": "Ton compte vit sur le serveur de Bartap."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Il tuo account vive sul server di BarTab."
+            "value": "Il tuo account vive sul server di Bartap."
           }
         }
       }

@@ -14,8 +14,8 @@ jobs:
       - name: Build unsigned app
         run: |
           xcodebuild build \
-            -project BarTab.xcodeproj \
-            -scheme BarTab \
+            -project Bartap.xcodeproj \
+            -scheme Bartap \
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
@@ -23,14 +23,14 @@ jobs:
 
       - name: Package IPA
         run: |
-          APP=$(find build/Build/Products -name "BarTab.app" -type d | head -1)
+          APP=$(find build/Build/Products -name "Bartap.app" -type d | head -1)
           echo "Found app at: $APP"
           mkdir -p Payload
           cp -R "$APP" Payload/
-          zip -r BarTab.ipa Payload
-          ls -lh BarTab.ipa
+          zip -r Bartap.ipa Payload
+          ls -lh Bartap.ipa
 
       - uses: actions/upload-artifact@v4
         with:
-          name: BarTab
-          path: BarTab.ipa
+          name: Bartap
+          path: Bartap.ipa

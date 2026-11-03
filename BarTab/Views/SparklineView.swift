@@ -9,8 +9,8 @@ struct SparklineView: View {
     init(
         dataPoints: [CGFloat],
         lineWidth: CGFloat = 1.5,
-        lineColor: Color = .barTabPrimary,
-        fillColor: Color = .barTabPrimary.opacity(0.1)
+        lineColor: Color = .BartapPrimary,
+        fillColor: Color = .BartapPrimary.opacity(0.1)
     ) {
         self.dataPoints = dataPoints
         self.lineWidth = lineWidth

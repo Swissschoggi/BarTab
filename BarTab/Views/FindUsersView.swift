@@ -15,14 +15,14 @@ struct FindUsersView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
 
-                BarTabScreenHeader(
+                BartapScreenHeader(
                     title: String(localized: "Find Friends"),
                     subtitle: String(localized: "Search by username to send a follow request.")
                 )
 
-                HStack(spacing: BarTabSpacing.sm) {
+                HStack(spacing: BartapSpacing.sm) {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
 
                     TextField(String(localized: "Search username…"), text: $query)
                         .textFieldStyle(.plain)
@@ -38,17 +38,17 @@ struct FindUsersView: View {
                             hasSearched = false
                         } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.barTabSecondary)
+                                .foregroundColor(.BartapSecondary)
                         }
                         .buttonStyle(.plain)
                     }
                 }
                 .padding(12)
-                .background(Color.barTabCardFill)
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                .background(Color.BartapCardFill)
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                        .stroke(Color.barTabCardBorder, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                        .stroke(Color.BartapCardBorder, lineWidth: 1)
                 )
 
                 if isLoading {
@@ -56,21 +56,21 @@ struct FindUsersView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 40)
                 } else if hasSearched && results.isEmpty {
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
                         Image(systemName: "person.crop.circle.badge.questionmark")
-                            .font(.barTabEmptyIcon)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapEmptyIcon)
+                            .foregroundColor(.BartapPrimary)
 
                         Text(String(localized: "No users found"))
-                            .font(.barTabHeading)
+                            .font(.BartapHeading)
 
                         Text(String(localized: "Try a different search term."))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .barTabCard()
+                    .BartapCard()
                 } else if !results.isEmpty {
                     LazyVStack(spacing: 0) {
                         ForEach(results) { profile in
@@ -81,13 +81,13 @@ struct FindUsersView: View {
                             }
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 20)
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Find Friends"))
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -98,14 +98,14 @@ struct FindUsersView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile.display_name ?? String(localized: "User"))
-                    .font(.barTabBody)
+                    .font(.BartapBody)
                     .fontWeight(.medium)
-                    .foregroundColor(.barTabText)
+                    .foregroundColor(.BartapText)
 
                 if profile.is_admin {
                     Text(String(localized: "Admin"))
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabAccent)
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapAccent)
                 }
             }
 
@@ -113,8 +113,8 @@ struct FindUsersView: View {
 
             FollowButton(userID: profile.id)
         }
-        .padding(.horizontal, BarTabSpacing.sm)
-        .padding(.vertical, BarTabSpacing.sm)
+        .padding(.horizontal, BartapSpacing.sm)
+        .padding(.vertical, BartapSpacing.sm)
     }
 
     private func search() async {

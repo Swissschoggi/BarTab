@@ -47,12 +47,12 @@ struct DrinkRatingSheet: View {
 
                         if let brand {
                             Text(brand)
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .foregroundColor(.secondary)
                         }
 
                         Text(size.displayName)
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .foregroundColor(.secondary)
                     }
                     .padding(.top, 8)
@@ -66,30 +66,30 @@ struct DrinkRatingSheet: View {
                                         .foregroundColor(.yellow)
                                 }
                             }
-                            .font(.barTabTitle)
+                            .font(.BartapTitle)
 
                             Text(String(format: "%.1f", data.average))
-                                .font(.barTabHeading)
+                                .font(.BartapHeading)
                                 + Text(String(localized: " from \(data.count) \(data.count == 1 ? "rating" : "ratings")"))
-                                .font(.barTabSmall)
+                                .font(.BartapSmall)
                                 .foregroundColor(.secondary)
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .barTabCard()
+                        .BartapCard()
                     } else {
                         Text(String(localized: "No ratings yet   be the first!"))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .barTabCard()
+                            .BartapCard()
                     }
 
                     // Your rating
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
                         Text(String(localized: "Your rating"))
-                            .font(.barTabHeading)
+                            .font(.BartapHeading)
 
                         HStack(spacing: 16) {
                             ForEach(1...5, id: \.self) { star in
@@ -105,11 +105,11 @@ struct DrinkRatingSheet: View {
                         }
                     }
                     .padding()
-                    .barTabCard()
+                    .BartapCard()
                 }
                 .padding(.horizontal)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

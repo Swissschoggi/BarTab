@@ -28,19 +28,19 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            Color.barTabBackground.ignoresSafeArea()
+            Color.BartapBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Progress indicator
                 ProgressView(value: Double(page + 1), total: Double(pages.count))
-                    .tint(.barTabPrimary)
-                    .padding(.horizontal, BarTabSpacing.lg)
-                    .padding(.top, BarTabSpacing.sm)
+                    .tint(.BartapPrimary)
+                    .padding(.horizontal, BartapSpacing.lg)
+                    .padding(.top, BartapSpacing.sm)
 
                 Text(String(localized: "Step \(page + 1) of \(pages.count)"))
-                    .font(.barTabCaption)
-                    .foregroundColor(.barTabSecondary)
-                    .padding(.top, BarTabSpacing.xs)
+                    .font(.BartapCaption)
+                    .foregroundColor(.BartapSecondary)
+                    .padding(.top, BartapSpacing.xs)
 
                 TabView(selection: $page) {
                 ForEach(pages.indices, id: \.self) { index in
@@ -74,15 +74,15 @@ struct OnboardingView: View {
             dismiss()
         } label: {
             Text(String(localized: "Skip"))
-                .font(.barTabCaption)
+                .font(.BartapCaption)
                 .fontWeight(.semibold)
                 .foregroundColor(.secondary)
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.xs)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.xs)
                 .contentShape(Rectangle())
         }
-        .padding(.top, BarTabSpacing.xs)
-        .padding(.trailing, BarTabSpacing.md)
+        .padding(.top, BartapSpacing.xs)
+        .padding(.trailing, BartapSpacing.md)
         .accessibilityLabel(Text(String(localized: "Skip onboarding")))
     }
 
@@ -125,7 +125,7 @@ private enum OnboardingPage: CaseIterable {
 
     var title: String {
         switch self {
-        case .welcome: return String(localized: "Welcome to BarTab")
+        case .welcome: return String(localized: "Welcome to Bartap")
         case .location: return String(localized: "Find bars near you")
         case .notifications: return String(localized: "Never miss a deal")
         case .interests: return String(localized: "What do you drink?")
@@ -165,7 +165,7 @@ private enum OnboardingPage: CaseIterable {
         case .welcome:
             StandardOnboardingPage(
                 icon: icon,
-                tint: .barTabPrimary,
+                tint: .BartapPrimary,
                 title: title,
                 subtitle: subtitle
             ) {
@@ -177,11 +177,11 @@ private enum OnboardingPage: CaseIterable {
         case .location:
             StandardOnboardingPage(
                 icon: icon,
-                tint: .barTabPrimary,
+                tint: .BartapPrimary,
                 title: title,
                 subtitle: subtitle
             ) {
-                VStack(spacing: BarTabSpacing.sm) {
+                VStack(spacing: BartapSpacing.sm) {
                     let isAuthorized =
                         locationService.authorizationStatus == .authorizedWhenInUse ||
                         locationService.authorizationStatus == .authorizedAlways
@@ -210,11 +210,11 @@ private enum OnboardingPage: CaseIterable {
         case .notifications:
             StandardOnboardingPage(
                 icon: icon,
-                tint: .barTabPrimary,
+                tint: .BartapPrimary,
                 title: title,
                 subtitle: subtitle
             ) {
-                VStack(spacing: BarTabSpacing.sm) {
+                VStack(spacing: BartapSpacing.sm) {
                     OnboardingPrimaryButton(title: String(localized: "Enable notifications")) {
                         UNUserNotificationCenter.current().requestAuthorization(
                             options: [.alert, .sound, .badge]
@@ -255,27 +255,27 @@ private enum OnboardingPage: CaseIterable {
         case .done:
             StandardOnboardingPage(
                 icon: icon,
-                tint: .barTabAccent,
+                tint: .BartapAccent,
                 title: title,
                 subtitle: subtitle
             ) {
-                VStack(spacing: BarTabSpacing.sm) {
+                VStack(spacing: BartapSpacing.sm) {
                     if let bar = nearestBar {
-                        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                        VStack(alignment: .leading, spacing: BartapSpacing.xs) {
                             Text(String(localized: "Nearest bar to you"))
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapCaption)
+                                .foregroundColor(.BartapSecondary)
                             Text(bar.name)
-                                .font(.barTabBodySemibold)
-                                .foregroundColor(.barTabText)
+                                .font(.BartapBodySemibold)
+                                .foregroundColor(.BartapText)
                             Text(bar.address)
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
                                 .lineLimit(1)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(BarTabSpacing.md)
-                        .barTabCard()
+                        .padding(BartapSpacing.md)
+                        .BartapCard()
                     }
 
                     OnboardingPrimaryButton(
@@ -314,30 +314,30 @@ private struct OnboardingPageHeader: View {
     let subtitle: String
 
     var body: some View {
-        VStack(spacing: BarTabSpacing.lg) {
+        VStack(spacing: BartapSpacing.lg) {
             Image(systemName: icon)
                 .font(.system(size: 40, weight: .semibold))
                 .foregroundColor(tint)
                 .frame(width: 108, height: 108)
-                .background(Color.barTabSurface)
+                .background(Color.BartapSurface)
                 .clipShape(Circle())
                 .overlay(
                     Circle().stroke(tint.opacity(0.20), lineWidth: 1)
                 )
 
-            VStack(spacing: BarTabSpacing.sm) {
+            VStack(spacing: BartapSpacing.sm) {
                 Text(title)
-                    .font(.barTabTitle)
+                    .font(.BartapTitle)
                     .multilineTextAlignment(.center)
 
                 Text(subtitle)
-                    .font(.barTabBody)
+                    .font(.BartapBody)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 340)
             }
         }
-        .padding(.horizontal, BarTabSpacing.lg)
+        .padding(.horizontal, BartapSpacing.lg)
     }
 }
 
@@ -367,7 +367,7 @@ private struct StandardOnboardingPage<Footer: View>: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Spacer(minLength: BarTabSpacing.xl)
+            Spacer(minLength: BartapSpacing.xl)
 
             OnboardingPageHeader(
                 icon: icon,
@@ -376,11 +376,11 @@ private struct StandardOnboardingPage<Footer: View>: View {
                 subtitle: subtitle
             )
 
-            Spacer(minLength: BarTabSpacing.xl)
+            Spacer(minLength: BartapSpacing.xl)
 
             footer
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.bottom, BarTabSpacing.xl + 12)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.bottom, BartapSpacing.xl + 12)
         }
     }
 }
@@ -395,10 +395,10 @@ private struct OnboardingPrimaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .barTabPrimaryButton()
+                .BartapPrimaryButton()
         }
     }
 }
@@ -411,10 +411,10 @@ private struct OnboardingSecondaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, BarTabSpacing.xs)
+                .padding(.vertical, BartapSpacing.xs)
                 .contentShape(Rectangle())
         }
     }
@@ -437,20 +437,20 @@ private struct InterestsPage: View {
         VStack(spacing: 0) {
             OnboardingPageHeader(
                 icon: icon,
-                tint: .barTabPrimary,
+                tint: .BartapPrimary,
                 title: title,
                 subtitle: subtitle
             )
-            .padding(.top, BarTabSpacing.lg)
+            .padding(.top, BartapSpacing.lg)
 
             // The grid is the only flexible element on this page, so it
             // always gets the full height between header and button.
             ScrollView {
                 LazyVGrid(
                     columns: [
-                        GridItem(.adaptive(minimum: 100), spacing: BarTabSpacing.sm)
+                        GridItem(.adaptive(minimum: 100), spacing: BartapSpacing.sm)
                     ],
-                    spacing: BarTabSpacing.sm
+                    spacing: BartapSpacing.sm
                 ) {
                     ForEach(allDrinks) { drink in
                         InterestChip(
@@ -465,17 +465,17 @@ private struct InterestsPage: View {
                         }
                     }
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.top, BarTabSpacing.md)
-                .padding(.bottom, BarTabSpacing.sm)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.top, BartapSpacing.md)
+                .padding(.bottom, BartapSpacing.sm)
             }
 
             OnboardingPrimaryButton(title: String(localized: "Continue")) {
                 withAnimation { page += 1 }
             }
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.top, BarTabSpacing.xs)
-            .padding(.bottom, BarTabSpacing.xl + 12)
+            .padding(.horizontal, BartapSpacing.md)
+            .padding(.top, BartapSpacing.xs)
+            .padding(.bottom, BartapSpacing.xl + 12)
         }
     }
 }
@@ -491,17 +491,17 @@ private struct InterestChip: View {
                 Image(systemName: drink.icon)
                     .font(.title2)
                 Text(drink.displayName)
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                     .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, BarTabSpacing.md)
-            .background(isSelected ? Color.barTabPrimary : Color.barTabSurface)
-            .foregroundColor(isSelected ? .white : .barTabText)
-            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+            .padding(.vertical, BartapSpacing.md)
+            .background(isSelected ? Color.BartapPrimary : Color.BartapSurface)
+            .foregroundColor(isSelected ? .white : .BartapText)
+            .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                    .stroke(isSelected ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                    .stroke(isSelected ? Color.clear : Color.BartapCardBorder, lineWidth: 0.5)
             )
         }
         .buttonStyle(.plain)

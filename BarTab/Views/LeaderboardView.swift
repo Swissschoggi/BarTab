@@ -40,81 +40,81 @@ struct LeaderboardView: View {
                 .padding(.vertical, 8)
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: BarTabSpacing.md) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.md) {
 
                         if leaderboardEntries.isEmpty {
                             VStack(spacing: 12) {
                                 Image(systemName: "person.3.sequence")
-                                    .font(.barTabDisplay)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapDisplay)
+                                    .foregroundColor(.BartapSecondary)
 
                                 Text(scope == .local ? String(localized: "No contributors nearby yet") : String(localized: "No contributors yet"))
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapSecondary)
 
                                 Text(String(localized: "Be the first to add drinks and bars!"))
-                                    .font(.barTabSmall)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapSmall)
+                                    .foregroundColor(.BartapSecondary)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.top, BarTabSpacing.xxl)
+                            .padding(.top, BartapSpacing.xxl)
                         } else {
                             ForEach(Array(leaderboardEntries.enumerated()), id: \.element.id) { index, entry in
                                 HStack(spacing: 12) {
                                     Text("#\(index + 1)")
-                                        .font(.barTabBody)
+                                        .font(.BartapBody)
                                         .fontWeight(.bold)
-                                        .foregroundColor(index < 3 ? .barTabAccent : .barTabSecondary)
+                                        .foregroundColor(index < 3 ? .BartapAccent : .BartapSecondary)
                                         .frame(width: 32, alignment: .leading)
 
                                     if let userID = UUID(uuidString: entry.id) {
                                         UserAvatarView(urlString: avatarCache[userID], displayName: entry.username, size: 36)
                                     } else {
                                         Image(systemName: entry.level.icon)
-                                            .font(.barTabBody)
+                                            .font(.BartapBody)
                                             .foregroundColor(.white)
                                             .frame(width: 32, height: 32)
-                                            .background(Color.barTabAccent.opacity(index < 3 ? 1.0 : 0.7))
-                                            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                                            .background(Color.BartapAccent.opacity(index < 3 ? 1.0 : 0.7))
+                                            .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
                                     }
 
                                     VStack(alignment: .leading, spacing: 1) {
                                         Text(entry.username)
-                                            .font(.barTabBody)
+                                            .font(.BartapBody)
                                             .fontWeight(.semibold)
-                                            .foregroundColor(.barTabText)
+                                            .foregroundColor(.BartapText)
 
                                         Text(entry.level.name)
-                                            .font(.barTabTiny)
-                                            .foregroundColor(.barTabSecondary)
+                                            .font(.BartapTiny)
+                                            .foregroundColor(.BartapSecondary)
                                     }
 
                                     Spacer()
 
                                     Text("\(entry.contributions)")
-                                        .font(.barTabSmall)
+                                        .font(.BartapSmall)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(.barTabPrimary)
+                                        .foregroundColor(.BartapPrimary)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 3)
-                                        .background(Color.barTabPrimary.opacity(0.08))
+                                        .background(Color.BartapPrimary.opacity(0.08))
                                         .clipShape(Capsule())
                                 }
                                 .padding(.horizontal, 16)
-                                .padding(.vertical, BarTabSpacing.sm)
+                                .padding(.vertical, BartapSpacing.sm)
 
                                 if index < leaderboardEntries.count - 1 {
                                     Divider()
-                                        .foregroundColor(.barTabCardBorder)
-                                        .padding(.leading, BarTabSpacing.md)
+                                        .foregroundColor(.BartapCardBorder)
+                                        .padding(.leading, BartapSpacing.md)
                                 }
                             }
                         }
                     }
-                    .padding(.top, BarTabSpacing.xs)
+                    .padding(.top, BartapSpacing.xs)
                 }
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "Leaderboard"))
             .navigationBarTitleDisplayMode(.inline)
         }

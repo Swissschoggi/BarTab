@@ -22,22 +22,22 @@ struct AdminReportsView: View {
 
                 if reports.isEmpty {
 
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
                         Image(systemName: "checkmark.shield")
-                            .font(.barTabEmptyIcon)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapEmptyIcon)
+                            .foregroundColor(.BartapPrimary)
 
                         Text(String(localized: "All clear"))
-                            .font(.barTabHeading)
+                            .font(.BartapHeading)
 
                         Text(String(localized: "Flagged bars and drinks will show up here for review."))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .barTabCard()
+                    .BartapCard()
 
                 } else {
 
@@ -46,7 +46,7 @@ struct AdminReportsView: View {
                             String(localized: "\(barRepository.unreviewedReportCount) \(barRepository.unreviewedReportCount == 1 ? "needs" : "need") review"),
                             systemImage: "exclamationmark.circle"
                         )
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .foregroundColor(.secondary)
 
                         Spacer()
@@ -63,7 +63,7 @@ struct AdminReportsView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 20)
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Reported content"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -94,7 +94,7 @@ struct AdminReportsView: View {
             return barRepository.barForPriceGroupKey(report.targetID)
         }()
 
-        return VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        return VStack(alignment: .leading, spacing: BartapSpacing.sm) {
 
             if let bar = barForReport {
                 NavigationLink {
@@ -111,12 +111,12 @@ struct AdminReportsView: View {
             }
 
             Text(report.reason.title)
-                .font(.barTabBody)
+                .font(.BartapBody)
                 .foregroundColor(.primary)
 
             reportCardActions(report)
         }
-        .barTabCard()
+        .BartapCard()
     }
 
     private func reportCardHeader(
@@ -130,38 +130,38 @@ struct AdminReportsView: View {
                     ? "mappin.and.ellipse"
                     : "dollarsign.circle"
             )
-            .font(.barTabBody)
-            .foregroundColor(.barTabWarning)
+            .font(.BartapBody)
+            .foregroundColor(.BartapWarning)
 
             Text(report.targetLabel)
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .lineLimit(1)
 
             Spacer()
 
             if tappable {
                 Image(systemName: "chevron.right")
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
             }
 
             if !report.isReviewed {
                 Text(String(localized: "New"))
-                    .font(.barTabTiny)
+                    .font(.BartapTiny)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
-                    .background(Color.barTabAccent)
+                    .background(Color.BartapAccent)
                     .clipShape(Capsule())
             } else {
                 Label(
                     String(localized: "Reviewed"),
                     systemImage: "checkmark.circle.fill"
                 )
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .fontWeight(.semibold)
-                .foregroundColor(.barTabSuccess)
+                .foregroundColor(.BartapSuccess)
             }
         }
     }
@@ -172,15 +172,15 @@ struct AdminReportsView: View {
         HStack(spacing: 6) {
 
             Text(String(localized: "by \(report.reportedByName)"))
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .foregroundColor(.secondary)
 
             Text("\u{00B7}")
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .foregroundColor(.secondary)
 
             Text(relativeDate(report.reportedAt))
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .foregroundColor(.secondary)
 
             Spacer()
@@ -191,9 +191,9 @@ struct AdminReportsView: View {
                     showingDeleteConfirmation = true
                 } label: {
                     Label(String(localized: "Remove"), systemImage: "trash")
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .fontWeight(.semibold)
-                        .foregroundColor(.barTabDanger)
+                        .foregroundColor(.BartapDanger)
                 }
             } else {
                 Button {
@@ -202,9 +202,9 @@ struct AdminReportsView: View {
                     }
                 } label: {
                     Text(String(localized: "Mark reviewed"))
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .fontWeight(.semibold)
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
                 }
             }
         }

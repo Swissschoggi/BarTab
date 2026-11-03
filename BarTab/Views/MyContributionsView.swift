@@ -34,7 +34,7 @@ struct MyContributionsView: View {
                         Text(
                             String(localized: "\(myPrices.count) \(myPrices.count == 1 ? "contribution" : "contributions")")
                         )
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .foregroundColor(.secondary)
 
                         Spacer()
@@ -79,7 +79,7 @@ struct MyContributionsView: View {
                                             systemImage: "pencil"
                                         )
                                     }
-                                    .tint(.barTabPrimary)
+                                    .tint(.BartapPrimary)
                                 }
                             }
                         }
@@ -91,7 +91,7 @@ struct MyContributionsView: View {
             .padding(.bottom, 30)
         }
         .background(
-            Color.barTabBackground
+            Color.BartapBackground
                 .ignoresSafeArea()
         )
         .navigationTitle(String(localized: "My Contributions"))
@@ -111,13 +111,13 @@ struct MyContributionsView: View {
 
     private var emptyState: some View {
 
-        VStack(spacing: BarTabSpacing.sm) {
+        VStack(spacing: BartapSpacing.sm) {
 
             ZStack {
 
                 Circle()
                     .fill(
-                        Color.barTabPrimary.opacity(0.12)
+                        Color.BartapPrimary.opacity(0.12)
                     )
                     .frame(
                         width: 72,
@@ -129,18 +129,18 @@ struct MyContributionsView: View {
                 )
                 .font(.system(size: 28))
                 .foregroundColor(
-                    .barTabPrimary
+                    .BartapPrimary
                 )
             }
 
             Text(String(localized: "No contributions yet"))
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .fontWeight(.semibold)
 
             Text(
                 String(localized: "Drinks you add to bars will appear here.")
             )
-            .font(.barTabBody)
+            .font(.BartapBody)
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 30)
@@ -155,7 +155,7 @@ struct MyContributionsView: View {
 
         VStack(
             alignment: .leading,
-            spacing: BarTabSpacing.sm
+            spacing: BartapSpacing.sm
         ) {
 
             HStack(
@@ -166,19 +166,19 @@ struct MyContributionsView: View {
                 ZStack {
 
                     RoundedRectangle(
-                        cornerRadius: BarTabRadius.control,
+                        cornerRadius: BartapRadius.control,
                         style: .continuous
                     )
                     .fill(
-                        Color.barTabPrimary.opacity(0.12)
+                        Color.BartapPrimary.opacity(0.12)
                     )
 
                     Image(
                         systemName: price.drink.icon
                     )
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
                     .foregroundColor(
-                        .barTabPrimary
+                        .BartapPrimary
                     )
                 }
                 .frame(
@@ -195,12 +195,12 @@ struct MyContributionsView: View {
                         price.brand
                             ?? price.drink.displayName
                     )
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
 
                     Text(
                         "\(price.drink.displayName) · \(price.size.displayName)"
                     )
-                    .font(.barTabBody)
+                    .font(.BartapBody)
                     .foregroundColor(.secondary)
                 }
 
@@ -221,11 +221,11 @@ struct MyContributionsView: View {
                         )
                     )
                     .foregroundColor(
-                        .barTabPrimary
+                        .BartapPrimary
                     )
 
                     Text(price.currency)
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .foregroundColor(.secondary)
                 }
             }
@@ -242,7 +242,7 @@ struct MyContributionsView: View {
                         systemName: "mappin.circle.fill"
                     )
                     .foregroundColor(
-                        .barTabPrimary
+                        .BartapPrimary
                     )
 
                     VStack(
@@ -251,11 +251,11 @@ struct MyContributionsView: View {
                     ) {
 
                         Text(bar.name)
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .fontWeight(.medium)
 
                         Text(bar.address)
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .foregroundColor(.secondary)
                             .lineLimit(1)
                     }
@@ -272,12 +272,12 @@ struct MyContributionsView: View {
                     )
 
                     Text(String(localized: "Bar no longer available"))
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                 }
                 .foregroundColor(.secondary)
             }
         }
-        .barTabCard()
+        .BartapCard()
     }
 
 }

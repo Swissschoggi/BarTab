@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appID": "LUHP6G9833.com.example.BarTab",
+        "appID": "LUHP6G9833.com.example.Bartap",
         "paths": ["/bar/*", "/group/*"]
       }
     ]

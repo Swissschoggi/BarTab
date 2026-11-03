@@ -13,31 +13,31 @@ struct CreateGroupSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
 
                     // Name entry card
-                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.xs) {
                         Text(String(localized: "GROUP NAME"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
                         TextField(String(localized: "Group name"), text: $groupName)
                             .textInputAutocapitalization(.words)
-                            .font(.barTabBody)
-                            .foregroundColor(.barTabText)
-                            .padding(.vertical, BarTabSpacing.xs)
+                            .font(.BartapBody)
+                            .foregroundColor(.BartapText)
+                            .padding(.vertical, BartapSpacing.xs)
                     }
-                    .padding(BarTabSpacing.md)
-                    .background(Color.barTabCardFill)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .padding(BartapSpacing.md)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                     )
 
                     Text(String(localized: "Friends you invite can create polls and vote on where to go."))
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
 
                     // Create action
                     Button {
@@ -45,14 +45,14 @@ struct CreateGroupSheet: View {
                     } label: {
                         Text(String(localized: "Create Group"))
                     }
-                    .barTabPrimaryButton()
-                    .padding(.top, BarTabSpacing.xs)
+                    .BartapPrimaryButton()
+                    .padding(.top, BartapSpacing.xs)
                     .disabled(groupName.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.md)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .scrollDismissesKeyboard(.immediately)
             .navigationTitle(String(localized: "New Group"))
             .navigationBarTitleDisplayMode(.inline)
@@ -61,7 +61,7 @@ struct CreateGroupSheet: View {
                     Button(String(localized: "Cancel")) {
                         dismiss()
                     }
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
                 }
             }
         }

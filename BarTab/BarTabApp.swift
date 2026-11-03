@@ -4,7 +4,7 @@ import Combine
 import UserNotifications
 
 @main
-struct BarTabApp: App {
+struct BartapApp: App {
 
     @StateObject private var barRepository = BarRepository()
     @StateObject private var userSession = UserSession()
@@ -35,7 +35,7 @@ struct BarTabApp: App {
         let cache = URLCache(
             memoryCapacity: 50 * 1024 * 1024,
             diskCapacity: 200 * 1024 * 1024,
-            diskPath: "BarTabURLCache"
+            diskPath: "BartapURLCache"
         )
         URLCache.shared = cache
     }
@@ -55,17 +55,17 @@ struct BarTabApp: App {
 
         let barAppearance = UINavigationBarAppearance()
         barAppearance.configureWithOpaqueBackground()
-        barAppearance.backgroundColor = .barTabBackgroundTint
+        barAppearance.backgroundColor = .BartapBackgroundTint
 
         let navigationBar = UINavigationBar.appearance()
         navigationBar.backIndicatorImage = backArrow
         navigationBar.backIndicatorTransitionMaskImage = backArrow
-        navigationBar.tintColor = .barTabPrimaryTint
+        navigationBar.tintColor = .BartapPrimaryTint
         navigationBar.standardAppearance = barAppearance
         navigationBar.scrollEdgeAppearance = barAppearance
         navigationBar.compactAppearance = barAppearance
 
-        UIBarButtonItem.appearance().tintColor = .barTabPrimaryTint
+        UIBarButtonItem.appearance().tintColor = .BartapPrimaryTint
     }
 
     var body: some Scene {
@@ -79,7 +79,7 @@ struct BarTabApp: App {
                 .environmentObject(liveLocationService)
                 .environmentObject(deepLinkRouter)
                 .environment(\.locale, languageManager.currentLocale)
-                .barTabToast(center: toastCenter)
+                .BartapToast(center: toastCenter)
                 .task {
                     await barRepository.fetchAllData()
                     await WidgetSnapshotService.refresh(barRepository: barRepository, locationService: locationService)
@@ -203,7 +203,7 @@ final class DeepLinkRouter: ObservableObject {
 
     @Published var destination: Destination?
 
-    /// Parses a `bartab://bar/<id>` or `bartab://group/<id>` URL.
+    /// Parses a `Bartap://bar/<id>` or `Bartap://group/<id>` URL.
     static func parse(url: URL) -> Destination? {
         guard url.scheme == SupabaseConfig.oauthCallbackScheme else { return nil }
 

@@ -34,13 +34,13 @@ struct UserAvatarView: View {
 
     private var fallback: some View {
         Circle()
-            .fill(Color.barTabPrimary.opacity(0.12))
+            .fill(Color.BartapPrimary.opacity(0.12))
             .frame(width: size, height: size)
             .overlay(
                 Text(initial)
                     .font(size >= 36 ? .headline : .caption)
                     .fontWeight(.semibold)
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
             )
     }
 }

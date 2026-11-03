@@ -1,6 +1,6 @@
-# BarTab
+# Bartap
 
-BarTab is a crowdsourced iOS app for discovering drink prices at bars.
+Bartap is a crowdsourced iOS app for discovering drink prices at bars.
 
 Users can:
 - Find nearby bars

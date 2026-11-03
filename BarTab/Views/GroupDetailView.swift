@@ -42,21 +42,21 @@ struct GroupDetailView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
                                 Text(String(localized: "Members"))
-                                    .font(.barTabHeading)
+                                    .font(.BartapHeading)
                                 Spacer()
                                 Button {
                                     showingInvite = true
                                 } label: {
                                     Image(systemName: "person.badge.plus")
-                                        .font(.barTabBody)
-                                        .foregroundColor(.barTabPrimary)
+                                        .font(.BartapBody)
+                                        .foregroundColor(.BartapPrimary)
                                 }
                                 Button {
                                     shareGroup()
                                 } label: {
                                     Image(systemName: "square.and.arrow.up")
-                                        .font(.barTabBody)
-                                        .foregroundColor(.barTabPrimary)
+                                        .font(.BartapBody)
+                                        .foregroundColor(.BartapPrimary)
                                 }
                             }
 
@@ -65,22 +65,22 @@ struct GroupDetailView: View {
                                     HStack(spacing: 4) {
                                         UserAvatarView(urlString: avatarCache[member.userID], displayName: userCache[member.userID], size: 20)
                                         Text(memberLabel(member))
-                                            .font(.barTabSmall)
+                                            .font(.BartapSmall)
                                             .fontWeight(.medium)
                                     }
-                                    .padding(.horizontal, BarTabSpacing.sm)
+                                    .padding(.horizontal, BartapSpacing.sm)
                                     .padding(.vertical, 5)
-                                    .background(Color.barTabPrimary.opacity(0.08))
+                                    .background(Color.BartapPrimary.opacity(0.08))
                                     .clipShape(Capsule())
                                 }
                             }
                         }
-                        .barTabCard()
+                        .BartapCard()
 
                         // Nights out section header
                         HStack {
                             Text(String(localized: "Nights out"))
-                                .font(.barTabHeading)
+                                .font(.BartapHeading)
                             Spacer()
                             Button {
                                 showingNewEvent = true
@@ -90,23 +90,23 @@ struct GroupDetailView: View {
                                     Text(String(localized: "Plan"))
                                         .fontWeight(.semibold)
                                 }
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapPrimary)
                             }
                         }
 
                         if events.isEmpty {
-                            VStack(spacing: BarTabSpacing.sm) {
+                            VStack(spacing: BartapSpacing.sm) {
                                 Image(systemName: "figure.walk.circle")
-                                    .font(.barTabEmptyIcon)
-                                    .foregroundColor(.barTabPrimary)
+                                    .font(.BartapEmptyIcon)
+                                    .foregroundColor(.BartapPrimary)
                                 Text(String(localized: "No nights out yet"))
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapSecondary)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 30)
-                            .barTabCard()
+                            .BartapCard()
                         } else {
                             ForEach(events) { event in
                                 NightOutCard(event: event, onDelete: {
@@ -121,7 +121,7 @@ struct GroupDetailView: View {
                         // Polls section header
                         HStack {
                             Text(String(localized: "Polls"))
-                                .font(.barTabHeading)
+                                .font(.BartapHeading)
                             Spacer()
                             Button {
                                 showingNewPoll = true
@@ -131,23 +131,23 @@ struct GroupDetailView: View {
                                     Text(String(localized: "New Poll"))
                                         .fontWeight(.semibold)
                                 }
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapPrimary)
                             }
                         }
 
                         if polls.isEmpty {
-                            VStack(spacing: BarTabSpacing.sm) {
+                            VStack(spacing: BartapSpacing.sm) {
                                 Image(systemName: "checkmark.circle")
-                                    .font(.barTabEmptyIcon)
-                                    .foregroundColor(.barTabPrimary)
+                                    .font(.BartapEmptyIcon)
+                                    .foregroundColor(.BartapPrimary)
                                 Text(String(localized: "No polls yet"))
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapSecondary)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 30)
-                            .barTabCard()
+                            .BartapCard()
                         } else {
                             ForEach(polls) { poll in
                                 PollCard(poll: poll, isAdmin: isAdmin, onClose: {
@@ -160,7 +160,7 @@ struct GroupDetailView: View {
                         }
 
                         // Danger zone
-                        VStack(spacing: BarTabSpacing.sm) {
+                        VStack(spacing: BartapSpacing.sm) {
                             Button {
                                 showingLeaveConfirmation = true
                             } label: {
@@ -169,9 +169,9 @@ struct GroupDetailView: View {
                             }
                             .buttonStyle(.plain)
                             .padding(.vertical, 12)
-                            .background(Color.barTabDanger.opacity(0.08))
-                            .foregroundColor(.barTabDanger)
-                            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                            .background(Color.BartapDanger.opacity(0.08))
+                            .foregroundColor(.BartapDanger)
+                            .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
 
                             if isAdmin {
                                 Button {
@@ -182,16 +182,16 @@ struct GroupDetailView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .padding(.vertical, 12)
-                                .background(Color.barTabDanger.opacity(0.15))
-                                .foregroundColor(.barTabDanger)
-                                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                                .background(Color.BartapDanger.opacity(0.15))
+                                .foregroundColor(.BartapDanger)
+                                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
                             }
                         }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
                 }
-                .background(Color.barTabBackground.ignoresSafeArea())
+                .background(Color.BartapBackground.ignoresSafeArea())
                 .navigationTitle(group.name)
                 .navigationBarTitleDisplayMode(.inline)
                 .sheet(isPresented: $showingNewPoll) {
@@ -384,7 +384,7 @@ struct GroupDetailView: View {
     }
 
     private func shareGroup() {
-        let shareText = "Join my group \"\(group.name)\" on BarTab! 🍺"
+        let shareText = "Join my group \"\(group.name)\" on Bartap! 🍺"
         shareItems = [shareText, DeepLink.group(group.id)]
     }
 }
@@ -427,28 +427,28 @@ struct PollCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
             HStack {
                 Text(poll.title)
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
                 Spacer()
                 if isOpen {
                     Text(String(localized: "Active"))
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Color.barTabSuccess)
+                        .background(Color.BartapSuccess)
                         .clipShape(Capsule())
                 } else {
                     Text(String(localized: "Closed"))
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .fontWeight(.bold)
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Color.barTabSecondary.opacity(0.2))
+                        .background(Color.BartapSecondary.opacity(0.2))
                         .clipShape(Capsule())
                 }
             }
@@ -463,18 +463,18 @@ struct PollCard: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "xmark.circle")
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                         Text(String(localized: "Close poll"))
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .fontWeight(.medium)
                     }
-                    .foregroundColor(.barTabDanger)
+                    .foregroundColor(.BartapDanger)
                 }
                 .padding(.top, 4)
             }
         }
         .padding(14)
-        .barTabCard()
+        .BartapCard()
         .task {
             await loadPollData()
         }
@@ -516,41 +516,41 @@ struct PollCard: View {
             Task { await vote(option) }
         } label: {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: BarTabSpacing.sm) {
+                HStack(spacing: BartapSpacing.sm) {
                     Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(selected ? .barTabPrimary : .barTabSecondary)
+                        .foregroundColor(selected ? .BartapPrimary : .BartapSecondary)
 
                     Text(option.label)
-                        .font(.barTabBody)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapBody)
+                        .foregroundColor(.BartapText)
 
                     Spacer()
 
                     Text("\(voteCount)")
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .fontWeight(.bold)
-                        .foregroundColor(.barTabAccent)
+                        .foregroundColor(.BartapAccent)
                 }
 
                 if let barID = option.barID,
                    let bar = barRepository.getBar(id: barID) {
                     HStack(spacing: 4) {
                         Image(systemName: "mappin.circle.fill")
-                            .font(.barTabTiny)
+                            .font(.BartapTiny)
                         Text(bar.name)
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSecondary)
                     }
                     .padding(.leading, 26)
                 }
             }
             .padding(10)
             .background(
-                RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous)
-                    .fill(selected ? Color.barTabPrimary.opacity(0.08) : Color.clear)
+                RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous)
+                    .fill(selected ? Color.BartapPrimary.opacity(0.08) : Color.clear)
                     .overlay(
-                        RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous)
-                            .stroke(selected ? Color.barTabPrimary.opacity(0.3) : Color.barTabCardBorder, lineWidth: 1)
+                        RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous)
+                            .stroke(selected ? Color.BartapPrimary.opacity(0.3) : Color.BartapCardBorder, lineWidth: 1)
                     )
             )
         }

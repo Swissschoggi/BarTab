@@ -15,21 +15,21 @@ enum SupabaseConfig {
 
     /// Deep-link scheme used as the OAuth redirect target
     /// (Google sign-in). Must match CFBundleURLTypes in Info.plist.
-    static let oauthCallbackScheme = "bartab"
+    static let oauthCallbackScheme = "Bartap"
 
     /// Stripe publishable key for the tip jar. Set to your `pk_test_…`
     /// (development) or `pk_live_…` (production) key from the Stripe Dashboard.
     static let stripePublishableKey = ""
 }
 
-/// Builds shareable deep links that open BarTab to a specific screen.
+/// Builds shareable deep links that open Bartap to a specific screen.
 enum DeepLink {
 
     static let scheme = SupabaseConfig.oauthCallbackScheme
 
     /// Universal Link host. Only used once the app has the paid Developer
     /// Program (the Associated Domains entitlement is unavailable on free
-    /// personal teams). Until then, share links use `bartab://…`.
+    /// personal teams). Until then, share links use `Bartap://…`.
     static let host = "bartap.info"
 
     static func bar(_ id: UUID) -> URL {

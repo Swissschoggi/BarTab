@@ -20,12 +20,12 @@ struct RateBarSheet: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 28) {
 
-                VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                     Text(String(localized: "Ambience"))
-                        .font(.barTabHeading)
+                        .font(.BartapHeading)
 
                     Text(String(localized: "What's the vibe at \(bar.name)? Select all that apply."))
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .foregroundColor(.secondary)
 
                     LazyVGrid(columns: [
@@ -42,22 +42,22 @@ struct RateBarSheet: View {
                             } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: style.icon)
-                                        .font(.barTabSmall)
+                                        .font(.BartapSmall)
                                     Text(style.displayName)
-                                        .font(.barTabSmall)
+                                        .font(.BartapSmall)
                                 }
                                 .fixedSize(horizontal: true, vertical: false)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
                                 .frame(maxWidth: .infinity)
-                                .foregroundColor(selectedAmbiences.contains(style) ? .white : .barTabPrimary)
-                                .background(selectedAmbiences.contains(style) ? Color.barTabPrimary : Color.barTabPillFill)
-                                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                                .foregroundColor(selectedAmbiences.contains(style) ? .white : .BartapPrimary)
+                                .background(selectedAmbiences.contains(style) ? Color.BartapPrimary : Color.BartapPillFill)
+                                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
                             }
                         }
                     }
                 }
-                .barTabCard()
+                .BartapCard()
 
                 Spacer()
 
@@ -65,16 +65,16 @@ struct RateBarSheet: View {
                     submit()
                 } label: {
                     Text(String(localized: "Save rating"))
-                        .font(.barTabHeading)
+                        .font(.BartapHeading)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .barTabPrimaryButton()
+                        .BartapPrimaryButton()
                 }
                 .disabled(selectedAmbiences.isEmpty)
             }
             .padding()
             .background(
-                Color.barTabBackground.ignoresSafeArea()
+                Color.BartapBackground.ignoresSafeArea()
             )
             .navigationTitle(String(localized: "Rate this bar"))
             .navigationBarTitleDisplayMode(.inline)

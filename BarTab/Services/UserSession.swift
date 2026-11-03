@@ -302,7 +302,7 @@ final class UserSession: ObservableObject {
     ) async -> User {
 
         let fallbackUsername = session.user.username.isEmpty
-            ? "BarTab User"
+            ? "Bartap User"
             : session.user.username
 
         let profile = await authService.fetchProfile(
