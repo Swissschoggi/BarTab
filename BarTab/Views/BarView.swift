@@ -153,11 +153,11 @@ struct BarView: View {
         attachModals(
             to: ScrollView {
                 content
-                    .padding(.horizontal, BarTabSpacing.md)
-                    .padding(.top, BarTabSpacing.sm)
+                    .padding(.horizontal, BartapSpacing.md)
+                    .padding(.top, BartapSpacing.sm)
                     .padding(.bottom, 32)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .refreshable {
                 syncFromRepository()
             }
@@ -183,25 +183,25 @@ struct BarView: View {
     private var content: some View {
         VStack(alignment: .leading, spacing: 0) {
             barHeader
-                .padding(.bottom, BarTabSpacing.md)
+                .padding(.bottom, BartapSpacing.md)
 
             if userSession.currentUser != nil {
                 quickActionsRow
-                    .padding(.bottom, BarTabSpacing.lg)
+                    .padding(.bottom, BartapSpacing.lg)
             }
 
             compactInfoRow
-                .padding(.bottom, BarTabSpacing.lg)
+                .padding(.bottom, BartapSpacing.lg)
 
             menuSection
 
             if !similarBars.isEmpty {
                 similarBarsSection
-                    .padding(.top, BarTabSpacing.lg)
+                    .padding(.top, BartapSpacing.lg)
             }
 
             directionsButton
-                .padding(.top, BarTabSpacing.lg)
+                .padding(.top, BartapSpacing.lg)
         }
     }
 
@@ -212,13 +212,13 @@ struct BarView: View {
     }
 
     private var similarBarsSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
             Text(String(localized: "Bars like this"))
-                .font(.barTabHeading)
-                .foregroundColor(.barTabText)
+                .font(.BartapHeading)
+                .foregroundColor(.BartapText)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: BarTabSpacing.sm) {
+                HStack(spacing: BartapSpacing.sm) {
                     ForEach(similarBars) { bar in
                         NavigationLink {
                             BarView(bar: bar, allowsDismissal: false)
@@ -240,23 +240,23 @@ struct BarView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
                 Image(systemName: "wineglass.fill")
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabPrimary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapPrimary)
                 Text(bar.name)
-                    .font(.barTabBodySemibold)
-                    .foregroundColor(.barTabText)
+                    .font(.BartapBodySemibold)
+                    .foregroundColor(.BartapText)
                     .lineLimit(1)
             }
 
             Text(bar.address)
-                .font(.barTabTiny)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapTiny)
+                .foregroundColor(.BartapSecondary)
                 .lineLimit(1)
 
             if let location = locationService.location {
                 Text(DistanceService.formattedDistance(from: location, to: bar))
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabAccent)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapAccent)
             }
 
             let shared = sharedAmbienceCount(with: bar)
@@ -264,17 +264,17 @@ struct BarView: View {
                 Text(shared == 1
                      ? String(localized: "1 shared vibe")
                      : String(localized: "\(shared) shared vibes"))
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
             }
         }
         .frame(width: 160, alignment: .leading)
-        .padding(BarTabSpacing.sm)
-        .background(Color.barTabCardFill)
-        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+        .padding(BartapSpacing.sm)
+        .background(Color.BartapCardFill)
+        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
         )
     }
 
@@ -289,8 +289,8 @@ struct BarView: View {
     private var barHeader: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(currentBar.address)
-                .font(.barTabSmall)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapSmall)
+                .foregroundColor(.BartapSecondary)
                 .lineLimit(2)
 
             HStack(spacing: 6) {
@@ -301,37 +301,37 @@ struct BarView: View {
 
                 if let priceLevel = priceLevelString {
                     Text("·")
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
                     Text(priceLevel)
                         .fontWeight(.semibold)
                     Text(priceLevelTitle(priceLevel))
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
                 }
 
                 Spacer()
             }
-            .font(.barTabTiny)
-            .foregroundColor(.barTabSecondary)
+            .font(.BartapTiny)
+            .foregroundColor(.BartapSecondary)
 
             if !ambienceStyles.isEmpty {
                 HStack(spacing: 6) {
                     ForEach(ambienceStyles) { style in
                         HStack(spacing: 3) {
                             Image(systemName: style.icon)
-                                .font(.barTabTiny)
+                                .font(.BartapTiny)
                             Text(style.displayName)
-                                .font(.barTabTiny)
+                                .font(.BartapTiny)
                         }
-                        .foregroundColor(.barTabAccent)
+                        .foregroundColor(.BartapAccent)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Color.barTabAccent.opacity(0.1))
+                        .background(Color.BartapAccent.opacity(0.1))
                         .clipShape(Capsule())
                     }
                     if ambienceCount > ambienceStyles.count {
                         Text("+\(ambienceCount - ambienceStyles.count)")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSecondary)
                     }
                 }
                 .padding(.top, 2)
@@ -342,8 +342,8 @@ struct BarView: View {
                     SparklineView(
                         dataPoints: priceTrendData,
                         lineWidth: 1.5,
-                        lineColor: .barTabPrimary,
-                        fillColor: .barTabPrimary.opacity(0.08)
+                        lineColor: .BartapPrimary,
+                        fillColor: .BartapPrimary.opacity(0.08)
                     )
                     .frame(width: 60, height: 24)
 
@@ -351,11 +351,11 @@ struct BarView: View {
                         let diff = latest - first
                         if diff > 0.5 {
                             Image(systemName: "arrow.up.right")
-                                .font(.barTabTiny)
+                                .font(.BartapTiny)
                                 .foregroundColor(.red)
                         } else if diff < -0.5 {
                             Image(systemName: "arrow.down.right")
-                                .font(.barTabTiny)
+                                .font(.BartapTiny)
                                 .foregroundColor(.green)
                         }
                     }
@@ -382,6 +382,18 @@ struct BarView: View {
                     if hasCheckedIn {
                         ok = await barRepository.uncheckIn(bar: currentBar, user: user)
                     } else {
+                        guard let location = locationService.location else {
+                            toastCenter.show(String(localized: "Turn on location to check in"), kind: .error)
+                            return
+                        }
+                        let distance = location.distance(from: CLLocation(
+                            latitude: currentBar.coordinate.latitude,
+                            longitude: currentBar.coordinate.longitude
+                        ))
+                        guard distance <= 150 else {
+                            toastCenter.show(String(localized: "You need to be near the bar to check in"), kind: .error)
+                            return
+                        }
                         ok = await barRepository.checkIn(bar: currentBar, user: user)
                         if ok {
                             HapticEngine.success()
@@ -403,21 +415,21 @@ struct BarView: View {
                             .opacity(0.72)
                     }
                 }
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .fontWeight(.semibold)
-                .foregroundColor(hasCheckedIn ? .barTabSuccess : .white)
+                .foregroundColor(hasCheckedIn ? .BartapSuccess : .white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 11)
                 .background(
                     hasCheckedIn
-                        ? Color.barTabSuccess.opacity(0.10)
-                        : Color.barTabPrimary
+                        ? Color.BartapSuccess.opacity(0.10)
+                        : Color.BartapPrimary
                 )
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                 .overlay {
                     if hasCheckedIn {
-                        RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                            .stroke(Color.barTabSuccess.opacity(0.25), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                            .stroke(Color.BartapSuccess.opacity(0.25), lineWidth: 1)
                     }
                 }
             }
@@ -430,13 +442,13 @@ struct BarView: View {
                     Image(systemName: "plus")
                     Text(String(localized: "Add price"))
                 }
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .fontWeight(.semibold)
-                .foregroundColor(.barTabPrimary)
+                .foregroundColor(.BartapPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 11)
-                .background(Color.barTabPrimary.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                .background(Color.BartapPrimary.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
             }
             .buttonStyle(.plain)
         }
@@ -459,15 +471,15 @@ struct BarView: View {
                     showingAllAttributes = true
                 } label: {
                     Text("+\(attributes.count - 4) more")
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .fontWeight(.medium)
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
-                        .background(Color.barTabSurface)
+                        .background(Color.BartapSurface)
                         .clipShape(Capsule())
                         .overlay(
-                            Capsule().stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                            Capsule().stroke(Color.BartapCardBorder, lineWidth: 0.5)
                         )
                 }
                 .buttonStyle(.plain)
@@ -483,12 +495,12 @@ struct BarView: View {
                     Image(systemName: "star")
                     Text(String(localized: "Rate"))
                 }
-                .font(.barTabTiny)
+                .font(.BartapTiny)
                 .fontWeight(.semibold)
-                .foregroundColor(.barTabAccent)
+                .foregroundColor(.BartapAccent)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
-                .background(Color.barTabAccent.opacity(0.1))
+                .background(Color.BartapAccent.opacity(0.1))
                 .clipShape(Capsule())
             }
             .buttonStyle(.plain)
@@ -509,10 +521,10 @@ struct BarView: View {
             Button(action: action) {
                 HStack(spacing: 4) {
                     Image(systemName: attribute.key.icon)
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                     if let value = attribute.consensusValue {
                         Text(value)
-                            .font(.barTabTiny)
+                            .font(.BartapTiny)
                             .fontWeight(.medium)
                         // Confidence indicator
                         if attribute.consensusConfidence > 0 {
@@ -526,24 +538,24 @@ struct BarView: View {
                         }
                     } else {
                         Text(String(localized: "Unknown"))
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSecondary)
                     }
                 }
-                .foregroundColor(attribute.consensusValue != nil ? .barTabPrimary : .barTabSecondary)
+                .foregroundColor(attribute.consensusValue != nil ? .BartapPrimary : .BartapSecondary)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
                 .background(
                     attribute.consensusValue != nil
-                    ? Color.barTabPrimary.opacity(0.1)
-                    : Color.barTabSurface
+                    ? Color.BartapPrimary.opacity(0.1)
+                    : Color.BartapSurface
                 )
                 .clipShape(Capsule())
                 .overlay(
                     Capsule().stroke(
                         attribute.consensusValue != nil
-                        ? Color.barTabPrimary.opacity(0.3)
-                        : Color.barTabCardBorder,
+                        ? Color.BartapPrimary.opacity(0.3)
+                        : Color.BartapCardBorder,
                         lineWidth: 0.5
                     )
                 )
@@ -553,9 +565,9 @@ struct BarView: View {
 
         func confidenceColor(_ pct: Int) -> Color {
             switch pct {
-            case 80...100: return .barTabSuccess
-            case 50..<80: return .barTabWarning
-            default: return .barTabDanger
+            case 80...100: return .BartapSuccess
+            case 50..<80: return .BartapWarning
+            default: return .BartapDanger
             }
         }
     }
@@ -572,10 +584,10 @@ struct BarView: View {
                     .fontWeight(.medium)
                 Spacer()
                 Image(systemName: "arrow.up.right")
-                    .font(.barTabTiny)
+                    .font(.BartapTiny)
             }
-            .font(.barTabSmall)
-            .foregroundColor(.barTabSecondary)
+            .font(.BartapSmall)
+            .foregroundColor(.BartapSecondary)
             .padding(.vertical, 9)
         }
         .buttonStyle(.plain)
@@ -584,18 +596,18 @@ struct BarView: View {
     // MARK: - Menu
 
     private var menuSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
             HStack(alignment: .firstTextBaseline) {
                 Text(String(localized: "Menu"))
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
                     .fontWeight(.bold)
 
                 Spacer()
 
                 if let fetchedAt = barRepository.lastFetchedAt {
                     Text("Updated \(fetchedAt.relativeFormatted)")
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapSecondary)
                 }
             }
             .padding(.bottom, 2)
@@ -625,19 +637,19 @@ struct BarView: View {
             } label: {
                 HStack(spacing: 9) {
                     Image(systemName: drink.icon)
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabPrimary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapPrimary)
                         .frame(width: 22)
 
                     Text(drink.displayName.uppercased())
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .fontWeight(.bold)
                         .tracking(0.7)
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
 
                     Text("\(groups.count)")
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabSecondary.opacity(0.8))
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapSecondary.opacity(0.8))
 
                     Spacer()
 
@@ -645,7 +657,7 @@ struct BarView: View {
                           ? "chevron.up"
                           : "chevron.down")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
                 }
                 .contentShape(Rectangle())
                 .padding(.vertical, 10)
@@ -681,20 +693,20 @@ struct BarView: View {
                         HStack(spacing: 5) {
                             if let brand = group.brand, !brand.isEmpty {
                                 Text(brand)
-                                    .font(.barTabBody)
+                                    .font(.BartapBody)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.barTabText)
+                                    .foregroundColor(.BartapText)
                             } else {
                                 Text(group.drink.displayName)
-                                    .font(.barTabBody)
+                                    .font(.BartapBody)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.barTabText)
+                                    .foregroundColor(.BartapText)
                             }
 
                             if isFlagged {
                                 Image(systemName: "flag.fill")
-                                    .font(.barTabTiny)
-                                    .foregroundColor(.barTabWarning)
+                                    .font(.BartapTiny)
+                                    .foregroundColor(.BartapWarning)
                             }
                         }
 
@@ -711,28 +723,28 @@ struct BarView: View {
                                 Text(serving.displayName)
                             }
                         }
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapSecondary)
                     }
 
                     Spacer(minLength: 8)
 
                     VStack(alignment: .trailing, spacing: 2) {
                         Text("\(Currency.defaultCurrency.symbol)\(Decimal(averageAmount(for: group)).formattedAmount)")
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .fontWeight(.bold)
-                            .foregroundColor(.barTabPrimary)
+                            .foregroundColor(.BartapPrimary)
 
                         if group.prices.count > 1 {
                             Text("\(group.prices.count) reports")
-                                .font(.barTabTiny)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapTiny)
+                                .foregroundColor(.BartapSecondary)
                         }
                     }
 
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
                         .frame(width: 14)
                 }
                 .contentShape(Rectangle())
@@ -748,8 +760,8 @@ struct BarView: View {
                             .padding(.top, 2)
                     } else {
                         Text(String(localized: "One reported price"))
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSecondary)
                     }
 
                     ForEach(group.prices) { price in
@@ -762,7 +774,7 @@ struct BarView: View {
                             showingDrinkRating = true
                         } label: {
                             Label(String(localized: "Rate"), systemImage: myDrinkRatingIcon(for: group))
-                                .font(.barTabTiny)
+                                .font(.BartapTiny)
                                 .fontWeight(.semibold)
                         }
 
@@ -771,7 +783,7 @@ struct BarView: View {
                             showingPriceAlert = true
                         } label: {
                             Label(String(localized: "Alert"), systemImage: "bell")
-                                .font(.barTabTiny)
+                                .font(.BartapTiny)
                                 .fontWeight(.semibold)
                         }
 
@@ -801,12 +813,12 @@ struct BarView: View {
                             }
                         } label: {
                             Image(systemName: "ellipsis")
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
                                 .frame(width: 28, height: 28)
                         }
                     }
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
                     .padding(.bottom, 8)
                 }
                 .padding(.leading, 34)
@@ -840,18 +852,18 @@ struct BarView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 5) {
                     Text("\(Currency.defaultCurrency.symbol)\(converted.formattedAmount)")
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .fontWeight(.semibold)
-                        .foregroundColor(.barTabText)
+                        .foregroundColor(.BartapText)
 
                     if verifyCount > 0 {
                         Image(systemName: "checkmark.seal.fill")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSuccess)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSuccess)
 
                         Text("\(verifyCount)")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSuccess)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSuccess)
                     }
                 }
 
@@ -862,8 +874,8 @@ struct BarView: View {
                         Text("· \(price.formattedAmount) \(price.currency)")
                     }
                 }
-                .font(.barTabTiny)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapTiny)
+                .foregroundColor(.BartapSecondary)
             }
 
             Spacer()
@@ -896,8 +908,8 @@ struct BarView: View {
                     Image(systemName: hasVerified
                           ? "checkmark.circle.fill"
                           : "checkmark.circle")
-                        .font(.barTabBody)
-                        .foregroundColor(hasVerified ? .barTabSuccess : .barTabSecondary)
+                        .font(.BartapBody)
+                        .foregroundColor(hasVerified ? .BartapSuccess : .BartapSecondary)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(
@@ -913,8 +925,8 @@ struct BarView: View {
                     showingDeletePriceConfirmation = true
                 } label: {
                     Image(systemName: "trash")
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabDanger)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapDanger)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(String(localized: "Delete price"))
@@ -922,8 +934,8 @@ struct BarView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .background(Color.barTabPrimary.opacity(0.045))
-        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+        .background(Color.BartapPrimary.opacity(0.045))
+        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
         .contextMenu {
             if !isMine {
                 Button {
@@ -957,21 +969,21 @@ struct BarView: View {
     private var emptyPricesView: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(String(localized: "No prices yet"))
-                .font(.barTabBody)
+                .font(.BartapBody)
                 .fontWeight(.semibold)
 
             Text(String(localized: "Be the first to add a drink price at this bar."))
-                .font(.barTabSmall)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapSmall)
+                .foregroundColor(.BartapSecondary)
 
             if userSession.currentUser != nil {
                 Button {
                     showingAddPrice = true
                 } label: {
                     Text(String(localized: "Add the first price"))
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .fontWeight(.semibold)
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 3)
@@ -1003,7 +1015,7 @@ struct BarView: View {
                 HapticEngine.lightTap()
             } label: {
                 Image(systemName: isFavorited ? "heart.fill" : "heart")
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
             }
             .accessibilityLabel(
                 isFavorited ? String(localized: "Remove from favorites") : String(localized: "Add to favorites")
@@ -1044,7 +1056,7 @@ struct BarView: View {
                 }
             } label: {
                 Image(systemName: "ellipsis")
-                    .foregroundColor(.barTabSecondary)
+                    .foregroundColor(.BartapSecondary)
             }
             .accessibilityLabel(String(localized: "More options"))
         }
@@ -1211,7 +1223,7 @@ struct BarView: View {
     }
 
     private var shareText: String {
-        "Check out \(currentBar.name) on BarTab!"
+        "Check out \(currentBar.name) on Bartap!"
     }
 
     private var canDeleteBar: Bool {
@@ -1257,7 +1269,7 @@ struct BarView: View {
         guard let user = userSession.currentUser else { return }
         barRepository.reportBar(currentBar, reason: reason, reportedBy: user)
         HapticEngine.success()
-        toastCenter.show(String(localized: "Reported - thanks for helping keep BarTab accurate."), kind: .success)
+        toastCenter.show(String(localized: "Reported - thanks for helping keep Bartap accurate."), kind: .success)
     }
 
     private func reportPriceGroup(_ group: PriceGroup, reason: ReportReason) {
@@ -1272,7 +1284,7 @@ struct BarView: View {
             reportedBy: user
         )
         HapticEngine.success()
-        toastCenter.show(String(localized: "Reported - thanks for helping keep BarTab accurate."), kind: .success)
+        toastCenter.show(String(localized: "Reported - thanks for helping keep Bartap accurate."), kind: .success)
     }
 
     private func deleteBar() {

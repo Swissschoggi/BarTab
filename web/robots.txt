@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /_vercel/
 
-Sitemap: https://bartap.info/sitemap.xml
+Sitemap: https://www.bartap.info/sitemap.xml

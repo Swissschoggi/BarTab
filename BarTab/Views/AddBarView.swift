@@ -31,10 +31,10 @@ struct AddBarView: View {
             VStack(spacing: 0) {
 
 
-                HStack(spacing: BarTabSpacing.sm) {
+                HStack(spacing: BartapSpacing.sm) {
 
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
 
                     TextField(
                         String(localized: "Search for a bar or place"),
@@ -60,19 +60,19 @@ struct AddBarView: View {
                     }
                 }
                 .padding(14)
-                .background(Color.barTabCardFill)
+                .background(Color.BartapCardFill)
                 .clipShape(
                     RoundedRectangle(
-                        cornerRadius: BarTabRadius.control,
+                        cornerRadius: BartapRadius.control,
                         style: .continuous
                     )
                 )
                 .overlay(
                     RoundedRectangle(
-                        cornerRadius: BarTabRadius.control,
+                        cornerRadius: BartapRadius.control,
                         style: .continuous
                     )
-                    .stroke(Color.barTabPrimary.opacity(0.25), lineWidth: 1)
+                    .stroke(Color.BartapPrimary.opacity(0.25), lineWidth: 1)
                 )
                 .padding(.horizontal)
                 .padding(.top)
@@ -95,13 +95,13 @@ struct AddBarView: View {
                                     selectPlace(result)
                                 } label: {
 
-                                    HStack(spacing: BarTabSpacing.sm) {
+                                    HStack(spacing: BartapSpacing.sm) {
 
                                         Image(
                                             systemName: "mappin.circle.fill"
                                         )
-                                        .font(.barTabHeading)
-                                        .foregroundColor(.barTabPrimary)
+                                        .font(.BartapHeading)
+                                        .foregroundColor(.BartapPrimary)
 
                                         VStack(
                                             alignment: .leading,
@@ -109,11 +109,11 @@ struct AddBarView: View {
                                         ) {
 
                                             Text(result.title)
-                                                .font(.barTabHeading)
+                                                .font(.BartapHeading)
                                                 .foregroundColor(.primary)
 
                                             Text(result.subtitle)
-                                                .font(.barTabBody)
+                                                .font(.BartapBody)
                                                 .foregroundColor(.secondary)
                                                 .lineLimit(2)
                                         }
@@ -134,22 +134,22 @@ struct AddBarView: View {
 
                 } else if selectedCoordinate == nil {
 
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
 
                         Spacer()
 
                         Image(systemName: "building.2")
-                            .font(.barTabEmptyIcon)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapEmptyIcon)
+                            .foregroundColor(.BartapPrimary)
 
                         Text(String(localized: "Find your bar"))
-                            .font(.barTabHeading)
+                            .font(.BartapHeading)
                             .fontWeight(.semibold)
 
                         Text(
                             String(localized: "Search for a bar, pub, cafe or other place.")
                         )
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .multilineTextAlignment(.center)
                         .foregroundColor(.secondary)
                         .padding(.horizontal, 40)
@@ -188,8 +188,8 @@ struct AddBarView: View {
                                         systemName: "chevron.right"
                                     )
                                 }
-                                .foregroundColor(.barTabPrimary)
-                                .barTabCard(cornerRadius: BarTabRadius.control)
+                                .foregroundColor(.BartapPrimary)
+                                .BartapCard(cornerRadius: BartapRadius.control)
                             }
 
                             Button {
@@ -197,10 +197,10 @@ struct AddBarView: View {
                             } label: {
 
                                 Text(String(localized: "Add Bar"))
-                                    .font(.barTabHeading)
+                                    .font(.BartapHeading)
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .barTabPrimaryButton()
+                                    .BartapPrimaryButton()
                             }
                             .disabled(!canCreateBar)
                             .opacity(canCreateBar ? 1 : 0.5)
@@ -210,7 +210,7 @@ struct AddBarView: View {
                 }
             }
             .background(
-                Color.barTabBackground
+                Color.BartapBackground
                     .ignoresSafeArea()
             )
             .scrollDismissesKeyboard(.immediately)
@@ -270,23 +270,23 @@ struct AddBarView: View {
                 Image(
                     systemName: "checkmark.circle.fill"
                 )
-                .foregroundColor(.barTabPrimary)
+                .foregroundColor(.BartapPrimary)
 
                 Text(String(localized: "Selected place"))
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
 
                 Spacer()
             }
 
             Text(name)
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .fontWeight(.semibold)
 
             Text(address)
-                .font(.barTabBody)
+                .font(.BartapBody)
                 .foregroundColor(.secondary)
         }
-        .barTabCard()
+        .BartapCard()
     }
 
 
@@ -301,7 +301,7 @@ struct AddBarView: View {
                 )
                 .foregroundColor(.primary)
             }
-            .tint(.barTabPrimary)
+            .tint(.BartapPrimary)
 
             Divider()
 
@@ -312,9 +312,9 @@ struct AddBarView: View {
                 )
                 .foregroundColor(.primary)
             }
-            .tint(.barTabPrimary)
+            .tint(.BartapPrimary)
         }
-        .barTabCard()
+        .BartapCard()
     }
 
 

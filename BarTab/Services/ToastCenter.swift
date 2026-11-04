@@ -28,7 +28,7 @@ struct Toast: Identifiable, Equatable {
             case .error:
                 return .red
             case .info:
-                return Color.barTabPrimary
+                return Color.BartapPrimary
             }
         }
     }
@@ -182,7 +182,7 @@ enum FriendlyError {
         case 404:
             return "That entry could not be found."
         case 500...599:
-            return "BarTab's server is having trouble right now. Please try again soon."
+            return "Bartap's server is having trouble right now. Please try again soon."
         default:
             return "Something went wrong. Please try again."
         }
@@ -233,7 +233,7 @@ private struct ToastOverlay: View {
             Text(toast.message)
                 .font(.subheadline)
                 .fontWeight(.medium)
-                .foregroundColor(.barTabText)
+                .foregroundColor(.BartapText)
                 .multilineTextAlignment(.leading)
 
             Spacer(minLength: 0)
@@ -242,7 +242,7 @@ private struct ToastOverlay: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color.barTabCardFill)
+                .fill(Color.BartapCardFill)
                 .shadow(
                     color: Color.black.opacity(0.15),
                     radius: 18,
@@ -252,7 +252,7 @@ private struct ToastOverlay: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.barTabCardBorder.opacity(0.7), lineWidth: 0.5)
+                .stroke(Color.BartapCardBorder.opacity(0.7), lineWidth: 0.5)
         )
         .padding(.horizontal, 20)
     }
@@ -319,7 +319,7 @@ final class ToastWindowController {
     }
 }
 
-struct BarTabToastModifier: ViewModifier {
+struct BartapToastModifier: ViewModifier {
     @ObservedObject var toastCenter: ToastCenter
 
     func body(content: Content) -> some View {
@@ -331,7 +331,7 @@ struct BarTabToastModifier: ViewModifier {
 
 extension View {
     /// Attach once near the root of a scene; toasts appear at the top.
-    func barTabToast(center: ToastCenter) -> some View {
-        modifier(BarTabToastModifier(toastCenter: center))
+    func BartapToast(center: ToastCenter) -> some View {
+        modifier(BartapToastModifier(toastCenter: center))
     }
 }

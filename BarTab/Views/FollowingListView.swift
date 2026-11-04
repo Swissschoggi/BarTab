@@ -17,21 +17,21 @@ struct FollowingListView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if followingIDs.isEmpty {
-                VStack(spacing: BarTabSpacing.sm) {
+                VStack(spacing: BartapSpacing.sm) {
                     Image(systemName: "person.2.slash")
-                        .font(.barTabEmptyIcon)
-                        .foregroundColor(.barTabPrimary)
+                        .font(.BartapEmptyIcon)
+                        .foregroundColor(.BartapPrimary)
                     Text(String(localized: "Not following anyone yet"))
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .fontWeight(.medium)
                     Text(String(localized: "Find friends to see their drink reports here."))
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 40)
-                .barTabCard()
+                .BartapCard()
             } else {
                 ScrollView {
                     VStack(spacing: 0) {
@@ -40,18 +40,18 @@ struct FollowingListView: View {
                                 followingRow(profile: profile)
                                 if userID != followingIDs.last {
                                     Divider()
-                                        .foregroundColor(.barTabCardBorder)
+                                        .foregroundColor(.BartapCardBorder)
                                         .padding(.leading, 60)
                                 }
                             }
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
                     .padding(.horizontal, 16)
                 }
             }
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Following"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -65,9 +65,9 @@ struct FollowingListView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile.display_name ?? String(localized: "User"))
-                    .font(.barTabBody)
+                    .font(.BartapBody)
                     .fontWeight(.semibold)
-                    .foregroundColor(.barTabText)
+                    .foregroundColor(.BartapText)
             }
 
             Spacer()
@@ -76,12 +76,12 @@ struct FollowingListView: View {
                 Task { await unfollow(profile) }
             } label: {
                 Text(String(localized: "Unfollow"))
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                     .fontWeight(.medium)
-                    .foregroundColor(.barTabDanger)
+                    .foregroundColor(.BartapDanger)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.barTabDanger.opacity(0.08))
+                    .background(Color.BartapDanger.opacity(0.08))
                     .clipShape(Capsule())
             }
             .buttonStyle(.plain)

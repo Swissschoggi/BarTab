@@ -4,9 +4,9 @@ final class BadgeService {
 
     static let shared = BadgeService()
 
-    private let streakKey = "com.bartab.streak"
-    private let lastContributionKey = "com.bartab.lastContributionDate"
-    private let earnedBadgesKey = "com.bartab.earnedBadges"
+    private let streakKey = "com.Bartap.streak"
+    private let lastContributionKey = "com.Bartap.lastContributionDate"
+    private let earnedBadgesKey = "com.Bartap.earnedBadges"
 
     private init() {}
 

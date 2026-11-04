@@ -22,89 +22,89 @@ struct SetAlertSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
 
                     // Alert-for card
-                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.xs) {
                         Text(String(localized: "ALERT FOR"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
                         HStack {
                             Text(bar.name)
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabText)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapText)
                             Spacer()
                             Image(systemName: "mappin.and.ellipse")
-                                .foregroundColor(.barTabPrimary)
+                                .foregroundColor(.BartapPrimary)
                         }
 
                         HStack {
                             Text(drink.displayName)
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabText)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapText)
                             Spacer()
                             Text(size.displayName)
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapSecondary)
                         }
 
                         if let brand {
                             HStack {
                                 Text(String(localized: "Brand"))
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabText)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapText)
                                 Spacer()
                                 Text(brand)
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapSecondary)
                             }
                         }
                     }
-                    .padding(BarTabSpacing.md)
-                    .background(Color.barTabCardFill)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .padding(BartapSpacing.md)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                     )
 
                     // Target price card
-                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.xs) {
                         Text(String(localized: "TARGET PRICE"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
                         HStack {
                             Text(Currency.defaultCurrency.symbol)
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapSecondary)
                             TextField(String(localized: "Any price"), text: $targetPrice)
                                 .keyboardType(.decimalPad)
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabText)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapText)
                         }
 
                         if let price = parsedPrice, price < 0 {
                             Text(String(localized: "Price cannot be negative."))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabDanger)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapDanger)
                         } else if let price = parsedPrice, price == 0 {
                             Text(String(localized: "Price must be greater than zero, or leave empty for any price."))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabDanger)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapDanger)
                         } else {
                             Text(String(localized: "Leave empty to be alerted on any new price. Set a value to be notified when the price drops to or below it."))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
                         }
                     }
-                    .padding(BarTabSpacing.md)
-                    .background(Color.barTabCardFill)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .padding(BartapSpacing.md)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                     )
 
                     Button {
@@ -112,14 +112,14 @@ struct SetAlertSheet: View {
                     } label: {
                         Text(String(localized: "Set Alert"))
                     }
-                    .barTabPrimaryButton()
-                    .padding(.top, BarTabSpacing.xs)
+                    .BartapPrimaryButton()
+                    .padding(.top, BartapSpacing.xs)
                     .disabled(isSaving)
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.md)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .scrollDismissesKeyboard(.immediately)
             .navigationTitle(String(localized: "Price Alert"))
             .navigationBarTitleDisplayMode(.inline)
@@ -128,7 +128,7 @@ struct SetAlertSheet: View {
                     Button(String(localized: "Cancel")) {
                         dismiss()
                     }
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
                 }
             }
         }

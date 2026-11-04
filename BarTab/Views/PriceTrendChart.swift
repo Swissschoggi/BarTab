@@ -151,7 +151,7 @@ struct PriceTrendChart: View {
                         path.closeSubpath()
                     }
                     .fill(
-                        Color.barTabPrimary.opacity(0.15)
+                        Color.BartapPrimary.opacity(0.15)
                     )
 
                     Path { path in
@@ -162,7 +162,7 @@ struct PriceTrendChart: View {
                         }
                     }
                     .stroke(
-                        Color.barTabPrimary,
+                        Color.BartapPrimary,
                         style: StrokeStyle(
                             lineWidth: 2,
                             lineCap: .round,
@@ -178,8 +178,8 @@ struct PriceTrendChart: View {
                     Circle()
                         .fill(
                             index == chartPoints.count - 1
-                                ? Color.barTabAccent
-                                : Color.barTabPrimary
+                                ? Color.BartapAccent
+                                : Color.BartapPrimary
                         )
                         .frame(
                             width:
@@ -205,11 +205,11 @@ struct PriceTrendChart: View {
         HStack(spacing: 8) {
 
             Circle()
-                .fill(Color.barTabAccent)
+                .fill(Color.BartapAccent)
                 .frame(width: 10, height: 10)
 
             Text("Only one report so far   add another to see a trend.")
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .foregroundColor(.secondary)
         }
         .frame(
@@ -223,7 +223,7 @@ struct PriceTrendChart: View {
     ) -> some View {
 
         Text(message)
-            .font(.barTabSmall)
+            .font(.BartapSmall)
             .foregroundColor(.secondary)
             .frame(
                 maxWidth: .infinity,
@@ -274,6 +274,6 @@ struct PriceTrendChart_Previews: PreviewProvider {
             ]
         )
         .padding()
-        .background(Color.barTabBackground)
+        .background(Color.BartapBackground)
     }
 }

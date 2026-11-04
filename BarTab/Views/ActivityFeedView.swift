@@ -16,51 +16,51 @@ struct ActivityFeedView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: BarTabSpacing.md) {
+            VStack(alignment: .leading, spacing: BartapSpacing.md) {
 
-                BarTabScreenHeader(
+                BartapScreenHeader(
                     title: String(localized: "Activity"),
                     subtitle: String(localized: "See what your friends are drinking.")
                 )
 
                 if let refreshError {
                     Text(refreshError)
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabDanger)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapDanger)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
 
                 if isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
-                    .padding(.vertical, BarTabSpacing.xxl)
+                    .padding(.vertical, BartapSpacing.xxl)
                 } else if items.isEmpty {
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
                         Image(systemName: "person.2.slash")
-                            .font(.barTabEmptyIcon)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapEmptyIcon)
+                            .foregroundColor(.BartapPrimary)
 
                         Text(String(localized: "No activity yet"))
-                            .font(.barTabHeading)
+                            .font(.BartapHeading)
 
                         Text(String(localized: "Accept follow requests to see their price reports and ratings here."))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .barTabCard()
+                    .BartapCard()
                 } else {
                     ForEach(items) { item in
                         activityRow(item)
                     }
                 }
             }
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, BarTabSpacing.lg)
+            .padding(.horizontal, BartapSpacing.md)
+            .padding(.vertical, BartapSpacing.lg)
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Activity"))
         .navigationBarTitleDisplayMode(.inline)
         .refreshable {
@@ -94,11 +94,11 @@ struct ActivityFeedView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 4) {
                         Text(username(for: item.userID))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .fontWeight(.semibold)
 
                         Text(item.actionText)
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                     }
 
@@ -106,79 +106,79 @@ struct ActivityFeedView: View {
                     case .priceReport(let barName, _, let amount, let currency):
                         HStack(spacing: 4) {
                             Text(barName)
-                                .font(.barTabSmall)
+                                .font(.BartapSmall)
                                 .fontWeight(.medium)
                             Text("·")
-                                .font(.barTabSmall)
+                                .font(.BartapSmall)
                                 .foregroundColor(.secondary)
                             Text("\(Currency(rawValue: currency)?.symbol ?? currency)\(amount.formattedAmount)")
-                                .font(.barTabSmall)
+                                .font(.BartapSmall)
                                 .fontWeight(.bold)
-                                .foregroundColor(.barTabAccent)
+                                .foregroundColor(.BartapAccent)
                         }
 
                     case .barRating(let barName, let ambience):
                         HStack(spacing: 4) {
                             Text(barName)
-                                .font(.barTabSmall)
+                                .font(.BartapSmall)
                                 .fontWeight(.medium)
                             if let ambience {
                                 Text("·")
-                                    .font(.barTabSmall)
+                                    .font(.BartapSmall)
                                     .foregroundColor(.secondary)
                                 Text(ambience)
-                                    .font(.barTabSmall)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapSmall)
+                                    .foregroundColor(.BartapSecondary)
                             }
                         }
 
                     case .drinkRating(let barName, let drink, let quality):
                         HStack(spacing: 4) {
                             Text(barName)
-                                .font(.barTabSmall)
+                                .font(.BartapSmall)
                                 .fontWeight(.medium)
                             Text("·")
-                                .font(.barTabSmall)
+                                .font(.BartapSmall)
                                 .foregroundColor(.secondary)
                             Text("\(drink) · \(quality)/5")
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
                         }
 
                     case .barCreated(let barName):
                         Text(barName)
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .fontWeight(.medium)
                     }
 
                     Text(item.timestamp.relativeDescription)
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapSecondary)
                 }
 
                 Spacer()
 
                 if matchesTaste(item) {
                     Text(String(localized: "For you"))
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .fontWeight(.semibold)
-                        .foregroundColor(.barTabAccent)
+                        .foregroundColor(.BartapAccent)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 3)
-                        .background(Color.barTabAccent.opacity(0.15))
+                        .background(Color.BartapAccent.opacity(0.15))
                         .clipShape(Capsule())
                         .padding(.top, 4)
                 }
 
                 if item.barID != nil {
                     Image(systemName: "chevron.right")
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapSecondary)
                         .padding(.top, 4)
                 }
             }
             .padding(12)
-            .barTabCard()
+            .BartapCard()
         }
         .buttonStyle(.plain)
     }

@@ -1,4 +1,4 @@
-/* BarTab — site styles
+/* Bartap — site styles
    Palette is the app's own. No external fonts: system faces only, so the site
    makes no third-party requests beyond Turnstile (and matches the privacy policy). */
 :root {
@@ -98,6 +98,8 @@ nav {
 }
 .hero .lede { color: var(--muted); font-size: 19px; max-width: 31em; margin-bottom: 34px; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-note { margin-top: 16px; font-size: 14px; color: var(--muted); max-width: 52ch; }
+.hero-note a { color: var(--gold, #c9a227); font-weight: 600; }
 
 /* The receipt: the one memorable thing on the page */
 .ticket {
@@ -243,6 +245,12 @@ section.container { padding-top: 88px; padding-bottom: 88px; }
 .waitlist-msg.success { color: var(--sage); }
 .waitlist-msg.error { color: var(--rose); }
 .cta .waitlist-note { margin: 4px 0 0; font-size: 13px; }
+.cta-note {
+  max-width: 560px; margin: 0 auto 22px; padding: 16px 20px;
+  border: 1px solid var(--line); border-radius: var(--r-md, 12px);
+  background: rgba(107, 39, 55, .18); color: var(--text); font-size: 15px; line-height: 1.5;
+}
+.cta-note a { color: var(--gold, #c9a227); font-weight: 600; }
 
 /* ---------- Footer with big wordmark ---------- */
 footer { border-top: 1px solid var(--line); padding-top: 32px; color: var(--muted); font-size: 14px; overflow: hidden; }

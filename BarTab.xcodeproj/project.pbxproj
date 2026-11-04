@@ -120,14 +120,14 @@
 			containerPortal = AE78395B3034F16A00F1555E /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = AE7839623034F16A00F1555E;
-			remoteInfo = BarTab;
+			remoteInfo = Bartap;
 		};
 		AE78397E3034F16B00F1555E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AE78395B3034F16A00F1555E /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = AE7839623034F16A00F1555E;
-			remoteInfo = BarTab;
+			remoteInfo = Bartap;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -137,13 +137,13 @@
 		AE52284930487D6F00B25ECF /* BarHopView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarHopView.swift; sourceTree = "<group>"; };
 		AE52284A30487D6F00B25ECF /* AllAttributesSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllAttributesSheet.swift; sourceTree = "<group>"; };
 		AE52284B30487D6F00B25ECF /* AttributeDetailSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttributeDetailSheet.swift; sourceTree = "<group>"; };
-		AE7839633034F16A00F1555E /* BarTab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarTab.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE7839633034F16A00F1555E /* Bartap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bartap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE7839663034F16A00F1555E /* BarTabApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabApp.swift; sourceTree = "<group>"; };
 		AE78396A3034F16B00F1555E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AE78396D3034F16B00F1555E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		AE7839733034F16B00F1555E /* BarTabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarTabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE7839733034F16B00F1555E /* BartapTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BartapTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE7839773034F16B00F1555E /* BarTabTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabTests.swift; sourceTree = "<group>"; };
-		AE78397D3034F16B00F1555E /* BarTabUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarTabUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE78397D3034F16B00F1555E /* BartapUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BartapUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE7839813034F16B00F1555E /* BarTabUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabUITests.swift; sourceTree = "<group>"; };
 		AE7839833034F16B00F1555E /* BarTabUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTabUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		AE7839963034F4E700F1555E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -273,9 +273,9 @@
 			isa = PBXGroup;
 			children = (
 				AE7839963034F4E700F1555E /* README.md */,
-				AE7839653034F16A00F1555E /* BarTab */,
-				AE7839763034F16B00F1555E /* BarTabTests */,
-				AE7839803034F16B00F1555E /* BarTabUITests */,
+				AE7839653034F16A00F1555E /* Bartap */,
+				AE7839763034F16B00F1555E /* BartapTests */,
+				AE7839803034F16B00F1555E /* BartapUITests */,
 				AE7839643034F16A00F1555E /* Products */,
 				AE7959153035E879005EE91A /* Frameworks */,
 			);
@@ -284,14 +284,14 @@
 		AE7839643034F16A00F1555E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AE7839633034F16A00F1555E /* BarTab.app */,
-				AE7839733034F16B00F1555E /* BarTabTests.xctest */,
-				AE78397D3034F16B00F1555E /* BarTabUITests.xctest */,
+				AE7839633034F16A00F1555E /* Bartap.app */,
+				AE7839733034F16B00F1555E /* BartapTests.xctest */,
+				AE78397D3034F16B00F1555E /* BartapUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		AE7839653034F16A00F1555E /* BarTab */ = {
+		AE7839653034F16A00F1555E /* Bartap */ = {
 			isa = PBXGroup;
 			children = (
 				AEA1BD6E3035ECE500DE059C /* DTOs */,
@@ -318,7 +318,7 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		AE7839763034F16B00F1555E /* BarTabTests */ = {
+		AE7839763034F16B00F1555E /* BartapTests */ = {
 			isa = PBXGroup;
 			children = (
 				AE7839773034F16B00F1555E /* BarTabTests.swift */,
@@ -326,7 +326,7 @@
 			path = BarTabTests;
 			sourceTree = "<group>";
 		};
-		AE7839803034F16B00F1555E /* BarTabUITests */ = {
+		AE7839803034F16B00F1555E /* BartapUITests */ = {
 			isa = PBXGroup;
 			children = (
 				AE7839813034F16B00F1555E /* BarTabUITests.swift */,
@@ -484,9 +484,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AE7839623034F16A00F1555E /* BarTab */ = {
+		AE7839623034F16A00F1555E /* Bartap */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AE7839873034F16B00F1555E /* Build configuration list for PBXNativeTarget "BarTab" */;
+			buildConfigurationList = AE7839873034F16B00F1555E /* Build configuration list for PBXNativeTarget "Bartap" */;
 			buildPhases = (
 				AE78395F3034F16A00F1555E /* Sources */,
 				AE7839603034F16A00F1555E /* Frameworks */,
@@ -496,14 +496,14 @@
 			);
 			dependencies = (
 			);
-			name = BarTab;
-			productName = BarTab;
-			productReference = AE7839633034F16A00F1555E /* BarTab.app */;
+			name = Bartap;
+			productName = Bartap;
+			productReference = AE7839633034F16A00F1555E /* Bartap.app */;
 			productType = "com.apple.product-type.application";
 		};
-		AE7839723034F16B00F1555E /* BarTabTests */ = {
+		AE7839723034F16B00F1555E /* BartapTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AE78398A3034F16B00F1555E /* Build configuration list for PBXNativeTarget "BarTabTests" */;
+			buildConfigurationList = AE78398A3034F16B00F1555E /* Build configuration list for PBXNativeTarget "BartapTests" */;
 			buildPhases = (
 				AE78396F3034F16B00F1555E /* Sources */,
 				AE7839703034F16B00F1555E /* Frameworks */,
@@ -514,14 +514,14 @@
 			dependencies = (
 				AE7839753034F16B00F1555E /* PBXTargetDependency */,
 			);
-			name = BarTabTests;
-			productName = BarTabTests;
-			productReference = AE7839733034F16B00F1555E /* BarTabTests.xctest */;
+			name = BartapTests;
+			productName = BartapTests;
+			productReference = AE7839733034F16B00F1555E /* BartapTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		AE78397C3034F16B00F1555E /* BarTabUITests */ = {
+		AE78397C3034F16B00F1555E /* BartapUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AE78398D3034F16B00F1555E /* Build configuration list for PBXNativeTarget "BarTabUITests" */;
+			buildConfigurationList = AE78398D3034F16B00F1555E /* Build configuration list for PBXNativeTarget "BartapUITests" */;
 			buildPhases = (
 				AE7839793034F16B00F1555E /* Sources */,
 				AE78397A3034F16B00F1555E /* Frameworks */,
@@ -532,9 +532,9 @@
 			dependencies = (
 				AE78397F3034F16B00F1555E /* PBXTargetDependency */,
 			);
-			name = BarTabUITests;
-			productName = BarTabUITests;
-			productReference = AE78397D3034F16B00F1555E /* BarTabUITests.xctest */;
+			name = BartapUITests;
+			productName = BartapUITests;
+			productReference = AE78397D3034F16B00F1555E /* BartapUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -560,7 +560,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AE78395E3034F16A00F1555E /* Build configuration list for PBXProject "BarTab" */;
+			buildConfigurationList = AE78395E3034F16A00F1555E /* Build configuration list for PBXProject "Bartap" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -578,9 +578,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AE7839623034F16A00F1555E /* BarTab */,
-				AE7839723034F16B00F1555E /* BarTabTests */,
-				AE78397C3034F16B00F1555E /* BarTabUITests */,
+				AE7839623034F16A00F1555E /* Bartap */,
+				AE7839723034F16B00F1555E /* BartapTests */,
+				AE78397C3034F16B00F1555E /* BartapUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -741,12 +741,12 @@
 /* Begin PBXTargetDependency section */
 		AE7839753034F16B00F1555E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AE7839623034F16A00F1555E /* BarTab */;
+			target = AE7839623034F16A00F1555E /* Bartap */;
 			targetProxy = AE7839743034F16B00F1555E /* PBXContainerItemProxy */;
 		};
 		AE78397F3034F16B00F1555E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AE7839623034F16A00F1555E /* BarTab */;
+			target = AE7839623034F16A00F1555E /* Bartap */;
 			targetProxy = AE78397E3034F16B00F1555E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -880,7 +880,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BarTab/Info.plist;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarTab uses your Location to show nearby bars and their drink prices.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Bartap uses your Location to show nearby bars and their drink prices.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -914,7 +914,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BarTab/Info.plist;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarTab uses your Location to show nearby bars and their drink prices.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Bartap uses your Location to show nearby bars and their drink prices.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -944,12 +944,12 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.BarTabTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.BartapTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BarTab.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BarTab";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bartap.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Bartap";
 			};
 			name = Debug;
 		};
@@ -963,12 +963,12 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.BarTabTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.BartapTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BarTab.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BarTab";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bartap.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Bartap";
 			};
 			name = Release;
 		};
@@ -980,12 +980,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.BarTabUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.BartapUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = BarTab;
+				TEST_TARGET_NAME = Bartap;
 			};
 			name = Debug;
 		};
@@ -997,19 +997,19 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.BarTabUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.BartapUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = BarTab;
+				TEST_TARGET_NAME = Bartap;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AE78395E3034F16A00F1555E /* Build configuration list for PBXProject "BarTab" */ = {
+		AE78395E3034F16A00F1555E /* Build configuration list for PBXProject "Bartap" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE7839853034F16B00F1555E /* Debug */,
@@ -1018,7 +1018,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AE7839873034F16B00F1555E /* Build configuration list for PBXNativeTarget "BarTab" */ = {
+		AE7839873034F16B00F1555E /* Build configuration list for PBXNativeTarget "Bartap" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE7839883034F16B00F1555E /* Debug */,
@@ -1027,7 +1027,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AE78398A3034F16B00F1555E /* Build configuration list for PBXNativeTarget "BarTabTests" */ = {
+		AE78398A3034F16B00F1555E /* Build configuration list for PBXNativeTarget "BartapTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE78398B3034F16B00F1555E /* Debug */,
@@ -1036,7 +1036,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AE78398D3034F16B00F1555E /* Build configuration list for PBXNativeTarget "BarTabUITests" */ = {
+		AE78398D3034F16B00F1555E /* Build configuration list for PBXNativeTarget "BartapUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE78398E3034F16B00F1555E /* Debug */,

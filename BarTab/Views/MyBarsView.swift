@@ -39,7 +39,7 @@ struct MyBarsView: View {
                         Text(
                             String(localized: "\(myBars.count) \(myBars.count == 1 ? "bar" : "bars")")
                         )
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .foregroundColor(.secondary)
 
                         Spacer()
@@ -70,7 +70,7 @@ struct MyBarsView: View {
                                             systemImage: "pencil"
                                         )
                                     }
-                                    .tint(.barTabPrimary)
+                                    .tint(.BartapPrimary)
 
                                     Button(role: .destructive) {
                                         Task {
@@ -96,7 +96,7 @@ struct MyBarsView: View {
             .padding(.bottom, 30)
         }
         .background(
-            Color.barTabBackground
+            Color.BartapBackground
                 .ignoresSafeArea()
         )
         .navigationTitle(String(localized: "My Bars"))
@@ -114,13 +114,13 @@ struct MyBarsView: View {
 
     private var emptyState: some View {
 
-        VStack(spacing: BarTabSpacing.sm) {
+        VStack(spacing: BartapSpacing.sm) {
 
             ZStack {
 
                 Circle()
                     .fill(
-                        Color.barTabPrimary.opacity(0.12)
+                        Color.BartapPrimary.opacity(0.12)
                     )
                     .frame(
                         width: 72,
@@ -132,18 +132,18 @@ struct MyBarsView: View {
                 )
                 .font(.system(size: 28))
                 .foregroundColor(
-                    .barTabPrimary
+                    .BartapPrimary
                 )
             }
 
             Text(String(localized: "No bars yet"))
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .fontWeight(.semibold)
 
             Text(
                 String(localized: "Bars you add will appear here.")
             )
-            .font(.barTabBody)
+            .font(.BartapBody)
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 30)
@@ -174,19 +174,19 @@ struct MyBarsView: View {
                 ZStack {
 
                     RoundedRectangle(
-                        cornerRadius: BarTabRadius.control,
+                        cornerRadius: BartapRadius.control,
                         style: .continuous
                     )
                     .fill(
-                        Color.barTabPrimary.opacity(0.12)
+                        Color.BartapPrimary.opacity(0.12)
                     )
 
                     Image(
                         systemName: "wineglass.fill"
                     )
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
                     .foregroundColor(
-                        .barTabPrimary
+                        .BartapPrimary
                     )
                 }
                 .frame(
@@ -200,15 +200,15 @@ struct MyBarsView: View {
                 ) {
 
                     Text(bar.name)
-                        .font(.barTabHeading)
+                        .font(.BartapHeading)
                         .foregroundColor(.primary)
 
                     Text(bar.address)
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .foregroundColor(.secondary)
                         .lineLimit(1)
 
-                    HStack(spacing: BarTabSpacing.sm) {
+                    HStack(spacing: BartapSpacing.sm) {
 
                         if let location = locationService.location {
 
@@ -226,7 +226,7 @@ struct MyBarsView: View {
                             systemImage: "mug.fill"
                         )
                     }
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                     .foregroundColor(.secondary)
                 }
 
@@ -235,7 +235,7 @@ struct MyBarsView: View {
                 Image(
                     systemName: "chevron.right"
                 )
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .foregroundColor(.secondary)
             }
 
@@ -255,7 +255,7 @@ struct MyBarsView: View {
                             Text(
                                 "\(summary.drink.displayName) · \(summary.size.displayName)"
                             )
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
 
                             Spacer()
@@ -263,9 +263,9 @@ struct MyBarsView: View {
                             Text(
                                 "\(summary.formattedConvertedAmount) \(Currency.defaultCurrency.rawValue)"
                             )
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .fontWeight(.semibold)
-                            .foregroundColor(.barTabPrimary)
+                            .foregroundColor(.BartapPrimary)
                         }
                     }
 
@@ -274,13 +274,13 @@ struct MyBarsView: View {
                         Text(
                             String(localized: "And \(summaries.count - visibleSummaries.count) more…")
                         )
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .foregroundColor(.secondary)
                     }
                 }
             }
         }
-        .barTabCard()
+        .BartapCard()
     }
 }
 

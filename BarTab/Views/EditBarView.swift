@@ -28,66 +28,66 @@ struct EditBarView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
 
                     // Name card
-                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.xs) {
                         Text(String(localized: "BAR NAME"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
                         TextField(String(localized: "Bar name"), text: $name)
-                            .font(.barTabBody)
-                            .foregroundColor(.barTabText)
+                            .font(.BartapBody)
+                            .foregroundColor(.BartapText)
                     }
-                    .padding(BarTabSpacing.md)
-                    .background(Color.barTabCardFill)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .padding(BartapSpacing.md)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                     )
 
                     // Address card
-                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.xs) {
                         Text(String(localized: "ADDRESS"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
                         TextField(String(localized: "Address"), text: $address)
-                            .font(.barTabBody)
-                            .foregroundColor(.barTabText)
+                            .font(.BartapBody)
+                            .foregroundColor(.BartapText)
                     }
-                    .padding(BarTabSpacing.md)
-                    .background(Color.barTabCardFill)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .padding(BartapSpacing.md)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                     )
 
                     // Details card
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                         Text(String(localized: "DETAILS"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
                         Toggle(isOn: $smokingFriendly) {
                             Label(String(localized: "Smoking friendly"), systemImage: "smoke.fill")
                         }
-                        .tint(.barTabPrimary)
+                        .tint(.BartapPrimary)
 
                         Toggle(isOn: $outdoorSeating) {
                             Label(String(localized: "Outdoor seating"), systemImage: "sun.max.fill")
                         }
-                        .tint(.barTabPrimary)
+                        .tint(.BartapPrimary)
                     }
-                    .padding(BarTabSpacing.md)
-                    .background(Color.barTabCardFill)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .padding(BartapSpacing.md)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                     )
 
                     Button {
@@ -95,15 +95,15 @@ struct EditBarView: View {
                     } label: {
                         Text(String(localized: "Save Bar"))
                     }
-                    .barTabPrimaryButton()
-                    .padding(.top, BarTabSpacing.xs)
+                    .BartapPrimaryButton()
+                    .padding(.top, BartapSpacing.xs)
                     .disabled(isSaving || !canSave)
                     .opacity(canSave ? 1 : 0.5)
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.md)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .scrollDismissesKeyboard(.immediately)
             .navigationTitle(String(localized: "Edit Bar"))
             .navigationBarTitleDisplayMode(.inline)
@@ -112,7 +112,7 @@ struct EditBarView: View {
                     Button(String(localized: "Cancel")) {
                         dismiss()
                     }
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
                 }
             }
         }

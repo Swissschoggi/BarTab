@@ -3,9 +3,9 @@ import UIKit
 
 extension UIColor {
 
-    /// Dynamic burgundy backing `Color.barTabPrimary`.
+    /// Dynamic burgundy backing `Color.BartapPrimary`.
     /// Use this where UIKit needs a tint color (navigation bar back arrows, bar buttons).
-    static let barTabPrimaryTint = UIColor { traitCollection in
+    static let BartapPrimaryTint = UIColor { traitCollection in
         traitCollection.userInterfaceStyle == .dark
             ? UIColor(
                 red: 0xD4 / 255,
@@ -21,9 +21,9 @@ extension UIColor {
             )
     }
 
-    /// Dynamic warm cream backing `Color.barTabBackground`.
+    /// Dynamic warm cream backing `Color.BartapBackground`.
     /// Use this where UIKit needs the app background color (navigation bar backgrounds).
-    static let barTabBackgroundTint = UIColor { traitCollection in
+    static let BartapBackgroundTint = UIColor { traitCollection in
         traitCollection.userInterfaceStyle == .dark
             ? UIColor(
                 red: 0x1A / 255,
@@ -42,7 +42,7 @@ extension UIColor {
 
 extension Color {
 
-    private static func barTabAdaptive(
+    private static func BartapAdaptive(
         light: UIColor,
         dark: UIColor
     ) -> Color {
@@ -57,11 +57,11 @@ extension Color {
 
     // MARK: - Primary (burgundy)
 
-    static let barTabPrimary = Color(.barTabPrimaryTint)
+    static let BartapPrimary = Color(.BartapPrimaryTint)
 
     // MARK: - Accent (gold)
 
-    static let barTabAccent = barTabAdaptive(
+    static let BartapAccent = BartapAdaptive(
         light: UIColor(
             red: 0xC9 / 255,
             green: 0xA2 / 255,
@@ -78,11 +78,11 @@ extension Color {
 
     // MARK: - Background (warm cream)
 
-    static let barTabBackground = Color(.barTabBackgroundTint)
+    static let BartapBackground = Color(.BartapBackgroundTint)
 
     // MARK: - Text (warm charcoal)
 
-    static let barTabText = barTabAdaptive(
+    static let BartapText = BartapAdaptive(
         light: UIColor(
             red: 0x2C / 255,
             green: 0x26 / 255,
@@ -99,7 +99,7 @@ extension Color {
 
     // MARK: - Secondary text (warm gray)
 
-    static let barTabSecondary = barTabAdaptive(
+    static let BartapSecondary = BartapAdaptive(
         light: UIColor(
             red: 0x9A / 255,
             green: 0x90 / 255,
@@ -116,7 +116,7 @@ extension Color {
 
     // MARK: - Card fill (warm cream)
 
-    static let barTabCardFill = barTabAdaptive(
+    static let BartapCardFill = BartapAdaptive(
         light: UIColor(
             red: 0xFF / 255,
             green: 0xFA / 255,
@@ -133,7 +133,7 @@ extension Color {
 
     // MARK: - Card border (crisp hairline, not a glow)
 
-    static let barTabCardBorder = barTabAdaptive(
+    static let BartapCardBorder = BartapAdaptive(
         light: UIColor(
             red: 0xE4 / 255,
             green: 0xDA / 255,
@@ -150,7 +150,7 @@ extension Color {
 
     // MARK: - Elevated surface (one step above background, e.g. text fields, chips)
 
-    static let barTabSurface = barTabAdaptive(
+    static let BartapSurface = BartapAdaptive(
         light: UIColor(
             red: 0xEF / 255,
             green: 0xE8 / 255,
@@ -167,7 +167,7 @@ extension Color {
 
     // MARK: - Danger (brick red, tuned to sit with the warm palette)
 
-    static let barTabDanger = barTabAdaptive(
+    static let BartapDanger = BartapAdaptive(
         light: UIColor(
             red: 0xB8 / 255,
             green: 0x3A / 255,
@@ -184,7 +184,7 @@ extension Color {
 
     // MARK: - Warning (amber, distinct from the gold accent)
 
-    static let barTabWarning = barTabAdaptive(
+    static let BartapWarning = BartapAdaptive(
         light: UIColor(
             red: 0xB8 / 255,
             green: 0x74 / 255,
@@ -201,7 +201,7 @@ extension Color {
 
     // MARK: - Success green (sage)
 
-    static let barTabSuccess = barTabAdaptive(
+    static let BartapSuccess = BartapAdaptive(
         light: UIColor(
             red: 0x5A / 255,
             green: 0x9E / 255,
@@ -218,7 +218,7 @@ extension Color {
 
     // MARK: - Soft pill fill (warm sand)
 
-    static let barTabPillFill = barTabAdaptive(
+    static let BartapPillFill = BartapAdaptive(
         light: UIColor(
             red: 0xF2 / 255,
             green: 0xEB / 255,
@@ -235,23 +235,23 @@ extension Color {
 
     // MARK: - Gradient helpers
 
-    static let barTabGradientStart = barTabPrimary
+    static let BartapGradientStart = BartapPrimary
 
-    static let barTabGradientEnd = barTabAccent
+    static let BartapGradientEnd = BartapAccent
 
     // MARK: - Semantic tokens (modern design-system aliases)
-    // Web/shadcn-style semantic names mapped onto the BarTab palette so
+    // Web/shadcn-style semantic names mapped onto the Bartap palette so
     // components can be expressed in background/foreground/primary/muted/
     // accent/border terms, matching the cross-platform design language.
 
-    static let background = barTabBackground
-    static let foreground = barTabText
-    static let primary = barTabPrimary
-    static let muted = barTabSecondary
-    static let accent = barTabAccent
-    static let border = barTabCardBorder
-    static let surface = barTabSurface
-    static let danger = barTabDanger
-    static let success = barTabSuccess
-    static let warning = barTabWarning
+    static let background = BartapBackground
+    static let foreground = BartapText
+    static let primary = BartapPrimary
+    static let muted = BartapSecondary
+    static let accent = BartapAccent
+    static let border = BartapCardBorder
+    static let surface = BartapSurface
+    static let danger = BartapDanger
+    static let success = BartapSuccess
+    static let warning = BartapWarning
 }

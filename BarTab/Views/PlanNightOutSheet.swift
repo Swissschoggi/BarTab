@@ -46,50 +46,50 @@ struct PlanNightOutSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
 
                     // Title Section
                     selectorGroup(title: String(localized: "TITLE")) {
                         TextField(String(localized: "Name your night out"), text: $titleText)
                             .textInputAutocapitalization(.words)
                             .padding(.vertical, 12)
-                            .padding(.horizontal, BarTabSpacing.md)
-                            .background(Color.barTabSurface)
-                            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                            .padding(.horizontal, BartapSpacing.md)
+                            .background(Color.BartapSurface)
+                            .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                             .overlay(
-                                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                                RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                                    .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                             )
                     }
 
                     // Date Section
                     selectorGroup(title: String(localized: "WHEN")) {
-                        VStack(spacing: BarTabSpacing.sm) {
+                        VStack(spacing: BartapSpacing.sm) {
                             Toggle(String(localized: "Set a date"), isOn: $hasDate.animation())
-                                .tint(.barTabPrimary)
+                                .tint(.BartapPrimary)
 
                             if hasDate {
                                 DatePicker(String(localized: "When"), selection: $date, displayedComponents: [.date, .hourAndMinute])
                                     .datePickerStyle(.compact)
                                     .padding(.vertical, 8)
-                                    .padding(.horizontal, BarTabSpacing.md)
-                                    .background(Color.barTabSurface)
-                                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                                    .padding(.horizontal, BartapSpacing.md)
+                                    .background(Color.BartapSurface)
+                                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                                        RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                                     )
                             }
                         }
                     }
 
                     // Location Section
-                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.xs) {
                         Text(String(localized: "SEARCHING NEAR"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
-                        FlowLayout(spacing: BarTabSpacing.xs) {
+                        FlowLayout(spacing: BartapSpacing.xs) {
                             originPill(
                                 title: String(localized: "My location"),
                                 icon: "location.fill",
@@ -110,11 +110,11 @@ struct PlanNightOutSheet: View {
                     }
 
                     // Crawl Section
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                         HStack {
                             Text(String(localized: "CRAWL"))
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapCaption)
+                                .foregroundColor(.BartapSecondary)
 
                             Spacer()
 
@@ -123,7 +123,7 @@ struct PlanNightOutSheet: View {
                                     generateCrawl()
                                 } label: {
                                     Label(String(localized: "Shuffle"), systemImage: "shuffle")
-                                        .barTabPillButton()
+                                        .BartapPillButton()
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -135,7 +135,7 @@ struct PlanNightOutSheet: View {
                             } label: {
                                 Label(String(localized: "Generate a crawl"), systemImage: "figure.walk.circle.fill")
                                     .frame(maxWidth: .infinity)
-                                    .barTabPrimaryButton()
+                                    .BartapPrimaryButton()
                             }
                         } else {
                             VStack(spacing: 0) {
@@ -144,26 +144,26 @@ struct PlanNightOutSheet: View {
 
                                     if index < crawlBars.count - 1 {
                                         Divider()
-                                            .foregroundColor(.barTabCardBorder)
+                                            .foregroundColor(.BartapCardBorder)
                                             .padding(.leading, 58)
                                     }
                                 }
                             }
                             .background(
-                                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                                    .fill(Color.barTabCardFill)
+                                RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                                    .fill(Color.BartapCardFill)
                             )
                             .overlay(
-                                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                                RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                                    .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                             )
 
-                            HStack(spacing: BarTabSpacing.sm) {
+                            HStack(spacing: BartapSpacing.sm) {
                                 Button {
                                     generateCrawl()
                                 } label: {
                                     Label(String(localized: "Shuffle"), systemImage: "shuffle")
-                                        .barTabPillButton()
+                                        .BartapPillButton()
                                 }
                                 .buttonStyle(.plain)
 
@@ -171,19 +171,19 @@ struct PlanNightOutSheet: View {
                                     showingRouteMap = true
                                 } label: {
                                     Label(String(localized: "Show on map"), systemImage: "map.fill")
-                                        .barTabPillButton()
+                                        .BartapPillButton()
                                 }
                                 .buttonStyle(.plain)
                             }
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
 
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.md)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "New Night Out"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -225,44 +225,44 @@ struct PlanNightOutSheet: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.barTabCaption)
+                    .font(.BartapCaption)
                 Text(title)
-                    .font(.barTabCaption)
+                    .font(.BartapCaption)
                     .lineLimit(1)
             }
-            .padding(.horizontal, BarTabSpacing.sm)
+            .padding(.horizontal, BartapSpacing.sm)
             .padding(.vertical, 8)
-            .background(isSelected ? Color.barTabPrimary : Color.barTabSurface)
-            .foregroundColor(isSelected ? .white : .barTabText)
+            .background(isSelected ? Color.BartapPrimary : Color.BartapSurface)
+            .foregroundColor(isSelected ? .white : .BartapText)
             .clipShape(Capsule())
             .overlay(
                 Capsule()
-                    .stroke(isSelected ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
+                    .stroke(isSelected ? Color.clear : Color.BartapCardBorder, lineWidth: 0.5)
             )
         }
         .buttonStyle(.plain)
     }
 
     private func crawlRow(index: Int, bar: Bar) -> some View {
-        HStack(spacing: BarTabSpacing.sm) {
+        HStack(spacing: BartapSpacing.sm) {
             ZStack {
                 Circle()
-                    .fill(Color.barTabPrimary)
+                    .fill(Color.BartapPrimary)
                     .frame(width: 30, height: 30)
                 Text("\(index + 1)")
-                    .font(.barTabBodySemibold)
+                    .font(.BartapBodySemibold)
                     .foregroundColor(.white)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(bar.name)
-                    .font(.barTabBodySemibold)
-                    .foregroundColor(.barTabText)
+                    .font(.BartapBodySemibold)
+                    .foregroundColor(.BartapText)
                     .lineLimit(1)
 
                 Text(bar.address)
-                    .font(.barTabCaption)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapCaption)
+                    .foregroundColor(.BartapSecondary)
                     .lineLimit(1)
             }
 
@@ -271,15 +271,15 @@ struct PlanNightOutSheet: View {
             if let popular = barRepository.popularAmbience(for: bar) {
                 HStack(spacing: 3) {
                     Image(systemName: popular.icon)
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                     Text(popular.displayName)
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                 }
-                .barTabPillButton()
+                .BartapPillButton()
             }
         }
-        .padding(.horizontal, BarTabSpacing.md)
-        .padding(.vertical, BarTabSpacing.sm)
+        .padding(.horizontal, BartapSpacing.md)
+        .padding(.vertical, BartapSpacing.sm)
     }
 
     private func generateCrawl() {
@@ -346,10 +346,10 @@ struct PlanNightOutSheet: View {
 // MARK: - Subviews
 
 private func selectorGroup<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+    VStack(alignment: .leading, spacing: BartapSpacing.xs) {
         Text(title)
-            .font(.barTabCaption)
-            .foregroundColor(.barTabSecondary)
+            .font(.BartapCaption)
+            .foregroundColor(.BartapSecondary)
         content()
     }
 }

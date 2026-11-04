@@ -46,8 +46,8 @@ struct InviteMemberSheet: View {
                             }
                         }
                         .padding(10)
-                        .background(Color.barTabPillFill)
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                        .background(Color.BartapPillFill)
+                        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
                         .padding(.horizontal)
                         .padding(.top, 8)
 
@@ -56,7 +56,7 @@ struct InviteMemberSheet: View {
                                 Text(searchText.isEmpty
                                     ? String(localized: "All your friends are already in this group.")
                                     : String(localized: "No friends match your search."))
-                                    .font(.barTabBody)
+                                    .font(.BartapBody)
                                     .foregroundColor(.secondary)
                             } else {
                                 ForEach(filteredFriends, id: \.self) { userID in
@@ -66,10 +66,10 @@ struct InviteMemberSheet: View {
                                         HStack {
                                             UserAvatarView(urlString: avatarCache[userID], displayName: userCache[userID], size: 32)
                                             Text(userCache[userID] ?? "User")
-                                                .foregroundColor(.barTabText)
+                                                .foregroundColor(.BartapText)
                                             Spacer()
                                             Image(systemName: "plus.circle.fill")
-                                                .foregroundColor(.barTabPrimary)
+                                                .foregroundColor(.BartapPrimary)
                                         }
                                     }
                                 }

@@ -26,69 +26,69 @@ struct AttributeDetailSheet: View {
     }
 
     private var confirmBG: Color {
-        attribute.isConfirmed ? .barTabSuccess.opacity(0.1) : .barTabPrimary.opacity(0.1)
+        attribute.isConfirmed ? .BartapSuccess.opacity(0.1) : .BartapPrimary.opacity(0.1)
     }
 
     private var confirmFG: Color {
-        attribute.isConfirmed ? .barTabSuccess : .barTabPrimary
+        attribute.isConfirmed ? .BartapSuccess : .BartapPrimary
     }
 
     private var confirmStroke: Color {
-        attribute.isConfirmed ? .barTabSuccess.opacity(0.3) : .barTabPrimary.opacity(0.3)
+        attribute.isConfirmed ? .BartapSuccess.opacity(0.3) : .BartapPrimary.opacity(0.3)
     }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                VStack(spacing: BarTabSpacing.md) {
+                VStack(spacing: BartapSpacing.md) {
                     Image(systemName: attribute.key.icon)
                         .font(.system(size: 40, weight: .light))
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
 
                     Text(attribute.key.displayName)
-                        .font(.barTabHeading)
+                        .font(.BartapHeading)
                         .fontWeight(.bold)
 
                     if let value = attribute.consensusValue {
                         VStack(spacing: 4) {
                             Text(value)
-                                .font(.barTabDisplay)
+                                .font(.BartapDisplay)
                                 .fontWeight(.bold)
-                                .foregroundColor(.barTabPrimary)
+                                .foregroundColor(.BartapPrimary)
 
                             HStack(spacing: 8) {
                                 Text("\(attribute.totalReports) \(reportLabel)")
-                                    .font(.barTabCaption)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapCaption)
+                                    .foregroundColor(.BartapSecondary)
 
                                 Circle()
                                     .fill(confidenceColor(attribute.consensusConfidence))
                                     .frame(width: 8, height: 8)
 
                                 Text("\(attribute.consensusConfidence)% confidence")
-                                    .font(.barTabCaption)
+                                    .font(.BartapCaption)
                                     .fontWeight(.medium)
                                     .foregroundColor(confidenceColor(attribute.consensusConfidence))
                             }
                         }
                     } else {
                         Text(String(localized: "No consensus yet"))
-                            .font(.barTabBody)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapBody)
+                            .foregroundColor(.BartapSecondary)
                     }
 
                     if let lastConfirmed = attribute.lastConfirmedAt {
                         Text("Last confirmed \(lastConfirmed.relativeFormatted)")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSecondary)
                     }
                 }
-                .padding(.vertical, BarTabSpacing.xl)
+                .padding(.vertical, BartapSpacing.xl)
 
                 Divider()
-                    .padding(.horizontal, BarTabSpacing.md)
+                    .padding(.horizontal, BartapSpacing.md)
 
-                VStack(spacing: BarTabSpacing.sm) {
+                VStack(spacing: BartapSpacing.sm) {
                     Button {
                         showingConfirmDialog = true
                     } label: {
@@ -101,9 +101,9 @@ struct AttributeDetailSheet: View {
                         .padding(.vertical, 14)
                         .background(confirmBG)
                         .foregroundColor(confirmFG)
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                         .overlay(
-                            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                            RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
                                 .stroke(confirmStroke, lineWidth: 1)
                         )
                     }
@@ -119,60 +119,60 @@ struct AttributeDetailSheet: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color.barTabWarning.opacity(0.1))
-                        .foregroundColor(.barTabWarning)
-                        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                        .background(Color.BartapWarning.opacity(0.1))
+                        .foregroundColor(.BartapWarning)
+                        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                         .overlay(
-                            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                                .stroke(Color.barTabWarning.opacity(0.3), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                                .stroke(Color.BartapWarning.opacity(0.3), lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.top, BarTabSpacing.md)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.top, BartapSpacing.md)
 
                 Spacer()
 
                 if attribute.consensus.count > 1 {
                     Divider()
-                        .padding(.horizontal, BarTabSpacing.md)
+                        .padding(.horizontal, BartapSpacing.md)
 
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                         Text(String(localized: "Other reports"))
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .fontWeight(.semibold)
-                            .foregroundColor(.barTabSecondary)
-                            .padding(.horizontal, BarTabSpacing.md)
+                            .foregroundColor(.BartapSecondary)
+                            .padding(.horizontal, BartapSpacing.md)
 
                         ForEach(attribute.consensus.dropFirst()) { consensus in
                             HStack {
                                 Text(consensus.displayValue)
-                                    .font(.barTabSmall)
-                                    .foregroundColor(.barTabText)
+                                    .font(.BartapSmall)
+                                    .foregroundColor(.BartapText)
                                 Spacer()
                                 Text(consensusCountLabel(consensus.reportCount))
-                                    .font(.barTabCaption)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapCaption)
+                                    .foregroundColor(.BartapSecondary)
                                 Text("\(consensus.confidencePct)%")
-                                    .font(.barTabCaption)
+                                    .font(.BartapCaption)
                                     .fontWeight(.medium)
                                     .foregroundColor(confidenceColor(consensus.confidencePct))
                             }
-                            .padding(.horizontal, BarTabSpacing.md)
-                            .padding(.vertical, BarTabSpacing.xs)
+                            .padding(.horizontal, BartapSpacing.md)
+                            .padding(.vertical, BartapSpacing.xs)
                         }
                     }
-                    .padding(.bottom, BarTabSpacing.lg)
+                    .padding(.bottom, BartapSpacing.lg)
                 }
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "Attribute"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(String(localized: "Done")) { dismiss() }
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
                 }
             }
             .confirmationDialog(
@@ -238,9 +238,9 @@ struct AttributeDetailSheet: View {
 
     func confidenceColor(_ pct: Int) -> Color {
         switch pct {
-        case 80...100: return .barTabSuccess
-        case 50..<80: return .barTabWarning
-        default: return .barTabDanger
+        case 80...100: return .BartapSuccess
+        case 50..<80: return .BartapWarning
+        default: return .BartapDanger
         }
     }
 }

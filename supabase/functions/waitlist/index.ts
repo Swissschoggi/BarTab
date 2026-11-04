@@ -1,4 +1,4 @@
-// BarTab waitlist signup.
+// Bartap waitlist signup.
 //
 // Security model: the `waitlist` table has NO public read/write policies.
 // This function is the only writer, using the service-role key. Every request
@@ -17,7 +17,7 @@ const TURNSTILE_SECRET = Deno.env.get("TURNSTILE_SECRET")!;
 // function still accepts signups, it just doesn't send the welcome email.
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
 const BREVO_SENDER_EMAIL = Deno.env.get("BREVO_SENDER_EMAIL") ?? "no-reply@bartap.info";
-const BREVO_SENDER_NAME = Deno.env.get("BREVO_SENDER_NAME") ?? "BarTab";
+const BREVO_SENDER_NAME = Deno.env.get("BREVO_SENDER_NAME") ?? "Bartap";
 const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
 // Comma-separated list of origins allowed to call this endpoint. Browsers
@@ -130,16 +130,16 @@ async function emailExists(email: string): Promise<boolean> {
 async function sendWelcomeEmail(email: string): Promise<void> {
   if (!BREVO_API_KEY) return;
 
-  const subject = "You're on the BarTab list 🍻";
+  const subject = "You're on the Bartap list 🍻";
   const textContent =
-    "Thanks for signing up for BarTab, you're on the list.\n\n" +
-    "We'll email you the moment BarTab is ready where you are. " +
-    "No spam, just the good stuff.\n\nThe BarTab team";
+    "Thanks for signing up for Bartap, you're on the list.\n\n" +
+    "We'll email you the moment Bartap is ready where you are. " +
+    "No spam, just the good stuff.\n\nThe Bartap team";
 
   const htmlContent =
-    `<p>Thanks for signing up for <strong>BarTab</strong>, you're on the list.</p>` +
-    `<p>We'll email you the moment BarTab is ready where you are. No spam, just the good stuff.</p>` +
-    `<p>The BarTab team</p>`;
+    `<p>Thanks for signing up for <strong>Bartap</strong>, you're on the list.</p>` +
+    `<p>We'll email you the moment Bartap is ready where you are. No spam, just the good stuff.</p>` +
+    `<p>The Bartap team</p>`;
 
   try {
     await fetch(BREVO_API_URL, {

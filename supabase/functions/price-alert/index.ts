@@ -163,7 +163,7 @@ Deno.serve(async (req) => {
 
     const title = "Price alert";
     const body = `${barName}  ${record.amount} ${record.currency}`;
-    const deepLink = `bartab://bar/${record.bar_id}`;
+    const deepLink = `Bartap://bar/${record.bar_id}`;
 
     const results = await Promise.allSettled(
       tokens.map((t) => sendOne(t, jwt, title, body, deepLink)),

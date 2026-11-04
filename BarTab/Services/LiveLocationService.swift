@@ -9,7 +9,7 @@ final class LiveLocationService: ObservableObject {
     @Published private(set) var friendsLocations: [UUID: LiveLocation] = [:]
     @Published private(set) var isSharing = false
 
-    private static let sharingKey = "com.bartab.liveLocationSharing"
+    private static let sharingKey = "com.Bartap.liveLocationSharing"
 
     private var updateTimer: Timer?
     private var cancellables = Set<AnyCancellable>()

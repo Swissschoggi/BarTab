@@ -1,13 +1,13 @@
 //
-//  BarTabUITestsLaunchTests.swift
-//  BarTabUITests
+//  BartapUITestsLaunchTests.swift
+//  BartapUITests
 //
 //  Created by marcel blanc on 18.08.26.
 //
 
 import XCTest
 
-final class BarTabUITestsLaunchTests: XCTestCase {
+final class BartapUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

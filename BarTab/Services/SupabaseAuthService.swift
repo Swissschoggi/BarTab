@@ -16,19 +16,19 @@ final class SupabaseAuthService {
     private let apiKey = SupabaseConfig.anonKey
 
     private let keychain = KeychainService(
-        service: "com.bartab.session"
+        service: "com.Bartap.session"
     )
 
     private let sessionAccount = "session"
 
     /// One-time random tokens for the OAuth / password-reset deep
-    /// links. Without this, `bartab://auth/callback#access_token=…`
-    /// and `bartab://reset-password#access_token=…` are accepted
+    /// links. Without this, `Bartap://auth/callback#access_token=…`
+    /// and `Bartap://reset-password#access_token=…` are accepted
     /// from ANY source — not just the browser sheet we opened —
     /// because `.onOpenURL` fires for any app or website that gets
-    /// the person to tap a `bartab://…` link. An attacker can host
+    /// the person to tap a `Bartap://…` link. An attacker can host
     /// their own Supabase session's tokens in such a link; opening it
-    /// would silently sign the victim into the attacker's BarTab
+    /// would silently sign the victim into the attacker's Bartap
     /// account (login CSRF), and anything the victim then does in
     /// the app — prices, check-ins, group chats — lands in an
     /// account the attacker controls. Generating an unguessable
@@ -294,7 +294,7 @@ final class SupabaseAuthService {
         let state = Self.makeAndStoreState()
         let body: [String: String] = [
             "email": email,
-            "redirect_to": "bartab://reset-password?state=\(state)"
+            "redirect_to": "Bartap://reset-password?state=\(state)"
         ]
         _ = try await performAuth(endpoint: "recover", body: body)
     }
@@ -303,7 +303,7 @@ final class SupabaseAuthService {
     /// Parses access_token and refresh_token from the URL fragment
     /// and saves the new session. Requires the `state` value this
     /// device generated when `resetPassword(email:)` was called, so
-    /// an unsolicited `bartab://reset-password#access_token=…` link
+    /// an unsolicited `Bartap://reset-password#access_token=…` link
     /// (crafted by an attacker with their own tokens) can't sign this
     /// device into the attacker's account — see `pendingOAuthState`.
     func handleResetPasswordCallback(_ url: URL) async -> Bool {
@@ -364,7 +364,7 @@ final class SupabaseAuthService {
 
     /// Handles the deep link returned by the Google OAuth flow.
     /// Tokens arrive in the URL fragment:
-    /// `bartab://auth/callback#access_token=…&refresh_token=…&expires_in=…`
+    /// `Bartap://auth/callback#access_token=…&refresh_token=…&expires_in=…`
     func handleGoogleCallback(_ callbackURL: URL) async throws -> AuthSession {
 
         guard callbackURL.scheme == SupabaseConfig.oauthCallbackScheme else {
@@ -708,7 +708,7 @@ final class SupabaseAuthService {
                 separatedBy: "@"
             ).first ?? email
         } else {
-            username = "BarTab User"
+            username = "Bartap User"
         }
 
         let expiresAt: Date?

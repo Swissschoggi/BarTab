@@ -13,7 +13,7 @@ struct StarRatingView: View {
             ForEach(1...5, id: \.self) { value in
                 Image(systemName: filled(value) ? "star.fill" : "star")
                     .font(.system(size: size))
-                    .foregroundColor(.barTabAccent)
+                    .foregroundColor(.BartapAccent)
                     .onTapGesture {
                         rating = (rating == value) ? nil : value
                     }
@@ -48,14 +48,14 @@ struct StarRatingSummaryView: View {
                             : "star"
                     )
                     .font(.system(size: size))
-                    .foregroundColor(.barTabAccent)
+                    .foregroundColor(.BartapAccent)
                 }
             }
 
             Text(
                 "\(String(format: "%.1f", average)) (\(count))"
             )
-            .font(.barTabSmall)
+            .font(.BartapSmall)
             .foregroundColor(.secondary)
         }
     }

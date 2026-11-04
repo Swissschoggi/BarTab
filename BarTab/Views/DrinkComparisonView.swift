@@ -28,21 +28,21 @@ struct DrinkComparisonView: View {
             VStack(alignment: .leading, spacing: 12) {
 
                 if results.isEmpty {
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
                         Image(systemName: "chart.bar.xaxis")
-                            .font(.barTabEmptyIcon)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapEmptyIcon)
+                            .foregroundColor(.BartapPrimary)
                         Text(String(localized: "No comparisons found"))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .barTabCard()
+                    .BartapCard()
                 } else {
                     Text(String(localized: "\(results.count) bars have this drink"))
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
 
                     ForEach(Array(results.enumerated()), id: \.element.bar.id) { index, result in
                         Button {
@@ -51,37 +51,37 @@ struct DrinkComparisonView: View {
                             HStack(spacing: 12) {
                                 // Rank
                                 Text("\(index + 1)")
-                                    .font(.barTabHeading)
-                                    .foregroundColor(.barTabPrimary)
+                                    .font(.BartapHeading)
+                                    .foregroundColor(.BartapPrimary)
                                     .frame(width: 28, height: 28)
-                                    .background(Color.barTabPrimary.opacity(0.1))
+                                    .background(Color.BartapPrimary.opacity(0.1))
                                     .clipShape(Circle())
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(result.bar.name)
-                                        .font(.barTabBody)
+                                        .font(.BartapBody)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(.barTabText)
+                                        .foregroundColor(.BartapText)
                                     Text(result.bar.address)
-                                        .font(.barTabTiny)
-                                        .foregroundColor(.barTabSecondary)
+                                        .font(.BartapTiny)
+                                        .foregroundColor(.BartapSecondary)
                                 }
 
                                 Spacer()
 
                                 VStack(alignment: .trailing, spacing: 2) {
                                     Text("\(Currency.defaultCurrency.symbol)\(result.summary.convertedAmount.formattedAmount)")
-                                        .font(.barTabBody)
+                                        .font(.BartapBody)
                                         .fontWeight(.bold)
-                                        .foregroundColor(.barTabPrimary)
+                                        .foregroundColor(.BartapPrimary)
 
                                     Text(String(localized: "\(result.summary.confidence)% confidence"))
-                                        .font(.barTabTiny)
-                                        .foregroundColor(.barTabSecondary)
+                                        .font(.BartapTiny)
+                                        .foregroundColor(.BartapSecondary)
                                 }
                             }
                             .padding(12)
-                            .barTabCard()
+                            .BartapCard()
                         }
                         .buttonStyle(.plain)
                     }
@@ -90,7 +90,7 @@ struct DrinkComparisonView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 20)
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Compare Prices"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedBar) { bar in

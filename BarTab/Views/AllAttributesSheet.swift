@@ -15,21 +15,21 @@ struct AllAttributesSheet: View {
         NavigationStack {
             List {
                 if attributes.isEmpty {
-                    VStack(spacing: BarTabSpacing.md) {
+                    VStack(spacing: BartapSpacing.md) {
                         Image(systemName: "info.circle")
                             .font(.system(size: 40, weight: .light))
-                            .foregroundColor(.barTabSecondary)
+                            .foregroundColor(.BartapSecondary)
                         Text(String(localized: "No attribute reports yet"))
-                            .font(.barTabHeading)
-                            .foregroundColor(.barTabText)
+                            .font(.BartapHeading)
+                            .foregroundColor(.BartapText)
                         Text(String(localized: "Be the first to report on this bar's amenities!"))
-                            .font(.barTabBody)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapBody)
+                            .foregroundColor(.BartapSecondary)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .listRowBackground(Color.barTabBackground)
+                    .listRowBackground(Color.BartapBackground)
                 } else {
                     ForEach(attributes) { attr in
                         AttributeRow(attribute: attr) {
@@ -41,13 +41,13 @@ struct AllAttributesSheet: View {
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "All Attributes"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(String(localized: "Done")) { dismiss() }
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
                 }
             }
             .sheet(isPresented: $showingDetail) {
@@ -78,22 +78,22 @@ private struct AttributeRow: View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: attribute.key.icon)
-                    .font(.barTabBody)
-                    .foregroundColor(.barTabPrimary)
+                    .font(.BartapBody)
+                    .foregroundColor(.BartapPrimary)
                     .frame(width: 28)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(attribute.key.displayName)
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .fontWeight(.medium)
-                        .foregroundColor(.barTabText)
+                        .foregroundColor(.BartapText)
 
                     if let value = attribute.consensusValue {
                         HStack(spacing: 6) {
                             Text(value)
-                                .font(.barTabCaption)
+                                .font(.BartapCaption)
                                 .fontWeight(.medium)
-                                .foregroundColor(.barTabPrimary)
+                                .foregroundColor(.BartapPrimary)
 
                             Text("\(attribute.consensusConfidence)%")
                                 .font(.system(size: 10, weight: .bold))
@@ -104,34 +104,34 @@ private struct AttributeRow: View {
                                 .clipShape(Capsule())
 
                             Text("\(attribute.totalReports) report\(attribute.totalReports == 1 ? "" : "s")")
-                                .font(.barTabTiny)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapTiny)
+                                .foregroundColor(.BartapSecondary)
                         }
                     } else {
                         Text(String(localized: "No reports yet"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
                     }
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
             }
             .padding(.vertical, 4)
         }
         .buttonStyle(.plain)
-        .listRowBackground(Color.barTabSurface)
-        .listRowSeparatorTint(Color.barTabCardBorder)
+        .listRowBackground(Color.BartapSurface)
+        .listRowSeparatorTint(Color.BartapCardBorder)
     }
 
     func confidenceColor(_ pct: Int) -> Color {
         switch pct {
-        case 80...100: return .barTabSuccess
-        case 50..<80: return .barTabWarning
-        default: return .barTabDanger
+        case 80...100: return .BartapSuccess
+        case 50..<80: return .BartapWarning
+        default: return .BartapDanger
         }
     }
 }

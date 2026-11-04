@@ -111,7 +111,8 @@ Built in Zürich.
 
 BarTab is heavily vibe-coded. Most of the app, the backend functions, the website and this README were written with AI assistants (including Claude) and directed, tested and reviewed by the maintainer rather than written line by line by hand.
 
-If you find something odd, buggy or insecure, please [open an issue](https://github.com/Swissschoggi/BarTab/issues). It's probably a real problem and not a design choice.
+Early development. Bartap is not on the App Store yet: I can't afford Apple's yearly developer fee right now. If you'd
+like to help, you can donate at https://ko-fi.com/bartap.
 
 ## License
 

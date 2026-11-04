@@ -127,7 +127,7 @@ struct MainTabView: View {
             tabBar
         }
         .background(
-            Color.barTabBackground
+            Color.BartapBackground
                 .ignoresSafeArea()
         )
         .onAppear {
@@ -194,7 +194,7 @@ struct MainTabView: View {
 
             // Layer 2: fluid selection pill (slides above the gray labels)
             Capsule()
-                .fill(Color.barTabPrimary)
+                .fill(Color.BartapPrimary)
                 .frame(width: max(tabWidth - 4, 0), height: 40)
                 .offset(x: pillOffsetX)
                 .scaleEffect(x: pillStretch, y: 1, anchor: .center)
@@ -226,14 +226,14 @@ struct MainTabView: View {
         .padding(6)
         .background(.ultraThinMaterial)
         .clipShape(
-            RoundedRectangle(cornerRadius: BarTabRadius.sheet, style: .continuous)
+            RoundedRectangle(cornerRadius: BartapRadius.sheet, style: .continuous)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: BarTabRadius.sheet, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: BartapRadius.sheet, style: .continuous)
+                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
         )
-        .padding(.horizontal, BarTabSpacing.lg)
-        .padding(.bottom, BarTabSpacing.lg)
+        .padding(.horizontal, BartapSpacing.lg)
+        .padding(.bottom, BartapSpacing.lg)
     }
 
     private var tabBarSwipeGesture: some Gesture {
@@ -298,12 +298,12 @@ struct MainTabView: View {
                 .overlay(alignment: .topTrailing) {
                     if badge > 0 {
                         Text("\(badge)")
-                            .font(.barTabBadge)
+                            .font(.BartapBadge)
                             .foregroundColor(.white)
                             .frame(width: 15, height: 15)
-                            .background(Color.barTabDanger)
+                            .background(Color.BartapDanger)
                             .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.barTabCardFill, lineWidth: 1.5))
+                            .overlay(Circle().stroke(Color.BartapCardFill, lineWidth: 1.5))
                             .offset(x: 9, y: -7)
                     }
                 }
@@ -320,7 +320,7 @@ struct MainTabView: View {
         .foregroundColor(
             isSelected
                 ? .white
-                : .barTabSecondary.opacity(0.8)
+                : .BartapSecondary.opacity(0.8)
         )
         .contentShape(Rectangle())
         .accessibilityLabel(Text(tab.title))
@@ -392,12 +392,12 @@ private struct DeepLinkBarView: View {
     ) -> some View {
         VStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.barTabEmptyIcon)
-                .foregroundColor(.barTabPrimary)
+                .font(.BartapEmptyIcon)
+                .foregroundColor(.BartapPrimary)
             Text(title)
-                .font(.barTabHeading)
+                .font(.BartapHeading)
             Text(message)
-                .font(.barTabBody)
+                .font(.BartapBody)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             Button(String(localized: "Close")) { dismiss() }
@@ -437,12 +437,12 @@ private struct DeepLinkGroupView: View {
             } else {
                 VStack(spacing: 12) {
                     Image(systemName: "person.3.fill")
-                        .font(.barTabEmptyIcon)
-                        .foregroundColor(.barTabPrimary)
+                        .font(.BartapEmptyIcon)
+                        .foregroundColor(.BartapPrimary)
                     Text(String(localized: "Group not found"))
-                        .font(.barTabHeading)
+                        .font(.BartapHeading)
                     Text(String(localized: "You may not be a member of this group."))
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                     Button(String(localized: "Close")) { dismiss() }

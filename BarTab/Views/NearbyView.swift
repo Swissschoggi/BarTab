@@ -46,6 +46,7 @@ struct NearbyView: View {
 
     // Drink search state
     @State private var searchText = ""
+    @State private var barSearchText = ""
     @State private var selectedDrinks: Set<Drink> = [.beer]
     @State private var selectedSizes: Set<DrinkSize> = [.fiveDeciliters]
     @State private var hasSeededDrinks = false
@@ -56,11 +57,18 @@ struct NearbyView: View {
     // Collapsible filter state
     @State private var filtersExpanded = false
     @State private var sortExpanded = false
+    @State private var showForYou = false
+
+    private enum BarSortOption {
+        case closest, name, busiest
+    }
+    @State private var barSortOption: BarSortOption = .closest
 
     enum SortOption {
         case cheapest
         case closest
         case brand
+        case bestValue
     }
 
     @State private var sortOption: SortOption = .cheapest
@@ -120,6 +128,25 @@ struct NearbyView: View {
                 (bar: bar, distance: DistanceService.distance(from: originLocation, to: bar))
             }
             .sorted { $0.distance < $1.distance }
+    }
+
+    private var filteredNearbyBars: [(bar: Bar, distance: CLLocationDistance)] {
+        let trimmed = barSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        var results = nearbyBars
+        if !trimmed.isEmpty {
+            results = results.filter {
+                $0.bar.name.localizedCaseInsensitiveContains(trimmed)
+                    || $0.bar.address.localizedCaseInsensitiveContains(trimmed)
+            }
+        }
+        switch barSortOption {
+        case .closest:
+            return results.sorted { $0.distance < $1.distance }
+        case .name:
+            return results.sorted { $0.bar.name.localizedCaseInsensitiveCompare($1.bar.name) == .orderedAscending }
+        case .busiest:
+            return results.sorted { barRepository.busyCount(for: $0.bar.id) > barRepository.busyCount(for: $1.bar.id) }
+        }
     }
 
     // MARK: - Price search results
@@ -185,6 +212,11 @@ struct NearbyView: View {
         if !trimmedSearchText.isEmpty {
             results = results.filter {
                 $0.bar.name.localizedCaseInsensitiveContains(trimmedSearchText)
+                    || $0.bar.address.localizedCaseInsensitiveContains(trimmedSearchText)
+                    || $0.summary.drink.displayName.localizedCaseInsensitiveContains(trimmedSearchText)
+                    || ($0.summary.brand?.localizedCaseInsensitiveContains(trimmedSearchText) ?? false)
+                    || $0.summary.size.displayName.localizedCaseInsensitiveContains(trimmedSearchText)
+                    || ($0.summary.style?.localizedCaseInsensitiveContains(trimmedSearchText) ?? false)
             }
         }
 
@@ -212,6 +244,8 @@ struct NearbyView: View {
         switch sortOption {
         case .cheapest:
             return results.sorted { comparisonValue($0.summary) < comparisonValue($1.summary) }
+        case .bestValue:
+            return results.sorted { (bestValue($0.summary) ?? .greatestFiniteMagnitude) < (bestValue($1.summary) ?? .greatestFiniteMagnitude) }
         case .brand:
             return results
         case .closest:
@@ -279,19 +313,25 @@ struct NearbyView: View {
         NSDecimalNumber(decimal: summary.convertedAmount).doubleValue
     }
 
+    /// Price per decilitre for "best value" sorting. Returns nil for
+    /// non-volume servings so they sort last.
+    private func bestValue(_ summary: PriceSummary) -> Double? {
+        summary.pricePerDeciliter
+    }
+
     // MARK: - Body
 
     var body: some View {
         NavigationStack {
             ScrollView {
-            VStack(alignment: .leading, spacing: BarTabSpacing.md) {
+            VStack(alignment: .leading, spacing: BartapSpacing.md) {
 
-                BarTabScreenHeader(
+                BartapScreenHeader(
                     title: String(localized: "Discover"),
                     subtitle: String(localized: "Find bars and compare drink prices nearby.")
                 )
 
-                BarTabInfoBar(
+                BartapInfoBar(
                     icon: originIcon,
                     title: String(localized: "Searching near"),
                     value: origin.label,
@@ -305,7 +345,26 @@ struct NearbyView: View {
                 }
 
                 if !forYouResults.isEmpty {
-                    forYouSection
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) { showForYou.toggle() }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: showForYou ? "sparkles" : "sparkles")
+                            Text(showForYou ? String(localized: "Hide For you") : String(localized: "Show For you"))
+                                .font(.BartapSmall)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.BartapPrimary)
+                        .padding(.horizontal, BartapSpacing.sm)
+                        .padding(.vertical, 6)
+                        .background(Color.BartapPrimary.opacity(0.1))
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+
+                    if showForYou {
+                        forYouSection
+                    }
                 }
 
                     // Segment control
@@ -330,7 +389,7 @@ struct NearbyView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 30)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .scrollDismissesKeyboard(.immediately)
             .refreshable {
                 await refreshBars()
@@ -373,14 +432,14 @@ struct NearbyView: View {
     private var locationSheet: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
 
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                         Text(String(localized: "Location"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
-                        HStack(spacing: BarTabSpacing.sm) {
+                        HStack(spacing: BartapSpacing.sm) {
                             locationOptionButton(
                                 icon: "location.fill",
                                 label: String(localized: "My location"),
@@ -402,8 +461,8 @@ struct NearbyView: View {
                         if case .myLocation = origin, locationService.location == nil {
                             HStack(spacing: 6) {
                                 Text(String(localized: "Waiting for location..."))
-                                    .font(.barTabSmall)
-                                    .foregroundColor(.barTabSecondary)
+                                    .font(.BartapSmall)
+                                    .foregroundColor(.BartapSecondary)
 
                                 Button {
                                     if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -411,18 +470,18 @@ struct NearbyView: View {
                                     }
                                 } label: {
                                     Text(String(localized: "Open Settings"))
-                                        .font(.barTabSmall)
+                                        .font(.BartapSmall)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(.barTabPrimary)
+                                        .foregroundColor(.BartapPrimary)
                                 }
                             }
                         }
                     }
 
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                         Text(String(localized: "Explore a city"))
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 8) {
@@ -431,11 +490,11 @@ struct NearbyView: View {
                                         origin = .custom(name: city.name, coordinate: city.coordinate)
                                     } label: {
                                         Text(city.name)
-                                            .font(.barTabBodySemibold)
-                                            .padding(.horizontal, BarTabSpacing.sm)
+                                            .font(.BartapBodySemibold)
+                                            .padding(.horizontal, BartapSpacing.sm)
                                             .padding(.vertical, 8)
-                                            .foregroundColor(isCitySelected(city.name) ? .white : .barTabPrimary)
-                                            .background(isCitySelected(city.name) ? Color.barTabPrimary : Color.barTabSurface)
+                                            .foregroundColor(isCitySelected(city.name) ? .white : .BartapPrimary)
+                                            .background(isCitySelected(city.name) ? Color.BartapPrimary : Color.BartapSurface)
                                             .clipShape(Capsule())
                                     }
                                 }
@@ -443,26 +502,26 @@ struct NearbyView: View {
                         }
                     }
 
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                         HStack {
                             Text(String(localized: "Radius"))
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapCaption)
+                                .foregroundColor(.BartapSecondary)
                             Spacer()
                             Text(formattedRadius)
-                                .font(.barTabBodySemibold)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapBodySemibold)
+                                .foregroundColor(.BartapPrimary)
                         }
 
                         Slider(value: $radiusKM, in: Self.radiusRange)
-                            .tint(.barTabPrimary)
+                            .tint(.BartapPrimary)
                     }
 
                     Spacer(minLength: 0)
                 }
-                .padding(BarTabSpacing.lg)
+                .padding(BartapSpacing.lg)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "Search area"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -483,17 +542,17 @@ struct NearbyView: View {
         Button(action: action) {
             VStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.barTabHeading)
+                    .font(.BartapHeading)
                 Text(label)
-                    .font(.barTabCaption)
+                    .font(.BartapCaption)
                     .fontWeight(.semibold)
                     .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, BarTabSpacing.sm)
-            .foregroundColor(isSelected ? .white : .barTabPrimary)
-            .background(isSelected ? Color.barTabPrimary : Color.barTabSurface)
-            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+            .padding(.vertical, BartapSpacing.sm)
+            .foregroundColor(isSelected ? .white : .BartapPrimary)
+            .background(isSelected ? Color.BartapPrimary : Color.BartapSurface)
+            .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
         }
     }
 
@@ -515,7 +574,17 @@ struct NearbyView: View {
 
     private var barsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            BarTabSectionHeader(title: String(localized: "Bars"), count: nearbyBars.count)
+            BartapSectionHeader(title: String(localized: "Bars"), count: filteredNearbyBars.count)
+
+            BartapSearchField(text: $barSearchText, placeholder: String(localized: "Search bars..."))
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    barSortButton(title: "Closest", option: .closest)
+                    barSortButton(title: "Name", option: .name)
+                    barSortButton(title: "Busiest", option: .busiest)
+                }
+            }
 
             if originCoordinate == nil {
                 emptyState(
@@ -524,16 +593,16 @@ struct NearbyView: View {
                     message: "Allow location access, or search for a place to look near."
                 )
             } else if barRepository.bars.isEmpty {
-                VStack(spacing: BarTabSpacing.sm) {
+                VStack(spacing: BartapSpacing.sm) {
                     ProgressView()
                     Text(String(localized: "Loading bars…"))
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 40)
-                .barTabCard()
-            } else if nearbyBars.isEmpty {
+                .BartapCard()
+            } else if filteredNearbyBars.isEmpty {
                 emptyState(
                     icon: "mappin.slash",
                     title: "No bars nearby",
@@ -541,7 +610,7 @@ struct NearbyView: View {
                 )
             } else {
                 VStack(spacing: 0) {
-                    ForEach(Array(nearbyBars.enumerated()), id: \.element.bar.id) { index, result in
+                    ForEach(Array(filteredNearbyBars.enumerated()), id: \.element.bar.id) { index, result in
                         NavigationLink(
                             destination: BarView(bar: result.bar)
                                 .environmentObject(barRepository)
@@ -552,66 +621,66 @@ struct NearbyView: View {
                         }
                         .buttonStyle(.plain)
 
-                        if index < nearbyBars.count - 1 {
-                            Divider().padding(.leading, BarTabSpacing.md)
+                        if index < filteredNearbyBars.count - 1 {
+                            Divider().padding(.leading, BartapSpacing.md)
                         }
                     }
                 }
                 .padding(.vertical, 4)
                 .background(
-                    RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                        .fill(Color.barTabCardFill)
+                    RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                        .fill(Color.BartapCardFill)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                        .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                    RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                        .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                 )
             }
         }
     }
 
     private func barRow(bar: Bar, distance: CLLocationDistance) -> some View {
-        HStack(spacing: BarTabSpacing.sm) {
+        HStack(spacing: BartapSpacing.sm) {
             ZStack {
                 Circle()
-                    .fill(Color.barTabPrimary.opacity(0.1))
+                    .fill(Color.BartapPrimary.opacity(0.1))
                     .frame(width: 40, height: 40)
                 Image(systemName: "wineglass.fill")
-                    .font(.barTabCaption)
-                    .foregroundColor(.barTabPrimary)
+                    .font(.BartapCaption)
+                    .foregroundColor(.BartapPrimary)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(bar.name)
-                        .font(.barTabBodySemibold)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapBodySemibold)
+                        .foregroundColor(.BartapText)
                         .lineLimit(1)
 
                     if barRepository.isBarFlagged(bar) {
                         Image(systemName: "flag.fill")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabWarning)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapWarning)
                     }
 
                     if let level = barRepository.priceLevel(for: bar) {
                         Text(level)
-                            .font(.barTabTiny)
+                            .font(.BartapTiny)
                             .fontWeight(.semibold)
-                            .foregroundColor(.barTabAccent)
+                            .foregroundColor(.BartapAccent)
                     }
 
                     if servesFavoriteDrinks(bar) {
                         Image(systemName: "heart.fill")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabDanger)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapDanger)
                             .accessibilityLabel(Text(String(localized: "Serves your favorite drinks")))
                     }
                 }
 
                 Text(bar.address)
-                    .font(.barTabSmall)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapSmall)
+                    .foregroundColor(.BartapSecondary)
                     .lineLimit(1)
             }
 
@@ -619,17 +688,23 @@ struct NearbyView: View {
 
             VStack(alignment: .trailing, spacing: 1) {
                 Text(Self.formattedDistance(distance))
-                    .font(.barTabCaption)
+                    .font(.BartapCaption)
                     .fontWeight(.semibold)
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
+
+                if barRepository.busyCount(for: bar.id) > 0 {
+                    Text(String(localized: "\(barRepository.busyCount(for: bar.id)) here"))
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapAccent)
+                }
 
                 Image(systemName: "chevron.right")
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
             }
         }
-        .padding(.horizontal, BarTabSpacing.md)
-        .padding(.vertical, BarTabSpacing.xs)
+        .padding(.horizontal, BartapSpacing.md)
+        .padding(.vertical, BartapSpacing.xs)
         .contentShape(Rectangle())
     }
 
@@ -669,27 +744,27 @@ struct NearbyView: View {
         ) {
             HStack(spacing: 12) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous)
+                    RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous)
                         .fill(Color.white.opacity(0.15))
                         .frame(width: 44, height: 44)
                     Image(systemName: "sparkles")
-                        .font(.barTabHeading)
+                        .font(.BartapHeading)
                         .foregroundColor(.white)
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(String(localized: "Best deal near you"))
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white.opacity(0.85))
 
                     Text(deal.bar.name)
-                        .font(.barTabBodySemibold)
+                        .font(.BartapBodySemibold)
                         .foregroundColor(.white)
                         .lineLimit(1)
 
                     Text("\(deal.summary.drink.displayName) \u{00B7} \(deal.summary.size.displayName)")
-                        .font(.barTabSmall)
+                        .font(.BartapSmall)
                         .foregroundColor(.white.opacity(0.85))
                         .lineLimit(1)
                 }
@@ -698,26 +773,26 @@ struct NearbyView: View {
 
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("\(Currency.defaultCurrency.symbol) \(deal.summary.convertedAmount.formattedAmount)")
-                        .font(.barTabStat)
+                        .font(.BartapStat)
                         .foregroundColor(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
 
                     Image(systemName: "chevron.right")
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .foregroundColor(.white.opacity(0.85))
                 }
             }
-            .padding(BarTabSpacing.md)
+            .padding(BartapSpacing.md)
             .background(
                 LinearGradient(
-                    colors: [Color.barTabPrimary, Color.barTabPrimary.opacity(0.85)],
+                    colors: [Color.BartapPrimary, Color.BartapPrimary.opacity(0.85)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
-            .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
-            .shadow(color: Color.barTabPrimary.opacity(0.25), radius: 8, y: 4)
+            .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
+            .shadow(color: Color.BartapPrimary.opacity(0.25), radius: 8, y: 4)
         }
         .buttonStyle(.plain)
     }
@@ -725,24 +800,22 @@ struct NearbyView: View {
     // MARK: - For you
 
     private var forYouSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
             HStack(spacing: 6) {
                 Image(systemName: "sparkles")
-                    .font(.barTabHeading)
-                    .foregroundColor(.barTabPrimary)
+                    .font(.BartapHeading)
+                    .foregroundColor(.BartapPrimary)
 
                 Text(String(localized: "For you"))
-                    .font(.barTabHeading)
-                    .foregroundColor(.barTabText)
+                    .font(.BartapHeading)
+                    .foregroundColor(.BartapText)
 
                 Spacer()
             }
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: BarTabSpacing.sm) {
-                    ForEach(forYouResults, id: \.summary.id) { result in
-                        forYouCard(result)
-                    }
+            VStack(spacing: BartapSpacing.sm) {
+                ForEach(forYouResults, id: \.summary.id) { result in
+                    forYouCard(result)
                 }
             }
         }
@@ -758,41 +831,41 @@ struct NearbyView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 4) {
                     Image(systemName: result.summary.drink.icon)
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabPrimary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapPrimary)
 
                     Text(result.summary.drink.displayName)
-                        .font(.barTabBodySemibold)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapBodySemibold)
+                        .foregroundColor(.BartapText)
 
                     Text("\u{00B7}")
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
 
                     Text(result.summary.size.displayName)
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
                 }
                 .lineLimit(1)
 
                 Text(result.bar.name)
-                    .font(.barTabSmall)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapSmall)
+                    .foregroundColor(.BartapSecondary)
                     .lineLimit(1)
 
                 Text("\(Currency.defaultCurrency.symbol) \(result.summary.convertedAmount.formattedAmount)")
-                    .font(.barTabStat)
-                    .foregroundColor(.barTabPrimary)
+                    .font(.BartapStat)
+                    .foregroundColor(.BartapPrimary)
             }
-            .padding(BarTabSpacing.md)
-            .frame(width: 150, height: 116, alignment: .topLeading)
+            .padding(BartapSpacing.md)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
             .background(
-                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                    .fill(Color.barTabCardFill)
+                RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                    .fill(Color.BartapCardFill)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                    .stroke(Color.BartapCardBorder, lineWidth: 0.5)
             )
         }
         .buttonStyle(.plain)
@@ -804,7 +877,7 @@ struct NearbyView: View {
         VStack(alignment: .leading, spacing: 12) {
 
             // Search bar (always visible)
-            BarTabSearchField(text: $searchText, placeholder: String(localized: "Search bars..."))
+            BartapSearchField(text: $searchText, placeholder: String(localized: "Search bars or drinks..."))
             // Active filter summary (always visible)
             if selectedDrinks.count > 1 || selectedBrand != nil || !selectedAmbience.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -812,13 +885,13 @@ struct NearbyView: View {
                         if selectedDrinks.count > 1 {
                             HStack(spacing: 3) {
                                 Image(systemName: "line.3.horizontal.decrease.circle.fill")
-                                    .font(.barTabTiny)
+                                    .font(.BartapTiny)
                                 Text(String(localized: "\(selectedDrinks.count) drinks"))
                             }
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(Color.barTabPrimary.opacity(0.1))
+                            .background(Color.BartapPrimary.opacity(0.1))
                             .clipShape(Capsule())
                         }
 
@@ -828,25 +901,25 @@ struct NearbyView: View {
                                 Image(systemName: "xmark.circle.fill")
                                     .onTapGesture { selectedBrand = nil }
                             }
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(Color.barTabPrimary.opacity(0.1))
+                            .background(Color.BartapPrimary.opacity(0.1))
                             .clipShape(Capsule())
                         }
 
                         ForEach(Array(selectedAmbience)) { ambience in
                             HStack(spacing: 3) {
                                 Image(systemName: ambience.icon)
-                                    .font(.barTabTiny)
+                                    .font(.BartapTiny)
                                 Text(ambience.displayName)
                                 Image(systemName: "xmark.circle.fill")
                                     .onTapGesture { selectedAmbience.remove(ambience) }
                             }
-                            .font(.barTabSmall)
+                            .font(.BartapSmall)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(Color.barTabPrimary.opacity(0.1))
+                            .background(Color.BartapPrimary.opacity(0.1))
                             .clipShape(Capsule())
                         }
                     }
@@ -874,7 +947,7 @@ struct NearbyView: View {
             // Collapsible filters
             VStack(alignment: .leading, spacing: 8) {
                 if filtersExpanded {
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                         filterRow(label: String(localized: "Drink")) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 6) {
@@ -890,14 +963,14 @@ struct NearbyView: View {
                                         } label: {
                                             HStack(spacing: 4) {
                                                 Image(systemName: drink.icon)
-                                                    .font(.barTabTiny)
+                                                    .font(.BartapTiny)
                                                 Text(drink.displayName)
-                                                    .font(.barTabSmall)
+                                                    .font(.BartapSmall)
                                             }
-                                            .padding(.horizontal, BarTabSpacing.sm)
+                                            .padding(.horizontal, BartapSpacing.sm)
                                             .padding(.vertical, 6)
-                                            .foregroundColor(selectedDrinks.contains(drink) ? .white : .barTabPrimary)
-                                            .background(selectedDrinks.contains(drink) ? Color.barTabPrimary : Color.barTabSurface)
+                                            .foregroundColor(selectedDrinks.contains(drink) ? .white : .BartapPrimary)
+                                            .background(selectedDrinks.contains(drink) ? Color.BartapPrimary : Color.BartapSurface)
                                             .clipShape(Capsule())
                                         }
                                     }
@@ -919,11 +992,11 @@ struct NearbyView: View {
                                             }
                                         } label: {
                                             Text(size.displayName)
-                                                .font(.barTabSmall)
-                                                .padding(.horizontal, BarTabSpacing.sm)
+                                                .font(.BartapSmall)
+                                                .padding(.horizontal, BartapSpacing.sm)
                                                 .padding(.vertical, 6)
-                                                .foregroundColor(selectedSizes.contains(size) ? .white : .barTabPrimary)
-                                                .background(selectedSizes.contains(size) ? Color.barTabPrimary : Color.barTabSurface)
+                                                .foregroundColor(selectedSizes.contains(size) ? .white : .BartapPrimary)
+                                                .background(selectedSizes.contains(size) ? Color.BartapPrimary : Color.BartapSurface)
                                                 .clipShape(Capsule())
                                         }
                                     }
@@ -938,11 +1011,11 @@ struct NearbyView: View {
                                         selectedBrand = nil
                                     } label: {
                                         Text(String(localized: "All"))
-                                            .font(.barTabSmall)
-                                            .padding(.horizontal, BarTabSpacing.sm)
+                                            .font(.BartapSmall)
+                                            .padding(.horizontal, BartapSpacing.sm)
                                             .padding(.vertical, 6)
-                                            .foregroundColor(selectedBrand == nil ? .white : .barTabPrimary)
-                                            .background(selectedBrand == nil ? Color.barTabPrimary : Color.barTabSurface)
+                                            .foregroundColor(selectedBrand == nil ? .white : .BartapPrimary)
+                                            .background(selectedBrand == nil ? Color.BartapPrimary : Color.BartapSurface)
                                             .clipShape(Capsule())
                                     }
 
@@ -951,11 +1024,11 @@ struct NearbyView: View {
                                             selectedBrand = brand
                                         } label: {
                                             Text(brand)
-                                                .font(.barTabSmall)
-                                                .padding(.horizontal, BarTabSpacing.sm)
+                                                .font(.BartapSmall)
+                                                .padding(.horizontal, BartapSpacing.sm)
                                                 .padding(.vertical, 6)
-                                                .foregroundColor(selectedBrand == brand ? .white : .barTabPrimary)
-                                                .background(selectedBrand == brand ? Color.barTabPrimary : Color.barTabSurface)
+                                                .foregroundColor(selectedBrand == brand ? .white : .BartapPrimary)
+                                                .background(selectedBrand == brand ? Color.BartapPrimary : Color.BartapSurface)
                                                 .clipShape(Capsule())
                                         }
                                     }
@@ -970,11 +1043,11 @@ struct NearbyView: View {
                                         selectedAmbience = []
                                     } label: {
                                         Text(String(localized: "Any"))
-                                            .font(.barTabSmall)
-                                            .padding(.horizontal, BarTabSpacing.sm)
+                                            .font(.BartapSmall)
+                                            .padding(.horizontal, BartapSpacing.sm)
                                             .padding(.vertical, 6)
-                                            .foregroundColor(selectedAmbience.isEmpty ? .white : .barTabPrimary)
-                                            .background(selectedAmbience.isEmpty ? Color.barTabPrimary : Color.barTabSurface)
+                                            .foregroundColor(selectedAmbience.isEmpty ? .white : .BartapPrimary)
+                                            .background(selectedAmbience.isEmpty ? Color.BartapPrimary : Color.BartapSurface)
                                             .clipShape(Capsule())
                                     }
 
@@ -988,14 +1061,14 @@ struct NearbyView: View {
                                         } label: {
                                             HStack(spacing: 3) {
                                                 Image(systemName: style.icon)
-                                                    .font(.barTabTiny)
+                                                    .font(.BartapTiny)
                                                 Text(style.displayName)
                                             }
-                                            .font(.barTabSmall)
-                                            .padding(.horizontal, BarTabSpacing.sm)
+                                            .font(.BartapSmall)
+                                            .padding(.horizontal, BartapSpacing.sm)
                                             .padding(.vertical, 6)
-                                            .foregroundColor(selectedAmbience.contains(style) ? .white : .barTabPrimary)
-                                            .background(selectedAmbience.contains(style) ? Color.barTabPrimary : Color.barTabSurface)
+                                            .foregroundColor(selectedAmbience.contains(style) ? .white : .BartapPrimary)
+                                            .background(selectedAmbience.contains(style) ? Color.BartapPrimary : Color.BartapSurface)
                                             .clipShape(Capsule())
                                         }
                                     }
@@ -1018,15 +1091,18 @@ struct NearbyView: View {
                     .padding(.top, 8)
                 }
             }
-            .font(.barTabBody)
+            .font(.BartapBody)
             .fontWeight(.medium)
-            .foregroundColor(.barTabText)
+            .foregroundColor(.BartapText)
 
             if sortExpanded {
-                HStack(spacing: 8) {
-                    sortButton(title: "Cheapest", option: .cheapest)
-                    sortButton(title: "Closest", option: .closest)
-                    sortButton(title: "Brand", option: .brand)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        sortButton(title: "Cheapest", option: .cheapest)
+                        sortButton(title: "Best value", option: .bestValue)
+                        sortButton(title: "Closest", option: .closest)
+                        sortButton(title: "Brand", option: .brand)
+                    }
                 }
             }
         }
@@ -1038,9 +1114,9 @@ struct NearbyView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label)
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .fontWeight(.medium)
-                .foregroundColor(.barTabSecondary)
+                .foregroundColor(.BartapSecondary)
             content()
         }
     }
@@ -1054,14 +1130,14 @@ struct NearbyView: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.barTabTiny)
+                    .font(.BartapTiny)
                 Text(label)
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
             }
-            .padding(.horizontal, BarTabSpacing.sm)
+            .padding(.horizontal, BartapSpacing.sm)
             .padding(.vertical, 6)
-            .foregroundColor(isActive ? .white : .barTabPrimary)
-            .background(isActive ? Color.barTabPrimary : Color.barTabSurface)
+            .foregroundColor(isActive ? .white : .BartapPrimary)
+            .background(isActive ? Color.BartapPrimary : Color.BartapSurface)
             .clipShape(Capsule())
         }
     }
@@ -1069,19 +1145,19 @@ struct NearbyView: View {
     // MARK: - Price results
 
     private var priceResultsSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
-            BarTabSectionHeader(title: String(localized: "Drinks"), count: priceResults.count)
+        VStack(alignment: .leading, spacing: BartapSpacing.xs) {
+            BartapSectionHeader(title: String(localized: "Drinks"), count: priceResults.count)
 
             if priceResults.isEmpty {
                 emptyState(
                     icon: "magnifyingglass",
                     title: "No drinks found",
                     message: !trimmedSearchText.isEmpty
-                        ? "No bars match \"\(trimmedSearchText)\"."
+                        ? "No drinks match \"\(trimmedSearchText)\"."
                         : "Be the first to add a drink in this area."
                 )
             } else {
-                VStack(spacing: BarTabSpacing.xs) {
+                VStack(spacing: BartapSpacing.xs) {
                     ForEach(priceResults, id: \.summary.id) { result in
                         NavigationLink(
                             destination: BarView(bar: result.bar)
@@ -1103,19 +1179,19 @@ struct NearbyView: View {
     }
 
     private func priceRow(bar: Bar, summary: PriceSummary, isBestDeal: Bool = false) -> some View {
-        HStack(alignment: .top, spacing: BarTabSpacing.sm) {
+        HStack(alignment: .top, spacing: BartapSpacing.sm) {
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
                     Text(bar.name)
-                        .font(.barTabBodySemibold)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapBodySemibold)
+                        .foregroundColor(.BartapText)
                         .lineLimit(1)
 
                     if barRepository.isBarFlagged(bar) {
                         Image(systemName: "flag.fill")
-                            .font(.barTabTiny)
-                            .foregroundColor(.barTabWarning)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapWarning)
                     }
                 }
 
@@ -1134,8 +1210,8 @@ struct NearbyView: View {
                         Text(style)
                     }
                 }
-                .font(.barTabSmall)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapSmall)
+                .foregroundColor(.BartapSecondary)
                 .lineLimit(1)
 
                 HStack(spacing: 6) {
@@ -1145,48 +1221,66 @@ struct NearbyView: View {
 
                     Text(summary.reportCount == 1 ? String(localized: "1 report") : String(localized: "\(summary.reportCount) reports"))
                 }
-                .font(.barTabTiny)
-                .foregroundColor(.barTabSecondary.opacity(0.8))
+                .font(.BartapTiny)
+                .foregroundColor(.BartapSecondary.opacity(0.8))
 
                 confidenceView(summary: summary)
                     .padding(.top, 2)
             }
 
-            Spacer(minLength: BarTabSpacing.xs)
+            Spacer(minLength: BartapSpacing.xs)
 
             VStack(alignment: .trailing, spacing: 4) {
                 if isForYou(summary) {
                     Text(String(localized: "For you"))
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color.barTabPrimary)
+                        .background(Color.BartapPrimary)
                         .clipShape(Capsule())
                 }
 
                 if isBestDeal {
                     Text(String(localized: "Best deal"))
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color.barTabAccent)
+                        .background(Color.BartapAccent)
                         .clipShape(Capsule())
                 }
 
                 Text(summary.formattedConvertedAmount)
-                    .font(.barTabStat)
-                    .foregroundColor(.barTabPrimary)
+                    .font(.BartapStat)
+                    .foregroundColor(.BartapPrimary)
 
                 Text(Currency.defaultCurrency.rawValue)
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
+
+                if summary.isStale {
+                    Text(String(localized: "Stale"))
+                        .font(.BartapTiny)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.BartapWarning)
+                        .clipShape(Capsule())
+                }
             }
         }
-        .barTabCard()
+        .BartapCard()
+        .opacity(summary.isStale ? 0.72 : 1.0)
     }
 
     private func sortButton(title: LocalizedStringKey, option: SortOption) -> some View {
@@ -1195,22 +1289,42 @@ struct NearbyView: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: option == .cheapest ? "arrow.down" : "location")
-                    .font(.barTabTiny)
+                    .font(.BartapTiny)
                 Text(title)
+                    .lineLimit(1)
             }
-            .font(.barTabSmall)
+            .font(.BartapSmall)
             .fontWeight(.semibold)
-            .foregroundColor(sortOption == option ? .white : .barTabPrimary)
-            .padding(.horizontal, BarTabSpacing.sm)
+            .foregroundColor(sortOption == option ? .white : .BartapPrimary)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.horizontal, BartapSpacing.sm)
             .padding(.vertical, 7)
-            .background(sortOption == option ? Color.barTabPrimary : Color.barTabPrimary.opacity(0.1))
+            .background(sortOption == option ? Color.BartapPrimary : Color.BartapPrimary.opacity(0.1))
             .clipShape(Capsule())
+        }
+    }
+
+    private func barSortButton(title: LocalizedStringKey, option: BarSortOption) -> some View {
+        Button {
+            barSortOption = option
+        } label: {
+            Text(title)
+                .font(.BartapSmall)
+                .fontWeight(.semibold)
+                .foregroundColor(barSortOption == option ? .white : .BartapPrimary)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .padding(.horizontal, BartapSpacing.sm)
+                .padding(.vertical, 7)
+                .background(barSortOption == option ? Color.BartapPrimary : Color.BartapPrimary.opacity(0.1))
+                .clipShape(Capsule())
         }
     }
 
     private var sortLabel: String {
         switch sortOption {
         case .cheapest: return "Cheapest"
+        case .bestValue: return "Best value"
         case .closest: return "Closest"
         case .brand: return "Brand"
         }
@@ -1224,21 +1338,21 @@ struct NearbyView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            HStack(spacing: BarTabSpacing.xxs) {
+            HStack(spacing: BartapSpacing.xxs) {
                 Text(title)
                 Image(systemName: "chevron.down")
-                    .font(.barTabTiny.weight(.semibold))
+                    .font(.BartapTiny.weight(.semibold))
                     .rotationEffect(.degrees(isExpanded ? 180 : 0))
             }
-            .font(.barTabCaption)
+            .font(.BartapCaption)
             .fontWeight(.semibold)
-            .foregroundColor(isExpanded ? .white : .barTabText)
-            .padding(.horizontal, BarTabSpacing.sm)
-            .padding(.vertical, BarTabSpacing.xs)
-            .background(isExpanded ? Color.barTabPrimary : Color.barTabSurface)
+            .foregroundColor(isExpanded ? .white : .BartapText)
+            .padding(.horizontal, BartapSpacing.sm)
+            .padding(.vertical, BartapSpacing.xs)
+            .background(isExpanded ? Color.BartapPrimary : Color.BartapSurface)
             .clipShape(Capsule())
             .overlay(
-                Capsule().stroke(isExpanded ? Color.clear : Color.barTabCardBorder, lineWidth: 1)
+                Capsule().stroke(isExpanded ? Color.clear : Color.BartapCardBorder, lineWidth: 1)
             )
         }
     }
@@ -1249,28 +1363,28 @@ struct NearbyView: View {
         return VStack(alignment: .leading, spacing: 3) {
             HStack {
                 Text(String(localized: "Confidence"))
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
 
                     Text(String(localized: "\u{00B7} \(summary.reportCount) \(summary.reportCount == 1 ? "report" : "reports")"))
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
 
                 Spacer()
 
                 Text(summary.confidenceLabel)
-                    .font(.barTabTiny)
+                    .font(.BartapTiny)
                     .fontWeight(.semibold)
-                    .foregroundColor(.barTabPrimary)
+                    .foregroundColor(.BartapPrimary)
             }
 
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .fill(Color.barTabPrimary.opacity(0.12))
+                        .fill(Color.BartapPrimary.opacity(0.12))
 
                     Capsule()
-                        .fill(Color.barTabPrimary)
+                        .fill(Color.BartapPrimary)
                         .frame(width: geometry.size.width * CGFloat(confidence) / 100)
                 }
             }
@@ -1283,17 +1397,17 @@ struct NearbyView: View {
     private func emptyState(icon: String, title: LocalizedStringKey, message: LocalizedStringKey) -> some View {
         VStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.barTabEmptyIcon)
-                .foregroundColor(.barTabPrimary.opacity(0.6))
+                .font(.BartapEmptyIcon)
+                .foregroundColor(.BartapPrimary.opacity(0.6))
 
             Text(title)
-                .font(.barTabBody)
+                .font(.BartapBody)
                 .fontWeight(.medium)
-                .foregroundColor(.barTabText)
+                .foregroundColor(.BartapText)
 
             Text(message)
-                .font(.barTabSmall)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapSmall)
+                .foregroundColor(.BartapSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 20)
         }
@@ -1327,9 +1441,9 @@ private struct LocationSearchSheet: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                HStack(spacing: BarTabSpacing.sm) {
+                HStack(spacing: BartapSpacing.sm) {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
 
                     TextField(
                         String(localized: "Search a city or place"),
@@ -1346,16 +1460,16 @@ private struct LocationSearchSheet: View {
                             searchService.clearResults()
                         } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.barTabSecondary)
+                                .foregroundColor(.BartapSecondary)
                         }
                     }
                 }
                 .padding(14)
-                .background(Color.barTabCardFill)
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+                .background(Color.BartapCardFill)
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                        .stroke(Color.barTabPrimary.opacity(0.25), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                        .stroke(Color.BartapPrimary.opacity(0.25), lineWidth: 1)
                 )
                 .padding()
 
@@ -1365,19 +1479,19 @@ private struct LocationSearchSheet: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 3) {
                             Text(result.title)
-                                .font(.barTabHeading)
+                                .font(.BartapHeading)
                                 .foregroundColor(.primary)
 
                             Text(result.subtitle)
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapSecondary)
                                 .lineLimit(2)
                         }
                     }
                 }
                 .listStyle(.plain)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "Search a place"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

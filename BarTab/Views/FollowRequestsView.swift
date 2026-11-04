@@ -11,7 +11,7 @@ struct FollowRequestsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
 
-                BarTabScreenHeader(
+                BartapScreenHeader(
                     title: String(localized: "Follow Requests"),
                     subtitle: String(localized: "People who want to follow you.")
                 )
@@ -21,21 +21,21 @@ struct FollowRequestsView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 40)
                 } else if requests.isEmpty {
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
                         Image(systemName: "person.badge.plus")
-                            .font(.barTabEmptyIcon)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapEmptyIcon)
+                            .foregroundColor(.BartapPrimary)
 
                         Text(String(localized: "No pending requests"))
-                            .font(.barTabHeading)
+                            .font(.BartapHeading)
 
                         Text(String(localized: "When someone follows you, their request will appear here."))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .barTabCard()
+                    .BartapCard()
                 } else {
                     LazyVStack(spacing: 0) {
                         ForEach(Array(requests.enumerated()), id: \.element.id) { index, request in
@@ -46,13 +46,13 @@ struct FollowRequestsView: View {
                             }
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 20)
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Follow Requests"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await loadRequests() }
@@ -67,12 +67,12 @@ struct FollowRequestsView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile?.display_name ?? String(localized: "User"))
-                    .font(.barTabBody)
+                    .font(.BartapBody)
                     .fontWeight(.medium)
-                    .foregroundColor(.barTabText)
+                    .foregroundColor(.BartapText)
 
                 Text(String(localized: "wants to follow you"))
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                     .foregroundColor(.secondary)
             }
 
@@ -83,12 +83,12 @@ struct FollowRequestsView: View {
                     Task { await approve(request: request) }
                 } label: {
                     Text(String(localized: "Accept"))
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .fontWeight(.semibold)
                         .frame(width: 64, height: 32)
                 }
                 .buttonStyle(.plain)
-                .background(Color.barTabAccent)
+                .background(Color.BartapAccent)
                 .foregroundColor(.white)
                 .clipShape(Capsule())
 
@@ -96,18 +96,18 @@ struct FollowRequestsView: View {
                     Task { await reject(request: request) }
                 } label: {
                     Text(String(localized: "Decline"))
-                        .font(.barTabBody)
+                        .font(.BartapBody)
                         .fontWeight(.semibold)
                         .frame(width: 64, height: 32)
                 }
                 .buttonStyle(.plain)
-                .background(Color.barTabPrimary.opacity(0.12))
-                .foregroundColor(.barTabPrimary)
+                .background(Color.BartapPrimary.opacity(0.12))
+                .foregroundColor(.BartapPrimary)
                 .clipShape(Capsule())
             }
         }
-        .padding(.horizontal, BarTabSpacing.sm)
-        .padding(.vertical, BarTabSpacing.sm)
+        .padding(.horizontal, BartapSpacing.sm)
+        .padding(.vertical, BartapSpacing.sm)
     }
 
     private func loadRequests() async {

@@ -24,29 +24,29 @@ struct BadgeGridView: View {
                 if streak > 0 {
                     HStack(spacing: 12) {
                         Image(systemName: "flame.fill")
-                            .font(.barTabTitle)
-                            .foregroundColor(.barTabWarning)
+                            .font(.BartapTitle)
+                            .foregroundColor(.BartapWarning)
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(String(localized: "\(streak)-day streak"))
-                                .font(.barTabHeading)
-                                .foregroundColor(.barTabText)
+                                .font(.BartapHeading)
+                                .foregroundColor(.BartapText)
                             Text(String(localized: "Keep it going!"))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
                         }
 
                         Spacer()
                     }
                     .padding(16)
-                    .barTabCard()
+                    .BartapCard()
                 }
 
                 // Earned badges
                 if !earnedBadges.isEmpty {
                     Text(String(localized: "Earned"))
-                        .font(.barTabHeading)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapHeading)
+                        .foregroundColor(.BartapText)
 
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(earnedBadges) { badge in
@@ -58,8 +58,8 @@ struct BadgeGridView: View {
                 // Unearned badges
                 if !unearnedBadges.isEmpty {
                     Text(String(localized: "Locked"))
-                        .font(.barTabHeading)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapHeading)
+                        .foregroundColor(.BartapText)
 
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(unearnedBadges) { badge in
@@ -71,7 +71,7 @@ struct BadgeGridView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 20)
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Badges"))
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -79,38 +79,38 @@ struct BadgeGridView: View {
     private func badgeCard(_ badge: Badge, earned: Bool) -> some View {
         VStack(spacing: 6) {
             Image(systemName: badge.icon)
-                .font(.barTabTitle)
-                .foregroundColor(earned ? .barTabPrimary : .barTabSecondary)
+                .font(.BartapTitle)
+                .foregroundColor(earned ? .BartapPrimary : .BartapSecondary)
                 .frame(width: 44, height: 44)
                 .background(
                     earned
-                        ? Color.barTabPrimary.opacity(0.1)
+                        ? Color.BartapPrimary.opacity(0.1)
                         : Color.gray.opacity(0.1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
 
             Text(badge.name)
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .fontWeight(.semibold)
-                .foregroundColor(earned ? .barTabText : .barTabSecondary)
+                .foregroundColor(earned ? .BartapText : .BartapSecondary)
                 .lineLimit(1)
 
             Text(badge.description)
-                .font(.barTabTiny)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapTiny)
+                .foregroundColor(.BartapSecondary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, BarTabSpacing.sm)
+        .padding(.vertical, BartapSpacing.sm)
         .padding(.horizontal, 6)
         .background(
-            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                .fill(earned ? Color.barTabCardFill : Color.barTabCardFill.opacity(0.5))
+            RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                .fill(earned ? Color.BartapCardFill : Color.BartapCardFill.opacity(0.5))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                .stroke(earned ? Color.barTabPrimary.opacity(0.2) : Color.clear, lineWidth: 1)
+            RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                .stroke(earned ? Color.BartapPrimary.opacity(0.2) : Color.clear, lineWidth: 1)
         )
         .opacity(earned ? 1.0 : 0.6)
     }

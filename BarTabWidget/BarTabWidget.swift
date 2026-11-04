@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - Bundle
 
 @main
-struct BarTabWidgetBundle: WidgetBundle {
+struct BartapWidgetBundle: WidgetBundle {
     var body: some Widget {
         CheapestBeerWidget()
         NextCrawlStopWidget()

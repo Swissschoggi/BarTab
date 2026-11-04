@@ -28,12 +28,12 @@ struct FollowButton: View {
                         Task { await sendRequest() }
                     } label: {
                         Text(String(localized: "Follow"))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .fontWeight(.semibold)
                             .frame(width: 80, height: 32)
                     }
                     .buttonStyle(.plain)
-                    .background(Color.barTabPrimary)
+                    .background(Color.BartapPrimary)
                     .foregroundColor(.white)
                     .clipShape(Capsule())
 
@@ -42,13 +42,13 @@ struct FollowButton: View {
                         Task { await cancelRequest() }
                     } label: {
                         Text(String(localized: "Requested"))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .fontWeight(.semibold)
                             .frame(width: 80, height: 32)
                     }
                     .buttonStyle(.plain)
-                    .background(Color.barTabPrimary.opacity(0.12))
-                    .foregroundColor(.barTabPrimary)
+                    .background(Color.BartapPrimary.opacity(0.12))
+                    .foregroundColor(.BartapPrimary)
                     .clipShape(Capsule())
 
                 case .pendingIncoming:
@@ -57,12 +57,12 @@ struct FollowButton: View {
                             Task { await approveRequest() }
                         } label: {
                             Text(String(localized: "Accept"))
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
                                 .frame(width: 64, height: 32)
                         }
                         .buttonStyle(.plain)
-                        .background(Color.barTabAccent)
+                        .background(Color.BartapAccent)
                         .foregroundColor(.white)
                         .clipShape(Capsule())
 
@@ -70,13 +70,13 @@ struct FollowButton: View {
                             Task { await rejectRequest() }
                         } label: {
                             Text(String(localized: "Decline"))
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
                                 .frame(width: 64, height: 32)
                         }
                         .buttonStyle(.plain)
-                        .background(Color.barTabPrimary.opacity(0.12))
-                        .foregroundColor(.barTabPrimary)
+                        .background(Color.BartapPrimary.opacity(0.12))
+                        .foregroundColor(.BartapPrimary)
                         .clipShape(Capsule())
                     }
 
@@ -85,13 +85,13 @@ struct FollowButton: View {
                         Task { await removeFollow() }
                     } label: {
                         Text(String(localized: "Following"))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .fontWeight(.semibold)
                             .frame(width: 80, height: 32)
                     }
                     .buttonStyle(.plain)
-                    .background(Color.barTabPrimary.opacity(0.12))
-                    .foregroundColor(.barTabPrimary)
+                    .background(Color.BartapPrimary.opacity(0.12))
+                    .foregroundColor(.BartapPrimary)
                     .clipShape(Capsule())
                 }
             }

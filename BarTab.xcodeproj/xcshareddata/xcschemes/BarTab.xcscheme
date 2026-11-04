@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AE7839623034F16A00F1555E"
-               BuildableName = "BarTab.app"
-               BlueprintName = "BarTab"
+               BuildableName = "Bartap.app"
+               BlueprintName = "Bartap"
                ReferencedContainer = "container:BarTab.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -43,8 +43,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AE7839623034F16A00F1555E"
-            BuildableName = "BarTab.app"
-            BlueprintName = "BarTab"
+            BuildableName = "Bartap.app"
+            BlueprintName = "Bartap"
             ReferencedContainer = "container:BarTab.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -60,8 +60,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AE7839623034F16A00F1555E"
-            BuildableName = "BarTab.app"
-            BlueprintName = "BarTab"
+            BuildableName = "Bartap.app"
+            BlueprintName = "Bartap"
             ReferencedContainer = "container:BarTab.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

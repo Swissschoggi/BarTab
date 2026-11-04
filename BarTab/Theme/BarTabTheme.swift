@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Spacing scale
 
-enum BarTabSpacing {
+enum BartapSpacing {
     static let xxs: CGFloat = 4
     static let xs: CGFloat = 8
     static let sm: CGFloat = 12
@@ -14,7 +14,7 @@ enum BarTabSpacing {
 
 // MARK: - Corner radius scale
 
-enum BarTabRadius {
+enum BartapRadius {
     static let sheet: CGFloat = 20
     static let card: CGFloat = 16
     static let control: CGFloat = 12
@@ -26,42 +26,42 @@ enum BarTabRadius {
 extension Font {
 
     /// Screen title.
-    static let barTabDisplay = Font.system(size: 28, weight: .bold, design: .rounded)
+    static let BartapDisplay = Font.system(size: 28, weight: .bold, design: .rounded)
 
     /// Large in-content title.
-    static let barTabTitle = Font.system(size: 22, weight: .bold, design: .rounded)
+    static let BartapTitle = Font.system(size: 22, weight: .bold, design: .rounded)
 
     /// Section / card heading.
-    static let barTabHeading = Font.system(size: 15, weight: .semibold, design: .default)
+    static let BartapHeading = Font.system(size: 15, weight: .semibold, design: .default)
 
     /// Big numeric stat.
-    static let barTabStat = Font.system(size: 20, weight: .bold, design: .rounded)
+    static let BartapStat = Font.system(size: 20, weight: .bold, design: .rounded)
 
     /// Primary body text.
-    static let barTabBody = Font.system(size: 15, weight: .regular, design: .default)
+    static let BartapBody = Font.system(size: 15, weight: .regular, design: .default)
 
     /// Emphasized body text.
-    static let barTabBodySemibold = Font.system(size: 15, weight: .semibold, design: .default)
+    static let BartapBodySemibold = Font.system(size: 15, weight: .semibold, design: .default)
 
     /// Secondary text / captions.
-    static let barTabCaption = Font.system(size: 13, weight: .medium, design: .default)
+    static let BartapCaption = Font.system(size: 13, weight: .medium, design: .default)
 
     /// Small captions.
-    static let barTabSmall = Font.system(size: 12, weight: .regular, design: .default)
+    static let BartapSmall = Font.system(size: 12, weight: .regular, design: .default)
 
     /// Tiny labels / counts.
-    static let barTabTiny = Font.system(size: 11, weight: .medium, design: .default)
+    static let BartapTiny = Font.system(size: 11, weight: .medium, design: .default)
 
     /// Counts inside badge dots.
-    static let barTabBadge = Font.system(size: 9, weight: .bold, design: .rounded)
+    static let BartapBadge = Font.system(size: 9, weight: .bold, design: .rounded)
 
     // MARK: - SF Symbol icon scale
 
     /// Standard empty-state glyph.
-    static let barTabEmptyIcon = Font.system(size: 36, weight: .regular)
+    static let BartapEmptyIcon = Font.system(size: 36, weight: .regular)
 
     /// Large hero / onboarding glyph.
-    static let barTabEmptyIconLarge = Font.system(size: 44, weight: .regular)
+    static let BartapEmptyIconLarge = Font.system(size: 44, weight: .regular)
 }
 
 // MARK: - Date relative formatting
@@ -76,7 +76,7 @@ extension Date {
 
 // MARK: - Screen header
 
-struct BarTabScreenHeader: View {
+struct BartapScreenHeader: View {
 
     let title: String
     let subtitle: String
@@ -84,16 +84,16 @@ struct BarTabScreenHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.barTabDisplay)
+                .font(.BartapDisplay)
                 .tracking(-0.4)
-                .foregroundColor(.barTabText)
+                .foregroundColor(.BartapText)
 
             Text(subtitle)
-                .font(.barTabBody)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapBody)
+                .foregroundColor(.BartapSecondary)
                 .lineSpacing(4)
         }
-        .padding(.top, BarTabSpacing.xs)
+        .padding(.top, BartapSpacing.xs)
     }
 }
 
@@ -101,10 +101,10 @@ struct BarTabScreenHeader: View {
 
 extension View {
 
-    func barTabCard(
-        cornerRadius: CGFloat = BarTabRadius.card,
-        fill: Color = Color.barTabCardFill,
-        padding: CGFloat = BarTabSpacing.md,
+    func BartapCard(
+        cornerRadius: CGFloat = BartapRadius.card,
+        fill: Color = Color.BartapCardFill,
+        padding: CGFloat = BartapSpacing.md,
         shadow: Bool = false
     ) -> some View {
         self
@@ -125,7 +125,7 @@ extension View {
                     cornerRadius: cornerRadius,
                     style: .continuous
                 )
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
             )
             .shadow(
                 color: Color.black.opacity(shadow ? 0.04 : 0),
@@ -140,15 +140,15 @@ extension View {
 
 extension View {
 
-    func barTabPrimaryButton(
-        cornerRadius: CGFloat = BarTabRadius.control
+    func BartapPrimaryButton(
+        cornerRadius: CGFloat = BartapRadius.control
     ) -> some View {
         self
-            .font(.barTabBodySemibold)
+            .font(.BartapBodySemibold)
             .foregroundColor(.white)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .background(Color.barTabPrimary)
+            .background(Color.BartapPrimary)
             .clipShape(
                 RoundedRectangle(
                     cornerRadius: cornerRadius,
@@ -158,21 +158,21 @@ extension View {
     }
 
     /// Quiet secondary action.
-    func barTabSecondaryButton(
-        cornerRadius: CGFloat = BarTabRadius.control
+    func BartapSecondaryButton(
+        cornerRadius: CGFloat = BartapRadius.control
     ) -> some View {
         self
-            .font(.barTabBodySemibold)
-            .foregroundColor(.barTabText)
+            .font(.BartapBodySemibold)
+            .foregroundColor(.BartapText)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .background(Color.barTabSurface)
+            .background(Color.BartapSurface)
             .clipShape(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                    .stroke(Color.BartapCardBorder, lineWidth: 0.5)
             )
     }
 }
@@ -181,13 +181,13 @@ extension View {
 
 extension View {
 
-    func barTabPillButton(
-        color: Color = .barTabPrimary
+    func BartapPillButton(
+        color: Color = .BartapPrimary
     ) -> some View {
         self
-            .font(.barTabCaption)
+            .font(.BartapCaption)
             .foregroundColor(color)
-            .padding(.horizontal, BarTabSpacing.sm)
+            .padding(.horizontal, BartapSpacing.sm)
             .padding(.vertical, 6)
             .background(color.opacity(0.1))
             .clipShape(Capsule())
@@ -196,7 +196,7 @@ extension View {
 
 // MARK: - Section header
 
-struct BarTabSectionHeader: View {
+struct BartapSectionHeader: View {
 
     let title: String
     var count: Int? = nil
@@ -204,21 +204,21 @@ struct BarTabSectionHeader: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .tracking(-0.2)
-                .foregroundColor(.barTabText)
+                .foregroundColor(.BartapText)
 
             Spacer()
 
             if let count = count {
                 Text("\(count)")
-                    .font(.barTabSmall)
-                    .foregroundColor(.barTabPrimary)
-                    .padding(.horizontal, BarTabSpacing.xs)
+                    .font(.BartapSmall)
+                    .foregroundColor(.BartapPrimary)
+                    .padding(.horizontal, BartapSpacing.xs)
                     .padding(.vertical, 3)
                     .background(
                         Capsule()
-                            .fill(Color.barTabPrimary.opacity(0.1))
+                            .fill(Color.BartapPrimary.opacity(0.1))
                     )
             }
         }
@@ -227,7 +227,7 @@ struct BarTabSectionHeader: View {
 
 // MARK: - List container
 
-struct BarTabListContainer<Data: RandomAccessCollection, RowContent: View>: View
+struct BartapListContainer<Data: RandomAccessCollection, RowContent: View>: View
 where Data.Element: Identifiable {
 
     let data: Data
@@ -237,29 +237,29 @@ where Data.Element: Identifiable {
         VStack(spacing: 0) {
             ForEach(Array(data.enumerated()), id: \.element.id) { index, element in
                 rowContent(element)
-                    .padding(.vertical, BarTabSpacing.sm)
-                    .padding(.horizontal, BarTabSpacing.md)
+                    .padding(.vertical, BartapSpacing.sm)
+                    .padding(.horizontal, BartapSpacing.md)
 
                 if index < data.count - 1 {
                     Divider()
-                        .padding(.leading, BarTabSpacing.md)
+                        .padding(.leading, BartapSpacing.md)
                 }
             }
         }
         .background(
-            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                .fill(Color.barTabCardFill)
+            RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                .fill(Color.BartapCardFill)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
         )
     }
 }
 
 // MARK: - Compact info bar
 
-struct BarTabInfoBar: View {
+struct BartapInfoBar: View {
 
     let icon: String
     let title: String
@@ -269,82 +269,82 @@ struct BarTabInfoBar: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: BarTabSpacing.sm) {
+            HStack(spacing: BartapSpacing.sm) {
                 ZStack {
                     Circle()
-                        .fill(Color.barTabPrimary.opacity(0.1))
+                        .fill(Color.BartapPrimary.opacity(0.1))
                         .frame(width: 34, height: 34)
                     Image(systemName: icon)
-                        .font(.barTabCaption)
-                        .foregroundColor(.barTabPrimary)
+                        .font(.BartapCaption)
+                        .foregroundColor(.BartapPrimary)
                 }
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(title)
-                        .font(.barTabTiny)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapSecondary)
                     Text(value)
-                        .font(.barTabBodySemibold)
-                        .foregroundColor(.barTabText)
+                        .font(.BartapBodySemibold)
+                        .foregroundColor(.BartapText)
                         .lineLimit(1)
                 }
 
-                Spacer(minLength: BarTabSpacing.xs)
+                Spacer(minLength: BartapSpacing.xs)
 
                 if let trailingValue {
                     Text(trailingValue)
-                        .font(.barTabCaption)
-                        .foregroundColor(.barTabPrimary)
+                        .font(.BartapCaption)
+                        .foregroundColor(.BartapPrimary)
                 }
 
                 Image(systemName: "chevron.down")
-                    .font(.barTabTiny.weight(.semibold))
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny.weight(.semibold))
+                    .foregroundColor(.BartapSecondary)
             }
-            .padding(.horizontal, BarTabSpacing.md)
-            .padding(.vertical, BarTabSpacing.xs)
+            .padding(.horizontal, BartapSpacing.md)
+            .padding(.vertical, BartapSpacing.xs)
         }
         .buttonStyle(.plain)
-        .background(Color.barTabCardFill)
-        .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous))
+        .background(Color.BartapCardFill)
+        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
         )
     }
 }
 
 // MARK: - Input field
 
-struct BarTabFieldStyle: TextFieldStyle {
+struct BartapFieldStyle: TextFieldStyle {
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
-            .font(.barTabBody)
-            .padding(.horizontal, BarTabSpacing.md)
+            .font(.BartapBody)
+            .padding(.horizontal, BartapSpacing.md)
             .padding(.vertical, 12)
-            .background(Color.barTabSurface)
+            .background(Color.BartapSurface)
             .clipShape(
-                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                    .stroke(Color.BartapCardBorder, lineWidth: 0.5)
             )
     }
 }
 
 extension View {
-    func barTabFieldSurface() -> some View {
+    func BartapFieldSurface() -> some View {
         self
-            .padding(.horizontal, BarTabSpacing.md)
+            .padding(.horizontal, BartapSpacing.md)
             .padding(.vertical, 12)
-            .background(Color.barTabSurface)
+            .background(Color.BartapSurface)
             .clipShape(
-                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                    .stroke(Color.BartapCardBorder, lineWidth: 0.5)
             )
     }
 }
@@ -412,9 +412,9 @@ struct SkeletonModifier: ViewModifier {
             .overlay(
                 LinearGradient(
                     colors: [
-                        Color.barTabPillFill,
-                        Color.barTabCardBorder,
-                        Color.barTabPillFill
+                        Color.BartapPillFill,
+                        Color.BartapCardBorder,
+                        Color.BartapPillFill
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
@@ -449,44 +449,44 @@ struct EmptyStateView: View {
     let message: String
 
     var body: some View {
-        VStack(spacing: BarTabSpacing.sm) {
+        VStack(spacing: BartapSpacing.sm) {
             Image(systemName: icon)
-                .font(.barTabEmptyIcon)
-                .foregroundColor(.barTabPrimary.opacity(0.5))
+                .font(.BartapEmptyIcon)
+                .foregroundColor(.BartapPrimary.opacity(0.5))
                 .accessibilityHidden(true)
 
             Text(title)
-                .font(.barTabBodySemibold)
+                .font(.BartapBodySemibold)
                 .tracking(-0.2)
-                .foregroundColor(.barTabText)
+                .foregroundColor(.BartapText)
 
             Text(message)
-                .font(.barTabCaption)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapCaption)
+                .foregroundColor(.BartapSecondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(3)
-                .padding(.horizontal, BarTabSpacing.lg)
+                .padding(.horizontal, BartapSpacing.lg)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, BarTabSpacing.xl)
+        .padding(.vertical, BartapSpacing.xl)
     }
 }
 
 // MARK: - Search field
 
-struct BarTabSearchField: View {
+struct BartapSearchField: View {
 
     @Binding var text: String
     var placeholder: String = "Search..."
 
     var body: some View {
-        HStack(spacing: BarTabSpacing.xs) {
+        HStack(spacing: BartapSpacing.xs) {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(.barTabSecondary)
-                .font(.barTabBody)
+                .foregroundColor(.BartapSecondary)
+                .font(.BartapBody)
 
             TextField(placeholder, text: $text)
-                .font(.barTabBody)
+                .font(.BartapBody)
                 .textFieldStyle(.plain)
                 .autocorrectionDisabled()
 
@@ -495,33 +495,33 @@ struct BarTabSearchField: View {
                     text = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.barTabSecondary)
+                        .foregroundColor(.BartapSecondary)
                 }
             }
         }
-        .barTabFieldSurface()
+        .BartapFieldSurface()
     }
 }
 
 struct BarRowSkeleton: View {
 
     var body: some View {
-        HStack(spacing: BarTabSpacing.sm) {
-            RoundedRectangle(cornerRadius: BarTabRadius.chip)
-                .fill(Color.barTabSurface)
+        HStack(spacing: BartapSpacing.sm) {
+            RoundedRectangle(cornerRadius: BartapRadius.chip)
+                .fill(Color.BartapSurface)
                 .frame(width: 50, height: 50)
 
             VStack(alignment: .leading, spacing: 6) {
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.barTabSurface)
+                    .fill(Color.BartapSurface)
                     .frame(width: 140, height: 14)
 
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.barTabCardBorder.opacity(0.7))
+                    .fill(Color.BartapCardBorder.opacity(0.7))
                     .frame(width: 100, height: 10)
 
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.barTabCardBorder.opacity(0.7))
+                    .fill(Color.BartapCardBorder.opacity(0.7))
                     .frame(width: 80, height: 10)
             }
 

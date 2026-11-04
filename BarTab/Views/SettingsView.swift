@@ -1,7 +1,4 @@
 import SwiftUI
-#if canImport(StripePaymentSheet)
-import StripePaymentSheet
-#endif
 
 struct SettingsView: View {
 
@@ -14,7 +11,12 @@ struct SettingsView: View {
     @State private var showingRestartAlert = false
     @State private var showingUsernameEditor = false
     @State private var showingPasswordEditor = false
-    @State private var showingTipJar = false
+
+    private var appVersionString: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return "\(version) (\(build))"
+    }
     @State private var currencyExpanded = false
     @State private var languageExpanded = false
     @State private var selectedCurrency: Currency = Currency.defaultCurrency
@@ -31,19 +33,19 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
 
                     // Account section
                     if userSession.isLoggedIn {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(spacing: 8) {
                                 Image(systemName: "person.circle")
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabPrimary)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapPrimary)
                                 Text(String(localized: "Account"))
-                                    .font(.barTabBody)
+                                    .font(.BartapBody)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.barTabText)
+                                    .foregroundColor(.BartapText)
                             }
 
                             VStack(spacing: 0) {
@@ -52,41 +54,41 @@ struct SettingsView: View {
                                 } label: {
                                     settingsRow(
                                         icon: "person.fill",
-                                        iconColor: .barTabPrimary,
+                                        iconColor: .BartapPrimary,
                                         title: String(localized: "Username"),
                                         value: userSession.currentUser?.username ?? String(localized: "Not set")
                                     )
                                 }
 
                                 Divider()
-                                    .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, BarTabSpacing.md)
+                                    .foregroundColor(.BartapCardBorder)
+                                    .padding(.leading, BartapSpacing.md)
 
                                 Button {
                                     showingPasswordEditor = true
                                 } label: {
                                     settingsRow(
                                         icon: "lock.fill",
-                                        iconColor: .barTabPrimary,
+                                        iconColor: .BartapPrimary,
                                         title: String(localized: "Change Password"),
                                         value: ""
                                     )
                                 }
                             }
                         }
-                        .barTabCard()
+                        .BartapCard()
                     }
 
                     // Preferences (currency + language)
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "slider.horizontal.3")
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapPrimary)
                             Text(String(localized: "Preferences"))
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
+                                .foregroundColor(.BartapText)
                         }
 
                         DisclosureGroup(isExpanded: $currencyExpanded) {
@@ -98,18 +100,18 @@ struct SettingsView: View {
                                     } label: {
                                         HStack {
                                             Text(currency.symbol)
-                                                .font(.barTabHeading)
+                                                .font(.BartapHeading)
                                                 .fontWeight(.semibold)
                                                 .frame(width: 32)
 
                                             VStack(alignment: .leading, spacing: 1) {
                                                 Text(currency.rawValue)
-                                                    .font(.barTabBody)
+                                                    .font(.BartapBody)
                                                     .fontWeight(.medium)
-                                                    .foregroundColor(.barTabText)
+                                                    .foregroundColor(.BartapText)
                                                 Text(currency.displayName)
-                                                    .font(.barTabSmall)
-                                                    .foregroundColor(.barTabSecondary)
+                                                    .font(.BartapSmall)
+                                                    .foregroundColor(.BartapSecondary)
                                             }
 
                                             Spacer()
@@ -117,43 +119,43 @@ struct SettingsView: View {
                                             if selectedCurrency == currency {
                                                 Image(systemName: "checkmark.circle.fill")
                                                     .fontWeight(.semibold)
-                                                    .foregroundColor(.barTabPrimary)
+                                                    .foregroundColor(.BartapPrimary)
                                             } else {
                                                 Image(systemName: "circle")
-                                                    .foregroundColor(.barTabCardBorder)
+                                                    .foregroundColor(.BartapCardBorder)
                                             }
                                         }
-                                        .padding(.vertical, BarTabSpacing.sm)
+                                        .padding(.vertical, BartapSpacing.sm)
                                     }
 
                                     if currency != Currency.allCases.last {
                                         Divider()
-                                            .foregroundColor(.barTabCardBorder)
-                                            .padding(.leading, BarTabSpacing.md)
+                                            .foregroundColor(.BartapCardBorder)
+                                            .padding(.leading, BartapSpacing.md)
                                     }
                                 }
                             }
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: "dollarsign.circle")
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabPrimary)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapPrimary)
                                 Text(String(localized: "Currency"))
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabText)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapText)
 
                                 Spacer()
 
                                 Text(selectedCurrency.rawValue)
-                                    .font(.barTabBody)
+                                    .font(.BartapBody)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.barTabSecondary)
+                                    .foregroundColor(.BartapSecondary)
                             }
                         }
-                        .tint(.barTabSecondary)
+                        .tint(.BartapSecondary)
 
                         Divider()
-                            .foregroundColor(.barTabCardBorder)
+                            .foregroundColor(.BartapCardBorder)
 
                         DisclosureGroup(isExpanded: $languageExpanded) {
                             VStack(spacing: 0) {
@@ -166,64 +168,64 @@ struct SettingsView: View {
                                     } label: {
                                         HStack {
                                             Text(lang.flag)
-                                                .font(.barTabHeading)
+                                                .font(.BartapHeading)
 
                                             Text(lang.name)
-                                                .font(.barTabBody)
-                                                .foregroundColor(.barTabText)
+                                                .font(.BartapBody)
+                                                .foregroundColor(.BartapText)
 
                                             Spacer()
 
                                             if languageManager.selectedLanguage == lang.code {
                                                 Image(systemName: "checkmark.circle.fill")
                                                     .fontWeight(.semibold)
-                                                    .foregroundColor(.barTabPrimary)
+                                                    .foregroundColor(.BartapPrimary)
                                             } else {
                                                 Image(systemName: "circle")
-                                                    .foregroundColor(.barTabCardBorder)
+                                                    .foregroundColor(.BartapCardBorder)
                                             }
                                         }
-        .padding(.vertical, BarTabSpacing.sm)
+        .padding(.vertical, BartapSpacing.sm)
                                     }
 
                                     if index < languages.count - 1 {
                                         Divider()
-                                            .foregroundColor(.barTabCardBorder)
+                                            .foregroundColor(.BartapCardBorder)
                                     }
                                 }
                             }
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: "globe")
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabPrimary)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapPrimary)
                                 Text(String(localized: "Language"))
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabText)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapText)
 
                                 Spacer()
 
                                 Text(languages.first { $0.code == languageManager.selectedLanguage }?.name ?? "English")
-                                    .font(.barTabBody)
+                                    .font(.BartapBody)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.barTabSecondary)
+                                    .foregroundColor(.BartapSecondary)
                             }
                         }
-                        .tint(.barTabSecondary)
+                        .tint(.BartapSecondary)
                     }
-                    .barTabCard()
+                    .BartapCard()
 
                     // Admin section
                     if userSession.currentUser?.isAdmin == true {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(spacing: 8) {
                                 Image(systemName: "shield.lefthalf.filled")
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabPrimary)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapPrimary)
                                 Text(String(localized: "Admin"))
-                                    .font(.barTabBody)
+                                    .font(.BartapBody)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.barTabText)
+                                    .foregroundColor(.BartapText)
                             }
 
                             VStack(spacing: 0) {
@@ -232,115 +234,115 @@ struct SettingsView: View {
                                 } label: {
                                     HStack {
                                         Label(String(localized: "Brand Requests"), systemImage: "tag.fill")
-                                            .font(.barTabBody)
-                                            .foregroundColor(.barTabText)
+                                            .font(.BartapBody)
+                                            .foregroundColor(.BartapText)
 
                                         Spacer()
 
                                         if barRepository.pendingBrandRequestCount > 0 {
                                             Text("\(barRepository.pendingBrandRequestCount)")
-                                                .font(.barTabTiny)
+                                                .font(.BartapTiny)
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.white)
                                                 .padding(.horizontal, 7)
                                                 .padding(.vertical, 2)
-                                                .background(Color.barTabWarning)
+                                                .background(Color.BartapWarning)
                                                 .clipShape(Capsule())
                                         }
 
                                         Image(systemName: "chevron.right")
-                                            .font(.barTabTiny)
-                                            .foregroundColor(.barTabSecondary)
+                                            .font(.BartapTiny)
+                                            .foregroundColor(.BartapSecondary)
                                     }
-                                    .padding(.vertical, BarTabSpacing.sm)
+                                    .padding(.vertical, BartapSpacing.sm)
                                     .padding(.horizontal, 12)
                                 }
 
                                 Divider()
-                                    .foregroundColor(.barTabCardBorder)
-                                    .padding(.leading, BarTabSpacing.md)
+                                    .foregroundColor(.BartapCardBorder)
+                                    .padding(.leading, BartapSpacing.md)
 
                                 NavigationLink {
                                     AdminReportsView()
                                 } label: {
                                     HStack {
                                         Label(String(localized: "Reported Content"), systemImage: "exclamationmark.shield.fill")
-                                            .font(.barTabBody)
-                                            .foregroundColor(.barTabText)
+                                            .font(.BartapBody)
+                                            .foregroundColor(.BartapText)
 
                                         Spacer()
 
                                         if barRepository.unreviewedReportCount > 0 {
                                             Text("\(barRepository.unreviewedReportCount)")
-                                                .font(.barTabTiny)
+                                                .font(.BartapTiny)
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.white)
                                                 .padding(.horizontal, 7)
                                                 .padding(.vertical, 2)
-                                                .background(Color.barTabDanger)
+                                                .background(Color.BartapDanger)
                                                 .clipShape(Capsule())
                                         }
 
                                         Image(systemName: "chevron.right")
-                                            .font(.barTabTiny)
-                                            .foregroundColor(.barTabSecondary)
+                                            .font(.BartapTiny)
+                                            .foregroundColor(.BartapSecondary)
                                     }
-                                    .padding(.vertical, BarTabSpacing.sm)
+                                    .padding(.vertical, BartapSpacing.sm)
                                     .padding(.horizontal, 12)
                                 }
                             }
                         }
-                        .barTabCard()
+                        .BartapCard()
                     }
 
                     // About
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "info.circle")
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapPrimary)
                             Text(String(localized: "About"))
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
+                                .foregroundColor(.BartapText)
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("BarTab")
-                                .font(.barTabBody)
+                            Text("Bartap")
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
+                                .foregroundColor(.BartapText)
 
                             Text(String(localized: "Find bars, compare drinks, and discover the best drink deals around you."))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
                         }
 
                         Divider()
-                            .foregroundColor(.barTabCardBorder)
+                            .foregroundColor(.BartapCardBorder)
 
                         HStack {
                             Text(String(localized: "Version"))
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabText)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapText)
                             Spacer()
-                            Text("BETA")
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabSecondary)
+                            Text(appVersionString)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapSecondary)
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
 
                     // Cache
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "trash")
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapPrimary)
                             Text(String(localized: "Cache"))
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
+                                .foregroundColor(.BartapText)
                         }
 
                         VStack(spacing: 0) {
@@ -356,94 +358,86 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
 
                     // Onboarding
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "sparkles")
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapPrimary)
                             Text(String(localized: "Onboarding"))
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
+                                .foregroundColor(.BartapText)
                         }
 
                         VStack(spacing: 0) {
                             Button {
                                 UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
                                 toastCenter.show(
-                                    String(localized: "Restart BarTab to replay onboarding"),
+                                    String(localized: "Restart Bartap to replay onboarding"),
                                     kind: .success
                                 )
                             } label: {
                                 settingsRow(
                                     icon: "arrow.counterclockwise",
-                                    iconColor: .barTabAccent,
+                                    iconColor: .BartapAccent,
                                     title: String(localized: "Replay Onboarding"),
                                     value: ""
                                 )
                             }
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
 
                     // Support the Dev
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "cup.and.saucer.fill")
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapPrimary)
                             Text(String(localized: "Support the Dev"))
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
+                                .foregroundColor(.BartapText)
                         }
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(String(localized: "Buy the developer a drink!"))
-                                .font(.barTabBody)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
+                        Text(String(localized: "If Bartap helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running."))
+                            .font(.BartapBody)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
 
-                            Text(String(localized: "If BarTab helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running."))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
-                        }
-
-                        Button {
-                            showingTipJar = true
-                        } label: {
+                        Link(destination: URL(string: "https://ko-fi.com/bartap")!) {
                             HStack {
-                                Image(systemName: "cup.and.saucer.fill")
-                                Text(String(localized: "Buy a Drink"))
+                                Image(systemName: "heart.fill")
+                                Text(String(localized: "Donate on Ko-fi"))
                                     .fontWeight(.semibold)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, BarTabSpacing.sm)
-                            .barTabPrimaryButton()
+                            .padding(.vertical, BartapSpacing.sm)
+                            .BartapPrimaryButton()
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
 
                     // Legal
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "doc.text")
-                                .font(.barTabBody)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapBody)
+                                .foregroundColor(.BartapPrimary)
                             Text(String(localized: "Legal"))
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
+                                .foregroundColor(.BartapText)
                         }
 
                         VStack(spacing: 0) {
                             Link(destination: URL(string: "https://bartap.info/privacy.html")!) {
                                 settingsRow(
                                     icon: "hand.raised",
-                                    iconColor: .barTabPrimary,
+                                    iconColor: .BartapPrimary,
                                     title: String(localized: "Privacy Policy"),
                                     value: ""
                                 )
@@ -451,13 +445,13 @@ struct SettingsView: View {
                             .buttonStyle(.plain)
 
                             Divider()
-                                .foregroundColor(.barTabCardBorder)
-                                .padding(.leading, BarTabSpacing.md)
+                                .foregroundColor(.BartapCardBorder)
+                                .padding(.leading, BartapSpacing.md)
 
                             Link(destination: URL(string: "https://bartap.info/terms.html")!) {
                                 settingsRow(
                                     icon: "doc.plaintext",
-                                    iconColor: .barTabPrimary,
+                                    iconColor: .BartapPrimary,
                                     title: String(localized: "Terms of Service"),
                                     value: ""
                                 )
@@ -465,19 +459,19 @@ struct SettingsView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    .barTabCard()
+                    .BartapCard()
 
                     // Danger zone
                     if userSession.isLoggedIn {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .font(.barTabBody)
-                                    .foregroundColor(.barTabDanger)
+                                    .font(.BartapBody)
+                                    .foregroundColor(.BartapDanger)
                                 Text(String(localized: "Danger Zone"))
-                                    .font(.barTabBody)
+                                    .font(.BartapBody)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.barTabText)
+                                    .foregroundColor(.BartapText)
                             }
 
                             VStack(spacing: 0) {
@@ -490,18 +484,18 @@ struct SettingsView: View {
                                         title: String(localized: "Delete Account"),
                                         value: ""
                                     )
-                                    .foregroundColor(.barTabDanger)
+                                    .foregroundColor(.BartapDanger)
                                 }
                             }
                         }
-                        .barTabCard()
+                        .BartapCard()
                     }
                 }
                 .padding(.horizontal)
                 .padding(.top, 20)
                 .padding(.bottom, 30)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "Settings"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -541,23 +535,6 @@ struct SettingsView: View {
                 .environmentObject(userSession)
                 .environmentObject(toastCenter)
         }
-        .sheet(isPresented: $showingTipJar) {
-            tipJarSheet
-        }
-    }
-
-    @ViewBuilder
-    private var tipJarSheet: some View {
-        #if canImport(StripePaymentSheet)
-        TipJarSheet()
-            .environmentObject(toastCenter)
-        #else
-        Text(String(localized: "Tip jar coming soon! We're setting up payments   stay tuned."))
-            .font(.barTabBody)
-            .multilineTextAlignment(.center)
-            .padding()
-            .presentationDetents([.height(160)])
-        #endif
     }
 
     private func settingsRow(
@@ -572,150 +549,26 @@ struct SettingsView: View {
                 .frame(width: 24)
 
             Text(title)
-                .font(.barTabBody)
-                .foregroundColor(.barTabText)
+                .font(.BartapBody)
+                .foregroundColor(.BartapText)
 
             Spacer()
 
             if !value.isEmpty {
                 Text(value)
-                    .font(.barTabBody)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapBody)
+                    .foregroundColor(.BartapSecondary)
             }
 
             Image(systemName: "chevron.right")
-                .font(.barTabTiny)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapTiny)
+                .foregroundColor(.BartapSecondary)
         }
-        .padding(.vertical, BarTabSpacing.sm)
+        .padding(.vertical, BartapSpacing.sm)
     }
 }
 
-#if canImport(StripePaymentSheet)
 
-private struct TipJarSheet: View {
-    @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var paymentSheet: PaymentSheet?
-    @State private var isBusy = false
-
-    private let tips: [Int] = [300, 500, 1000]
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: BarTabSpacing.lg) {
-                Spacer()
-
-                Image(systemName: "cup.and.saucer.fill")
-                    .font(.system(size: 48, weight: .semibold))
-                    .foregroundColor(.barTabPrimary)
-
-                Text(String(localized: "Buy the developer a drink!"))
-                    .font(.barTabTitle)
-                    .multilineTextAlignment(.center)
-
-                Text(String(localized: "If BarTab helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running."))
-                    .font(.barTabBody)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-
-                HStack(spacing: BarTabSpacing.md) {
-                    ForEach(tips, id: \.self) { amount in
-                        Button {
-                            Task { await startCheckout(amount) }
-                        } label: {
-                            Text("\(Currency.defaultCurrency.symbol) \((Decimal(amount) / 100).formattedAmount)")
-                                .font(.barTabHeading)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .barTabPrimaryButton()
-                        }
-                        .disabled(isBusy)
-                    }
-                }
-
-                Spacer()
-            }
-            .padding(BarTabSpacing.lg)
-            .background(Color.barTabBackground.ignoresSafeArea())
-            .navigationTitle(String(localized: "Support the Dev"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "Done")) { dismiss() }
-                }
-            }
-        }
-    }
-
-    private func startCheckout(_ amount: Int) async {
-        isBusy = true
-        defer { isBusy = false }
-
-        StripeAPI.defaultPublishableKey = SupabaseConfig.stripePublishableKey
-
-        guard let secret = await createPaymentIntent(amount: amount) else {
-            toastCenter.show(String(localized: "Couldn't start the tip. Please try again."), kind: .error)
-            return
-        }
-
-        var config = PaymentSheet.Configuration()
-        config.merchantDisplayName = "BarTab"
-        let sheet = PaymentSheet(paymentIntentClientSecret: secret, configuration: config)
-        paymentSheet = sheet
-
-        guard let presenter = UIViewController.top() else { return }
-        sheet.present(from: presenter) { result in
-            switch result {
-            case .completed:
-                toastCenter.show(String(localized: "Thanks for the tip! 🍻"), kind: .success)
-                dismiss()
-            case .canceled:
-                break
-            case .failed(let error):
-                toastCenter.show(error.localizedDescription, kind: .error)
-            }
-        }
-    }
-
-    private func createPaymentIntent(amount: Int) async -> String? {
-        let host = SupabaseConfig.projectURL.host ?? ""
-        guard let url = URL(string: "https://\(host)/functions/v1/create-payment-intent") else {
-            return nil
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(SupabaseConfig.anonKey, forHTTPHeaderField: "apikey")
-        request.setValue("Bearer \(SupabaseConfig.anonKey)", forHTTPHeaderField: "Authorization")
-        request.httpBody = try? JSONSerialization.data(withJSONObject: [
-            "amount": amount,
-            "currency": Currency.defaultCurrency.rawValue.lowercased()
-        ])
-
-        guard let (data, _) = try? await URLSession.shared.data(for: request),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            return nil
-        }
-        return json["clientSecret"] as? String
-    }
-}
-
-private extension UIViewController {
-    static func top() -> UIViewController? {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let root = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
-            return nil
-        }
-        var top = root
-        while let presented = top.presentedViewController { top = presented }
-        return top
-    }
-}
-
-#endif
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
@@ -762,18 +615,18 @@ private struct EditUsernameSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    HStack(spacing: BarTabSpacing.sm) {
+                    HStack(spacing: BartapSpacing.sm) {
                         avatarPreview
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(String(localized: "This is how others see you"))
-                                .font(.barTabSmall)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
 
                             Text(trimmed.isEmpty ? String(localized: "No name yet") : trimmed)
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.barTabText)
+                                .foregroundColor(.BartapText)
                                 .lineLimit(1)
                         }
                     }
@@ -793,7 +646,7 @@ private struct EditUsernameSheet: View {
                     HStack(alignment: .top) {
                         if let error = validationError {
                             Label(error, systemImage: "exclamationmark.circle.fill")
-                                .foregroundColor(.barTabDanger)
+                                .foregroundColor(.BartapDanger)
                         } else {
                             Text(String(localized: "Pick a name your friends will recognize."))
                         }
@@ -804,13 +657,13 @@ private struct EditUsernameSheet: View {
                             .foregroundColor(
                                 username.count > InputValidator.maxDisplayNameLength
                                     ? .red
-                                    : .barTabSecondary
+                                    : .BartapSecondary
                             )
                     }
                 }
             }
             .scrollContentBackground(.hidden)
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "Edit Username"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -835,11 +688,11 @@ private struct EditUsernameSheet: View {
     private var avatarPreview: some View {
         ZStack {
             Circle()
-                .fill(Color.barTabPrimary)
+                .fill(Color.BartapPrimary)
                 .frame(width: 44, height: 44)
 
             Text(String(trimmed.prefix(1)).uppercased())
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .foregroundColor(.white)
         }
     }
@@ -903,7 +756,7 @@ private struct ChangePasswordSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.sm) {
                         HStack {
                             SecureField(String(localized: "New password"), text: $newPassword)
                                 .focused($focusedField, equals: .newPassword)
@@ -913,7 +766,7 @@ private struct ChangePasswordSheet: View {
                                 showNew.toggle()
                             } label: {
                                 Image(systemName: showNew ? "eye.slash.fill" : "eye.fill")
-                                    .foregroundColor(.barTabSecondary)
+                                    .foregroundColor(.BartapSecondary)
                             }
                         }
 
@@ -926,7 +779,7 @@ private struct ChangePasswordSheet: View {
                 } footer: {
                     if let error = validationError {
                         Label(error, systemImage: "exclamationmark.circle.fill")
-                            .foregroundColor(.barTabDanger)
+                            .foregroundColor(.BartapDanger)
                     } else if !newPassword.isEmpty {
                         Text(strength.hint)
                     }
@@ -942,7 +795,7 @@ private struct ChangePasswordSheet: View {
                             showConfirm.toggle()
                         } label: {
                             Image(systemName: showConfirm ? "eye.slash.fill" : "eye.fill")
-                                .foregroundColor(.barTabSecondary)
+                                .foregroundColor(.BartapSecondary)
                         }
                     }
                 } header: {
@@ -950,12 +803,12 @@ private struct ChangePasswordSheet: View {
                 } footer: {
                     if !confirmPassword.isEmpty && newPassword != confirmPassword {
                         Text(String(localized: "Passwords don't match."))
-                            .foregroundColor(.barTabDanger)
+                            .foregroundColor(.BartapDanger)
                     }
                 }
             }
             .scrollContentBackground(.hidden)
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "Change Password"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -978,13 +831,13 @@ private struct ChangePasswordSheet: View {
             HStack(spacing: 4) {
                 ForEach(0..<3, id: \.self) { index in
                     Capsule()
-                        .fill(index < strength.filledSegments ? strength.color : Color.barTabPrimary.opacity(0.12))
+                        .fill(index < strength.filledSegments ? strength.color : Color.BartapPrimary.opacity(0.12))
                         .frame(height: 4)
                 }
             }
 
             Text(strength.label)
-                .font(.barTabSmall)
+                .font(.BartapSmall)
                 .fontWeight(.semibold)
                 .foregroundColor(strength.color)
         }
@@ -1024,30 +877,30 @@ private struct DeleteAccountSheet: View {
 
                 ZStack {
                     Circle()
-                        .fill(Color.barTabDanger.opacity(0.12))
+                        .fill(Color.BartapDanger.opacity(0.12))
                         .frame(width: 72, height: 72)
 
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 30))
-                        .foregroundColor(.barTabDanger)
+                        .foregroundColor(.BartapDanger)
                 }
                 .padding(.top, 24)
 
                 VStack(spacing: 8) {
                     Text(String(localized: "Delete your account?"))
-                        .font(.barTabHeading)
+                        .font(.BartapHeading)
                         .fontWeight(.bold)
 
                     Text(String(localized: "This permanently deletes your profile, prices, bars, ratings, and everything else you've contributed. This can't be undone."))
-                        .font(.barTabBody)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapBody)
+                        .foregroundColor(.BartapSecondary)
                         .multilineTextAlignment(.center)
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(String(localized: "Type DELETE to confirm"))
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabSecondary)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapSecondary)
 
                     TextField("DELETE", text: $confirmationText)
                         .textFieldStyle(.roundedBorder)
@@ -1071,11 +924,11 @@ private struct DeleteAccountSheet: View {
                     .foregroundColor(.white)
                     .background(
                         isConfirmed && !isDeleting
-                            ? Color.barTabDanger
-                            : Color.barTabSecondary.opacity(0.4)
+                            ? Color.BartapDanger
+                            : Color.BartapSecondary.opacity(0.4)
                     )
                     .clipShape(
-                        RoundedRectangle(cornerRadius: BarTabRadius.control, style: .continuous)
+                        RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
                     )
                 }
                 .disabled(!isConfirmed || isDeleting)
@@ -1083,7 +936,7 @@ private struct DeleteAccountSheet: View {
                 Spacer()
             }
             .padding(.horizontal, 24)
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .navigationTitle(String(localized: "Delete Account"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

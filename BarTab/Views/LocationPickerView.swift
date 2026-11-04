@@ -41,7 +41,7 @@ struct LocationPickerView: View {
                     .system(size: 40)
                 )
                 .foregroundColor(
-                    .barTabPrimary
+                    .BartapPrimary
                 )
 
                 VStack {
@@ -77,11 +77,11 @@ struct LocationPickerView: View {
                                 .infinity
                         )
                         .background(
-                            Color.barTabPrimary
+                            Color.BartapPrimary
                         )
                         .clipShape(
                             RoundedRectangle(
-                                cornerRadius: BarTabRadius.card,
+                                cornerRadius: BartapRadius.card,
                                 style: .continuous
                             )
                         )

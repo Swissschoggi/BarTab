@@ -17,16 +17,16 @@ struct PriceAlertListView: View {
             } else {
                 List {
                     if alerts.isEmpty {
-                        VStack(spacing: BarTabSpacing.sm) {
+                        VStack(spacing: BartapSpacing.sm) {
                             Image(systemName: "bell.slash")
-                                .font(.barTabEmptyIcon)
-                                .foregroundColor(.barTabPrimary)
+                                .font(.BartapEmptyIcon)
+                                .foregroundColor(.BartapPrimary)
 
                             Text(String(localized: "No alerts"))
-                                .font(.barTabHeading)
+                                .font(.BartapHeading)
 
                             Text(String(localized: "Set a price alert on any drink to be notified when the price changes."))
-                                .font(.barTabBody)
+                                .font(.BartapBody)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                         }
@@ -53,19 +53,19 @@ struct PriceAlertListView: View {
     private func alertRow(_ alert: PriceAlert) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "bell.fill")
-                .font(.barTabSmall)
-                .foregroundColor(.barTabAccent)
+                .font(.BartapSmall)
+                .foregroundColor(.BartapAccent)
                 .frame(width: 32, height: 32)
-                .background(Color.barTabAccent.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                .background(Color.BartapAccent.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(alert.drink)
-                    .font(.barTabBody)
+                    .font(.BartapBody)
                     .fontWeight(.medium)
 
                 Text(alert.size)
-                    .font(.barTabSmall)
+                    .font(.BartapSmall)
                     .foregroundColor(.secondary)
             }
 
@@ -73,13 +73,13 @@ struct PriceAlertListView: View {
 
             if let target = alert.targetPrice {
                 Text("\(Currency.defaultCurrency.symbol)\(String(format: "%.2f", target))")
-                    .font(.barTabBody)
+                    .font(.BartapBody)
                     .fontWeight(.bold)
-                    .foregroundColor(.barTabAccent)
+                    .foregroundColor(.BartapAccent)
             } else {
                 Text(String(localized: "Any price"))
-                    .font(.barTabSmall)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapSmall)
+                    .foregroundColor(.BartapSecondary)
             }
         }
     }

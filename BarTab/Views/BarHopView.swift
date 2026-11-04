@@ -47,7 +47,7 @@ struct BarHopView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
                     drinkSection
                     locationSection
 
@@ -57,10 +57,10 @@ struct BarHopView: View {
                         routeSection
                     }
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.md)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .onAppear {
                 locationService.requestPermission()
             }
@@ -97,13 +97,13 @@ struct BarHopView: View {
     // MARK: - Drink
 
     private var drinkSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+        VStack(alignment: .leading, spacing: BartapSpacing.xs) {
             Text(String(localized: "CHEAPEST FOR"))
-                .font(.barTabCaption)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapCaption)
+                .foregroundColor(.BartapSecondary)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: BarTabSpacing.xs) {
+                HStack(spacing: BartapSpacing.xs) {
                     ForEach(Drink.allCases.filter { $0 != .other }, id: \.self) { drink in
                         Button {
                             selectedDrink = drink
@@ -111,17 +111,17 @@ struct BarHopView: View {
                         } label: {
                             HStack(spacing: 4) {
                                 Image(systemName: drink.icon)
-                                    .font(.barTabTiny)
+                                    .font(.BartapTiny)
                                 Text(drink.displayName)
-                                    .font(.barTabCaption)
+                                    .font(.BartapCaption)
                             }
-                            .padding(.horizontal, BarTabSpacing.sm)
+                            .padding(.horizontal, BartapSpacing.sm)
                             .padding(.vertical, 8)
-                            .background(selectedDrink == drink ? Color.barTabPrimary : Color.barTabSurface)
-                            .foregroundColor(selectedDrink == drink ? .white : .barTabText)
+                            .background(selectedDrink == drink ? Color.BartapPrimary : Color.BartapSurface)
+                            .foregroundColor(selectedDrink == drink ? .white : .BartapText)
                             .clipShape(Capsule())
                             .overlay(
-                                Capsule().stroke(selectedDrink == drink ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
+                                Capsule().stroke(selectedDrink == drink ? Color.clear : Color.BartapCardBorder, lineWidth: 0.5)
                             )
                         }
                         .buttonStyle(.plain)
@@ -130,21 +130,21 @@ struct BarHopView: View {
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: BarTabSpacing.xs) {
+                HStack(spacing: BartapSpacing.xs) {
                     ForEach(availableSizes, id: \.self) { size in
                         Button {
                             selectedSize = size
                             selectedRoute = []
                         } label: {
                             Text(size.displayName)
-                                .font(.barTabCaption)
-                                .padding(.horizontal, BarTabSpacing.sm)
+                                .font(.BartapCaption)
+                                .padding(.horizontal, BartapSpacing.sm)
                                 .padding(.vertical, 8)
-                                .background(selectedSize == size ? Color.barTabPrimary : Color.barTabSurface)
-                                .foregroundColor(selectedSize == size ? .white : .barTabText)
+                                .background(selectedSize == size ? Color.BartapPrimary : Color.BartapSurface)
+                                .foregroundColor(selectedSize == size ? .white : .BartapText)
                                 .clipShape(Capsule())
                                 .overlay(
-                                    Capsule().stroke(selectedSize == size ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
+                                    Capsule().stroke(selectedSize == size ? Color.clear : Color.BartapCardBorder, lineWidth: 0.5)
                                 )
                         }
                         .buttonStyle(.plain)
@@ -176,12 +176,12 @@ struct BarHopView: View {
     // MARK: - Location
 
     private var locationSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+        VStack(alignment: .leading, spacing: BartapSpacing.xs) {
             Text(String(localized: "LOCATION"))
-                .font(.barTabCaption)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapCaption)
+                .foregroundColor(.BartapSecondary)
 
-            FlowLayout(spacing: BarTabSpacing.xs) {
+            FlowLayout(spacing: BartapSpacing.xs) {
                 originPill(
                     title: String(localized: "My location"),
                     icon: "location.fill",
@@ -211,19 +211,19 @@ struct BarHopView: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.barTabCaption)
+                    .font(.BartapCaption)
                 Text(title)
-                    .font(.barTabCaption)
+                    .font(.BartapCaption)
                     .lineLimit(1)
             }
-            .padding(.horizontal, BarTabSpacing.sm)
+            .padding(.horizontal, BartapSpacing.sm)
             .padding(.vertical, 8)
-            .background(isSelected ? Color.barTabPrimary : Color.barTabSurface)
-            .foregroundColor(isSelected ? .white : .barTabText)
+            .background(isSelected ? Color.BartapPrimary : Color.BartapSurface)
+            .foregroundColor(isSelected ? .white : .BartapText)
             .clipShape(Capsule())
             .overlay(
                 Capsule()
-                    .stroke(isSelected ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
+                    .stroke(isSelected ? Color.clear : Color.BartapCardBorder, lineWidth: 0.5)
             )
         }
         .buttonStyle(.plain)
@@ -232,39 +232,39 @@ struct BarHopView: View {
     // MARK: - Empty state
 
     private var emptyState: some View {
-        VStack(spacing: BarTabSpacing.md) {
+        VStack(spacing: BartapSpacing.md) {
             Image(systemName: "figure.walk.circle.fill")
-                .font(.barTabEmptyIconLarge)
-                .foregroundColor(.barTabPrimary.opacity(0.6))
+                .font(.BartapEmptyIconLarge)
+                .foregroundColor(.BartapPrimary.opacity(0.6))
 
             Text(String(localized: "Plan your crawl"))
-                .font(.barTabHeading)
-                .foregroundColor(.barTabText)
+                .font(.BartapHeading)
+                .foregroundColor(.BartapText)
 
-            Text(String(localized: "BarTab will find the cheapest bars for your drink within walking distance and draw the route."))
-                .font(.barTabSmall)
-                .foregroundColor(.barTabSecondary)
+            Text(String(localized: "Bartap will find the cheapest bars for your drink within walking distance and draw the route."))
+                .font(.BartapSmall)
+                .foregroundColor(.BartapSecondary)
                 .multilineTextAlignment(.center)
 
             Button {
                 generateRoute()
             } label: {
                 Text(String(localized: "Generate Route"))
-                    .barTabPrimaryButton()
+                    .BartapPrimaryButton()
             }
         }
         .frame(maxWidth: .infinity)
-        .barTabCard()
+        .BartapCard()
     }
 
     // MARK: - Route
 
     private var routeSection: some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.sm) {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
             HStack {
                 Text(String(localized: "YOUR CRAWL"))
-                    .font(.barTabCaption)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapCaption)
+                    .foregroundColor(.BartapSecondary)
 
                 Spacer()
 
@@ -272,7 +272,7 @@ struct BarHopView: View {
                     generateRoute()
                 } label: {
                     Label(String(localized: "Shuffle"), systemImage: "shuffle")
-                        .barTabPillButton()
+                        .BartapPillButton()
                 }
                 .buttonStyle(.plain)
             }
@@ -283,64 +283,64 @@ struct BarHopView: View {
 
                     if index < selectedRoute.count - 1 {
                         Divider()
-                            .foregroundColor(.barTabCardBorder)
+                            .foregroundColor(.BartapCardBorder)
                             .padding(.leading, 58)
                     }
                 }
             }
             .background(
-                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                    .fill(Color.barTabCardFill)
+                RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                    .fill(Color.BartapCardFill)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                    .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                    .stroke(Color.BartapCardBorder, lineWidth: 0.5)
             )
 
             Button {
                 showingRouteMap = true
             } label: {
                 Label(String(localized: "Show Route on Map"), systemImage: "map.fill")
-                    .barTabPrimaryButton()
+                    .BartapPrimaryButton()
             }
-            .padding(.top, BarTabSpacing.xs)
+            .padding(.top, BartapSpacing.xs)
 
             Button {
                 generateRoute()
             } label: {
                 Text(String(localized: "Try Another Route"))
-                    .barTabSecondaryButton()
+                    .BartapSecondaryButton()
             }
         }
     }
 
     private func routeRow(index: Int, bar: Bar) -> some View {
-        HStack(spacing: BarTabSpacing.sm) {
+        HStack(spacing: BartapSpacing.sm) {
             ZStack {
                 Circle()
-                    .fill(Color.barTabPrimary)
+                    .fill(Color.BartapPrimary)
                     .frame(width: 30, height: 30)
                 Text("\(index + 1)")
-                    .font(.barTabBodySemibold)
+                    .font(.BartapBodySemibold)
                     .foregroundColor(.white)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(bar.name)
-                    .font(.barTabBodySemibold)
-                    .foregroundColor(.barTabText)
+                    .font(.BartapBodySemibold)
+                    .foregroundColor(.BartapText)
                     .lineLimit(1)
 
                 Text(bar.address)
-                    .font(.barTabCaption)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapCaption)
+                    .foregroundColor(.BartapSecondary)
                     .lineLimit(1)
 
                 if let price = cheapestPrice(for: bar) {
                     Text("\(Currency.defaultCurrency.symbol)\(price.formattedAmount)")
-                        .font(.barTabCaption)
+                        .font(.BartapCaption)
                         .fontWeight(.semibold)
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
                 }
             }
 
@@ -349,15 +349,15 @@ struct BarHopView: View {
             if let popular = barRepository.popularAmbience(for: bar) {
                 HStack(spacing: 3) {
                     Image(systemName: popular.icon)
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                     Text(popular.displayName)
-                        .font(.barTabTiny)
+                        .font(.BartapTiny)
                 }
-                .barTabPillButton()
+                .BartapPillButton()
             }
         }
-        .padding(.horizontal, BarTabSpacing.md)
-        .padding(.vertical, BarTabSpacing.sm)
+        .padding(.horizontal, BartapSpacing.md)
+        .padding(.vertical, BartapSpacing.sm)
     }
 
     private func generateRoute() {

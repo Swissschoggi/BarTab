@@ -15,15 +15,15 @@ struct GroupPlanningView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
 
-                BarTabScreenHeader(
+                BartapScreenHeader(
                     title: String(localized: "Groups"),
                     subtitle: String(localized: "Plan where to go with friends.")
                 )
 
                 if let refreshError {
                     Text(refreshError)
-                        .font(.barTabSmall)
-                        .foregroundColor(.barTabDanger)
+                        .font(.BartapSmall)
+                        .foregroundColor(.BartapDanger)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
 
@@ -37,29 +37,29 @@ struct GroupPlanningView: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .barTabPrimaryButton()
+                .BartapPrimaryButton()
 
                 if isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 40)
                 } else if groups.isEmpty {
-                    VStack(spacing: BarTabSpacing.sm) {
+                    VStack(spacing: BartapSpacing.sm) {
                         Image(systemName: "person.3.fill")
-                            .font(.barTabEmptyIcon)
-                            .foregroundColor(.barTabPrimary)
+                            .font(.BartapEmptyIcon)
+                            .foregroundColor(.BartapPrimary)
 
                         Text(String(localized: "No groups yet"))
-                            .font(.barTabHeading)
+                            .font(.BartapHeading)
 
                         Text(String(localized: "Create a group to plan nights out with friends."))
-                            .font(.barTabBody)
+                            .font(.BartapBody)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .barTabCard()
+                    .BartapCard()
                 } else {
                     ForEach(groups) { group in
                         NavigationLink {
@@ -77,7 +77,7 @@ struct GroupPlanningView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 20)
         }
-        .background(Color.barTabBackground.ignoresSafeArea())
+        .background(Color.BartapBackground.ignoresSafeArea())
         .navigationTitle(String(localized: "Groups"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingCreateGroup) {
@@ -102,30 +102,30 @@ struct GroupPlanningView: View {
     private func groupRow(_ group: BarGroup) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "person.3.fill")
-                .font(.barTabHeading)
+                .font(.BartapHeading)
                 .foregroundColor(.white)
                 .frame(width: 40, height: 40)
-                .background(Color.barTabPrimary)
-                .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.chip, style: .continuous))
+                .background(Color.BartapPrimary)
+                .clipShape(RoundedRectangle(cornerRadius: BartapRadius.chip, style: .continuous))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(group.name)
-                    .font(.barTabBody)
+                    .font(.BartapBody)
                     .fontWeight(.semibold)
-                    .foregroundColor(.barTabText)
+                    .foregroundColor(.BartapText)
 
                 Text(String(localized: "Tap to open"))
-                    .font(.barTabTiny)
-                    .foregroundColor(.barTabSecondary)
+                    .font(.BartapTiny)
+                    .foregroundColor(.BartapSecondary)
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.barTabTiny)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapTiny)
+                .foregroundColor(.BartapSecondary)
         }
-        .barTabCard()
+        .BartapCard()
     }
 
     private func loadGroups() async {

@@ -71,22 +71,22 @@ struct AddPriceView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: BarTabSpacing.lg) {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
                     
                     // Main Numeric Entry Card
-                    VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+                    VStack(alignment: .leading, spacing: BartapSpacing.xs) {
                         Text("PRICE")
-                            .font(.barTabCaption)
-                            .foregroundColor(.barTabSecondary)
+                            .font(.BartapCaption)
+                            .foregroundColor(.BartapSecondary)
 
-                        HStack(alignment: .firstTextBaseline, spacing: BarTabSpacing.xs) {
+                        HStack(alignment: .firstTextBaseline, spacing: BartapSpacing.xs) {
                             Text(selectedCurrency.symbol)
-                                .font(.barTabTitle)
-                                .foregroundColor(.barTabSecondary)
+                                .font(.BartapTitle)
+                                .foregroundColor(.BartapSecondary)
 
                             TextField("0.00", text: $priceText)
                                 .font(.system(size: 38, weight: .bold, design: .rounded))
-                                .foregroundColor(.barTabText)
+                                .foregroundColor(.BartapText)
                                 .keyboardType(.decimalPad)
 
                             Spacer()
@@ -97,26 +97,26 @@ struct AddPriceView: View {
                                 }
                             }
                             .pickerStyle(.menu)
-                            .tint(.barTabPrimary)
+                            .tint(.BartapPrimary)
                         }
 
                         if let error = priceError {
                             Text(error)
-                                .font(.barTabCaption)
-                                .foregroundColor(.barTabDanger)
+                                .font(.BartapCaption)
+                                .foregroundColor(.BartapDanger)
                         }
                     }
-                    .padding(BarTabSpacing.md)
-                    .background(Color.barTabCardFill)
-                    .clipShape(RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous))
+                    .padding(BartapSpacing.md)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: BarTabRadius.card, style: .continuous)
-                            .stroke(Color.barTabCardBorder, lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                     )
 
                     // Category Selection
                     selectorGroup(title: "CATEGORY") {
-                        FlowLayout(spacing: BarTabSpacing.xs) {
+                        FlowLayout(spacing: BartapSpacing.xs) {
                             ForEach(Drink.allCases) { drink in
                                 pillButton(
                                     title: drink.displayName,
@@ -132,7 +132,7 @@ struct AddPriceView: View {
                     // Size Selection
                     if !availableSizes.isEmpty {
                         selectorGroup(title: "SIZE") {
-                            FlowLayout(spacing: BarTabSpacing.xs) {
+                            FlowLayout(spacing: BartapSpacing.xs) {
                                 ForEach(availableSizes, id: \.self) { size in
                                     pillButton(
                                         title: size.displayName,
@@ -148,7 +148,7 @@ struct AddPriceView: View {
                     // Serving Method
                     if !availableServingMethods.isEmpty {
                         selectorGroup(title: "SERVING METHOD") {
-                            FlowLayout(spacing: BarTabSpacing.xs) {
+                            FlowLayout(spacing: BartapSpacing.xs) {
                                 pillButton(
                                     title: "Any",
                                     isSelected: selectedServing == nil
@@ -170,7 +170,7 @@ struct AddPriceView: View {
 
                     // Brand Selection
                     selectorGroup(title: "BRAND") {
-                        FlowLayout(spacing: BarTabSpacing.xs) {
+                        FlowLayout(spacing: BartapSpacing.xs) {
                             pillButton(
                                 title: "Any",
                                 isSelected: selectedBrand == nil
@@ -190,17 +190,17 @@ struct AddPriceView: View {
                             } label: {
                                 HStack(spacing: 3) {
                                     Image(systemName: "plus.circle")
-                                        .font(.barTabCaption)
+                                        .font(.BartapCaption)
                                     Text("Request brand")
-                                        .font(.barTabSmall)
+                                        .font(.BartapSmall)
                                 }
-                                .foregroundColor(.barTabAccent)
+                                .foregroundColor(.BartapAccent)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
-                                .background(Color.barTabAccent.opacity(0.1))
+                                .background(Color.BartapAccent.opacity(0.1))
                                 .clipShape(Capsule())
                                 .overlay(
-                                    Capsule().stroke(Color.barTabAccent.opacity(0.3), lineWidth: 0.5)
+                                    Capsule().stroke(Color.BartapAccent.opacity(0.3), lineWidth: 0.5)
                                 )
                             }
                             .buttonStyle(.plain)
@@ -210,7 +210,7 @@ struct AddPriceView: View {
                     // Style Selection
                     if !availableStyles.isEmpty {
                         selectorGroup(title: "STYLE") {
-                            FlowLayout(spacing: BarTabSpacing.xs) {
+                            FlowLayout(spacing: BartapSpacing.xs) {
                                 pillButton(
                                     title: "Any",
                                     isSelected: selectedStyle == nil
@@ -233,21 +233,21 @@ struct AddPriceView: View {
                     Button(action: savePrice) {
                         Text(editingPrice != nil ? "Update Price" : "Save Price")
                     }
-                    .barTabPrimaryButton()
-                    .padding(.top, BarTabSpacing.xs)
+                    .BartapPrimaryButton()
+                    .padding(.top, BartapSpacing.xs)
                     .disabled(isSaving)
                 }
-                .padding(.horizontal, BarTabSpacing.md)
-                .padding(.vertical, BarTabSpacing.md)
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
             }
-            .background(Color.barTabBackground.ignoresSafeArea())
+            .background(Color.BartapBackground.ignoresSafeArea())
             .scrollDismissesKeyboard(.immediately)
             .navigationTitle(editingPrice != nil ? "Edit Price" : "New Price")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
-                        .foregroundColor(.barTabPrimary)
+                        .foregroundColor(.BartapPrimary)
                 }
             }
             .onChange(of: selectedDrink) { _ in
@@ -267,10 +267,10 @@ struct AddPriceView: View {
     // MARK: - Subviews & Helpers
 
     private func selectorGroup<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: BarTabSpacing.xs) {
+        VStack(alignment: .leading, spacing: BartapSpacing.xs) {
             Text(title)
-                .font(.barTabCaption)
-                .foregroundColor(.barTabSecondary)
+                .font(.BartapCaption)
+                .foregroundColor(.BartapSecondary)
             content()
         }
     }
@@ -285,19 +285,19 @@ struct AddPriceView: View {
             HStack(spacing: 4) {
                 if let icon = icon {
                     Image(systemName: icon)
-                        .font(.barTabCaption)
+                        .font(.BartapCaption)
                 }
                 Text(title)
-                    .font(.barTabCaption)
+                    .font(.BartapCaption)
             }
-            .padding(.horizontal, BarTabSpacing.sm)
+            .padding(.horizontal, BartapSpacing.sm)
             .padding(.vertical, 8)
-            .background(isSelected ? Color.barTabPrimary : Color.barTabSurface)
-            .foregroundColor(isSelected ? .white : .barTabText)
+            .background(isSelected ? Color.BartapPrimary : Color.BartapSurface)
+            .foregroundColor(isSelected ? .white : .BartapText)
             .clipShape(Capsule())
             .overlay(
                 Capsule()
-                    .stroke(isSelected ? Color.clear : Color.barTabCardBorder, lineWidth: 0.5)
+                    .stroke(isSelected ? Color.clear : Color.BartapCardBorder, lineWidth: 0.5)
             )
         }
         .buttonStyle(.plain)
