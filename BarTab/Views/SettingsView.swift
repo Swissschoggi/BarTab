@@ -422,9 +422,7 @@ struct SettingsView: View {
                                 .foregroundColor(.BartapSecondary)
                         }
 
-                        Button {
-                            showingTipJar = true
-                        } label: {
+                        Link(destination: URL(string: "https://ko-fi.com/bartap")!) {
                             HStack {
                                 Image(systemName: "cup.and.saucer.fill")
                                 Text(String(localized: "Buy a Drink"))

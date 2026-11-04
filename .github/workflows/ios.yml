@@ -14,8 +14,8 @@ jobs:
       - name: Build unsigned app
         run: |
           xcodebuild build \
-            -project Bartap.xcodeproj \
-            -scheme Bartap \
+            -project BarTab.xcodeproj \
+            -scheme BarTab \
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
