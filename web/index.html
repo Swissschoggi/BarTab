@@ -489,9 +489,9 @@
             Every coffee gets the app one step closer to release.</p>
          <p>If Bartap helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running.</p>
         </div>
-        <a class="button secondary" href="https://ko-fi.com/bartap" target="_blank" rel="noopener">
-          Support on Ko-fi
-        </a>
+        <div class="kofi-panel" style="margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid var(--line);">
+          <iframe id="kofiframe" src="https://ko-fi.com/bartap/?hidefeed=true&widget=true&embed=true" style="border:none;width:100%;padding:4px;background:transparent;display:block;" height="712" title="Support Bartap on Ko-fi" loading="lazy"></iframe>
+        </div>
 
         <form id="waitlist-form" class="waitlist" novalidate>
           <div class="waitlist-row">
@@ -809,6 +809,16 @@
         }
       });
     }
+  </script>
+
+  <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+  <script>
+    kofiWidgetOverlay.draw('bartap', {
+      'type': 'floating-chat',
+      'floating-chat.donateButton.text': 'Support Bartap',
+      'floating-chat.donateButton.background-color': '#6B2737',
+      'floating-chat.donateButton.text-color': '#F5F0E8'
+    });
   </script>
 
 </body>

@@ -17,9 +17,6 @@ enum SupabaseConfig {
     /// (Google sign-in). Must match CFBundleURLTypes in Info.plist.
     static let oauthCallbackScheme = "Bartap"
 
-    /// Stripe publishable key for the tip jar. Set to your `pk_test_…`
-    /// (development) or `pk_live_…` (production) key from the Stripe Dashboard.
-    static let stripePublishableKey = ""
 }
 
 /// Builds shareable deep links that open Bartap to a specific screen.

@@ -1,7 +1,4 @@
 import SwiftUI
-#if canImport(StripePaymentSheet)
-import StripePaymentSheet
-#endif
 
 struct SettingsView: View {
 
@@ -20,7 +17,6 @@ struct SettingsView: View {
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
         return "\(version) (\(build))"
     }
-    @State private var showingTipJar = false
     @State private var currencyExpanded = false
     @State private var languageExpanded = false
     @State private var selectedCurrency: Currency = Currency.defaultCurrency
@@ -407,6 +403,11 @@ struct SettingsView: View {
                                 .foregroundColor(.BartapText)
                         }
 
+                        Text(String(localized: "If Bartap helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running."))
+                            .font(.BartapBody)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+
                         Link(destination: URL(string: "https://ko-fi.com/bartap")!) {
                             HStack {
                                 Image(systemName: "heart.fill")
@@ -534,23 +535,6 @@ struct SettingsView: View {
                 .environmentObject(userSession)
                 .environmentObject(toastCenter)
         }
-        .sheet(isPresented: $showingTipJar) {
-            tipJarSheet
-        }
-    }
-
-    @ViewBuilder
-    private var tipJarSheet: some View {
-        #if canImport(StripePaymentSheet)
-        TipJarSheet()
-            .environmentObject(toastCenter)
-        #else
-        Text(String(localized: "Tip jar coming soon! We're setting up payments   stay tuned."))
-            .font(.BartapBody)
-            .multilineTextAlignment(.center)
-            .padding()
-            .presentationDetents([.height(160)])
-        #endif
     }
 
     private func settingsRow(
@@ -584,131 +568,7 @@ struct SettingsView: View {
     }
 }
 
-#if canImport(StripePaymentSheet)
 
-private struct TipJarSheet: View {
-    @EnvironmentObject private var toastCenter: ToastCenter
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var paymentSheet: PaymentSheet?
-    @State private var isBusy = false
-
-    private let tips: [Int] = [300, 500, 1000]
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: BartapSpacing.lg) {
-                Spacer()
-
-                Image(systemName: "cup.and.saucer.fill")
-                    .font(.system(size: 48, weight: .semibold))
-                    .foregroundColor(.BartapPrimary)
-
-                Text(String(localized: "Buy the developer a drink!"))
-                    .font(.BartapTitle)
-                    .multilineTextAlignment(.center)
-
-                Text(String(localized: "If Bartap helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running."))
-                    .font(.BartapBody)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-
-                HStack(spacing: BartapSpacing.md) {
-                    ForEach(tips, id: \.self) { amount in
-                        Button {
-                            Task { await startCheckout(amount) }
-                        } label: {
-                            Text("\(Currency.defaultCurrency.symbol) \((Decimal(amount) / 100).formattedAmount)")
-                                .font(.BartapHeading)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .BartapPrimaryButton()
-                        }
-                        .disabled(isBusy)
-                    }
-                }
-
-                Spacer()
-            }
-            .padding(BartapSpacing.lg)
-            .background(Color.BartapBackground.ignoresSafeArea())
-            .navigationTitle(String(localized: "Support the Dev"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "Done")) { dismiss() }
-                }
-            }
-        }
-    }
-
-    private func startCheckout(_ amount: Int) async {
-        isBusy = true
-        defer { isBusy = false }
-
-        StripeAPI.defaultPublishableKey = SupabaseConfig.stripePublishableKey
-
-        guard let secret = await createPaymentIntent(amount: amount) else {
-            toastCenter.show(String(localized: "Couldn't start the tip. Please try again."), kind: .error)
-            return
-        }
-
-        var config = PaymentSheet.Configuration()
-        config.merchantDisplayName = "Bartap"
-        let sheet = PaymentSheet(paymentIntentClientSecret: secret, configuration: config)
-        paymentSheet = sheet
-
-        guard let presenter = UIViewController.top() else { return }
-        sheet.present(from: presenter) { result in
-            switch result {
-            case .completed:
-                toastCenter.show(String(localized: "Thanks for the tip! 🍻"), kind: .success)
-                dismiss()
-            case .canceled:
-                break
-            case .failed(let error):
-                toastCenter.show(error.localizedDescription, kind: .error)
-            }
-        }
-    }
-
-    private func createPaymentIntent(amount: Int) async -> String? {
-        let host = SupabaseConfig.projectURL.host ?? ""
-        guard let url = URL(string: "https://\(host)/functions/v1/create-payment-intent") else {
-            return nil
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(SupabaseConfig.anonKey, forHTTPHeaderField: "apikey")
-        request.setValue("Bearer \(SupabaseConfig.anonKey)", forHTTPHeaderField: "Authorization")
-        request.httpBody = try? JSONSerialization.data(withJSONObject: [
-            "amount": amount,
-            "currency": Currency.defaultCurrency.rawValue.lowercased()
-        ])
-
-        guard let (data, _) = try? await URLSession.shared.data(for: request),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            return nil
-        }
-        return json["clientSecret"] as? String
-    }
-}
-
-private extension UIViewController {
-    static func top() -> UIViewController? {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let root = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
-            return nil
-        }
-        var top = root
-        while let presented = top.presentedViewController { top = presented }
-        return top
-    }
-}
-
-#endif
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
