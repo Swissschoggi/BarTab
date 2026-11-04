@@ -10,7 +10,8 @@ Users can:
 
 ## Status
 
-Early development.
+Early development. Bartap is not on the App Store yet: I can't afford Apple's yearly developer fee right now. If you'd
+like to help, you can donate at https://ko-fi.com/bartap.
 
 ## Planned stack
 

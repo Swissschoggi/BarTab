@@ -413,6 +413,10 @@ struct SettingsView: View {
                                 .fontWeight(.semibold)
                                 .foregroundColor(.BartapText)
 
+                            Text(String(localized: "Bartap isn't on the App Store yet because I can't afford Apple's yearly developer fee. Donations help me afford it."))
+                                .font(.BartapSmall)
+                                .foregroundColor(.BartapSecondary)
+
                             Text(String(localized: "If Bartap helped you find your favorite spot, consider tipping. Every dollar goes toward keeping the app running."))
                                 .font(.BartapSmall)
                                 .foregroundColor(.BartapSecondary)
@@ -424,6 +428,17 @@ struct SettingsView: View {
                             HStack {
                                 Image(systemName: "cup.and.saucer.fill")
                                 Text(String(localized: "Buy a Drink"))
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, BartapSpacing.sm)
+                            .BartapPrimaryButton()
+                        }
+
+                        Link(destination: URL(string: "https://ko-fi.com/bartap")!) {
+                            HStack {
+                                Image(systemName: "heart.fill")
+                                Text(String(localized: "Donate on Ko-fi"))
                                     .fontWeight(.semibold)
                             }
                             .frame(maxWidth: .infinity)
