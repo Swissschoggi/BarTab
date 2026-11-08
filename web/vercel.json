@@ -4,7 +4,7 @@
   "rewrites": [
     {
       "source": "/stats/:match*",
-      "destination": "https://your-umami-domain.com/:match*"
+      "destination": "https://umqmi.bartap.me/:match*"
     }
   ],
   "headers": [
