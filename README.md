@@ -39,7 +39,9 @@ Every price on the map was reported by someone who paid it. Nothing is scraped a
 
 - Nearby bars on a map or in a list, filterable by distance, vibe and outdoor seating
 - Price comparison for beer, wine and cocktails, with price history
-- Reporting a price takes about ten seconds
+- Price-per-100 ml normalisation so a 3 dl and a 5 dl pour can be compared fairly
+- A coverage overview that shows which nearby areas still need price reports
+- Reporting a price takes about ten seconds, with recent prices to confirm or reuse
 - Price alerts when a nearby bar hits the price you set
 - Following friends to see where they've been
 - Group polls and bar hop planning for nights out
@@ -56,7 +58,7 @@ Older reports get a "still accurate?" prompt that anyone can confirm or correct,
 - **App:** Swift, SwiftUI, MapKit, WidgetKit
 - **Backend:** [Supabase](https://supabase.com) for auth, database and Edge Functions
 - **Edge Functions:** TypeScript on Deno (`waitlist`, `price-alert`, `create-payment-intent`)
-- **Payments:** Stripe, for the optional tip jar
+- **Payments:** Stripe, for the optional tip jar (fixed, server-validated tip amounts)
 - **Website:** plain HTML and CSS in `web/`, hosted on Vercel
 - **CI:** GitHub Actions builds the app on every push to `main` and `dev`
 
@@ -79,7 +81,14 @@ cd BarTab
 open BarTab.xcodeproj
 ```
 
-Pick the BarTab scheme and run it on a simulator.
+Pick the BarTab scheme and run it on a simulator. To run the unit tests:
+
+```bash
+xcodebuild test \
+  -project BarTab.xcodeproj \
+  -scheme BarTab \
+  -destination 'platform=iOS Simulator,name=iPhone 15'
+```
 
 The app talks to a Supabase backend. To use your own, set `projectURL` and `anonKey` in `BarTab/Models/SupbabaseClient.swift`. The tip jar also needs a Stripe publishable key in the same file, which you can leave empty if you don't need it. Keep secret keys (Supabase service role, Stripe secret) out of the repo and in your Supabase function secrets.
 

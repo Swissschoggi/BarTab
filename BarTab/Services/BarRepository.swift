@@ -345,9 +345,9 @@ final class BarRepository: ObservableObject {
         style: String? = nil,
         serving: ServingMethod? = nil,
         reportedBy user: User
-    ) async {
-        guard price.reportedBy == user.id else { return }
-        guard let index = prices.firstIndex(where: { $0.id == price.id }) else { return }
+    ) async -> Bool {
+        guard price.reportedBy == user.id else { return false }
+        guard let index = prices.firstIndex(where: { $0.id == price.id }) else { return false }
 
         let updatedPrice = Price(
             id: price.id,
@@ -367,8 +367,10 @@ final class BarRepository: ObservableObject {
             try await SupabaseClient.shared.updatePrice(updatedPrice)
             self.prices[index] = updatedPrice
             recomputePriceLevels()
+            return true
         } catch {
             toastCenter?.showError(error)
+            return false
         }
     }
 
@@ -977,7 +979,8 @@ final class BarRepository: ObservableObject {
             makePriceSummary(reports: reports, barID: bar.id)
         }
         .sorted {
-            NSDecimalNumber(decimal: $0.amount).doubleValue < NSDecimalNumber(decimal: $1.amount).doubleValue
+            NSDecimalNumber(decimal: $0.convertedAmount).doubleValue
+                < NSDecimalNumber(decimal: $1.convertedAmount).doubleValue
         }
     }
 
@@ -997,10 +1000,21 @@ final class BarRepository: ObservableObject {
     private func makePriceSummary(reports: [Price], barID: UUID) -> PriceSummary? {
         guard let first = reports.first else { return nil }
 
+        let target = Currency.defaultCurrency.rawValue
         let confidence = calculateConfidence(reports: reports)
-        let sortedAmounts = reports.map { NSDecimalNumber(decimal: $0.amount).doubleValue }.sorted()
 
-        let median: Double
+        // Normalise every report into the user's default currency before
+        // taking the median, otherwise a group with mixed currencies would
+        // compare raw numbers (e.g. 8 CHF vs 8 EUR) as if they were equal.
+        let sortedAmounts = reports.map {
+            ExchangeRateService.shared.convert(
+                $0.amount,
+                from: $0.currency,
+                to: target
+            )
+        }.sorted()
+
+        let median: Decimal
         if sortedAmounts.count % 2 == 0 {
             let middle = sortedAmounts.count / 2
             median = (sortedAmounts[middle - 1] + sortedAmounts[middle]) / 2
@@ -1014,8 +1028,8 @@ final class BarRepository: ObservableObject {
             drink: first.drink,
             brand: first.brand,
             size: first.size,
-            amount: Decimal(median),
-            currency: first.currency,
+            amount: median,
+            currency: target,
             reports: reports.sorted { $0.reportedAt > $1.reportedAt },
             confidence: confidence,
             style: first.style,
@@ -1037,7 +1051,14 @@ final class BarRepository: ObservableObject {
             return total + freshness
         } / Double(recentReports.count)
 
-        let amounts = recentReports.map { NSDecimalNumber(decimal: $0.amount).doubleValue }
+        let target = Currency.defaultCurrency.rawValue
+        let amounts = recentReports.map {
+            NSDecimalNumber(decimal: ExchangeRateService.shared.convert(
+                $0.amount,
+                from: $0.currency,
+                to: target
+            )).doubleValue
+        }
         let average = amounts.reduce(0, +) / Double(amounts.count)
         guard average > 0 else { return 0 }
 

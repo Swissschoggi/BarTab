@@ -124,13 +124,13 @@ struct ProfileView: View {
         ) {
             Button(String(localized: "Log out"), role: .destructive) {
                 HapticEngine.impact()
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    userSession.logout()
+                Task {
+                    await userSession.logout()
+                    toastCenter.show(
+                        String(localized: "You've been logged out."),
+                        kind: .info
+                    )
                 }
-                toastCenter.show(
-                    String(localized: "You've been logged out."),
-                    kind: .info
-                )
             }
 
             Button(String(localized: "Cancel"), role: .cancel) {}

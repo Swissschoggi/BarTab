@@ -42,6 +42,7 @@ struct NearbyView: View {
     @State private var radiusKM: Double = 2
     @State private var showingLocationSearch = false
     @State private var showingLocationSheet = false
+    @State private var showingCoverage = false
     @State private var displayMode: DisplayMode = .bars
 
     // Drink search state
@@ -274,18 +275,23 @@ struct NearbyView: View {
             .filter { !barRepository.isBarAutoHidden($0) }
     }
 
-    /// Cheapest drink anywhere in range (ignoring drink filters), surfaced
-    /// as the "best deal" hero at the top of Discover.
+    /// Best value anywhere in range (ignoring drink filters), surfaced as
+    /// the "best deal" hero. Volume-based drinks are compared per 100 ml so
+    /// a cheap small pour doesn't beat a better large one.
     private var bestDeal: (bar: Bar, summary: PriceSummary)? {
         var best: (bar: Bar, summary: PriceSummary)?
         for bar in consideredBars {
             for summary in barRepository.getPriceSummaries(for: bar) {
-                if best == nil || summary.convertedAmount < best!.summary.convertedAmount {
+                if best == nil || dealValue(summary) < dealValue(best!.summary) {
                     best = (bar, summary)
                 }
             }
         }
         return best
+    }
+
+    private func dealValue(_ summary: PriceSummary) -> Double {
+        bestValue(summary) ?? comparisonValue(summary)
     }
 
     /// Drink deals near you that match the interests picked in onboarding,
@@ -342,6 +348,29 @@ struct NearbyView: View {
 
                 if let deal = bestDeal {
                     bestDealCard(deal)
+                }
+
+                if !barRepository.bars.isEmpty {
+                    Button {
+                        showingCoverage = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chart.bar.doc.horizontal")
+                                .font(.BartapSmall)
+                            Text(String(localized: "Price coverage"))
+                                .font(.BartapSmall)
+                                .fontWeight(.semibold)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.BartapTiny)
+                        }
+                        .foregroundColor(.BartapPrimary)
+                        .padding(.horizontal, BartapSpacing.sm)
+                        .padding(.vertical, 10)
+                        .background(Color.BartapPrimary.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
                 }
 
                 if !forYouResults.isEmpty {
@@ -411,6 +440,15 @@ struct NearbyView: View {
                 locationSheet
                     .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $showingCoverage) {
+                AreaCoverageSheet(
+                    center: originCoordinate,
+                    radius: originCoordinate == nil ? nil : radiusMeters
+                )
+                .environmentObject(barRepository)
+                .environmentObject(userSession)
+                .environmentObject(toastCenter)
             }
             .onChange(of: selectedDrinks) { _ in
                 let validSizes = Set(availableSizes)
@@ -778,6 +816,13 @@ struct NearbyView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
 
+                    if let per100 = deal.summary.formattedPricePer100ml {
+                        Text(per100)
+                            .font(.BartapTiny)
+                            .foregroundColor(.white.opacity(0.85))
+                            .lineLimit(1)
+                    }
+
                     Image(systemName: "chevron.right")
                         .font(.BartapTiny)
                         .foregroundColor(.white.opacity(0.85))
@@ -856,6 +901,12 @@ struct NearbyView: View {
                 Text("\(Currency.defaultCurrency.symbol) \(result.summary.convertedAmount.formattedAmount)")
                     .font(.BartapStat)
                     .foregroundColor(.BartapPrimary)
+
+                if let per100 = result.summary.formattedPricePer100ml {
+                    Text(per100)
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapSecondary)
+                }
             }
             .padding(BartapSpacing.md)
             .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -1265,6 +1316,13 @@ struct NearbyView: View {
                     .font(.BartapTiny)
                     .foregroundColor(.BartapSecondary)
 
+                if let per100 = summary.formattedPricePer100ml {
+                    Text(per100)
+                        .font(.BartapTiny)
+                        .foregroundColor(.BartapSecondary)
+                        .lineLimit(1)
+                }
+
                 if summary.isStale {
                     Text(String(localized: "Stale"))
                         .font(.BartapTiny)
@@ -1425,6 +1483,211 @@ struct NearbyView: View {
             return "\(Int(distance)) m"
         }
         return String(format: "%.1f km", distance / 1000)
+    }
+}
+
+// MARK: - Price coverage sheet
+
+private struct AreaCoverageSheet: View {
+
+    let center: CLLocationCoordinate2D?
+    let radius: CLLocationDistance?
+
+    @EnvironmentObject private var barRepository: BarRepository
+    @EnvironmentObject private var userSession: UserSession
+    @EnvironmentObject private var toastCenter: ToastCenter
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var addingPriceForBar: Bar?
+
+    var body: some View {
+        let summary = AreaCoverage.build(
+            bars: barRepository.bars.filter { !barRepository.isBarAutoHidden($0) },
+            prices: barRepository.prices,
+            center: center,
+            radius: radius
+        )
+
+        return NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: BartapSpacing.lg) {
+                    coverageHeader(summary: summary)
+                    areasSection(summary: summary)
+                    missingPricesSection(summary: summary)
+                }
+                .padding(.horizontal, BartapSpacing.md)
+                .padding(.vertical, BartapSpacing.md)
+            }
+            .background(Color.BartapBackground.ignoresSafeArea())
+            .navigationTitle(String(localized: "Price coverage"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(String(localized: "Done")) { dismiss() }
+                        .foregroundColor(.BartapPrimary)
+                }
+            }
+            .sheet(item: $addingPriceForBar) { bar in
+                AddPriceView(bar: bar)
+                    .environmentObject(barRepository)
+                    .environmentObject(userSession)
+                    .environmentObject(toastCenter)
+            }
+        }
+    }
+
+    private func coverageHeader(summary: AreaCoverage.Summary) -> some View {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text("\(Int((summary.coverage * 100).rounded()))%")
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .foregroundColor(.BartapPrimary)
+                Text(String(localized: "of nearby bars have a price"))
+                    .font(.BartapSmall)
+                    .foregroundColor(.BartapSecondary)
+            }
+
+            ProgressView(value: summary.coverage)
+                .tint(.BartapPrimary)
+
+            HStack(spacing: BartapSpacing.md) {
+                coverageStat(
+                    value: "\(summary.barsWithPrices)/\(summary.totalBars)",
+                    label: String(localized: "Bars covered")
+                )
+                coverageStat(
+                    value: "\(summary.priceCount)",
+                    label: String(localized: "Drink prices")
+                )
+                coverageStat(
+                    value: "\(summary.missingBars.count)",
+                    label: String(localized: "Missing")
+                )
+            }
+        }
+        .padding(BartapSpacing.md)
+        .background(Color.BartapCardFill)
+        .clipShape(RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
+                .stroke(Color.BartapCardBorder, lineWidth: 0.5)
+        )
+    }
+
+    private func coverageStat(value: String, label: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value)
+                .font(.BartapBodySemibold)
+                .foregroundColor(.BartapText)
+            Text(label)
+                .font(.BartapTiny)
+                .foregroundColor(.BartapSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func areasSection(summary: AreaCoverage.Summary) -> some View {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
+            Text(String(localized: "Areas"))
+                .font(.BartapHeading)
+                .foregroundColor(.BartapText)
+
+            if summary.areas.isEmpty {
+                Text(String(localized: "No bars found in this area yet."))
+                    .font(.BartapSmall)
+                    .foregroundColor(.BartapSecondary)
+            } else {
+                ForEach(summary.areas) { area in
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text(area.name)
+                                .font(.BartapBodySemibold)
+                                .foregroundColor(.BartapText)
+
+                            Spacer()
+
+                            if area.needsHelp {
+                                Text(String(localized: "Needs help"))
+                                    .font(.BartapTiny)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.BartapWarning)
+                            } else {
+                                Text(String(localized: "Covered"))
+                                    .font(.BartapTiny)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.BartapSuccess)
+                            }
+                        }
+
+                        ProgressView(value: area.coverage)
+                            .tint(area.needsHelp ? Color.BartapWarning : Color.BartapPrimary)
+
+                        Text("\(area.barsWithPrices)/\(area.barCount) bars · \(area.priceCount) drink prices")
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSecondary)
+                    }
+                    .padding(BartapSpacing.sm)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
+                    )
+                }
+            }
+        }
+    }
+
+    private func missingPricesSection(summary: AreaCoverage.Summary) -> some View {
+        VStack(alignment: .leading, spacing: BartapSpacing.sm) {
+            Text(String(localized: "Bars missing prices"))
+                .font(.BartapHeading)
+                .foregroundColor(.BartapText)
+
+            if summary.missingBars.isEmpty {
+                Text(String(localized: "Every nearby bar has at least one price. Nice work!"))
+                    .font(.BartapSmall)
+                    .foregroundColor(.BartapSecondary)
+                    .padding(BartapSpacing.sm)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
+            } else {
+                ForEach(summary.missingBars) { bar in
+                    HStack(spacing: BartapSpacing.sm) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(bar.name)
+                                .font(.BartapBodySemibold)
+                                .foregroundColor(.BartapText)
+                                .lineLimit(1)
+                            Text(bar.address)
+                                .font(.BartapTiny)
+                                .foregroundColor(.BartapSecondary)
+                                .lineLimit(1)
+                        }
+
+                        Spacer(minLength: 8)
+
+                        Button {
+                            addingPriceForBar = bar
+                        } label: {
+                            Label(String(localized: "Add price"), systemImage: "plus")
+                                .font(.BartapTiny)
+                                .fontWeight(.semibold)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.BartapPrimary)
+                    }
+                    .padding(BartapSpacing.sm)
+                    .background(Color.BartapCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                            .stroke(Color.BartapCardBorder, lineWidth: 0.5)
+                    )
+                }
+            }
+        }
     }
 }
 

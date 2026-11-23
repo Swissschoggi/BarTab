@@ -19,14 +19,17 @@ final class UserSession: ObservableObject {
 
     init() {
 
+        guard let session = authService.restoreSession() else {
+            // Signed out: don't hydrate interests from a previous
+            // account that used this device.
+            UserDefaults.standard.removeObject(forKey: Self.interestsDefaultsKey)
+            return
+        }
+
         // Seed from the local cache so Discover/Activity can personalize
         // before (or without) a backend sync.
         if let saved = UserDefaults.standard.stringArray(forKey: Self.interestsDefaultsKey) {
             drinkInterests = Set(saved.compactMap(Drink.init(rawValue:)))
-        }
-
-        guard let session = authService.restoreSession() else {
-            return
         }
 
         // Show the cached identity immediately, then refresh it
@@ -55,9 +58,7 @@ final class UserSession: ObservableObject {
             password: password
         )
 
-        currentUser = await makeUserWithAdminCheck(
-            from: session
-        )
+        await setCurrentUser(from: session)
         authService.saveSession(session)
     }
 
@@ -71,9 +72,7 @@ final class UserSession: ObservableObject {
             password: password
         )
 
-        currentUser = await makeUserWithAdminCheck(
-            from: session
-        )
+        await setCurrentUser(from: session)
         authService.saveSession(session)
     }
 
@@ -95,9 +94,7 @@ final class UserSession: ObservableObject {
             rawNonce: rawNonce
         )
 
-        currentUser = await makeUserWithAdminCheck(
-            from: session
-        )
+        await setCurrentUser(from: session)
         authService.saveSession(session)
     }
 
@@ -110,16 +107,24 @@ final class UserSession: ObservableObject {
             callbackURL
         )
 
-        currentUser = await makeUserWithAdminCheck(
-            from: session
-        )
+        await setCurrentUser(from: session)
         authService.saveSession(session)
     }
 
-    func logout() {
+    func logout() async {
 
         let session = authService.restoreSession()
         let accessToken = session?.tokens.accessToken
+
+        // Stop sharing and remove the remote row while the old access
+        // token is still valid. Doing this after `clearSession()` would
+        // leave the row visible to friends until it goes stale.
+        await LiveLocationService.shared.stopSharingAndClearRemote()
+
+        authService.clearSession()
+        currentUser = nil
+        drinkInterests = []
+        UserDefaults.standard.removeObject(forKey: Self.interestsDefaultsKey)
 
         if let accessToken {
             Task {
@@ -128,10 +133,6 @@ final class UserSession: ObservableObject {
                 )
             }
         }
-
-        authService.clearSession()
-        currentUser = nil
-        drinkInterests = []
     }
 
     /// Permanently deletes the signed-in user's account and all their data.
@@ -139,14 +140,35 @@ final class UserSession: ObservableObject {
         // Ensure a valid (refreshed if needed) session so the delete call
         // is authenticated.
         guard await authService.validSession() != nil else {
-            return
+            throw SupabaseAuthService.AuthError.invalidResponse
         }
+
+        // Remove the live-location row first; account deletion would
+        // cascade it, but clearing it explicitly avoids a stale marker
+        // if the Edge Function is briefly unavailable.
+        await LiveLocationService.shared.stopSharingAndClearRemote()
 
         try await SupabaseClient.shared.deleteAccount()
 
         authService.clearSession()
         currentUser = nil
         drinkInterests = []
+        UserDefaults.standard.removeObject(forKey: Self.interestsDefaultsKey)
+    }
+
+    /// Completes a password-reset deep link and updates the in-memory
+    /// session so the user doesn't appear signed out until relaunch.
+    func handlePasswordReset(url: URL) async -> Bool {
+        let success = await SupabaseAuthService()
+            .handleResetPasswordCallback(url)
+
+        guard success,
+              let session = authService.restoreSession() else {
+            return success
+        }
+
+        await setCurrentUser(from: session)
+        return true
     }
 
     // MARK: - Account updates
@@ -264,9 +286,7 @@ final class UserSession: ObservableObject {
             return
         }
 
-        currentUser = await makeUserWithAdminCheck(
-            from: freshSession
-        )
+        await setCurrentUser(from: freshSession)
     }
 
     /// Refreshes `drinkInterests` from the profiles table. Called after
@@ -274,6 +294,9 @@ final class UserSession: ObservableObject {
     func refreshDrinkInterests(userID: UUID? = nil) async {
         guard let userID = userID ?? currentUser?.id else { return }
         if let interests = try? await SupabaseClient.shared.fetchDrinkInterests(userID: userID) {
+            // A logout or account switch may have happened while the
+            // request was in flight; never apply another account's data.
+            guard currentUser?.id == userID else { return }
             drinkInterests = Set(interests)
             UserDefaults.standard.set(interests.map(\.rawValue), forKey: Self.interestsDefaultsKey)
         }
@@ -318,10 +341,17 @@ final class UserSession: ObservableObject {
             avatarURL: profile.avatarURL
         )
 
-        Task { [weak self] in
-            await self?.refreshDrinkInterests(userID: user.id)
-        }
-
         return user
+    }
+
+    /// Assigns the profile-backed user and only then refreshes drink
+    /// interests, so the guard in `refreshDrinkInterests` sees the new
+    /// account instead of racing the assignment.
+    private func setCurrentUser(
+        from session: SupabaseAuthService.AuthSession
+    ) async {
+        let user = await makeUserWithAdminCheck(from: session)
+        currentUser = user
+        await refreshDrinkInterests(userID: user.id)
     }
 }

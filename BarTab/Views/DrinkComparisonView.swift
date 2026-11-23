@@ -75,6 +75,12 @@ struct DrinkComparisonView: View {
                                         .fontWeight(.bold)
                                         .foregroundColor(.BartapPrimary)
 
+                                    if let per100 = result.summary.formattedPricePer100ml {
+                                        Text(per100)
+                                            .font(.BartapTiny)
+                                            .foregroundColor(.BartapSecondary)
+                                    }
+
                                     Text(String(localized: "\(result.summary.confidence)% confidence"))
                                         .font(.BartapTiny)
                                         .foregroundColor(.BartapSecondary)

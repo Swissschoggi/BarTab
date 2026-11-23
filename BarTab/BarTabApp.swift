@@ -85,6 +85,10 @@ struct BartapApp: App {
                     await WidgetSnapshotService.refresh(barRepository: barRepository, locationService: locationService)
                 }
                 .onReceive(userSession.$currentUser) { user in
+                    // Never let a new account inherit the previous
+                    // account's live-location sharing state.
+                    liveLocationService.reconcileAccount(with: user?.id)
+
                     guard user != nil else { return }
                     Task { await barRepository.fetchAllData() }
                 }
@@ -110,7 +114,7 @@ struct BartapApp: App {
         if url.scheme == SupabaseConfig.oauthCallbackScheme {
             if url.host == "reset-password" || url.host == nil || url.host == "" {
                 if url.fragment?.contains("access_token") == true {
-                    let success = await SupabaseAuthService().handleResetPasswordCallback(url)
+                    let success = await userSession.handlePasswordReset(url: url)
                     if success {
                         await MainActor.run {
                             toastCenter.show(String(localized: "Password updated successfully!"), kind: .success)

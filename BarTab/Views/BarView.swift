@@ -735,6 +735,12 @@ struct BarView: View {
                             .fontWeight(.bold)
                             .foregroundColor(.BartapPrimary)
 
+                        if let per100 = formattedPricePer100ml(for: group) {
+                            Text(per100)
+                                .font(.BartapTiny)
+                                .foregroundColor(.BartapSecondary)
+                        }
+
                         if group.prices.count > 1 {
                             Text("\(group.prices.count) reports")
                                 .font(.BartapTiny)
@@ -872,6 +878,10 @@ struct BarView: View {
 
                     if showOriginal {
                         Text("· \(price.formattedAmount) \(price.currency)")
+                    }
+
+                    if let per100 = price.formattedPricePer100ml {
+                        Text("· \(per100)")
                     }
                 }
                 .font(.BartapTiny)
@@ -1229,6 +1239,19 @@ struct BarView: View {
     private var canDeleteBar: Bool {
         guard let user = userSession.currentUser else { return false }
         return user.isAdmin || currentBar.createdBy == user.id
+    }
+
+    private func formattedPricePer100ml(for group: PriceGroup) -> String? {
+        guard let milliliters = group.size.volumeInMilliliters,
+              milliliters > 0,
+              !group.prices.isEmpty else { return nil }
+
+        let average = Decimal(averageAmount(for: group))
+        let per100ml = average * 100 / Decimal(milliliters)
+        return PriceFormatting.per100ml(
+            per100ml,
+            currency: Currency.defaultCurrency.rawValue
+        )
     }
 
     private func averageAmount(for group: PriceGroup) -> Double {

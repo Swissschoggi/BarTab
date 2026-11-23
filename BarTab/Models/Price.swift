@@ -44,6 +44,32 @@ struct Price: Identifiable {
     var formattedAmount: String {
         amount.formattedAmount
     }
+
+    /// The reported amount in the user's default currency.
+    var convertedAmount: Decimal {
+        ExchangeRateService.shared.convert(
+            amount,
+            from: currency,
+            to: Currency.defaultCurrency.rawValue
+        )
+    }
+
+    /// Converted price per 100 ml, when the serving size has a standard
+    /// volume. Used to compare a 3 dl beer with a 5 dl beer fairly.
+    var pricePer100ml: Decimal? {
+        guard let milliliters = size.volumeInMilliliters,
+              milliliters > 0 else { return nil }
+        return convertedAmount * 100 / Decimal(milliliters)
+    }
+
+    var formattedPricePer100ml: String? {
+        pricePer100ml.map {
+            PriceFormatting.per100ml(
+                $0,
+                currency: Currency.defaultCurrency.rawValue
+            )
+        }
+    }
 }
 
 /// A user's "still accurate" confirmation for a price.

@@ -20,6 +20,9 @@ struct AddPriceView: View {
     @State private var priceText = ""
     @State private var priceError: String?
     @State private var showingRequestBrand = false
+    @State private var pendingAmount: Decimal?
+    @State private var pendingSanityIssues: [PriceSanity.Issue] = []
+    @State private var showingSanityAlert = false
 
     init(bar: Bar, editingPrice: Price? = nil) {
         self.bar = bar
@@ -54,6 +57,33 @@ struct AddPriceView: View {
         case .shot: return [.glass]
         case .other: return ServingMethod.allCases
         }
+    }
+
+    private var recentPriceSuggestions: [Price] {
+        guard editingPrice == nil, let user = userSession.currentUser else {
+            return []
+        }
+
+        let matching = barRepository.prices
+            .filter {
+                $0.barID == bar.id &&
+                    $0.drink == selectedDrink &&
+                    $0.size == selectedSize &&
+                    $0.reportedBy != user.id
+            }
+            .sorted { $0.reportedAt > $1.reportedAt }
+
+        var seen = Set<String>()
+        return matching.filter { price in
+            let key = [
+                price.brand ?? "",
+                price.style ?? "",
+                price.serving?.rawValue ?? ""
+            ].joined(separator: "|")
+            return seen.insert(key).inserted
+        }
+        .prefix(5)
+        .map { $0 }
     }
 
     private var availableSizes: [DrinkSize] {
@@ -113,6 +143,63 @@ struct AddPriceView: View {
                         RoundedRectangle(cornerRadius: BartapRadius.card, style: .continuous)
                             .stroke(Color.BartapCardBorder, lineWidth: 0.5)
                     )
+
+                    // Recent prices for this bar/drink/size. Tapping one
+                    // fills the form so a repeat report takes a single tap.
+                    if !recentPriceSuggestions.isEmpty {
+                        selectorGroup(title: "RECENT PRICES") {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: BartapSpacing.xs) {
+                                    ForEach(recentPriceSuggestions) { suggestion in
+                                        Button {
+                                            applySuggestion(suggestion)
+                                        } label: {
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                HStack(spacing: 4) {
+                                                    Text(Currency(rawValue: suggestion.currency)?.symbol ?? suggestion.currency)
+                                                    Text(suggestion.formattedAmount)
+                                                }
+                                                .font(.BartapBodySemibold)
+                                                .foregroundColor(.BartapText)
+
+                                                if let per100 = suggestion.formattedPricePer100ml {
+                                                    Text(per100)
+                                                        .font(.BartapSmall)
+                                                        .foregroundColor(.BartapSecondary)
+                                                }
+
+                                                Text(suggestionDescription(suggestion))
+                                                    .font(.BartapCaption)
+                                                    .foregroundColor(.BartapSecondary)
+                                                    .lineLimit(1)
+                                            }
+                                            .padding(.horizontal, BartapSpacing.sm)
+                                            .padding(.vertical, 8)
+                                            .background(Color.BartapSurface)
+                                            .clipShape(RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: BartapRadius.control, style: .continuous)
+                                                    .stroke(Color.BartapCardBorder, lineWidth: 0.5)
+                                            )
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                            }
+
+                            if let latest = recentPriceSuggestions.first {
+                                Button {
+                                    confirmSuggestion(latest)
+                                } label: {
+                                    Label("Still accurate — confirm latest", systemImage: "checkmark.circle")
+                                        .font(.BartapCaption)
+                                        .foregroundColor(.BartapAccent)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.top, 4)
+                            }
+                        }
+                    }
 
                     // Category Selection
                     selectorGroup(title: "CATEGORY") {
@@ -261,6 +348,18 @@ struct AddPriceView: View {
             .sheet(isPresented: $showingRequestBrand) {
                 RequestBrandSheet(drink: selectedDrink)
             }
+            .alert("Check this price", isPresented: $showingSanityAlert) {
+                Button("Submit anyway", role: .destructive) {
+                    if let amount = pendingAmount {
+                        performSave(amount: amount)
+                    }
+                }
+                Button("Cancel", role: .cancel) {
+                    pendingAmount = nil
+                }
+            } message: {
+                Text(pendingSanityIssues.map(\.message).joined(separator: "\n\n"))
+            }
         }
     }
 
@@ -308,18 +407,49 @@ struct AddPriceView: View {
     private func savePrice() {
         guard !isSaving else { return }
 
-        guard let amount = Decimal(string: priceText), amount > 0 else {
-            priceError = "Please enter a valid price."
+        guard let amount = PriceInput.parseAmount(priceText) else {
+            priceError = String(localized: "Please enter a valid price.")
+            return
+        }
+
+        let rounded = PriceInput.roundedToCents(amount)
+        guard PriceInput.isValidAmount(rounded) else {
+            priceError = String(localized: "Please enter a valid price.")
             return
         }
 
         priceError = nil
+
+        let issues = PriceSanity.issues(
+            amount: rounded,
+            currency: selectedCurrency.rawValue,
+            size: selectedSize,
+            drink: selectedDrink,
+            existingPrices: barRepository.prices.filter { $0.barID == bar.id }
+        )
+
+        if !issues.isEmpty {
+            pendingAmount = rounded
+            pendingSanityIssues = issues
+            showingSanityAlert = true
+            return
+        }
+
+        performSave(amount: rounded)
+    }
+
+    private func performSave(amount: Decimal) {
+        guard !isSaving else { return }
         guard let user = userSession.currentUser else { return }
+
+        pendingAmount = nil
+        pendingSanityIssues = []
         isSaving = true
 
         Task {
+            let success: Bool
             if let editingPrice = editingPrice {
-                await barRepository.updatePrice(
+                success = await barRepository.updatePrice(
                     editingPrice,
                     drink: selectedDrink,
                     brand: selectedBrand,
@@ -331,7 +461,7 @@ struct AddPriceView: View {
                     reportedBy: user
                 )
             } else {
-                _ = await barRepository.addPrice(
+                success = await barRepository.addPrice(
                     to: bar,
                     drink: selectedDrink,
                     brand: selectedBrand,
@@ -344,9 +474,56 @@ struct AddPriceView: View {
                 )
             }
 
+            isSaving = false
+            guard success else {
+                priceError = String(localized: "Couldn't save this price. Please try again.")
+                return
+            }
+
             HapticEngine.success()
-            toastCenter.show(String(localized: "Price saved"), kind: .success)
+            toastCenter.show(
+                editingPrice != nil
+                    ? String(localized: "Price updated")
+                    : String(localized: "Price saved"),
+                kind: .success
+            )
             dismiss()
         }
+    }
+
+    private func applySuggestion(_ suggestion: Price) {
+        HapticEngine.impact()
+        priceText = suggestion.formattedAmount
+        selectedCurrency = Currency(rawValue: suggestion.currency) ?? .defaultCurrency
+        selectedBrand = suggestion.brand
+        selectedStyle = suggestion.style.flatMap { DrinkStyle(rawValue: $0) }
+        selectedServing = suggestion.serving
+        priceError = nil
+    }
+
+    private func confirmSuggestion(_ suggestion: Price) {
+        guard let user = userSession.currentUser else { return }
+
+        Task {
+            let success = await barRepository.verifyPrice(suggestion, user: user)
+            guard success else { return }
+            HapticEngine.success()
+            toastCenter.show(String(localized: "Thanks — price confirmed"), kind: .success)
+            dismiss()
+        }
+    }
+
+    private func suggestionDescription(_ price: Price) -> String {
+        var parts: [String] = []
+        if let brand = price.brand, !brand.isEmpty {
+            parts.append(brand)
+        }
+        if let style = price.style.flatMap({ DrinkStyle(rawValue: $0) }) {
+            parts.append(style.displayName)
+        }
+        if let serving = price.serving {
+            parts.append(serving.displayName)
+        }
+        return parts.isEmpty ? String(localized: "Same drink") : parts.joined(separator: " · ")
     }
 }

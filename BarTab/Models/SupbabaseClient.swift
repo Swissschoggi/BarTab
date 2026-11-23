@@ -138,10 +138,16 @@ final class SupabaseClient {
         guard let token = AuthTokenStore.shared.accessToken else { return nil }
         // JWT format: header.payload.signature
         let parts = token.split(separator: ".")
-        guard parts.count >= 2,
-              let payloadData = Data(base64Encoded: String(parts[1])
-                  .replacingOccurrences(of: "-", with: "+")
-                  .replacingOccurrences(of: "_", with: "/")),
+        guard parts.count >= 2 else { return nil }
+
+        var payload = String(parts[1])
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        while payload.count % 4 != 0 {
+            payload.append("=")
+        }
+
+        guard let payloadData = Data(base64Encoded: payload),
               let json = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
               let sub = json["sub"] as? String
         else { return nil }

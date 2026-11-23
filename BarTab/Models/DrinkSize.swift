@@ -59,22 +59,28 @@ enum DrinkSize: String, Codable, CaseIterable, Hashable {
     }
 
     var isVolumeBased: Bool {
-        switch self {
-        case .oneDeciliter,
-             .twoDeciliters,
-             .threeDeciliters,
-             .fiveDeciliters,
-             .twentyCentiliters,
-             .twentyFiveCentiliters,
-             .thirtyThreeCentiliters,
-             .fiftyCentiliters:
-            return true
+        volumeInMilliliters != nil
+    }
 
-        case .shot,
-             .bottle,
-             .glass,
-             .other:
-            return false
+    /// Standard volume in millilitres for sizes that have one. Bottles,
+    /// glasses, shots and "other" are intentionally nil because their
+    /// volume varies too much to compare fairly.
+    var volumeInMilliliters: Int? {
+        switch self {
+        case .oneDeciliter: return 100
+        case .twoDeciliters: return 200
+        case .threeDeciliters: return 300
+        case .fiveDeciliters: return 500
+        case .twentyCentiliters: return 200
+        case .twentyFiveCentiliters: return 250
+        case .thirtyThreeCentiliters: return 330
+        case .fiftyCentiliters: return 500
+        case .shot, .bottle, .glass, .other: return nil
         }
+    }
+
+    /// Volume in decilitres, for older call sites. 1 dl = 100 ml.
+    var volumeInDeciliters: Double? {
+        volumeInMilliliters.map { Double($0) / 100 }
     }
 }

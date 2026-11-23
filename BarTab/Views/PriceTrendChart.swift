@@ -13,8 +13,8 @@ extension Array where Element == Price {
             $0.reportedAt < $1.reportedAt
         }
 
-        guard let firstAmount = sorted.first?.amount,
-              let lastAmount = sorted.last?.amount else {
+        guard let firstAmount = sorted.first?.convertedAmount,
+              let lastAmount = sorted.last?.convertedAmount else {
             return nil
         }
 
@@ -47,7 +47,7 @@ struct PriceTrendChart: View {
                 ReportPoint(
                     date: $0.reportedAt,
                     amount: NSDecimalNumber(
-                        decimal: $0.amount
+                        decimal: $0.convertedAmount
                     ).doubleValue
                 )
             }

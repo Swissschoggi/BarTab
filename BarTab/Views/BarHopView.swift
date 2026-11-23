@@ -336,11 +336,17 @@ struct BarHopView: View {
                     .foregroundColor(.BartapSecondary)
                     .lineLimit(1)
 
-                if let price = cheapestPrice(for: bar) {
-                    Text("\(Currency.defaultCurrency.symbol)\(price.formattedAmount)")
+                if let summary = cheapestSummary(for: bar) {
+                    Text("\(Currency.defaultCurrency.symbol)\(summary.convertedAmount.formattedAmount)")
                         .font(.BartapCaption)
                         .fontWeight(.semibold)
                         .foregroundColor(.BartapPrimary)
+
+                    if let per100 = summary.formattedPricePer100ml {
+                        Text(per100)
+                            .font(.BartapTiny)
+                            .foregroundColor(.BartapSecondary)
+                    }
                 }
             }
 
@@ -424,10 +430,9 @@ struct BarHopView: View {
         selectedRoute = Array(ordered.prefix(4))
     }
 
-    private func cheapestPrice(for bar: Bar) -> Decimal? {
+    private func cheapestSummary(for bar: Bar) -> PriceSummary? {
         barRepository.getPriceSummaries(for: bar)
-            .first { $0.drink == selectedDrink && $0.size == selectedSize }?
-            .convertedAmount
+            .first { $0.drink == selectedDrink && $0.size == selectedSize }
     }
 }
 

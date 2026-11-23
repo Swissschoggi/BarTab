@@ -119,6 +119,9 @@ struct MapView: View {
             locationService.requestPermission()
             liveLocationService.subscribeToFriends()
         }
+        .onDisappear {
+            liveLocationService.unsubscribeFromFriends()
+        }
         .onReceive(locationService.$location) { location in
             guard let location = location else { return }
             guard !hasCenteredOnUser else { return }
